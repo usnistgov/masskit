@@ -1,0 +1,38 @@
+# ignore jetbrains config
+/.idea/
+# ignore vscode config
+# /.vscode/
+# c files
+*.so
+*.o
+# ignore mlflow output directories
+mlruns/
+# ignore pytorch lightning log directories
+lightning_logs/
+# ignore hydra output directories (set by hydra: run: dir:)
+hydra_output/
+hydra_sweep/
+.hydra/
+multirun/
+# python
+__pycache__/
+.ipynb_checkpoints/
+*.py.swp
+*.egg-info
+# nist caching directory
+.massspec_cache/
+# python build directories
+libraries/build/
+# sphinx document build directories
+_build/
+**/docs/*.rst
+!**/docs/index.rst
+**/docs/Makefile
+**/docs/make.bat
+# data files
+*.ckpt
+# log files
+*.log
+
+
+

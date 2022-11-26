@@ -1,0 +1,18 @@
+[build-system]
+requires = [
+    "setuptools>=42",
+    "wheel",
+    "ninja",
+    "cmake>=3.15",
+    "pybind11",
+    "numpy",
+    "pyarrow"
+]
+build-backend = "setuptools.build_meta"
+
+# [tool.autopep8]
+# max_line_length = 120
+# ignore = "E501,W6"  # or ["E501", "W6"]
+# in-place = true
+# recursive = true
+# aggressive = 3

@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "massspec-ext",
+  "version-string": "0.1.0",
+  "dependencies": [
+    {
+      "name": "arrow",
+      "default-features": false,
+      "features": [ "csv", "filesystem", "json", "parquet" ]
+    },
+    "parquet",
+    "pybind11"
+  ]
+}
