@@ -77,3 +77,9 @@ git remote -v
 ```
 git remote add REMOTE-ID REMOTE-URL
 ```
+e.g.
+```
+git remote add github git@github.com:usnistgov/masskit.git
+git branch -M main
+git push -u github main
+```
