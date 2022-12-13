@@ -1,0 +1,244 @@
+input:
+  file:
+    # list of input file names
+    # these are non consensus spectra.  numbered msp files from \\A327QNAP3\Data\AIProteomics\Spectral LIbrary-MSP\NIST\Sergey\
+    # the rest are taken from the web site as they are "best of"
+    names:
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/100.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/101.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/102.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/103.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/104.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/105.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/106.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/107.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/108.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/109.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/10.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/110.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/111.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/112.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/113.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/114.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/115.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/116.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/117.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/118.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/119.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/11.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/120.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/121.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/122.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/123.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/124.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/125.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/126.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/127.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/128.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/129.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/12.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/130.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/131.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/132.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/133.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/134.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/135.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/136.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/137.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/138.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/139.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/13.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/140.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/141.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/142.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/143.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/144.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/145.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/146.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/147.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/148.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/149.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/14.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/150.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/151.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/152.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/153.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/154.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/155.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/156.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/157.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/158.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/159.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/15.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/160.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/161.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/162.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/163.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/164.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/165.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/166.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/167.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/168.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/169.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/16.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/170.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/171.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/172.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/173.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/174.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/175.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/176.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/177.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/178.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/179.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/17.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/180.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/181.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/182.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/183.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/184.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/185.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/186.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/187.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/188.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/189.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/18.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/190.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/191.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/192.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/193.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/194.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/195.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/196.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/197.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/198.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/199.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/19.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/1.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/200.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/20.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/21.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/22.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/23.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/24.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/25.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/26.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/27.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/28.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/29.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/2.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/30.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/31.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/32.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/33.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/34.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/35.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/36.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/37.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/38.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/39.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/3.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/40.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/41.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/42.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/43.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/44.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/45.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/46.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/47.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/48.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/49.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/4.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/50.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/51.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/52.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/53.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/54.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/55.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/56.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/57.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/58.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/59.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/5.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/60.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/61.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/62.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/63.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/64.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/65.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/66.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/67.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/68.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/69.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/6.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/70.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/71.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/72.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/73.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/74.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/75.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/76.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/77.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/78.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/79.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/7.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/80.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/81.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/82.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/83.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/84.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/85.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/86.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/87.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/88.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/89.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/8.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/90.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/91.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/92.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/93.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/94.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/95.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/96.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/97.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/98.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/99.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/9.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/chinese_hamster_hcd_selected.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/cptac2_mouse_hcd_itraq_phospho_selected.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/cptac2_mouse_hcd_itraq_selected.msp
+      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/cptac2_mouse_hcd_selected.msp
+    # input file type
+    type:
+    # what is the source of the file? nist or pubchem
+    source:
+  # number of records to generate
+  num:
+
+conversion:
+  id:
+    # name of the id field, like NISTNO. if an integer and reading sdfs, this is the start value of the ids
+    field: 1
+  small_molecule:
+    # maximum bound of 3D conformer in angstroms (0=no limit)
+    max_bound: 0.0
+  msp:
+    # Dict containing instructions on how to parse the value in subfields in msp Comment fields.  For example,
+    # "--comment_fields \"{'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}\""
+    #  where the format is {comment_field_name: (regex, type, field_name)}
+    comment_fields:
+  set:
+    # probabilities of dev, train, valid, and test sets as space delimited list
+    probabilities: [0.0, 1.0, 0.0, 0.0]
+  spectra:
+    # min peak intensity allowed in spectral fingerprint
+    min_intensity: 0.0
+    # the max mz value allowed in spectral fingerprint
+    max_mz: 2000
+
+output:
+  file:
+    # output file or output file prefix
+    name: ${oc.env:HOME}/data/nist/aiomics/msp/consensus/raw.parquet
+    # parquet, msp, mzxml
+    types:

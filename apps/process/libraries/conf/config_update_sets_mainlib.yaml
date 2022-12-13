@@ -1,0 +1,11 @@
+input_source:
+  file:
+    name: ${oc.env:HOME}/data/nist/ei/2020/replib_2020.parquet
+input_update:
+  file:
+    name: ${oc.env:HOME}/data/nist/ei/2020/mainlib_2020.parquet
+output:
+  file:
+    # output file or output file prefix
+    name: ${oc.env:HOME}/data/nist/ei/2020/mainlib_2020.parquet
+  

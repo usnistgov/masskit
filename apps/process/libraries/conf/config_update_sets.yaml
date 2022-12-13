@@ -1,0 +1,11 @@
+input_source:
+  file:
+    name: ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos.parquet
+input_update:
+  file:
+    name: ${oc.env:HOME}/data/nist/tandem/2020/hr_msms_nist.parquet
+output:
+  file:
+    # output file or output file prefix
+    name: ${oc.env:HOME}/data/nist/tandem/2020/hr_msms_nist_fixed_set.parquet
+  

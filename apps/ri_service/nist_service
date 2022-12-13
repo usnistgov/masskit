@@ -1,0 +1,17 @@
+# nginx config file for nist_service uwsgi
+# sudo cp nist_service /etc/nginx/sites-available/
+# sudo ln -s /etc/nginx/sites-available/nist_service /etc/nginx/sites-enabled
+# sudo service nginx configtest
+# sudo service nginx restart
+
+server {
+    listen 80;
+    server_name ~.;
+
+    location / {
+        # force nginx to not rewrite %2F into forward slash.  Doesn't work with query params
+        rewrite ./ $request_uri break;
+        include         uwsgi_params;
+        uwsgi_pass      unix:/tmp/nist_service.sock;
+    }
+}
