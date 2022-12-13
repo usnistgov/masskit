@@ -121,6 +121,6 @@ class CMakeBuild(build_ext):
 
 # Mixing cython in does not work, rip it all out
 setup(
-    ext_modules = [ CMakeExtension("massspec_ext", sourcedir="src/massspec_ext") ],
+    ext_modules = [ CMakeExtension("masskit_ext", sourcedir="src/masskit_ext") ],
     cmdclass={"build_ext": CMakeBuild}
 )

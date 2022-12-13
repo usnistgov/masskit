@@ -4,4 +4,4 @@ rem This script is intended to be executed by CI/CD in the msdc_services\librari
 
 rmdir /s/q %CONDA_PREFIX%\conda-bld\*
 python setup.py bdist_conda
-copy %CONDA_PREFIX%\conda-bld\win-64\massspec*.tar.bz2 .
+copy %CONDA_PREFIX%\conda-bld\win-64\masskit*.tar.bz2 .

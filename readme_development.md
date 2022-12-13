@@ -6,7 +6,7 @@ The old method, `python setup.py develop` is obsolete, use:
 
 instead. When done, 
 
-```pip uninstall massspec```
+```pip uninstall masskit```
 
 If you are working in the python code, you only need to do this once. If modifying the C++, you'll need to do it everytime to recompile.
 
@@ -28,7 +28,7 @@ or
 
 # Building C++ standalone.
 
-In massspec_ext:
+In masskit_ext:
 
 ```
 cmake -S . -B build/debug -GNinja -DCMAKE_BUILD_TYPE=RelWithDebInfo

@@ -1,8 +1,8 @@
 # To be executed in the libraries directory
 
-mamba remove -y --force massspec || true
-rm -rf $CONDA_PREFIX/pkgs/massspec-*
-#mamba install -y -c $CONDA_PREFIX/conda-bld/linux-64/ --override-channels --no-deps massspec
-#mamba install --use-local massspec
-mamba install -y ./massspec-*.tar.bz2
+mamba remove -y --force masskit || true
+rm -rf $CONDA_PREFIX/pkgs/masskit-*
+#mamba install -y -c $CONDA_PREFIX/conda-bld/linux-64/ --override-channels --no-deps masskit
+#mamba install --use-local masskit
+mamba install -y ./masskit-*.tar.bz2
 pytest

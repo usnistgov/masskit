@@ -1,3 +1,3 @@
-# MassSpecLib
+# masskit
 
-Here lies the new old massspeclib source code repository.
+Here lies the masskit source code repository.

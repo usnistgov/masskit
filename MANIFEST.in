@@ -1,1 +1,1 @@
-recursive-include src/massspec* *.pkl
+recursive-include src/masskit* *.pkl
