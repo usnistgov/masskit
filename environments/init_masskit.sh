@@ -9,34 +9,50 @@ if [ $sourced -ne 1 ]; then
     exit 1
 fi
 
-# name of environment to set up
-ENVNAME=msml
+# default name of environment to set up
+ENVNAME=masskit
 # environment used to set up ENVNAME
-# SETUP_ENVNAME=msml_setup
+
 # remove previous versions of environments if set to 1
 REMOVE=0
-# name of the pytorch package
-PYTORCH=pytorch
-# name of the borchvision package
-TORCHVISION=torchvision
-# name of the cuda toolkit
-CUDATOOLKIT=cudatoolkit\=11.3
+# Add development packages if set to 1
+DEVELOPMENT=0
+# Enable machine learning packages if set to 1
+USE_ML=0
+# Only use the CPU for machine learning packages if set to 1
+CPUONLY=0
 
 while [[ $# -gt 0 ]]; do
   case $1 in
-    -f)
+    -f | --force)
       REMOVE=1
-      shift # past argument
+      shift # remove argument
       ;;
-    -c)
-      # cpu only environment
-      ENVNAME=msml_cpu
+    -d | --dev)
+      # add packages useful for development
+      DEVELOPMENT=1
+      shift # remove argument
+      ;;
+    -m | --ml)
+      # machine learning environment
+      ENVNAME=masskit_ml
+      USE_ML=1
+      PYTORCH=pytorch
+      TORCHVISION=torchvision
+      CUDATOOLKIT=cudatoolkit\=11.3
+      shift # remove argument
+      ;;
+    -c | --cpu)
+      # machine_learning, cpu only environment
+      ENVNAME=masskit_mlcpu
+      USE_ML=1
+      CPUONLY=1
       PYTORCH=pytorch
       TORCHVISION=torchvision
       CUDATOOLKIT=cpuonly
-      shift # past argument
+      shift # remove argument
       ;;
-    -*|--*)
+    -* | --*)
       echo "Unknown option $1"
       return 1
       ;;
@@ -63,8 +79,8 @@ fi
 
 if ! command -v mamba &> /dev/null
 then
-    if ! conda install mamba -n base -c conda-forge; then
-        echo  "if you don't have write access to the base enviroment, install your own copy of anaconda"
+    if ! conda install -y mamba -n base -c conda-forge; then
+        echo  "if you don't have write access to the base enviroment, please install your own copy of anaconda"
         return 2
     fi
 fi
@@ -77,48 +93,69 @@ fi
 #     conda install -y -n $SETUP_ENVNAME -c conda-forge mamba
 # fi
 
+# Notes:
+# Please keep lists alphabetical
+
+BASE_PACKAGES="
+  arrow-cpp=10.* \
+  conda-build \
+  cython \
+  hydra-core \
+  imageio \
+  jsonpickle \
+  jupyter \
+  matplotlib \
+  molvs \
+  numba \
+  numpy \
+  pandas \
+  pyarrow=10.* \
+  pybind11 \
+  pynndescent \
+  pytest \
+  python=3 \
+  quaternion \
+  rdkit=2021.09.4 \
+  sqlalchemy \
+  sqlparse"
+
+ML_CHANNELS=
+ML_PACKAGES=
+if [ $USE_ML -eq 1 ]; then
+  ML_CHANNELS="-c pytorch -c nvidia"
+  CUDATOOLKIT=cudatoolkit\=11.3
+  if [ $CPUONLY -eq 1 ]; then
+    CUDATOOLKIT=cpuonly
+  fi
+
+  # sqlparse added as it is necessary for some functionality in mlflow-skinny
+  ML_PACKAGES="\
+    boto3 \
+    $CUDATOOLKIT \
+    imbalanced-learn \
+    jupyter \
+    levenshtein \
+    mlflow-skinny \
+    pytorch \
+    pytorch-lightning \
+    scikit-learn \
+    torchmetrics \
+    torchvision"
+fi
+
+DEV_PACKAGES=
+if [ $DEVELOPMENT -eq 1 ]; then
+  DEV_PACKAGES=cmake
+fi
+
 echo "Initializing the conda $ENVNAME environment"
 if ! conda activate $ENVNAME; then
     # conda activate $SETUP_ENVNAME
     echo "Creating conda environment"
-    # Notes:
-    # Please keep list alphabetical
-    # sqlparse added as it is necessary for some functionality in mlflow-skinny
     conda create -y -n $ENVNAME
-    mamba install -y -n $ENVNAME -c pytorch -c nvidia -c conda-forge \
-          boto3 \
-          conda-build \
-          $CUDATOOLKIT \
-          cython \
-          hydra-core \
-          imageio \
-          imbalanced-learn \
-          jsonpickle \
-          jupyter \
-          levenshtein \
-          matplotlib \
-          mlflow-skinny \
-          molvs \
-          numba \
-          numpy \
-          pandas \
-          pyarrow=7 \
-          pybind11 \
-          pynndescent \
-          pytest \
-          python=3 \
-          $PYTORCH \
-          pytorch-lightning \
-          quaternion \
-          rdkit=2021.09.4 \
-          scikit-learn \
-          sqlalchemy \
-          sqlparse \
-          torchmetrics \
-          $TORCHVISION 
-
-
+    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES} ${DEV_PACKAGES}
     conda activate $ENVNAME
+    
     # # Check for bayesian_torch
     # (python -c "import bayesian_torch" 2> /dev/null) && has_lib=1 || has_lib=0
 
