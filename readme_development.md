@@ -19,11 +19,11 @@ See https://arrow.apache.org/install/
 
 ## Python
 
-```pip install pyarrow==9.0.*```
+```pip install pyarrow==10.*```
 
 or
 
-```conda install arrow-cpp=9.0.* pyarrow=9.0.* -c conda-forge```
+```conda install arrow-cpp=10.* pyarrow=10.* -c conda-forge```
 
 
 # Building C++ standalone.

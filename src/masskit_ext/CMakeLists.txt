@@ -21,9 +21,8 @@ message(STATUS "Building on: ${CMAKE_HOST_SYSTEM_NAME}")
 project ("masskit-ext")
 
 find_package(Arrow CONFIG REQUIRED)
-find_package(ArrowPython CONFIG REQUIRED HINTS ${Arrow_DIR})
-find_package(ArrowDataset CONFIG REQUIRED HINTS ${Arrow_DIR})
-find_package(Parquet CONFIG REQUIRED HINTS ${Arrow_DIR})
+#find_package(ArrowDataset CONFIG REQUIRED HINTS ${Arrow_DIR})
+find_package(ArrowDataset CONFIG REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 #target_link_libraries(main PRIVATE mylib pybind11::lto pybind11::embed pybind11::module)
 
@@ -47,9 +46,6 @@ endif()
 
 message(STATUS "Arrow version: ${ARROW_VERSION}")
 message(STATUS "Arrow SO version: ${ARROW_FULL_SO_VERSION}")
-
-message(STATUS "Parquet version: ${PARQUET_VERSION}")
-message(STATUS "Parquet SO version: ${PARQUET_FULL_SO_VERSION}")
 
 add_subdirectory(src)
 add_subdirectory(examples/cpp)
