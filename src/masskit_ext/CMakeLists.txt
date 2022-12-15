@@ -21,10 +21,8 @@ message(STATUS "Building on: ${CMAKE_HOST_SYSTEM_NAME}")
 project ("masskit-ext")
 
 find_package(Arrow CONFIG REQUIRED)
-#find_package(ArrowDataset CONFIG REQUIRED HINTS ${Arrow_DIR})
 find_package(ArrowDataset CONFIG REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
-#target_link_libraries(main PRIVATE mylib pybind11::lto pybind11::embed pybind11::module)
 
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
@@ -32,7 +30,7 @@ endif()
 
 # We require a C++11 compliant compiler
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-option(ARROW_LINK_SHARED "Link to the Arrow shared library" ON)
+#option(ARROW_LINK_SHARED "Link to the Arrow shared library" ON)
 
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
 	# add the automatically determined parts of the RPATH
@@ -44,8 +42,10 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-message(STATUS "Arrow version: ${ARROW_VERSION}")
-message(STATUS "Arrow SO version: ${ARROW_FULL_SO_VERSION}")
+# message(STATUS "Arrow version: ${ARROW_VERSION}")
+# message(STATUS "Arrow SO version: ${ARROW_FULL_SO_VERSION}")
+
+message(STATUS "pyarrow.h include dir: ${PYARROW_INCLUDE_DIR}")
 
 add_subdirectory(src)
 add_subdirectory(examples/cpp)

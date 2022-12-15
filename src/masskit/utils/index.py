@@ -9,7 +9,7 @@ from masskit.data_specs.schemas import min_spectrum_fields, molecule_experimenta
     base_experimental_fields, molecule_annotation_fields
 import masskit.utils.files as msuf
 from masskit.utils.general import open_if_filename
-from masskit.utils.search import tanimoto_search
+#from masskit.utils.search import tanimoto_search
 from masskit.utils.tables import row_view, arrow_to_pandas
 import pynndescent
 import pickle
@@ -605,8 +605,9 @@ class TanimotoIndex(Index):
                 fingerprint_numpy = fingerprint.to_numpy()
                 query_ids[i, :] = objects[i].id
                 spectrum_fp_count = fingerprint.to_bitvec().GetNumOnBits()
-            hits_out, tanimotos_out = tanimoto_search(fingerprint_numpy, self.index, spectrum_fp_count,
-                                                      self.index_count, epsilon, predicate=predicate)
+            # hits_out, tanimotos_out = tanimoto_search(fingerprint_numpy, self.index, spectrum_fp_count,
+            #                                           self.index_count, epsilon, predicate=predicate)
+            raise NotImplementedError('tanimoto_search no longer supported')
             if hits_out is None:
                 logging.warning(f'No hits from search for query {query_ids[i, 0]}')
             else:

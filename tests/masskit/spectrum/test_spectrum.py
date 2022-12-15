@@ -25,7 +25,7 @@ def test_load_spectrum():
     return
 
 def test_rdkit():
-    suppl = Chem.SDMolSupplier("libraries/tests/data/test.new.sdf", sanitize=False)
+    suppl = Chem.SDMolSupplier("tests/data/test.new.sdf", sanitize=False)
     for mol in suppl:
         spectrum = mss.HiResSpectrum()
         spectrum.from_mol(mol)

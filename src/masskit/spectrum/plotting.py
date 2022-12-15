@@ -1,7 +1,7 @@
 import math
 import imageio
 import numpy as np
-from masskit_ai.spectrum.peptide.peptide_constants import EPSILON
+from masskit.constants import EPSILON
 from matplotlib import collections as mc, pyplot as plt
 
 

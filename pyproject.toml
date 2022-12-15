@@ -15,4 +15,3 @@ build-backend = "setuptools.build_meta"
 # ignore = "E501,W6"  # or ["E501", "W6"]
 # in-place = true
 # recursive = true
-# aggressive = 3

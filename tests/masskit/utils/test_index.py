@@ -1,5 +1,5 @@
-from fingerprints import ECFPFingerprint
-from hitlist import CompareRecallDCG, CosineScore, TanimotoScore
+from masskit.utils.fingerprints import ECFPFingerprint
+from masskit.utils.hitlist import CompareRecallDCG, CosineScore, TanimotoScore
 import pytest
 from pytest import approx
 import numpy as np
@@ -11,12 +11,12 @@ import logging
 
 @pytest.fixture
 def table():
-    table = pq.read_table('libraries/tests/data/cho_uniq_short.parquet')
+    table = pq.read_table('tests/data/cho_uniq_short.parquet')
     return table
 
 @pytest.fixture
 def table_small_mol():
-    table = pq.read_table('libraries/tests/data/SRM1950_lumos.parquet')
+    table = pq.read_table('tests/data/SRM1950_lumos.parquet')
     return table
 
 @pytest.fixture
