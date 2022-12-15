@@ -257,34 +257,6 @@ def get_unspec_double_bonds(m):
     return res
 
 
-def similarity_search(fingerprints, query, threshold, skip_query=True):
-    """
-    search a list of chemical structures.
-
-    :param fingerprints: list of the fingerprints
-    :param query: either index in the list has the query fingerprint or the query fingerprint itself
-    :param threshold: the tanimoto threshold for allowing hits
-    :param skip_query: don't include the query in the hits if querying by index
-    :return: a numpy bool array that points to the hits
-    """
-    if type(query) is int:
-        query_fingerprint = fingerprints[query]
-        query_row = query
-    elif type(query) is DataStructs.cDataStructs.ExplicitBitVect:
-        query_fingerprint = query
-        query_row = -1
-    else:
-        raise ValueError("query has to be an index or a fingerprint object")
-    hits = np.full(len(fingerprints), False)
-    for i in range(0, len(fingerprints)):
-        if skip_query and i == query_row:
-            continue
-        tanimoto = DataStructs.FingerprintSimilarity(query_fingerprint, fingerprints[i])
-        if tanimoto >= threshold:
-            hits[i] = True
-    return hits
-
-
 def standardize_mol(mol):
     """
     standardize molecule.  correct valences on aromatic N's and do molvs standardization
