@@ -11,12 +11,9 @@ fi
 
 # default name of environment to set up
 ENVNAME=masskit
-# environment used to set up ENVNAME
 
 # remove previous versions of environments if set to 1
 REMOVE=0
-# Add development packages if set to 1
-DEVELOPMENT=0
 # Enable machine learning packages if set to 1
 USE_ML=0
 # Only use the CPU for machine learning packages if set to 1
@@ -28,18 +25,10 @@ while [[ $# -gt 0 ]]; do
       REMOVE=1
       shift # remove argument
       ;;
-    -d | --dev)
-      # add packages useful for development
-      DEVELOPMENT=1
-      shift # remove argument
-      ;;
     -m | --ml)
       # machine learning environment
       ENVNAME=masskit_ml
       USE_ML=1
-      PYTORCH=pytorch
-      TORCHVISION=torchvision
-      CUDATOOLKIT=cudatoolkit\=11.3
       shift # remove argument
       ;;
     -c | --cpu)
@@ -47,9 +36,6 @@ while [[ $# -gt 0 ]]; do
       ENVNAME=masskit_mlcpu
       USE_ML=1
       CPUONLY=1
-      PYTORCH=pytorch
-      TORCHVISION=torchvision
-      CUDATOOLKIT=cpuonly
       shift # remove argument
       ;;
     -* | --*)
@@ -61,12 +47,14 @@ done
 
 umask 0007
 for arg in "$@"; do shift; done  # Don't pass args to activate
-local_conda="${CONDA_PREFIX:-/opt/conda}"
+#local_conda="${CONDA_PREFIX:-/opt/conda}"
+local_conda="${CONDA_PREFIX:-$HOME/miniconda3}"
 source $local_conda/bin/activate
 
 if [[ $CONDA_SHLVL != 1 ]]
 then
     echo "must be in base environment or otherwise mamba will not work properly"
+    return 2
 fi
 
 if [ $REMOVE -eq 1 ]; then
@@ -99,6 +87,7 @@ fi
 BASE_PACKAGES="
   arrow-cpp=10.* \
   conda-build \
+  cmake \
   cython \
   hydra-core \
   imageio \
@@ -143,17 +132,12 @@ if [ $USE_ML -eq 1 ]; then
     torchvision"
 fi
 
-DEV_PACKAGES=
-if [ $DEVELOPMENT -eq 1 ]; then
-  DEV_PACKAGES=cmake
-fi
-
 echo "Initializing the conda $ENVNAME environment"
 if ! conda activate $ENVNAME; then
     # conda activate $SETUP_ENVNAME
     echo "Creating conda environment"
     conda create -y -n $ENVNAME
-    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES} ${DEV_PACKAGES}
+    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
     conda activate $ENVNAME
     
     # # Check for bayesian_torch
