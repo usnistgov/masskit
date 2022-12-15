@@ -27,13 +27,13 @@ while [[ $# -gt 0 ]]; do
       ;;
     -m | --ml)
       # machine learning environment
-      ENVNAME=masskit_ml
+      ENVNAME=masskit_ai
       USE_ML=1
       shift # remove argument
       ;;
     -c | --cpu)
       # machine_learning, cpu only environment
-      ENVNAME=masskit_mlcpu
+      ENVNAME=masskit_ai_cpu
       USE_ML=1
       CPUONLY=1
       shift # remove argument
@@ -45,9 +45,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-umask 0007
 for arg in "$@"; do shift; done  # Don't pass args to activate
-#local_conda="${CONDA_PREFIX:-/opt/conda}"
 local_conda="${CONDA_PREFIX:-$HOME/miniconda3}"
 source $local_conda/bin/activate
 
@@ -61,8 +59,6 @@ if [ $REMOVE -eq 1 ]; then
     # forcibly remove any existing environment
     echo "Trying to remove existing $ENVNAME environment.";
     conda env remove --name $ENVNAME || true
-    # conda env remove --name $SETUP_ENVNAME || true
-    # conda remove --name $ENVNAME --all
 fi
 
 if ! command -v mamba &> /dev/null
@@ -73,16 +69,8 @@ then
     fi
 fi
 
-# echo "Initializing the conda $SETUP_ENVNAME environment"
-# if ! conda activate $SETUP_ENVNAME; then
-#     echo "Creating conda setup environment"
-#     conda create -y -n $SETUP_ENVNAME
-#     # mamba is installed into $ENVNAME since on some computers mamba cannot be installed into the base environment
-#     conda install -y -n $SETUP_ENVNAME -c conda-forge mamba
-# fi
 
-# Notes:
-# Please keep lists alphabetical
+# Note: Please keep lists alphabetical
 
 BASE_PACKAGES="
   arrow-cpp=10.* \
@@ -117,7 +105,6 @@ if [ $USE_ML -eq 1 ]; then
     CUDATOOLKIT=cpuonly
   fi
 
-  # sqlparse added as it is necessary for some functionality in mlflow-skinny
   ML_PACKAGES="\
     boto3 \
     $CUDATOOLKIT \
