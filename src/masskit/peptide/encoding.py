@@ -132,15 +132,22 @@ class MSDictionary:
 
         :param fill_value: pandas doesn't allow None as a category value, so use the fill value
         """
-        if fill_value:
-            self.dictionary = [fill_value + str(x) for x in range(self.df['id'].max() + 1)]
-        else:
-            self.dictionary = [None] * (self.df['id'].max() + 1)
-        # drop rows with missing ids
-        df_drop = self.df.dropna(subset=['id'])
-        for row in df_drop.itertuples():
-            if row.id is not None:
-                self.dictionary[row.id] = row.Index
+        # the sole reason for this try block is to get autodoc (sphinx) working.  For autodoc
+        # we mock up pandas, but this causes a type error.  autodoc actually runs the python
+        # code
+        try:
+            if fill_value:
+                self.dictionary = [fill_value + str(x) for x in range(self.df['id'].max() + 1)]
+            else:
+                self.dictionary = [None] * (self.df['id'].max() + 1)
+            # drop rows with missing ids
+            df_drop = self.df.dropna(subset=['id'])
+            for row in df_drop.itertuples():
+                if row.id is not None:
+                    self.dictionary[row.id] = row.Index
+        except TypeError:
+            return
+
             
     def create_id2row(self):
         """
