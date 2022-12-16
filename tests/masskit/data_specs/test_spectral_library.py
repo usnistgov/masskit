@@ -9,7 +9,7 @@ from masskit.data_specs.spectral_library import LibraryAccessor
 
 @pytest.fixture
 def library_df():
-    table = ArrowLibraryMap.from_parquet('tests/data/cho_uniq_short.parquet')
+    table = ArrowLibraryMap.from_parquet('data/cho_uniq_short.parquet')
     return table.to_pandas()
 
 def test_df_to_msp(library_df, tmpdir):

@@ -1,7 +1,7 @@
 # ignore jetbrains config
 /.idea/
 # ignore vscode config
-# /.vscode/
+/.vscode/
 # c files
 *.so
 *.o

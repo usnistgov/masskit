@@ -22,8 +22,6 @@ from io import StringIO, BytesIO
 from base64 import b64encode
 
 
-diag_poisson = None
-
 # try:
 #     from numba import jit
 # except ImportError:
@@ -794,40 +792,6 @@ class Ions(ABC):
             skip_denom=skip_denom
         )
 
-    def composite_score(
-            self,
-            ion2,
-            index1=None,
-            index2=None
-    ):
-        """
-        calculate the composite score between this set of ions and ions2
-
-        :param ion2: the ions to compare against
-        :param index1: matched ions in this set of ions
-        :param index2: matched ions in ions2
-        :return: poisson_score, cosine_score, composite score
-        """
-        if index1 is None or index2 is None:
-            index1, index2 = self.intersect(ion2)
-        cosine_score = cosine_score_calc(
-            self.mz,
-            self.intensity,
-            ion2.mz,
-            ion2.intensity,
-            index1,
-            index2,
-            scale=1
-        )
-        global diag_poisson
-        if diag_poisson is None:
-            directory = os.path.dirname(os.path.abspath(__file__))
-            with open(f"{directory}/diag_0.1Da.pkl", "rb") as f:
-                diag_poisson = pickle.load(f)
-        index1_diag, index2_diag = self.intersect(diag_poisson.products)
-        poisson_score = poisson_score_calc(len(index1), index2_diag, diag_poisson)
-        return poisson_score, cosine_score, -np.log(1.000001 - poisson_score) / 30 + cosine_score
-
     def total_intensity(self):
         """
         total intensity of ions
@@ -1244,24 +1208,6 @@ def my_intersect1d(ar1, ar2):
     ar1_indices = aux_sort_indices[:-1][mask]
     ar2_indices = aux_sort_indices[1:][mask] - ar1.size
     return ar1_indices, ar2_indices
-
-
-# @jit(nopython=True)
-def poisson_score_calc(
-        k,
-        index_diag,
-        diag_matrix
-):
-    """
-    calculate the poisson score for a given spectrum. assumes spectrum is evenly spaced 0.1 Da.
-
-    :param index_diag: index into diag_matrix
-    :param k: number of matched peaks
-    :param diag_matrix: per bin poisson values
-    :return: poisson score
-    """
-    mu = np.sum(diag_matrix.products.intensity[index_diag])
-    return sts.poisson.sf(k, mu)
 
 
 #@jit(nopython=True, parallel=True, cache=True)

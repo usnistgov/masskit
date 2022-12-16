@@ -11,12 +11,12 @@ import logging
 
 @pytest.fixture
 def table():
-    table = pq.read_table('tests/data/cho_uniq_short.parquet')
+    table = pq.read_table('data/cho_uniq_short.parquet')
     return table
 
 @pytest.fixture
 def table_small_mol():
-    table = pq.read_table('tests/data/SRM1950_lumos.parquet')
+    table = pq.read_table('data/SRM1950_lumos.parquet')
     return table
 
 @pytest.fixture
@@ -107,12 +107,14 @@ def test_tanimoto_index(table, tmpdir):
     index.create(lib)
     index.save()
 
+@pytest.mark.skip(reason="tanimoto search currently unimplemented")
 def test_tanimoto_query(table, helpers, tmpdir):
     index = TanimotoIndex(tmpdir / '../test_tanimoto_indexcurrent/spectrum_fp_10000')
     lib = ArrowLibraryMap(table, num=100)
     index.load()
     helpers.do_queries(index, lib, num_queries=3, hitlist_size=100)
 
+@pytest.mark.skip(reason="tanimoto search currently unimplemented")
 def test_tanimoto_from_fingerprint(table_small_mol, tmpdir):
     index = TanimotoIndex(tmpdir / '../test_tanimoto_indexcurrent/tanimoto_from_column',
                           fingerprint_factory=ECFPFingerprint)
@@ -147,6 +149,7 @@ def test_a_fingerprint(hi_res3):
     fp = SpectrumFloatFingerprint()
     fp.object2fingerprint(hi_res3)
 
+@pytest.mark.skip(reason="tanimoto search currently unimplemented")
 def test_compare_tani_fast_search(table, helpers, tmpdir):
     tani = TanimotoIndex(tmpdir / '../test_tanimoto_indexcurrent/spectrum_fp_10000')
     tani.load()    

@@ -25,7 +25,7 @@ def test_load_spectrum():
     return
 
 def test_rdkit():
-    suppl = Chem.SDMolSupplier("tests/data/test.new.sdf", sanitize=False)
+    suppl = Chem.SDMolSupplier("data/test.new.sdf", sanitize=False)
     for mol in suppl:
         spectrum = mss.HiResSpectrum()
         spectrum.from_mol(mol)
@@ -249,11 +249,6 @@ def test_cosine_score_tiebreak(spectrum2, predicted_spectrum1):
     # according to mspepsearch should be 549.  spectra 484, first one in Qian's plot
     score = predicted_spectrum1.cosine_score(spectrum2, tiebreaker='mz')
     assert score == approx(992.2658666598618)
-
-def test_composite_score(spectrum1, predicted_spectrum1):
-    poisson_score, cosine_score, composite_score = \
-        spectrum1.products.composite_score(predicted_spectrum1.products)
-    assert composite_score == approx(0.9932590924536324)
 
 def test_to_msp(hi_res1):
     ret_value = hi_res1.to_msp()
