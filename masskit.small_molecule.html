@@ -1,0 +1,352 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>masskit.small_molecule package &#8212; masskit 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+  <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  //Regex to find address that start with https
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href');
+    if(re_nist.test(url) || !re_absolute_address.test(url)){
+      $(this).addClass('local');
+    }else{
+      //This a href appears to be external, so tag it
+      $(this).addClass('external');
+    }
+  });
+  // Add leaveNotice to external A elements
+  $('a.external').leaveNotice();
+});
+</script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">masskit.small_molecule package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="masskit-small-molecule-package">
+<h1>masskit.small_molecule package<a class="headerlink" href="#masskit-small-molecule-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-masskit.small_molecule.network">
+<span id="masskit-small-molecule-network-module"></span><h2>masskit.small_molecule.network module<a class="headerlink" href="#module-masskit.small_molecule.network" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.network.call_airi_service">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.network.</span></span><span class="sig-name descname"><span class="pre">call_airi_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smile_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10.208.85.87'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'80'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.network.call_airi_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>call the airi service</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>smile_in</strong> – the smiles string used to compute the ri value</p></li>
+<li><p><strong>server</strong> – the http server containing the airi service</p></li>
+<li><p><strong>port</strong> – the port on the server</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the json response from the server</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.small_molecule.plotting">
+<span id="masskit-small-molecule-plotting-module"></span><h2>masskit.small_molecule.plotting module<a class="headerlink" href="#module-masskit.small_molecule.plotting" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.plotting.file_download_button">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.plotting.</span></span><span class="sig-name descname"><span class="pre">file_download_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'download.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Download</span> <span class="pre">File'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'p-Widget</span> <span class="pre">jupyter-widgets</span> <span class="pre">jupyter-button</span> <span class="pre">widget-button</span> <span class="pre">mod-warning'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.plotting.file_download_button" title="Permalink to this definition">¶</a></dt>
+<dd><p>create an html file download button for use in jupyter notebook using HTML(file_download())
+:param filename: name of file to download
+:param data: string containing data to download
+:param button_text: the text on the button
+:param css_class: styling of the button
+:return: string containing button html</p>
+</dd></dl>
+
+</section>
+<section id="module-masskit.small_molecule.react">
+<span id="masskit-small-molecule-react-module"></span><h2>masskit.small_molecule.react module<a class="headerlink" href="#module-masskit.small_molecule.react" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.react.</span></span><span class="sig-name descname"><span class="pre">Reactor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">standardization_function=&lt;function</span> <span class="pre">standardize_mol&gt;</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>class for doing several reactions on molecules with multiple steps</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.apply_reactions">
+<span class="sig-name descname"><span class="pre">apply_reactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxProducts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.apply_reactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>apply a series of reactions to a list of molecules</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecules</strong> – list of rdkit Mol</p></li>
+<li><p><strong>maxProducts</strong> – maximum number of products per reaction</p></li>
+<li><p><strong>mass_range</strong> – tuple containing low and high value of allowed mass of product</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of product molecules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.create_reactions">
+<span class="sig-name descname"><span class="pre">create_reactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reactant_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_group_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.create_reactions" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a set of reactions using functional groups that are modified by the addition of replacement groups</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reactant_names</strong> – list of replacement group names</p></li>
+<li><p><strong>functional_group_names</strong> – list of functional group names</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.functional_group_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">functional_group_names</span></span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.functional_group_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of functional group names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of functional group names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.react">
+<span class="sig-name descname"><span class="pre">react</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reactant_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_group_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxProducts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_original_molecules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tautomers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.react" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a list of molecules, react them using the named reactions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>molecules</strong> – standardized molecule or list of molecules to be reacted</p></li>
+<li><p><strong>reactant_names</strong> – list of names of replacement groups added in the reaction.  [] means all</p></li>
+<li><p><strong>functional_group_names</strong> – list of names of the functional groups where reactions take place. [] means all</p></li>
+<li><p><strong>maxProducts</strong> – maximum number of products per reaction and overall.  an approximate bound</p></li>
+<li><p><strong>max_passes</strong> – iteratively apply the reactions to reaction products up to max_passes</p></li>
+<li><p><strong>include_original_molecules</strong> – add the original molecules to the returned products</p></li>
+<li><p><strong>num_tautomers</strong> – create up to this this number of tautomers from the input structures</p></li>
+<li><p><strong>mass_range</strong> – tuple containing low and high value of allowed mass of product</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of reaction products as rdkit Mol</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.reactant_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">reactant_names</span></span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.reactant_names" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a list of replacement group names</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of replacement group names</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="module-masskit.small_molecule.threed">
+<span id="masskit-small-molecule-threed-module"></span><h2>masskit.small_molecule.threed module<a class="headerlink" href="#module-masskit.small_molecule.threed" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.threed.bounding_box">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.threed.</span></span><span class="sig-name descname"><span class="pre">bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conformer_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.threed.bounding_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a mol with a conformer, return the bounding box of the conformer</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – the rdkit mol</p></li>
+<li><p><strong>conformer_id</strong> – the conformer to use</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the bounding box as an np array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.threed.create_conformer">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.threed.</span></span><span class="sig-name descname"><span class="pre">create_conformer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_conformers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.threed.create_conformer" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a conformer for a rdkit mol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – rdkit molecule. <strong>*note that an rdkit molecule is passed by value, not reference*</strong></p></li>
+<li><p><strong>num_conformers</strong> – max number of 3D conformers created per molecule</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>molecule, conformer ids, success/failure</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.small_molecule.utils">
+<span id="masskit-small-molecule-utils-module"></span><h2>masskit.small_molecule.utils module<a class="headerlink" href="#module-masskit.small_molecule.utils" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.utils.AdjustAromaticNs">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.utils.</span></span><span class="sig-name descname"><span class="pre">AdjustAromaticNs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nitrogenPattern</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'[n&amp;D2&amp;H0;r5,r6]'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.utils.AdjustAromaticNs" title="Permalink to this definition">¶</a></dt>
+<dd><p>default nitrogen pattern matches Ns in 5 rings and 6 rings in order to be able
+to fix: O=c1ccncc1
+nitrogenPattern is aromatic n in ring of size 5 or 6 with 2 further explict connections, with 0 further H</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.utils.get_unspec_double_bonds">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.utils.</span></span><span class="sig-name descname"><span class="pre">get_unspec_double_bonds</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.utils.get_unspec_double_bonds" title="Permalink to this definition">¶</a></dt>
+<dd><p>get list of double bonds with undefined stereochemistry.  Copied from
+<a class="reference external" href="https://github.com/DrrDom/rdkit-scripts/blob/master/sanitize_rdkit.py">https://github.com/DrrDom/rdkit-scripts/blob/master/sanitize_rdkit.py</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>m</strong> – molecule</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of bonds</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.utils.standardize_mol">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.utils.</span></span><span class="sig-name descname"><span class="pre">standardize_mol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.utils.standardize_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>standardize molecule.  correct valences on aromatic N’s and do molvs standardization</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mol</strong> – rdkit mol to standardize</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>standardized mol</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.small_molecule.utils.yang_polarizability">
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.utils.</span></span><span class="sig-name descname"><span class="pre">yang_polarizability</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.utils.yang_polarizability" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate group additivity values per atom</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mol</strong> – the molecule</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict that maps atom number to group additivity value, calculated polarizability</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.small_molecule">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.small_molecule" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">masskit.small_molecule package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.network">masskit.small_molecule.network module</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.plotting">masskit.small_molecule.plotting module</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.react">masskit.small_molecule.react module</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.threed">masskit.small_molecule.threed module</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.utils">masskit.small_molecule.utils module</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/masskit.small_molecule.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">masskit.small_molecule package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    </div>
+  </body>
+</html>

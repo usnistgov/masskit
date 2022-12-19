@@ -1,0 +1,2237 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Read and analyze predicted spectra &#8212; masskit 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Read and analyze predicted spectra" href="examine_predictions.html" />
+<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+  <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  //Regex to find address that start with https
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href');
+    if(re_nist.test(url) || !re_absolute_address.test(url)){
+      $(this).addClass('local');
+    }else{
+      //This a href appears to be external, so tag it
+      $(this).addClass('external');
+    }
+  });
+  // Add leaveNotice to external A elements
+  $('a.external').leaveNotice();
+});
+</script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examine_predictions.html" title="Read and analyze predicted spectra"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Read and analyze predicted spectra</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt a.copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">masskit.data_specs.spectral_library</span> <span class="kn">import</span> <span class="n">LibraryAccessor</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">masskit.utils.index</span> <span class="k">as</span> <span class="nn">msui</span>
+<span class="kn">import</span> <span class="nn">masskit.spectrum.join</span> <span class="k">as</span> <span class="nn">mssj</span>
+<span class="kn">import</span> <span class="nn">masskit.peptide.spectrum_generator</span> <span class="k">as</span> <span class="nn">msps</span>
+
+<span class="n">pd</span><span class="o">.</span><span class="n">set_option</span><span class="p">(</span><span class="s2">&quot;display.max_columns&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Read-and-analyze-predicted-spectra">
+<h1>Read and analyze predicted spectra<a class="headerlink" href="#Read-and-analyze-predicted-spectra" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_pickle</span><span class="p">(</span><span class="s2">&quot;../../../tests/data/FlipFlop183_uniq_220422.pkl&quot;</span><span class="p">)</span>
+
+<span class="c1"># add in theoretical spectrum column</span>
+<span class="n">msps</span><span class="o">.</span><span class="n">add_theoretical_spectra</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="s1">&#39;theoretical_spectrum&#39;</span><span class="p">)</span>
+
+<span class="c1"># make iterable maps over the spectra</span>
+<span class="n">exp_spectra</span> <span class="o">=</span> <span class="n">msui</span><span class="o">.</span><span class="n">PandasLibraryMap</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+<span class="n">pred_spectra</span> <span class="o">=</span> <span class="n">msui</span><span class="o">.</span><span class="n">PandasLibraryMap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">)</span>
+<span class="n">theo_spectra</span> <span class="o">=</span> <span class="n">msui</span><span class="o">.</span><span class="n">PandasLibraryMap</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column_name</span><span class="o">=</span><span class="s1">&#39;theoretical_spectrum&#39;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</div>
+<section id="Join-experimental,-predicted-and-theoretical-spectra-by-matching-peaks">
+<h2>Join experimental, predicted and theoretical spectra by matching peaks<a class="headerlink" href="#Join-experimental,-predicted-and-theoretical-spectra-by-matching-peaks" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">j3</span> <span class="o">=</span> <span class="n">mssj</span><span class="o">.</span><span class="n">ThreewayJoin</span><span class="p">(</span><span class="n">exp_spectra</span><span class="p">,</span> <span class="n">pred_spectra</span><span class="p">,</span> <span class="n">theo_spectra</span><span class="p">)</span>
+<span class="n">j3</span><span class="o">.</span><span class="n">do_join</span><span class="p">()</span>
+<span class="n">df_join</span> <span class="o">=</span> <span class="n">j3</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<section id="Examine-join-results">
+<h3>Examine join results<a class="headerlink" href="#Examine-join-results" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>exp_id</th>
+      <th>pred_id</th>
+      <th>theo_id</th>
+      <th>exp_peak_index</th>
+      <th>pred_peak_index</th>
+      <th>theo_peak_index</th>
+      <th>exp_mz</th>
+      <th>exp_intensity</th>
+      <th>pred_mz</th>
+      <th>pred_intensity</th>
+      <th>theo_mz</th>
+      <th>pred_stddev</th>
+      <th>z_score</th>
+      <th>ev</th>
+      <th>charge</th>
+      <th>cosine_score</th>
+      <th>peptide_length</th>
+      <th>num_neg_aa</th>
+      <th>num_pos_aa</th>
+      <th>cterm_aa</th>
+      <th>ptm</th>
+      <th>ion_type</th>
+      <th>product_charge</th>
+      <th>isotope</th>
+      <th>ion_subtype</th>
+      <th>position</th>
+      <th>end_position</th>
+      <th>aa_before</th>
+      <th>aa_after</th>
+      <th>ptm_before</th>
+      <th>ptm_after</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>116.5715</td>
+      <td>0.006924</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>6</td>
+      <td>30</td>
+      <td>120.0806</td>
+      <td>0.038769</td>
+      <td>120.1</td>
+      <td>0.076752</td>
+      <td>120.0808</td>
+      <td>0.025167</td>
+      <td>-1.509269</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>immonium</td>
+      <td>1</td>
+      <td>0</td>
+      <td>IFA</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>2</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>121.3951</td>
+      <td>0.007055</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>3</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>127.626</td>
+      <td>0.008457</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>4</td>
+      <td>12</td>
+      <td>&lt;NA&gt;</td>
+      <td>141.1022</td>
+      <td>0.034642</td>
+      <td>141.1</td>
+      <td>0.031227</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.006905</td>
+      <td>0.494631</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>95</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>95</td>
+      <td>163</td>
+      <td>262</td>
+      <td>717.3718</td>
+      <td>0.148742</td>
+      <td>717.4</td>
+      <td>0.047838</td>
+      <td>717.371934</td>
+      <td>0.014855</td>
+      <td>6.792667</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>y</td>
+      <td>1</td>
+      <td>1</td>
+      <td>&lt;NA&gt;</td>
+      <td>7</td>
+      <td>&lt;NA&gt;</td>
+      <td>A</td>
+      <td>I</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>96</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>96</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>782.7312</td>
+      <td>0.00643</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>97</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>97</td>
+      <td>172</td>
+      <td>278</td>
+      <td>812.424</td>
+      <td>0.022945</td>
+      <td>812.4</td>
+      <td>0.004205</td>
+      <td>812.426094</td>
+      <td>0.002039</td>
+      <td>9.191735</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>y</td>
+      <td>1</td>
+      <td>0</td>
+      <td>NH3</td>
+      <td>8</td>
+      <td>&lt;NA&gt;</td>
+      <td>I</td>
+      <td>G</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>98</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>98</td>
+      <td>173</td>
+      <td>285</td>
+      <td>829.4534</td>
+      <td>0.313579</td>
+      <td>829.4</td>
+      <td>0.000969</td>
+      <td>829.452643</td>
+      <td>0.000818</td>
+      <td>382.262535</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>y</td>
+      <td>1</td>
+      <td>0</td>
+      <td>&lt;NA&gt;</td>
+      <td>8</td>
+      <td>&lt;NA&gt;</td>
+      <td>I</td>
+      <td>G</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>99</th>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>99</td>
+      <td>175</td>
+      <td>286</td>
+      <td>830.456</td>
+      <td>0.120345</td>
+      <td>830.4</td>
+      <td>0.000174</td>
+      <td>830.455998</td>
+      <td>0.000097</td>
+      <td>1241.207879</td>
+      <td>45.0</td>
+      <td>2</td>
+      <td>585.724365</td>
+      <td>14</td>
+      <td>1</td>
+      <td>1</td>
+      <td>R</td>
+      <td>0</td>
+      <td>y</td>
+      <td>1</td>
+      <td>1</td>
+      <td>&lt;NA&gt;</td>
+      <td>8</td>
+      <td>&lt;NA&gt;</td>
+      <td>I</td>
+      <td>G</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>100 rows × 31 columns</p>
+</div></div>
+</div>
+</section>
+<section id="Examine-join-results-of-phosphopeptides">
+<h3>Examine join results of phosphopeptides<a class="headerlink" href="#Examine-join-results-of-phosphopeptides" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ptm == 21&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>exp_id</th>
+      <th>pred_id</th>
+      <th>theo_id</th>
+      <th>exp_peak_index</th>
+      <th>pred_peak_index</th>
+      <th>theo_peak_index</th>
+      <th>exp_mz</th>
+      <th>exp_intensity</th>
+      <th>pred_mz</th>
+      <th>pred_intensity</th>
+      <th>theo_mz</th>
+      <th>pred_stddev</th>
+      <th>z_score</th>
+      <th>ev</th>
+      <th>charge</th>
+      <th>cosine_score</th>
+      <th>peptide_length</th>
+      <th>num_neg_aa</th>
+      <th>num_pos_aa</th>
+      <th>cterm_aa</th>
+      <th>ptm</th>
+      <th>ion_type</th>
+      <th>product_charge</th>
+      <th>isotope</th>
+      <th>ion_subtype</th>
+      <th>position</th>
+      <th>end_position</th>
+      <th>aa_before</th>
+      <th>aa_after</th>
+      <th>ptm_before</th>
+      <th>ptm_after</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>467197</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>0</td>
+      <td>1</td>
+      <td>20</td>
+      <td>102.0554</td>
+      <td>0.043217</td>
+      <td>102.1</td>
+      <td>0.015513</td>
+      <td>102.055</td>
+      <td>0.008051</td>
+      <td>3.441178</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>immonium</td>
+      <td>1</td>
+      <td>0</td>
+      <td>IEA</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467198</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1</td>
+      <td>2</td>
+      <td>22</td>
+      <td>104.0533</td>
+      <td>0.022147</td>
+      <td>104.1</td>
+      <td>0.004737</td>
+      <td>104.0534</td>
+      <td>0.00351</td>
+      <td>4.960566</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>immonium</td>
+      <td>1</td>
+      <td>0</td>
+      <td>IMA</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467199</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>2</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>121.0291</td>
+      <td>0.02663</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467200</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>3</td>
+      <td>8</td>
+      <td>&lt;NA&gt;</td>
+      <td>126.0556</td>
+      <td>0.034801</td>
+      <td>126.1</td>
+      <td>0.000351</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.000276</td>
+      <td>124.762839</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467201</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>4</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>126.2552</td>
+      <td>0.026217</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>467292</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>&lt;NA&gt;</td>
+      <td>34</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>212.1</td>
+      <td>0.003309</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.002391</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467293</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>&lt;NA&gt;</td>
+      <td>35</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>213.1</td>
+      <td>0.00077</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.00049</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467294</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>&lt;NA&gt;</td>
+      <td>36</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>215.1</td>
+      <td>0.000436</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.000406</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467295</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>&lt;NA&gt;</td>
+      <td>37</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>216.1</td>
+      <td>0.010032</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.008176</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>467296</th>
+      <td>1323</td>
+      <td>1323</td>
+      <td>1323</td>
+      <td>&lt;NA&gt;</td>
+      <td>39</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>227.1</td>
+      <td>0.002694</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.002119</td>
+      <td>&lt;NA&gt;</td>
+      <td>32.0</td>
+      <td>2</td>
+      <td>633.076599</td>
+      <td>12</td>
+      <td>3</td>
+      <td>1</td>
+      <td>K</td>
+      <td>21</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>100 rows × 31 columns</p>
+</div></div>
+</div>
+</section>
+<section id="Examine-join-results-of-peptides-that-do-not-end-in-K-or-R">
+<h3>Examine join results of peptides that do not end in K or R<a class="headerlink" href="#Examine-join-results-of-peptides-that-do-not-end-in-K-or-R" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;cterm_aa not in[&quot;K&quot;, &quot;R&quot;]&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>exp_id</th>
+      <th>pred_id</th>
+      <th>theo_id</th>
+      <th>exp_peak_index</th>
+      <th>pred_peak_index</th>
+      <th>theo_peak_index</th>
+      <th>exp_mz</th>
+      <th>exp_intensity</th>
+      <th>pred_mz</th>
+      <th>pred_intensity</th>
+      <th>theo_mz</th>
+      <th>pred_stddev</th>
+      <th>z_score</th>
+      <th>ev</th>
+      <th>charge</th>
+      <th>cosine_score</th>
+      <th>peptide_length</th>
+      <th>num_neg_aa</th>
+      <th>num_pos_aa</th>
+      <th>cterm_aa</th>
+      <th>ptm</th>
+      <th>ion_type</th>
+      <th>product_charge</th>
+      <th>isotope</th>
+      <th>ion_subtype</th>
+      <th>position</th>
+      <th>end_position</th>
+      <th>aa_before</th>
+      <th>aa_after</th>
+      <th>ptm_before</th>
+      <th>ptm_after</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>32806</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>0</td>
+      <td>36</td>
+      <td>&lt;NA&gt;</td>
+      <td>240.0976</td>
+      <td>0.05831</td>
+      <td>240.1</td>
+      <td>0.030693</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.018143</td>
+      <td>1.522204</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32807</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>1</td>
+      <td>37</td>
+      <td>&lt;NA&gt;</td>
+      <td>241.0803</td>
+      <td>0.056933</td>
+      <td>241.1</td>
+      <td>0.033461</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.037932</td>
+      <td>0.618797</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32808</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>2</td>
+      <td>41</td>
+      <td>131</td>
+      <td>257.1233</td>
+      <td>0.417809</td>
+      <td>257.1</td>
+      <td>0.422641</td>
+      <td>257.124432</td>
+      <td>0.335987</td>
+      <td>-0.014384</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>y</td>
+      <td>1</td>
+      <td>0</td>
+      <td>H2O</td>
+      <td>2</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>T</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32809</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>3</td>
+      <td>42</td>
+      <td>133</td>
+      <td>258.1075</td>
+      <td>0.293561</td>
+      <td>258.1</td>
+      <td>0.583013</td>
+      <td>258.108448</td>
+      <td>0.354833</td>
+      <td>-0.81574</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>y</td>
+      <td>1</td>
+      <td>0</td>
+      <td>NH3</td>
+      <td>2</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>T</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32810</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>4</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>261.9867</td>
+      <td>0.030825</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>32901</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>95</td>
+      <td>320</td>
+      <td>&lt;NA&gt;</td>
+      <td>1313.6226</td>
+      <td>0.347608</td>
+      <td>1313.6</td>
+      <td>0.029375</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.039879</td>
+      <td>7.980009</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32902</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>96</td>
+      <td>321</td>
+      <td>540</td>
+      <td>1314.1073</td>
+      <td>0.418142</td>
+      <td>1314.1</td>
+      <td>0.044482</td>
+      <td>1314.108774</td>
+      <td>0.069938</td>
+      <td>5.342708</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>b</td>
+      <td>2</td>
+      <td>1</td>
+      <td>&lt;NA&gt;</td>
+      <td>24</td>
+      <td>&lt;NA&gt;</td>
+      <td>N</td>
+      <td>Y</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32903</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>97</td>
+      <td>322</td>
+      <td>&lt;NA&gt;</td>
+      <td>1314.6064</td>
+      <td>0.156002</td>
+      <td>1314.6</td>
+      <td>0.032953</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.067247</td>
+      <td>1.829811</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32904</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>98</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>1365.6086</td>
+      <td>0.062174</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+    <tr>
+      <th>32905</th>
+      <td>92</td>
+      <td>92</td>
+      <td>92</td>
+      <td>99</td>
+      <td>339</td>
+      <td>&lt;NA&gt;</td>
+      <td>1373.6221</td>
+      <td>0.170367</td>
+      <td>1373.6</td>
+      <td>0.042433</td>
+      <td>&lt;NA&gt;</td>
+      <td>0.056629</td>
+      <td>2.259149</td>
+      <td>40.0</td>
+      <td>3</td>
+      <td>375.432617</td>
+      <td>27</td>
+      <td>1</td>
+      <td>1</td>
+      <td>Q</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>&lt;NA&gt;</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+<p>100 rows × 31 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">columns</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Index([&#39;exp_id&#39;, &#39;pred_id&#39;, &#39;theo_id&#39;, &#39;exp_peak_index&#39;, &#39;pred_peak_index&#39;,
+       &#39;theo_peak_index&#39;, &#39;exp_mz&#39;, &#39;exp_intensity&#39;, &#39;pred_mz&#39;,
+       &#39;pred_intensity&#39;, &#39;theo_mz&#39;, &#39;pred_stddev&#39;, &#39;z_score&#39;, &#39;ev&#39;, &#39;charge&#39;,
+       &#39;cosine_score&#39;, &#39;peptide_length&#39;, &#39;num_neg_aa&#39;, &#39;num_pos_aa&#39;,
+       &#39;cterm_aa&#39;, &#39;ptm&#39;, &#39;ion_type&#39;, &#39;product_charge&#39;, &#39;isotope&#39;,
+       &#39;ion_subtype&#39;, &#39;position&#39;, &#39;end_position&#39;, &#39;aa_before&#39;, &#39;aa_after&#39;,
+       &#39;ptm_before&#39;, &#39;ptm_after&#39;],
+      dtype=&#39;object&#39;)
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Query-on-ion-annotations">
+<h2>Query on ion annotations<a class="headerlink" href="#Query-on-ion-annotations" title="Permalink to this heading">¶</a></h2>
+<section id="Mean-intensity-for-b-ions-with-charge-1">
+<h3>Mean intensity for b ions with charge 1<a class="headerlink" href="#Mean-intensity-for-b-ions-with-charge-1" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ion_type == &quot;b&quot; and product_charge == 1&#39;</span><span class="p">)[</span><span class="s1">&#39;exp_intensity&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.09583703113652287
+</pre></div></div>
+</div>
+</section>
+<section id="Mean-z-score-for-b-ions-with-charge-1">
+<h3>Mean z score for b ions with charge 1<a class="headerlink" href="#Mean-z-score-for-b-ions-with-charge-1" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ion_type == &quot;b&quot; and product_charge == 1 and pred_intensity &lt; 0.05&#39;</span><span class="p">)[</span><span class="s1">&#39;z_score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6.158208049289118
+</pre></div></div>
+</div>
+</section>
+<section id="Mean-z-score-for-ions-with-one-carbon-13">
+<h3>Mean z score for ions with one carbon 13<a class="headerlink" href="#Mean-z-score-for-ions-with-one-carbon-13" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;isotope == 1 and pred_intensity &lt; 0.05&#39;</span><span class="p">)[</span><span class="s1">&#39;z_score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+7.60065305984468
+</pre></div></div>
+</div>
+</section>
+<section id="Mean-z-score-for-immonium-ions">
+<h3>Mean z score for immonium ions<a class="headerlink" href="#Mean-z-score-for-immonium-ions" title="Permalink to this heading">¶</a></h3>
+</section>
+<section id="Note-that-the-type-of-immonium-ion-is-kept-in-the-neutral_loss-column">
+<h3>Note that the type of immonium ion is kept in the neutral_loss column<a class="headerlink" href="#Note-that-the-type-of-immonium-ion-is-kept-in-the-neutral_loss-column" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ion_type == &quot;immonium&quot; and pred_intensity &lt; 0.05&#39;</span><span class="p">)[</span><span class="s1">&#39;z_score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+7.4534606438435524
+</pre></div></div>
+</div>
+</section>
+<section id="Mean-z-score-for-internal-ions">
+<h3>Mean z score for internal ions<a class="headerlink" href="#Mean-z-score-for-internal-ions" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ion_type == &quot;internalb&quot; and pred_intensity &lt; 0.05&#39;</span><span class="p">)[</span><span class="s1">&#39;z_score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6.408632347078326
+</pre></div></div>
+</div>
+</section>
+<section id="Mean-z-score-for-parent-ions">
+<h3>Mean z score for parent ions<a class="headerlink" href="#Mean-z-score-for-parent-ions" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df_join</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">&#39;ion_type == &quot;parent&quot; and pred_intensity &lt; 0.05&#39;</span><span class="p">)[</span><span class="s1">&#39;z_score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+6.5820922264823345
+</pre></div></div>
+</div>
+</section>
+</section>
+<section id="Plot-two-spectra,-one-with-error-bars">
+<h2>Plot two spectra, one with error bars<a class="headerlink" href="#Plot-two-spectra,-one-with-error-bars" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="c1"># select spectra from the 2nd row of the datafram</span>
+<span class="n">experimental_spectrum</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span>
+<span class="n">predicted_spectrum</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span>
+<span class="n">experimental_spectrum</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">predicted_spectrum</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">mirror</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">plot_stddev</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/ion_analysis_26_0.png" src="_images/ion_analysis_26_0.png" />
+</div>
+</div>
+</section>
+<section id="Plot-two-spectra-with-a-mirror-plot,-no-error-bars">
+<h2>Plot two spectra with a mirror plot, no error bars<a class="headerlink" href="#Plot-two-spectra-with-a-mirror-plot,-no-error-bars" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">experimental_spectrum</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">predicted_spectrum</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">mirror</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/ion_analysis_28_0.png" src="_images/ion_analysis_28_0.png" />
+</div>
+</div>
+</section>
+<section id="Plot-relationship-between-cosine-score-and-various-spectrum-properties">
+<h2>Plot relationship between cosine score and various spectrum properties<a class="headerlink" href="#Plot-relationship-between-cosine-score-and-various-spectrum-properties" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="s1">&#39;nce&#39;</span><span class="p">,</span> <span class="s1">&#39;cosine_score&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/ion_analysis_30_0.png" src="_images/ion_analysis_30_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">plt</span><span class="o">.</span><span class="n">hist2d</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;charge&#39;</span><span class="p">],</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;cosine_score&#39;</span><span class="p">],</span> <span class="n">bins</span> <span class="o">=</span> <span class="mi">100</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/ion_analysis_31_0.png" src="_images/ion_analysis_31_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="_images/ion_analysis_32_0.svg" src="_images/ion_analysis_32_0.svg" /></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<img alt="_images/ion_analysis_33_0.svg" src="_images/ion_analysis_33_0.svg" /></div>
+</div>
+</section>
+<section id="Compute-the-cosine-score,-which-automatically-changes-the-mass-tolerance-of-the-experimental-spectra-to-evenly-spaced-bins-instead-of-ppm">
+<h2>Compute the cosine score, which automatically changes the mass tolerance of the experimental spectra to evenly spaced bins instead of ppm<a class="headerlink" href="#Compute-the-cosine-score,-which-automatically-changes-the-mass-tolerance-of-the-experimental-spectra-to-evenly-spaced-bins-instead-of-ppm" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># get the experimental spectrum from the 5th row</span>
+<span class="n">experimental_spectrum</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+<span class="c1"># get the predicted spectrum from the 5th row</span>
+<span class="n">predicted_spectrum</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="c1"># convert the experimental spectra, which has ions in +/- 10ppm bins into a spectrum with evenly spaced bins</span>
+<span class="c1"># that are the same size as the</span>
+
+<span class="n">df</span><span class="p">[</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cosine_score</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+682.8751554541735
+</pre></div></div>
+</div>
+</section>
+<section id="Access-mz,-intensity,-and-std-deviation-of-the-intensity-for-an-example-spectrum">
+<h2>Access mz, intensity, and std deviation of the intensity for an example spectrum<a class="headerlink" href="#Access-mz,-intensity,-and-std-deviation-of-the-intensity-for-an-example-spectrum" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mz</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">intensity</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">stddev</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[ 101.1  102.1  110.1  120.1  129.1  130.1  136.1  141.1  143.1  147.1
+  155.1  157.1  159.1  169.1  171.1  173.1  175.1  183.1  185.1  185.2
+  186.1  187.1  197.1  199.2  200.1  201.1  211.1  213.2  215.1  226.1
+  227.2  228.1  229.1  230.1  240.1  243.1  244.1  244.2  257.2  258.1
+  260.1  270.1  272.2  275.2  279.2  282.2  288.1  296.2  298.2  299.2
+  308.2  313.2  323.2  324.2  326.2  331.1  341.2  342.2  354.2  355.2
+  358.1  359.2  371.2  372.2  384.3  389.2  390.2  395.2  412.3  413.3
+  431.2  432.2  437.7  438.2  446.7  447.2  459.2  469.2  472.3  486.2
+  487.2  504.2  504.3  505.2  560.2  570.3  587.3  588.3  598.3  600.3
+  605.3  606.3  643.3  643.4  644.3  651.3  651.4  651.8  652.3  652.4
+  660.4  671.3  688.3  689.3  706.3  706.4  707.3  746.3  802.4  817.4
+  857.4  874.4  875.4  876.4  892.4  893.4  928.4  930.4  945.4  945.5
+  946.4  946.5  947.4  963.4  963.5  964.4  964.5 1041.5 1058.5 1059.5
+ 1060.5 1076.5 1076.6 1077.5 1086.5 1199.6 1200.6]
+[1.80569640e+00 1.13138043e+00 7.09895767e+00 1.50447761e+01
+ 3.41836787e+01 1.29840373e+01 1.22303123e+01 2.36604700e+01
+ 4.30689418e-01 3.29291285e+01 6.76000473e+01 1.58475517e+01
+ 7.11269910e+01 2.35122952e-01 4.26483373e-01 1.29914913e+00
+ 6.45464468e+00 7.00947230e+01 1.98784264e+01 4.38904502e-01
+ 1.16158741e-01 1.95074464e+00 2.35150672e-01 1.04063981e+01
+ 9.99000008e+02 1.86165689e+01 1.78077297e+00 1.47670396e-01
+ 7.88578335e-01 4.36842939e-01 6.51051081e+00 4.99957247e+02
+ 3.45702844e+00 1.22628794e+00 6.14570812e-01 2.97852322e+00
+ 2.62213865e-01 4.03182783e-01 2.49004462e+00 2.17523992e+01
+ 3.45175005e-01 1.16670541e-01 2.76266801e-01 1.53532223e+01
+ 1.40013646e-01 4.03130640e+00 1.57390753e+00 1.18324942e+00
+ 6.81957455e-01 4.83090816e+00 2.82409295e-01 2.87350396e+00
+ 4.57933807e+00 5.04119183e+00 1.51603536e+00 9.16047698e-01
+ 2.15399399e+02 2.45024676e+00 4.69610980e-01 1.94856536e+00
+ 1.02260256e-01 3.97610387e-01 2.32052331e+00 1.36700666e+01
+ 2.19294686e-01 7.89407499e+01 7.74351442e-01 6.35643568e-01
+ 4.84524548e+01 2.54807329e-01 1.08488301e-01 1.09939306e+00
+ 3.14603882e-01 1.98243994e+00 1.01052586e+00 1.15573543e-01
+ 7.31819431e-01 1.71211633e-01 2.38256259e-01 1.94538287e-01
+ 5.36491133e+00 6.05948867e+01 1.08230546e-01 3.14456461e-01
+ 1.28250604e+00 1.06215906e-01 1.10074493e+00 5.07261724e+00
+ 5.26251060e-01 6.70723246e-01 1.20904986e+02 1.93322101e+00
+ 3.63151090e-01 1.13052975e-01 1.04580000e-01 2.95368669e+00
+ 2.63342736e+00 1.71449087e+00 1.65483199e+01 5.76912533e+00
+ 1.82616117e-01 2.94629640e-01 5.04221483e+00 9.05636196e+00
+ 2.52552773e+02 1.42972771e-01 7.55964998e+00 7.18311324e-01
+ 1.31387952e-01 6.55669605e-01 3.15028906e-01 6.90590017e+00
+ 1.75982772e+01 5.27071450e-01 3.31167784e+02 2.06331024e+01
+ 2.32618002e-01 1.05844357e-01 3.81248376e+00 4.58752086e-01
+ 1.21358918e+01 3.26348790e-01 1.10278032e-01 4.43420612e+00
+ 3.47310256e+02 1.45319238e-01 3.32285240e+01 2.29238395e-01
+ 5.83643088e+00 1.16137490e+01 2.83011455e-01 3.56975944e+02
+ 3.71045913e-01 2.38939536e+01 1.35562128e-01 9.36785106e+00
+ 4.23299374e-01]
+[5.77813713e-01 3.12706640e-01 1.40091182e+00 3.21576450e+00
+ 5.16561742e+00 3.70641593e+00 1.97781202e+00 4.85640626e+00
+ 1.07918903e-01 4.02805946e+00 7.96410282e+00 3.47404429e+00
+ 1.43065865e+01 7.32157626e-02 7.83655186e-02 1.84613794e-01
+ 1.16856836e+00 1.06818555e+01 3.92114188e+00 1.24017394e-01
+ 7.69127975e-02 5.40853563e-01 6.34416391e-02 2.90989929e+00
+ 3.04496858e-05 5.32795708e+00 6.39152687e-01 5.10725355e-02
+ 1.35533683e-01 4.11968306e-01 2.60981514e+00 4.03027109e+01
+ 1.36828990e+00 6.95801168e-01 2.14433327e-01 1.14635443e+00
+ 1.35090937e-01 9.25212556e-02 1.26128701e+00 2.59022202e+00
+ 3.47550849e-01 1.13989202e-01 5.20455757e-01 4.68147404e+00
+ 1.30358537e-01 2.58643325e+00 1.21327908e+00 7.16701447e-01
+ 4.48749518e-01 2.42145877e+00 3.65541944e-01 1.50145324e+00
+ 2.16668328e+00 2.01459157e+00 1.31666981e+00 1.08755222e+00
+ 2.49159710e+01 1.16400196e+00 4.37000875e-01 2.16388986e+00
+ 1.44898685e-01 3.55830076e-01 1.47192262e+00 5.19068871e+00
+ 1.08572893e-01 1.43857658e+01 4.81924631e-01 7.74273469e-01
+ 1.11531750e+01 1.48669648e-01 1.40780127e-01 1.12000975e+00
+ 4.03758768e-01 1.02173733e+00 7.09494406e-01 1.45309576e-01
+ 6.64708845e-01 1.43925310e-01 2.77460640e-01 1.12897080e-01
+ 2.53720958e+00 1.60247458e+01 1.27854213e-01 2.44695453e-01
+ 8.89936714e-01 5.73524141e-02 7.29922758e-01 1.98945199e+00
+ 3.40279651e-01 8.02702920e-01 2.42392488e+01 8.72042094e-01
+ 2.83251163e-01 8.37129005e-02 6.84136287e-02 2.02874339e+00
+ 1.91598624e+00 8.27352097e-01 6.80585889e+00 2.15465042e+00
+ 2.42990019e-01 1.72736813e-01 3.57224745e+00 4.77330461e+00
+ 4.60551792e+01 1.86412244e-01 4.18531277e+00 6.91990053e-01
+ 2.37414970e-01 5.27319019e-01 3.47273941e-01 4.44143536e+00
+ 7.06596290e+00 2.82352889e-01 4.07284438e+01 7.58350665e+00
+ 1.91570028e-01 1.88022274e-01 2.93410713e+00 3.68986398e-01
+ 4.56547675e+00 3.18961322e-01 1.11751449e-01 4.66311854e+00
+ 6.54771241e+01 1.28277538e-01 1.12987937e+01 3.89332267e-01
+ 2.25814708e+00 6.90606013e+00 2.15173752e-01 4.78556238e+01
+ 2.70256820e-01 1.35841861e+01 2.23368407e-01 7.88633596e+00
+ 3.52776215e-01]
+</pre></div></div>
+</div>
+</section>
+<section id="Save-predicted-spectra-as-msp">
+<h2>Save predicted spectra as msp<a class="headerlink" href="#Save-predicted-spectra-as-msp" title="Permalink to this heading">¶</a></h2>
+<section id="All-predicted-spectra">
+<h3>All predicted spectra<a class="headerlink" href="#All-predicted-spectra" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">to_msp</span><span class="p">(</span><span class="s1">&#39;all.msp&#39;</span><span class="p">,</span> <span class="n">spectrum_column</span><span class="o">=</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="The-predicted-spectrum-at-row-0">
+<h3>The predicted spectrum at row 0<a class="headerlink" href="#The-predicted-spectrum-at-row-0" title="Permalink to this heading">¶</a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">df</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">to_msp</span><span class="p">(</span><span class="s1">&#39;single.msp&#39;</span><span class="p">,</span> <span class="n">spectrum_column</span><span class="o">=</span><span class="s1">&#39;predicted_spectrum&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Read and analyze predicted spectra</a><ul>
+<li><a class="reference internal" href="#Join-experimental,-predicted-and-theoretical-spectra-by-matching-peaks">Join experimental, predicted and theoretical spectra by matching peaks</a><ul>
+<li><a class="reference internal" href="#Examine-join-results">Examine join results</a></li>
+<li><a class="reference internal" href="#Examine-join-results-of-phosphopeptides">Examine join results of phosphopeptides</a></li>
+<li><a class="reference internal" href="#Examine-join-results-of-peptides-that-do-not-end-in-K-or-R">Examine join results of peptides that do not end in K or R</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Query-on-ion-annotations">Query on ion annotations</a><ul>
+<li><a class="reference internal" href="#Mean-intensity-for-b-ions-with-charge-1">Mean intensity for b ions with charge 1</a></li>
+<li><a class="reference internal" href="#Mean-z-score-for-b-ions-with-charge-1">Mean z score for b ions with charge 1</a></li>
+<li><a class="reference internal" href="#Mean-z-score-for-ions-with-one-carbon-13">Mean z score for ions with one carbon 13</a></li>
+<li><a class="reference internal" href="#Mean-z-score-for-immonium-ions">Mean z score for immonium ions</a></li>
+<li><a class="reference internal" href="#Note-that-the-type-of-immonium-ion-is-kept-in-the-neutral_loss-column">Note that the type of immonium ion is kept in the neutral_loss column</a></li>
+<li><a class="reference internal" href="#Mean-z-score-for-internal-ions">Mean z score for internal ions</a></li>
+<li><a class="reference internal" href="#Mean-z-score-for-parent-ions">Mean z score for parent ions</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#Plot-two-spectra,-one-with-error-bars">Plot two spectra, one with error bars</a></li>
+<li><a class="reference internal" href="#Plot-two-spectra-with-a-mirror-plot,-no-error-bars">Plot two spectra with a mirror plot, no error bars</a></li>
+<li><a class="reference internal" href="#Plot-relationship-between-cosine-score-and-various-spectrum-properties">Plot relationship between cosine score and various spectrum properties</a></li>
+<li><a class="reference internal" href="#Compute-the-cosine-score,-which-automatically-changes-the-mass-tolerance-of-the-experimental-spectra-to-evenly-spaced-bins-instead-of-ppm">Compute the cosine score, which automatically changes the mass tolerance of the experimental spectra to evenly spaced bins instead of ppm</a></li>
+<li><a class="reference internal" href="#Access-mz,-intensity,-and-std-deviation-of-the-intensity-for-an-example-spectrum">Access mz, intensity, and std deviation of the intensity for an example spectrum</a></li>
+<li><a class="reference internal" href="#Save-predicted-spectra-as-msp">Save predicted spectra as msp</a><ul>
+<li><a class="reference internal" href="#All-predicted-spectra">All predicted spectra</a></li>
+<li><a class="reference internal" href="#The-predicted-spectrum-at-row-0">The predicted spectrum at row 0</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="examine_predictions.html"
+                          title="previous chapter">Read and analyze predicted spectra</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/ion_analysis.ipynb.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="examine_predictions.html" title="Read and analyze predicted spectra"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Read and analyze predicted spectra</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    </div>
+  </body>
+</html>

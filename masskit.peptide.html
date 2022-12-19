@@ -1,0 +1,349 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>masskit.peptide package &#8212; masskit 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+  <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  //Regex to find address that start with https
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href');
+    if(re_nist.test(url) || !re_absolute_address.test(url)){
+      $(this).addClass('local');
+    }else{
+      //This a href appears to be external, so tag it
+      $(this).addClass('external');
+    }
+  });
+  // Add leaveNotice to external A elements
+  $('a.external').leaveNotice();
+});
+</script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">masskit.peptide package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="masskit-peptide-package">
+<h1>masskit.peptide package<a class="headerlink" href="#masskit-peptide-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-masskit.peptide.encoding">
+<span id="masskit-peptide-encoding-module"></span><h2>masskit.peptide.encoding module<a class="headerlink" href="#module-masskit.peptide.encoding" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.Alphabet">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">Alphabet</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chars</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoding</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missing</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">255</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.Alphabet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.Alphabet.decode">
+<span class="sig-name descname"><span class="pre">decode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.Alphabet.decode" title="Permalink to this definition">¶</a></dt>
+<dd><p>decode index array, x, to byte string of this alphabet</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.Alphabet.encode">
+<span class="sig-name descname"><span class="pre">encode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.Alphabet.encode" title="Permalink to this definition">¶</a></dt>
+<dd><p>encode a string into alphabet indices</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.Alphabet.get_kmer">
+<span class="sig-name descname"><span class="pre">get_kmer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.Alphabet.get_kmer" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieve byte string of length k decoded from integer h</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.Alphabet.unpack">
+<span class="sig-name descname"><span class="pre">unpack</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.Alphabet.unpack" title="Permalink to this definition">¶</a></dt>
+<dd><p>unpack integer h into array of this alphabet with length k</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.MSDictionary">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">MSDictionary</span></span><a class="headerlink" href="#masskit.peptide.encoding.MSDictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.MSDictionary.create_df">
+<span class="sig-name descname"><span class="pre">create_df</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.MSDictionary.create_df" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.MSDictionary.create_dictionary">
+<span class="sig-name descname"><span class="pre">create_dictionary</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.MSDictionary.create_dictionary" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a dictionary array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fill_value</strong> – pandas doesn’t allow None as a category value, so use the fill value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.MSDictionary.create_id2row">
+<span class="sig-name descname"><span class="pre">create_id2row</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.MSDictionary.create_id2row" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a dictionary that maps the unique id field to a row number</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.SDM12">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">SDM12</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.SDM12" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.peptide.encoding.Alphabet" title="masskit.peptide.encoding.Alphabet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Alphabet</span></code></a></p>
+<p>A D KER N TSQ YF LIVM C W H G P
+See <a class="reference external" href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732308/#B33">https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2732308/#B33</a>
+“Reduced amino acid alphabets exhibit an improved sensitivity and selectivity in fold assignment”
+Peterson et al. 2009. Bioinformatics.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.Uniprot21">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">Uniprot21</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.Uniprot21" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.peptide.encoding.Alphabet" title="masskit.peptide.encoding.Alphabet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Alphabet</span></code></a></p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.calc_ion_series">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">calc_ion_series</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ion_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_isotopes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cumulative_masses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peptide</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neutral_loss</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_offset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_internal_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.calc_ion_series" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.calc_ions_mz">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">calc_ions_mz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peptide</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_isotopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_internal_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.calc_ions_mz" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the mz values of an ion type
+default values are taken from the HCD values in <a class="reference external" href="https://pubs.acs.org/doi/full/10.1021/pr3007045">https://pubs.acs.org/doi/full/10.1021/pr3007045</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>peptide</strong> – the peptide sequence</p></li>
+<li><p><strong>ion_types_in</strong> – tuple or array of tuple of ion type and charge</p></li>
+<li><p><strong>mod_names</strong> – any modifications</p></li>
+<li><p><strong>mod_positions</strong> – the positions of the modifications</p></li>
+<li><p><strong>analysis_annotations</strong> – add additional annotations useful for analyzing spectra</p></li>
+<li><p><strong>precursor_charge</strong> – used to filter out ion types with charge greater than the precursor</p></li>
+<li><p><strong>num_isotopes</strong> – number of carbon 13 isotopes to calculate</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>a numpy arrays of the mz values for the ion series, ion intensities, annotations as an arrow list, precursor mass, fields used for analysing ion peaks</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.calc_named_ions">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">calc_named_ions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">arrays</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">named_ion</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mass</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neutral_loss</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_isotopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.calc_named_ions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.mod_sites">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">mod_sites</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'Acetyl':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'H']},</span> <span class="pre">'Amidate':</span> <span class="pre">{'sites':</span> <span class="pre">['-1']},</span> <span class="pre">'Ammonia-loss':</span> <span class="pre">{'sites':</span> <span class="pre">['N']},</span> <span class="pre">'Arg':</span> <span class="pre">{'sites':</span> <span class="pre">['0']},</span> <span class="pre">'Carbamidomethyl':</span> <span class="pre">{'sites':</span> <span class="pre">['C',</span> <span class="pre">'M',</span> <span class="pre">'0']},</span> <span class="pre">'Carbamyl':</span> <span class="pre">{'sites':</span> <span class="pre">['0']},</span> <span class="pre">'Carboxy':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'M']},</span> <span class="pre">'Cation:Ca[II]':</span> <span class="pre">{'sites':</span> <span class="pre">[]},</span> <span class="pre">'Cation:Fe[III]':</span> <span class="pre">{'sites':</span> <span class="pre">[]},</span> <span class="pre">'Cation:Fe[II]':</span> <span class="pre">{'sites':</span> <span class="pre">[]},</span> <span class="pre">'Cation:Na':</span> <span class="pre">{'sites':</span> <span class="pre">[]},</span> <span class="pre">'Deamidated':</span> <span class="pre">{'sites':</span> <span class="pre">['N',</span> <span class="pre">'Q']},</span> <span class="pre">'Dehydrated':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'N',</span> <span class="pre">'Q',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'Y',</span> <span class="pre">'D',</span> <span class="pre">'C']},</span> <span class="pre">'Dimethyl':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'K',</span> <span class="pre">'R']},</span> <span class="pre">'Dioxidation':</span> <span class="pre">{'sites':</span> <span class="pre">['W']},</span> <span class="pre">'Formyl':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'K',</span> <span class="pre">'S',</span> <span class="pre">'T']},</span> <span class="pre">'Gln-&gt;pyro-Glu':</span> <span class="pre">{'sites':</span> <span class="pre">['0Q']},</span> <span class="pre">'Glu-&gt;pyro-Glu':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'E']},</span> <span class="pre">'Hex':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'K']},</span> <span class="pre">'Lys':</span> <span class="pre">{'sites':</span> <span class="pre">['0']},</span> <span class="pre">'Lys-loss':</span> <span class="pre">{'sites':</span> <span class="pre">['-1']},</span> <span class="pre">'Methyl':</span> <span class="pre">{'sites':</span> <span class="pre">['K',</span> <span class="pre">'R',</span> <span class="pre">'0']},</span> <span class="pre">'Nitro':</span> <span class="pre">{'sites':</span> <span class="pre">['Y']},</span> <span class="pre">'Oxidation':</span> <span class="pre">{'sites':</span> <span class="pre">['M',</span> <span class="pre">'W',</span> <span class="pre">'K',</span> <span class="pre">'H',</span> <span class="pre">'P']},</span> <span class="pre">'Phospho':</span> <span class="pre">{'sites':</span> <span class="pre">['S',</span> <span class="pre">'T',</span> <span class="pre">'Y']},</span> <span class="pre">'Pyro-carbamidomethyl':</span> <span class="pre">{'sites':</span> <span class="pre">['0C']},</span> <span class="pre">'Sulfo':</span> <span class="pre">{'sites':</span> <span class="pre">['C']},</span> <span class="pre">'Trimethyl':</span> <span class="pre">{'sites':</span> <span class="pre">['0',</span> <span class="pre">'K',</span> <span class="pre">'R']},</span> <span class="pre">'Trioxidation':</span> <span class="pre">{'sites':</span> <span class="pre">['H']},</span> <span class="pre">'Xlink:Disulfide':</span> <span class="pre">{'sites':</span> <span class="pre">['C-C']}}</span></em><a class="headerlink" href="#masskit.peptide.encoding.mod_sites" title="Permalink to this definition">¶</a></dt>
+<dd><p>List of post translational modifications
+Taken from unimod</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.parse_ion_type_tuple">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">parse_ion_type_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tuple_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_charge</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.parse_ion_type_tuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>split ion_type tuple into ion type and neutral loss, if specified</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tuple_in</strong> – ion type tuple</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>ValueError</strong> – more than one neutral loss</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>ion type, neutral loss</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.encoding.protonate_mass">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.encoding.</span></span><span class="sig-name descname"><span class="pre">protonate_mass</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.encoding.protonate_mass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a neutral mass and charge of an ion, calculate the m/z of the ion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass</strong> – mass</p></li>
+<li><p><strong>z</strong> – charge</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>m/z</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.peptide.spectrum_generator">
+<span id="masskit-peptide-spectrum-generator-module"></span><h2>masskit.peptide.spectrum_generator module<a class="headerlink" href="#module-masskit.peptide.spectrum_generator" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.spectrum_generator.add_theoretical_spectra">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.spectrum_generator.</span></span><span class="sig-name descname"><span class="pre">add_theoretical_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">df</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoretical_spectrum_column</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_isotopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.spectrum_generator.add_theoretical_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>add theoretical spectra to a column</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>df</strong> – dataframe containing spectra</p></li>
+<li><p><strong>theoretical_spectrum_column</strong> – name of the column to hold theoretical spectra</p></li>
+<li><p><strong>ion_types</strong> – ion types to generate. None is default for TheoreticalPeptideSpectrum</p></li>
+<li><p><strong>num_isotopes</strong> – number of c-13 isotopes to calculate</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.spectrum_generator.create_peptide_name">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.spectrum_generator.</span></span><span class="sig-name descname"><span class="pre">create_peptide_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peptide</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_charge</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_names</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_positions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.spectrum_generator.create_peptide_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>_
+create the name of a peptide spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>peptide</strong> – the peptide string</p></li>
+<li><p><strong>precursor_charge</strong> – the precursor charge</p></li>
+<li><p><strong>mod_names</strong> – list of modification names (integer)</p></li>
+<li><p><strong>mod_positions</strong> – position of modifications, 0 based</p></li>
+<li><p><strong>ev</strong> – collision energy in ev</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.peptide.spectrum_generator.generate_peptide_library">
+<span class="sig-prename descclassname"><span class="pre">masskit.peptide.spectrum_generator.</span></span><span class="sig-name descname"><span class="pre">generate_peptide_library</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_ev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">60</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_probability</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.peptide.spectrum_generator.generate_peptide_library" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a theoretical peptide library</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>set</strong> – which set to create, e.g. train, valid, test</p></li>
+<li><p><strong>num</strong> – the number of peptides</p></li>
+<li><p><strong>min_length</strong> – minimum length of the peptides</p></li>
+<li><p><strong>max_length</strong> – maximum length of the peptides</p></li>
+<li><p><strong>min_charge</strong> – the minimum charge of the peptides</p></li>
+<li><p><strong>max_charge</strong> – the maximum charge of the peptides</p></li>
+<li><p><strong>min_ev</strong> – the minimum eV (also used for nce)</p></li>
+<li><p><strong>max_ev</strong> – the maximum eV (also used for nce)</p></li>
+<li><p><strong>mod_list</strong> – the list of allowed modifications</p></li>
+<li><p><strong>mod_probability</strong> – the probability of a modification at a particular site</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the dataframe</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.peptide">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.peptide" title="Permalink to this heading">¶</a></h2>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">masskit.peptide package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-masskit.peptide.encoding">masskit.peptide.encoding module</a></li>
+<li><a class="reference internal" href="#module-masskit.peptide.spectrum_generator">masskit.peptide.spectrum_generator module</a></li>
+<li><a class="reference internal" href="#module-masskit.peptide">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/masskit.peptide.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">masskit.peptide package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    </div>
+  </body>
+</html>
