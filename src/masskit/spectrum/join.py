@@ -53,9 +53,7 @@ class Join(ABC):
         :param predicted_spectrum: the predicted spectrum
         :param theoretical_spectrum: the annotated theoretical spectrum
         :param tiebreaker: how to deal with one to multiple matches. mz is closest mz value, intensity is closest intensity, None is report multiple matches
-        :return: 3 lists with the peak ids. first is experimental peaks matching the theoretical peaks. Second are
-        the predicted peaks that match the experimental peaks. Third are the theoretical peaks that match the
-        experimental peaks.  A value of None indicates no join.
+        :return: 3 lists with the peak ids. first is experimental peaks matching the theoretical peaks. Second are the predicted peaks that match the experimental peaks. Third are the theoretical peaks that match the experimental peaks.  A value of None indicates no join.
         """
 
         # naming convention of the peak id lists: first name after "join_" denotes the spectrum for the peak ids

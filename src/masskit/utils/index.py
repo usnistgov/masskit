@@ -884,8 +884,7 @@ class ArrowLibraryMap(TableMap):
         :param file: filename or stream
         :param num: number of rows.  None means all
         :param id_field: start value of the id field
-        :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is
-        { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
+        :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
         :param min_intensity: the minimum intensity to set the fingerprint bit
         :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :return: ArrowLibraryMap

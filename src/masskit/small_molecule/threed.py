@@ -18,10 +18,9 @@ def create_conformer(mol, num_conformers=10):
     """
     create a conformer for a rdkit mol
 
-    :param mol: rdkit molecule
+    :param mol: rdkit molecule. ***note that an rdkit molecule is passed by value, not reference***
     :param num_conformers: max number of 3D conformers created per molecule
     :return: molecule, conformer ids, success/failure
-    ***note that an rdkit molecule is passed by value, not reference***
     """
     if mol.GetNumAtoms() < 1:
         logging.info("Cannot create conformer for molecule with no atoms")

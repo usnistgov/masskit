@@ -434,8 +434,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     :param analysis_annotations: add additional annotations useful for analyzing spectra
     :param precursor_charge: used to filter out ion types with charge greater than the precursor
     :param num_isotopes: number of carbon 13 isotopes to calculate
-    :return: a numpy arrays of the mz values for the ion series, ion intensities, annotations as an arrow list,
-    precursor mass, fields used for analysing ion peaks
+    :return: a numpy arrays of the mz values for the ion series, ion intensities, annotations as an arrow list, precursor mass, fields used for analysing ion peaks
     """
     # if not array like, make into list
     if not hasattr(ion_types_in, "__len__") or (type(ion_types_in) == tuple and type(ion_types_in[0]) != tuple):

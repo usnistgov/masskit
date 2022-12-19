@@ -345,8 +345,10 @@ class Ions(ABC):
     @property
     def rank(self):
         """
-        :return: the rank of the ions by intensity.  could be a numpy array
+        return ranks of peaks by intensity
         1=most intense, rank is integer over the size of the intensity matrix
+
+        :return: the rank of the ions by intensity.  could be a numpy array. 
         """
         if not hasattr(self, "_rank") or self._rank is None:
             self.rank_ions()
@@ -542,7 +544,7 @@ class Ions(ABC):
         :param max_intensity_in: the intensity of the most intense peak
         :param keep_type: keep the type of the intensity array
         :param inplace: do operation on current ions, otherwise create copy
-        :param ord, if set, normalize using norm order as in np.linalg.norm. 2 = l2
+        :param ord: if set, normalize using norm order as in np.linalg.norm. 2 = l2
         :returns: normed copy if not inplace, otherwise current ions
         """
         if not inplace:
@@ -2414,7 +2416,7 @@ class BaseSpectrum:
         :param max_intensity_in: the intensity of the most intense peak
         :param keep_type: keep the type of the intensity array
         :param inplace: do operation on current spectrum, otherwise create copy
-        :param ord, if set, normalize using norm order as in np.linalg.norm. 2 = l2
+        :param ord: if set, normalize using norm order as in np.linalg.norm. 2 = l2
         :returns: normed copy if not inplace, otherwise current ions
         """
         if inplace:

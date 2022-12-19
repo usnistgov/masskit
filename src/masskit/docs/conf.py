@@ -50,7 +50,7 @@ source_suffix = {
 templates_path = ['_templates']
 
 # Suppress autodoc imports
-autodoc_mock_imports = ['pyarrow', 'rdkit', 'pandas', 'pynndescent', 'arrow']
+autodoc_mock_imports = ['search', 'setup', 'filelock', 'pyarrow', 'rdkit', 'pandas', 'pynndescent', 'arrow']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

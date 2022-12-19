@@ -534,10 +534,8 @@ def load_msp2array(
     :param num: the maximum number of records to generate (None=all)
     :param id_field: the spectrum id to begin with
     :param set_probabilities: how to divide into dev, train, valid, test
-    :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE
-    regex match group 1 is the value
-    :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is
-    { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
+    :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE. regex match group 1 is the value
+    :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :param parse_glyco_annotations: parse glycopeptide annotations
