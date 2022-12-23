@@ -22,8 +22,6 @@ class LibraryAccessor:
     def __init__(self, pandas_obj):
         self._validate(pandas_obj)
         self._obj = pandas_obj  # the dataframe
-        if 'lib_type' not in self._obj.attrs:
-            self._obj.attrs['lib_type'] = None  # used to persist the type of library. Unfortunately does not persist
         # across all operations, e.g. query()
 
     def copy(self):
