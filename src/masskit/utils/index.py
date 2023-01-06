@@ -5,8 +5,7 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from scipy import sparse
 from masskit.spectrum.spectrum import init_spectrum
-from masskit.data_specs.schemas import min_spectrum_fields, molecule_experimental_fields, peptide_fields, \
-    base_experimental_fields, molecule_annotation_fields
+from masskit.data_specs.schemas import min_spectrum_fields, tablemap_fields
 import masskit.utils.files as msuf
 from masskit.utils.general import open_if_filename
 #from masskit.utils.search import tanimoto_search
@@ -15,6 +14,7 @@ import pynndescent
 import pickle
 from masskit.utils.fingerprints import SpectrumFloatFingerprint, SpectrumTanimotoFingerPrint
 from masskit.utils.hitlist import Hitlist
+from rdkit import Chem
 
 # try:
 #     from numba import jit, prange
@@ -666,7 +666,7 @@ class TableMap(ABC):
         else:
             self.column_name = column_name
         # fields to report
-        self.field_list = molecule_experimental_fields + peptide_fields + base_experimental_fields + molecule_annotation_fields
+        self.field_list = tablemap_fields
 
     def __getitem__(self, key):
         """
@@ -758,6 +758,21 @@ class TableMap(ABC):
         """
         msuf.spectra_to_msp(file, self, annotate=annotate, ion_types=ion_types)
 
+def make_spectrum(row):
+    return init_spectrum().from_arrow(row)
+
+def make_mol(row):
+    attribute = row.get('mol')
+    if attribute is not None:
+        return Chem.rdMolInterchange.JSONToMols(attribute())[0]
+    else:
+        return None
+
+converter_list = {
+    'spectrum': make_spectrum,
+    'mol': make_mol,
+}
+
 class ArrowLibraryMap(TableMap):
     """
     wrapper for an arrow library
@@ -796,12 +811,18 @@ class ArrowLibraryMap(TableMap):
         return_val = {}
         # put interesting fields in the dictionary
         for field in self.field_list:
-            attribute = self.row.get(field.name)
-            if attribute is not None:
-                return_val[field.name] = attribute()
+            if field.name in converter_list:
+                converted_val = converter_list[field.name](self.row)
+                if converted_val is not None:
+                    return_val[field.name] = converted_val
+            else:
+                attribute = self.row.get(field.name)
+                if attribute is not None:
+                    return_val[field.name] = attribute()
 
         # create the spectrum
-        return_val[self.column_name] = init_spectrum().from_arrow(self.row)
+        if self.column_name is not None:
+            return_val[self.column_name] = init_spectrum().from_arrow(self.row)
         return return_val
 
     def getitem_by_id(self, key):
@@ -818,7 +839,10 @@ class ArrowLibraryMap(TableMap):
             return self.create_dict(key)
 
     def getspectrum_by_id(self, key):
-        return self.getitem_by_id(key)[self.column_name]
+        if self.column_name is not None:
+            return self.getitem_by_id(key)[self.column_name]
+        else:
+            return None
 
     def getspectrum_by_row(self, key):
         assert (0 <= key < len(self))

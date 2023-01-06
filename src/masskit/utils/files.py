@@ -1059,8 +1059,7 @@ def load_sdf2array(
         new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
         new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
         new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
-        json_string = json.dumps(Chem.rdMolInterchange.MolToJSON(mol))
-        new_row["mol"] = json_string
+        new_row["mol"] = Chem.rdMolInterchange.MolToJSON(mol)
         new_row["num_atoms"] = mol.GetNumAtoms()
         ecfp4.object2fingerprint(mol)  # expressed as a bit vector
         new_row["ecfp4"] = ecfp4.to_numpy()

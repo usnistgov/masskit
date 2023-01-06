@@ -237,11 +237,20 @@ molecule_annotation_fields = [
     pa.field("tpsa", pa.float64()),
 ]
 
+# fields that describe small molecules and associated spectra.  used in file schemas
 molecule_fields = molecule_definition_fields + molecule_annotation_fields + molecule_experimental_fields
 
+# used to convert an arrow table for a peptide spectra to a spectrum object
+# it omits the calcuated molecule_annotation_fields in part to avoid adding large fields to the spectrum
 experimental_fields = molecule_experimental_fields + peptide_fields + base_experimental_fields
 
+# fields used in arrow tables
+tablemap_fields = molecule_experimental_fields + peptide_fields + base_experimental_fields + molecule_annotation_fields + molecule_definition_fields
+
+# schema for standard spectral file formats which do not include a molecular connectivity graph
 spectrums_schema = pa.schema(base_fields + peptide_fields)
+
+# schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
 molecules_schema = pa.schema(base_fields + molecule_fields)
 
 # Useful lists of fields

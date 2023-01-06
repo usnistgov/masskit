@@ -21,7 +21,7 @@ def create_object_id(filename, filters):
     object_name = str(filename)
     if filters is not None:
         object_name += str(filters)
-    return hashlib.sha1(object_name.encode('utf-8')).digest()
+    return hashlib.sha1(object_name.encode('utf-8'))
 
 def create_lockfile_name(prefix):
     # use the plasma server pid to create a lockfile.  we use the server pid to avoid race conditions
@@ -45,7 +45,7 @@ def save_to_plasma(client, filename, columns, filters):
     :param filters: parquet file filters
     :return: ArrowLibraryMap or None if data is already in plasma
     """
-    obj_id = ObjectID(create_object_id(filename, filters))
+    obj_id = ObjectID(create_object_id(filename, filters).digest())
     data = None
         
     lock_file = create_lockfile_name("plasma_lock_save")       
@@ -72,6 +72,39 @@ def save_to_plasma(client, filename, columns, filters):
         
     return data
 
+def save_to_arrow(filename, columns, filters):
+    """
+    Load a parquet file and save it as a temp arrow file after applying
+    filters and column lists.  Load it as a memmap if the temp arrow file
+    already exists
+
+    :param filename: parquet file
+    :param columns: columns to load
+    :param filters: parquet file filters
+    :return: ArrowLibraryMap
+    """
+    obj_id = create_object_id(filename, filters).hexdigest() + '.arrow'
+    file_path = Path(tempfile.gettempdir()) / obj_id
+    data = None
+
+    # need to use a file lock here as the file might be partially written
+    # note that on linux, the lock file persists after the process exits because of
+    # https://stackoverflow.com/questions/58098634/why-does-the-python-filelock-library-delete-lockfiles-on-windows-but-not-unix
+    with FileLock(file_path.with_suffix(".lock")):
+        if file_path.is_file():
+            # read in arrow file as memory map
+            data = pa.ipc.RecordBatchFileReader(pa.memory_map(str(file_path), 'r')).read_all()
+            # create ArrowLibraryMap
+            data = ArrowLibraryMap(data)
+        else:
+            # read from parquet file
+            data = ArrowLibraryMap.from_parquet(filename, columns=columns, filters=filters)
+            with pa.OSFile(str(file_path), 'wb') as sink:
+                with pa.RecordBatchFileWriter(sink, data.to_arrow().schema) as writer:
+                    writer.write_table(data.to_arrow())
+
+    return data
+
 
 def load_from_plasma(client, filename, filters):
     """
@@ -83,7 +116,7 @@ def load_from_plasma(client, filename, filters):
     :raises ValueError: can't find the data
     :return: an ArrowLibraryMap
     """
-    obj_id = ObjectID(create_object_id(filename, filters))
+    obj_id = ObjectID(create_object_id(filename, filters).digest())
 
     lock_file = create_lockfile_name("plasma_lock_load")       
 
