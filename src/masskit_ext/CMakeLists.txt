@@ -24,6 +24,17 @@ find_package(Arrow CONFIG REQUIRED)
 find_package(ArrowDataset CONFIG REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
+if(NOT DEFINED PYARROW_INCLUDE_DIR)
+	#set(PYARROW_INCLUDE_DIR "/home/slottad/miniconda3/envs/masskit/lib/python3.9/site-packages/pyarrow/include")
+	execute_process(COMMAND python -c "import pyarrow as pa;print(pa.get_include(),end='')"
+                    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+                    RESULT_VARIABLE PYARROW_INCLUDE_RESULT
+					OUTPUT_VARIABLE PYARROW_INCLUDE_DIR)
+	if(NOT PYARROW_INCLUDE_RESULT EQUAL "0")
+		message(FATAL_ERROR "Unable to locate the include directory for pyarrow.h")
+	endif()
+endif()
+
 if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 11)
 endif()
