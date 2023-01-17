@@ -72,11 +72,15 @@ fi
 
 # Note: Please keep lists alphabetical
 
+# The gxx package is installed because the arrow-cpp package is built with 
+# a newer version than both AL2022 and the rest of conda-forge 
+# (11.3 at the time of this comment) Why? I dunno.
 BASE_PACKAGES="
   arrow-cpp=10.* \
   conda-build \
   cmake \
   cython \
+  gxx>12 \
   hydra-core \
   imageio \
   jsonpickle \
