@@ -23,6 +23,7 @@ __pycache__/
 .massspec_cache/
 # python build directories
 libraries/build/
+src/masskit_ext/out/
 # sphinx document build directories
 _build/
 **/docs/*.rst
