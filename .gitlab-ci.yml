@@ -11,7 +11,7 @@ stages:
 setup:masskit_env:
   stage: setup
   rules:
-    - if: $CI_COMMIT_REF_NAME =~ /master/
+    - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
       changes:
         - environments/init_masskit.sh
   script:
