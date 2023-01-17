@@ -1,0 +1,26 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+
+stages:
+  - setup
+  - build
+  - test
+  - deploy
+
+setup:masskit_env:
+  stage: setup
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ /master/
+      changes:
+        - environments/init_masskit.sh
+  script:
+    - source environments/init_masskit.sh --force
+    - echo "Dumping conda environment..."
+    - conda env export --name arrow > masskit_conda.yml
+  tags:
+    - linux
+    - masskit
+  artifacts:
+    paths:
+      - masskit_conda.yml
