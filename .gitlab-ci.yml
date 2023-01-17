@@ -8,7 +8,7 @@ stages:
   - test
   - deploy
 
-setup:masskit_env:
+setup masskit_env:
   stage: setup
   rules:
     - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
@@ -24,3 +24,36 @@ setup:masskit_env:
   artifacts:
     paths:
       - masskit_conda.yml
+
+build masskit:
+  stage: build
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
+  script:
+    - source environments/init_masskit.sh
+    - VERBOSE=1 pip wheel .
+  tags:
+    - linux
+    - masskit
+  artifacts:
+    paths:
+      - masskit*.whl
+
+test masskit:
+  stage: test
+  rules:
+    - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
+  dependencies:
+    - build masskit
+  script:
+    - source environments/init_masskit.sh
+    - pip install masskit*.whl
+    - cd tests
+    - pytest
+    - pip uninstall masskit
+  tags:
+    - linux
+    - masskit
+  artifacts:
+    paths:
+      - masskit*.whl
