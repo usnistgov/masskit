@@ -50,7 +50,7 @@ test masskit:
     - pip install masskit*.whl
     - cd tests
     - pytest
-    - pip uninstall masskit
+    - pip uninstall -y masskit
   tags:
     - linux
     - masskit
