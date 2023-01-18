@@ -42,7 +42,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_data(std::string filename) {
     //return scanner->Head(50);
 }
 
-arrow::Status Execute() {
+arrow::Status Execute(const std::string FILENAME) {
     // Adding compute functions to the central registry is a runtime
     // operation, even arrow does this for itself. At some point we'll
     // have a single function that calls all of the sub-registry
@@ -52,7 +52,7 @@ arrow::Status Execute() {
     ARROW_RETURN_NOT_OK(RegisterSearchFunctions(registry));
   
     // Load the two columns we need from the given parquet file.
-    const std::string FILENAME = "/home/slottad/nist/data/hr_msms_nist.parquet";
+    //const std::string FILENAME = "/home/slottad/nist/data/hr_msms_nist.parquet";
     std::shared_ptr<arrow::Table> table;
     ARROW_ASSIGN_OR_RAISE(table, read_data(FILENAME));
     std::cout << "Loaded " << table->num_rows() << " rows in " << table->num_columns() << " columns." << std::endl;
@@ -109,10 +109,17 @@ arrow::Status Execute() {
 
 
 int main(int argc, char** argv) {
-    auto status = Execute();
+    if (argc < 2) {
+        std::cerr << argv[0] << ": missing parquet input file!\n";
+        std::cerr << "\tusage: " << argv[0] << " <input_file> ...\n";
+        return EXIT_FAILURE;
+    }
+
+    auto status = Execute(std::string(argv[1]));
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
+
     return EXIT_SUCCESS;
 }
