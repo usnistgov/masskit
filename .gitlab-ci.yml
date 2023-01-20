@@ -1,7 +1,3 @@
-workflow:
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-
 stages:
   - setup
   - build
@@ -11,13 +7,12 @@ stages:
 setup masskit_env:
   stage: setup
   rules:
-    - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
-      changes:
+    - changes:
         - environments/init_masskit.sh
   script:
-    - source environments/init_masskit.sh --force
+    - source environments/init_masskit.sh --force --suffix $CI_COMMIT_BRANCH
     - echo "Dumping conda environment..."
-    - conda env export --name arrow > masskit_conda.yml
+    - conda env export --name masskit_${CI_COMMIT_BRANCH} > masskit_conda.yml
   tags:
     - linux
     - masskit
@@ -27,10 +22,8 @@ setup masskit_env:
 
 build masskit:
   stage: build
-  rules:
-    - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
   script:
-    - source environments/init_masskit.sh
+    - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
     - VERBOSE=1 pip wheel .
   tags:
     - linux
@@ -41,12 +34,10 @@ build masskit:
 
 test masskit:
   stage: test
-  rules:
-    - if: $CI_COMMIT_REF_NAME =~ $CI_DEFAULT_BRANCH
   dependencies:
     - build masskit
   script:
-    - source environments/init_masskit.sh
+    - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
     - pip install masskit*.whl
     - cd tests
     - pytest
