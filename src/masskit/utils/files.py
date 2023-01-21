@@ -21,6 +21,7 @@ from masskit.spectrum.spectrum import init_spectrum
 try:
     from rdkit import Chem
     from rdkit.Chem import AllChem
+    from rdkit.Chem.MolStandardize import rdMolStandardize
     from rdkit.Chem.EnumerateStereoisomers import StereoEnumerationOptions, EnumerateStereoisomers
     from rdkit import RDLogger
 except ImportError:
@@ -889,17 +890,6 @@ def load_sdf2array(
     set_probabilities=(0.01, 0.97, 0.01, 0.01),
     suppress_rdkit_warnings=True
 ):
-    if source is None:
-        source = 'nist'
-    if id_field is None:
-        id_field = 'NISTNO'
-    if type(id_field) is int:
-        # generate id using id_field as start
-        current_id = id_field
-    else:
-        current_id = None
-    if id_field_type is None:
-        id_field_type = 'int'
     """
     Read file in SDF format and return as Lists of Dicts.
 
@@ -928,6 +918,38 @@ def load_sdf2array(
     - some molecules fail Sanitize
     - some have empty spectra
     """
+    if source == None:
+        source = 'nist'
+
+    if source == 'nist':
+        if id_field is None:
+            id_field = 'NISTNO'
+        if id_field_type is None:
+            id_field_type = 'int'
+        name_field = ["_NAME", "NAME"]
+    elif source == 'pubchem':
+        if id_field is None:
+            id_field = 'PUBCHEM_COMPOUND_CID'
+        if id_field_type is None:
+            id_field_type = 'int'
+        name_field = ['PUBCHEM_IUPAC_NAME']
+    elif source == 'nist_ri':
+        if id_field is None:
+            id_field = 'NISTNO'
+        if id_field_type is None:
+            id_field_type = 'int'
+        name_field = ["_NAME", "NAME"]
+    else:
+        raise ValueError('unsupported sdf format')
+
+    current_id = None
+    current_name = None
+
+    # generate id using id_field as start
+    if type(id_field) is int:
+        current_id = id_field
+        id_field_type = 'int'
+
 
     # list of batch tables
     tables = []
@@ -950,6 +972,8 @@ def load_sdf2array(
     # fingerprint generator that respects counts but not chirality as mass spec tends to be chirality blind
     ecfp4 = ECFPFingerprint()
 
+    #dcon = rdMolStandardize.MetalDisconnector()
+
     # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
     # there is only one stereoisomer per molecule.
     # 2020-02-27  on the other hand, molvs does call sanitization in standardize_mol, so move to threed.standardize_mol
@@ -957,26 +981,38 @@ def load_sdf2array(
 
         error_string = f"index={i} "
 
-        if mol is None:
+        if mol is None or mol.GetNumAtoms() < 1:
             logging.info(f"Unable to create molecule object for {error_string}")
             continue
 
         # get ids for error reporting
         if type(id_field) is not int and mol.HasProp(id_field):
-            error_string += "id=" + mol.GetProp(id_field)
+            if id_field_type == 'int':
+                current_id = int(mol.GetProp(id_field))
+            else:
+                current_id = mol.GetProp(id_field)
 
-        if mol.HasProp("NAME"):
-            error_string += " name=" + mol.GetProp("NAME")
-        elif mol.HasProp("_NAME"):
-            error_string += " name=" + mol.GetProp("_NAME")
+        if current_id is not None:
+            error_string += "id=" + str(current_id)
+
+        for field in name_field:
+            if mol.HasProp(field):
+                current_name = mol.GetProp(field)
+                break
+
+        if current_name is not None:
+            error_string += " name=" + current_name
         else:
             logging.info(f"{error_string} does not have a NAME or _NAME property")
 
         try:
             mol = masskit.small_molecule.utils.standardize_mol(mol)
+            # mol = dcon.Disconnect(mol)
+            # mol = rdMolStandardize.Cleanup(mol)
         except ValueError as e:
             logging.info(f"Unable to standardize {error_string}")
             continue
+        
         if len(mol.GetPropsAsDict()) == 0:
             logging.info(f"All molecular props unavailable {error_string}")
             # likely due to bug in rdMolStandardize.Cleanup()
@@ -1088,62 +1124,82 @@ def load_sdf2array(
             spectrum.from_mol(
                 mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
             )
-            new_row["precursor_mz"] = spectrum.precursor.mz
-            new_row["name"] = spectrum.name
-            new_row["synonyms"] = json.dumps(spectrum.synonyms)
-            if current_id is not None:
-                spectrum.id = current_id
-                current_id += 1
-            new_row["id"] = spectrum.id
-            new_row["spectrum"] = spectrum
-            new_row["column"] = spectrum.column
-            new_row["experimental_ri"] = spectrum.experimental_ri
-            new_row["experimental_ri_error"] = spectrum.experimental_ri_error
-            new_row["experimental_ri_data"] = spectrum.experimental_ri_data
-            new_row["stdnp"] = spectrum.stdnp
-            new_row["stdnp_error"] = spectrum.stdnp_error
-            new_row["stdnp_data"] = spectrum.stdnp_data
-            new_row["stdpolar"] = spectrum.stdpolar
-            new_row["stdpolar_error"] = spectrum.stdpolar_error
-            new_row["stdpolar_data"] = spectrum.stdpolar_data
-            new_row["estimated_ri"] = spectrum.estimated_ri
-            new_row["estimated_ri_error"] = spectrum.estimated_ri_error
-            new_row["exact_mass"] = spectrum.exact_mass
-            new_row["ion_mode"] = spectrum.ion_mode
-            new_row["charge"] = spectrum.charge
-            new_row["instrument"] = spectrum.instrument
-            new_row["instrument_type"] = spectrum.instrument_type
-            new_row["instrument_model"] = spectrum.instrument_model
-            new_row["ionization"] = spectrum.ionization
-            new_row["collision_gas"] = spectrum.collision_gas
-            new_row["sample_inlet"] = spectrum.sample_inlet
-            new_row["spectrum_type"] = spectrum.spectrum_type
-            new_row["precursor_type"] = spectrum.precursor_type
-            new_row["inchi_key_orig"] = spectrum.inchi_key
-            new_row["vial_id"] = spectrum.vial_id
-            new_row["collision_energy"] = spectrum.collision_energy
-            new_row["nce"] = spectrum.nce
-            new_row["ev"] = spectrum.ev
-            new_row["insource_voltage"] = spectrum.insource_voltage
-            new_row["mz"] = spectrum.products.mz
-            new_row["intensity"] = spectrum.products.intensity
-            new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
-            new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
-            new_row["spectrum_fp"] = fingerprint.to_numpy()
-            new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-
+            spectrum.id = current_id
+            spectrum.name = current_name
+            try:
+                new_row["precursor_mz"] = spectrum.precursor.mz
+                new_row["synonyms"] = json.dumps(spectrum.synonyms)
+                new_row["spectrum"] = spectrum
+                new_row["column"] = spectrum.column
+                new_row["experimental_ri"] = spectrum.experimental_ri
+                new_row["experimental_ri_error"] = spectrum.experimental_ri_error
+                new_row["experimental_ri_data"] = spectrum.experimental_ri_data
+                new_row["stdnp"] = spectrum.stdnp
+                new_row["stdnp_error"] = spectrum.stdnp_error
+                new_row["stdnp_data"] = spectrum.stdnp_data
+                new_row["stdpolar"] = spectrum.stdpolar
+                new_row["stdpolar_error"] = spectrum.stdpolar_error
+                new_row["stdpolar_data"] = spectrum.stdpolar_data
+                new_row["estimated_ri"] = spectrum.estimated_ri
+                new_row["estimated_ri_error"] = spectrum.estimated_ri_error
+                new_row["exact_mass"] = spectrum.exact_mass
+                new_row["ion_mode"] = spectrum.ion_mode
+                new_row["charge"] = spectrum.charge
+                new_row["instrument"] = spectrum.instrument
+                new_row["instrument_type"] = spectrum.instrument_type
+                new_row["instrument_model"] = spectrum.instrument_model
+                new_row["ionization"] = spectrum.ionization
+                new_row["collision_gas"] = spectrum.collision_gas
+                new_row["sample_inlet"] = spectrum.sample_inlet
+                new_row["spectrum_type"] = spectrum.spectrum_type
+                new_row["precursor_type"] = spectrum.precursor_type
+                new_row["inchi_key_orig"] = spectrum.inchi_key
+                new_row["vial_id"] = spectrum.vial_id
+                new_row["collision_energy"] = spectrum.collision_energy
+                new_row["nce"] = spectrum.nce
+                new_row["ev"] = spectrum.ev
+                new_row["insource_voltage"] = spectrum.insource_voltage
+                new_row["mz"] = spectrum.products.mz
+                new_row["intensity"] = spectrum.products.intensity
+                new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
+                new_row["spectrum_fp"] = fingerprint.to_numpy()
+                new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+            except AttributeError:
+                logging.info('attribute error from spectrum: ' + error_string)
+                raise
         elif source == "pubchem":
-            if mol.HasProp("PUBCHEM_COMPOUND_CID"):
-                new_row["id"] = mol.GetProp("PUBCHEM_COMPOUND_CID")
-            if mol.HasProp("PUBCHEM_IUPAC_NAME"):
-                new_row["name"] = mol.GetProp("PUBCHEM_IUPAC_NAME")
             if mol.HasProp("PUBCHEM_XLOGP3"):
                 new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
             if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
                 new_row["component_count"] = float(
                     mol.GetProp("PUBCHEM_COMPONENT_COUNT")
                 )
+        elif source == 'nist_ri':
+            new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
+            if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
+                ri_string = mol.GetProp("COLUMN CLASS")
+                if ri_string == 'Semi-standard non-polar' or ri_string == 'All column types':
+                    new_row['column'] = 'SemiStdNP'
+                    new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
+                    new_row['experimental_ri_error'] = 0.0
+                    new_row['experimental_ri_data'] = 1
+                elif ri_string == 'Standard non-polar':
+                    new_row['column'] = 'StdNP'
+                    new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
+                    new_row['stdnp_error'] = 0.0
+                    new_row['stdnp_data'] = 1
+                elif ri_string == 'Standard polar':
+                    new_row['column'] = 'StdPolar'
+                    new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
+                    new_row['stdpolar_error'] = 0.0
+                    new_row['stdpolar_data'] = 1
+
+        new_row["id"] = current_id
+        new_row["name"] = current_name
+        if type(id_field) is int:
+            current_id += 1
 
         add_row_to_records(records, new_row)
         if i % 10000 == 0:

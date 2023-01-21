@@ -235,6 +235,7 @@ molecule_annotation_fields = [
     pa.field("rotatable_bonds", pa.int64()),
     pa.field("smiles", pa.string()),
     pa.field("tpsa", pa.float64()),
+    pa.field("shortest_paths", pa.string()),  # shortest paths between atoms in molecule
 ]
 
 # fields that describe small molecules and associated spectra.  used in file schemas

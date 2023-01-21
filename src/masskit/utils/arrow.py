@@ -1,4 +1,5 @@
 import builtins
+import os
 from pathlib import Path
 import tempfile
 from masskit.utils.index import ArrowLibraryMap
@@ -84,22 +85,22 @@ def save_to_arrow(filename, columns, filters):
     :return: ArrowLibraryMap
     """
     obj_id = create_object_id(filename, filters).hexdigest() + '.arrow'
-    file_path = Path(tempfile.gettempdir()) / obj_id
+    temp_file_path = Path(tempfile.gettempdir()) / obj_id
     data = None
 
     # need to use a file lock here as the file might be partially written
     # note that on linux, the lock file persists after the process exits because of
     # https://stackoverflow.com/questions/58098634/why-does-the-python-filelock-library-delete-lockfiles-on-windows-but-not-unix
-    with FileLock(file_path.with_suffix(".lock")):
-        if file_path.is_file():
+    with FileLock(temp_file_path.with_suffix(".lock")):
+        if temp_file_path.is_file() and os.path.getmtime(filename) < os.path.getmtime(temp_file_path):
             # read in arrow file as memory map
-            data = pa.ipc.RecordBatchFileReader(pa.memory_map(str(file_path), 'r')).read_all()
+            data = pa.ipc.RecordBatchFileReader(pa.memory_map(str(temp_file_path), 'r')).read_all()
             # create ArrowLibraryMap
             data = ArrowLibraryMap(data)
         else:
             # read from parquet file
             data = ArrowLibraryMap.from_parquet(filename, columns=columns, filters=filters)
-            with pa.OSFile(str(file_path), 'wb') as sink:
+            with pa.OSFile(str(temp_file_path), 'wb') as sink:
                 with pa.RecordBatchFileWriter(sink, data.to_arrow().schema) as writer:
                     writer.write_table(data.to_arrow())
 

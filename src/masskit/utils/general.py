@@ -1,7 +1,6 @@
 import importlib
 import os
 from pathlib import Path
-
 import numpy as np
 
 
@@ -12,6 +11,8 @@ def class_for_name(module_name_list, class_name):
     :param class_name: class to look for
     :return: class
     """
+    if class_name is None:
+        return None
     # load the module, will raise ImportError if module cannot be loaded
     c = None
     for module_name in module_name_list:
@@ -28,7 +29,7 @@ def class_for_name(module_name_list, class_name):
     return c
 
 
-def open_if_filename(fp, mode):
+def open_if_filename(fp, mode, newline=None):
     """
     if the fp is a string, open the file
 
@@ -37,7 +38,7 @@ def open_if_filename(fp, mode):
     :return: stream
     """
     if isinstance(fp, str) or isinstance(fp, Path) :
-        fp = open(fp, mode)
+        fp = open(fp, mode, newline=newline)
         if not fp:
             raise ValueError(f"not able to open file")
     return fp

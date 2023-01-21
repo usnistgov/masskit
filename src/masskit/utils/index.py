@@ -1,3 +1,4 @@
+import csv
 import logging
 import timeit
 import numpy as np
@@ -12,6 +13,7 @@ from masskit.utils.general import open_if_filename
 from masskit.utils.tables import row_view, arrow_to_pandas
 import pynndescent
 import pickle
+import jsonpickle
 from masskit.utils.fingerprints import SpectrumFloatFingerprint, SpectrumTanimotoFingerPrint
 from masskit.utils.hitlist import Hitlist
 from rdkit import Chem
@@ -758,6 +760,13 @@ class TableMap(ABC):
         """
         msuf.spectra_to_msp(file, self, annotate=annotate, ion_types=ion_types)
 
+"""
+code to convert encoded or multicolumn data structures into python objects.
+
+It would be useful to (a) include the names of these fields in the TableMap field_names,
+(b) have converters to str format for output to csv files, (c) possibly have this work from tables.py
+"""
+
 def make_spectrum(row):
     return init_spectrum().from_arrow(row)
 
@@ -768,9 +777,17 @@ def make_mol(row):
     else:
         return None
 
+def make_shortest_paths(row):
+    attribute = row.get('shortest_paths')
+    if attribute is not None:
+        return jsonpickle.decode(attribute(), keys=True)
+    else:
+        return None
+
 converter_list = {
     'spectrum': make_spectrum,
     'mol': make_mol,
+    'shortest_paths': make_shortest_paths,
 }
 
 class ArrowLibraryMap(TableMap):
@@ -782,6 +799,7 @@ class ArrowLibraryMap(TableMap):
     def __init__(self, table_in, column_name=None, num=0, *args, **kwargs):
         """
         :param table_in: parquet table
+        :param column_name: name of the spectrum column
         :param num: number of rows to use
         """
         super().__init__(column_name=column_name, *args, **kwargs)
@@ -879,6 +897,27 @@ class ArrowLibraryMap(TableMap):
         :param file: filename or file pointer
         """
         msuf.spectra_to_mgf(file, self)
+
+    def to_csv(self, file, columns=None):
+        """
+        Write to csv file, skipping any spectrum column and writing mol columns as
+        canonical SMILES
+
+        :param file: filename or file pointer.  newline should be set to ''
+        :param columns: list of columns to write out to csv file.  If none, all columns
+        """
+        if columns is None:
+            columns = self.field_list
+
+        fp = open_if_filename(file, 'w', newline='')
+        csv_writer = csv.DictWriter(fp, fieldnames=columns, extrasaction='ignore')
+        csv_writer.writeheader()
+
+        for i in range(len(self)):
+            row = self.getitem_by_row(i)
+            if 'mol' in row:
+                row['mol'] = Chem.rdmolfiles.MolToSmiles(row['mol'])
+            csv_writer.writerow(row)
 
     @staticmethod
     def from_parquet(file, columns=None, num=None, combine_chunks=False, filters=None):
