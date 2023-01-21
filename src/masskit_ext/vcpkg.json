@@ -6,7 +6,7 @@
     {
       "name": "arrow",
       "default-features": false,
-      "features": [ "csv", "filesystem", "json", "parquet" ]
+      "features": [ "csv", "filesystem", "json", "parquet", "dataset" ]
     },
     "parquet",
     "pybind11"

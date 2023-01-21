@@ -24,7 +24,7 @@ See https://arrow.apache.org/install/
 
 ## Python
 
-```pip install pyarrow==10.*```
+```pip install --user pyarrow==10.*```
 
 or
 
