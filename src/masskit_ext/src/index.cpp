@@ -66,29 +66,29 @@ std::shared_ptr<arrow::Table> calc_start_stops(std::shared_ptr<arrow::Table> tab
             }
             // std::cout.precision(12);	
             double tolval = tol->Value(i);
-            starts_list_builder.Append();
-            stops_list_builder.Append();
+            auto r1 = starts_list_builder.Append();
+            auto r2 = stops_list_builder.Append();
             for (int64_t j = mz_list->value_offset(i); j < mz_list->value_offset(i+1); j++) {
             	double mzval = mz->Value(j);
             	double mod = half_tolerance(mzval, tolval, isPPM);
                 // std::cout << "[" << mzval - mod
                 // 		  << "," << mzval 
                 // 		  << "," << mzval + mod  << "], ";
-         		starts_value_builder->Append(mzval - mod);
-         		stops_value_builder->Append(mzval + mod);
+         		auto r3 = starts_value_builder->Append(mzval - mod);
+         		auto r4 = stops_value_builder->Append(mzval + mod);
             }
             // std::cout << std::endl;
         }
     }
     std::shared_ptr<arrow::Array> starts_array;
-    starts_list_builder.Finish(&starts_array);
+    auto r5 = starts_list_builder.Finish(&starts_array);
     auto starts_field = arrow::field("starts", arrow::list(arrow::float64()));
     table = table->AddColumn(table->num_columns(), 
     						 starts_field, 
     						 std::make_shared<arrow::ChunkedArray>(arrow::ChunkedArray(starts_array))).ValueOrDie();
 
     std::shared_ptr<arrow::Array> stops_array;
-    stops_list_builder.Finish(&stops_array);
+    auto r6 = stops_list_builder.Finish(&stops_array);
     auto stops_field = arrow::field("stops", arrow::list(arrow::float64()));
     table = table->AddColumn(table->num_columns(), 
     						 stops_field, 
