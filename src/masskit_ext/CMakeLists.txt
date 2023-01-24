@@ -31,7 +31,11 @@ if(NOT DEFINED PYARROW_INCLUDE_DIR)
                     RESULT_VARIABLE PYARROW_INCLUDE_RESULT
 					OUTPUT_VARIABLE PYARROW_INCLUDE_DIR)
 	if(NOT PYARROW_INCLUDE_RESULT EQUAL "0")
-		message(FATAL_ERROR "Unable to locate the include directory for pyarrow.h")
+		if(EXISTS $ENV{HOME}/.local/lib/python3.11/site-packages/pyarrow/include/arrow/python/pyarrow.h)
+			set(PYARROW_INCLUDE_DIR $ENV{HOME}/.local/lib/python3.11/site-packages/pyarrow/include/)
+		else()
+			message(FATAL_ERROR "Unable to locate the include directory for pyarrow.h")
+		endif()
 	endif()
 endif()
 
@@ -39,7 +43,7 @@ if(NOT DEFINED CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 17)
 endif()
 
-# We require a C++11 compliant compiler
+# We require a C++17 compliant compiler
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #option(ARROW_LINK_SHARED "Link to the Arrow shared library" ON)
 

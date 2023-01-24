@@ -20,9 +20,9 @@ class  CosineScoreOptions : public cp::FunctionOptions {
   static CosineScoreOptions Defaults() { return CosineScoreOptions(); }
 
   /// Sorting order
-  SortOrder order;
+  //SortOrder order;
   /// Whether nulls and NaNs are placed at the start or at the end
-  NullPlacement null_placement;
+  //NullPlacement null_placement;
 };
 
 
