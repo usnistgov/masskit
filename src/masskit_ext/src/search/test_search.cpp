@@ -42,7 +42,11 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_data(std::string filename) {
     //return scanner->Head(50);
 }
 
+<<<<<<< HEAD
 arrow::Status Execute(std::string FILENAME) {
+=======
+arrow::Status Execute(const std::string FILENAME) {
+>>>>>>> f4fc10b25b1fbb96bf6e96e2ba97b557186303af
     // Adding compute functions to the central registry is a runtime
     // operation, even arrow does this for itself. At some point we'll
     // have a single function that calls all of the sub-registry
@@ -108,14 +112,24 @@ arrow::Status Execute(std::string FILENAME) {
 
 int main(int argc, char** argv) {
     if (argc < 2) {
+<<<<<<< HEAD
         std::cerr << argv[0] << ": missing input file!\n";
         std::cerr << "usage: " << argv[0] << " <input_file> ...\n";
         return EXIT_FAILURE;
     }
     auto status = Execute(argv[1]);
+=======
+        std::cerr << argv[0] << ": missing parquet input file!\n";
+        std::cerr << "\tusage: " << argv[0] << " <input_file> ...\n";
+        return EXIT_FAILURE;
+    }
+
+    auto status = Execute(std::string(argv[1]));
+>>>>>>> f4fc10b25b1fbb96bf6e96e2ba97b557186303af
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
+
     return EXIT_SUCCESS;
 }

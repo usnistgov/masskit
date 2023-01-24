@@ -11,7 +11,8 @@ fi
 
 # default name of environment to set up
 ENVNAME=masskit
-
+# Allow customizable suffixes, e.g. branch specific CI/CD testing
+SUFFIX=
 # remove previous versions of environments if set to 1
 REMOVE=0
 # Enable machine learning packages if set to 1
@@ -29,6 +30,12 @@ while [[ $# -gt 0 ]]; do
       # machine learning environment
       ENVNAME=masskit_ai
       USE_ML=1
+      shift # remove argument
+      ;;
+    -s | --suffix)
+      # Add suffix to environment
+      shift # remove argument
+      SUFFIX=$1
       shift # remove argument
       ;;
     -c | --cpu)
@@ -53,6 +60,10 @@ if [[ $CONDA_SHLVL != 1 ]]
 then
     echo "must be in base environment or otherwise mamba will not work properly"
     return 2
+fi
+
+if [[ ! -z "$SUFFIX" ]] ; then
+  ENVNAME=${ENVNAME}_${SUFFIX}
 fi
 
 if [ $REMOVE -eq 1 ]; then
