@@ -24,12 +24,12 @@ const cp::FunctionDoc tanimoto_func_doc{
     "returns the tanimoto score for every element for the given query input",
     // Arguments
     { "query_fingerprint", "query_fingerprint_count",
-      "fingerprint_array", "fingerprint_array_counts",
-      "predicate_array"},
+      "fingerprint_array", "fingerprint_array_counts"},
     // Options (optional) 
     "UDFOptions",
     // Are options required?
     false};
+
 
 // The actual compute function. This is a scalar function, so the
 // output will generally have the same number of rows as the
@@ -115,11 +115,39 @@ arrow::Status TanimotoFunction(cp::KernelContext* ctx,
   return arrow::Status::OK();
 }
 
+const cp::FunctionDoc cosine_score_doc{
+    // Summary
+    "User-defined-function to usage to calculate the cosine score",
+    // Description
+    "returns the cosine score for every element for the given query input",
+    // Arguments
+    { "query_mz", "query_intensity", "mz", "intensity"},
+    // Options (optional) 
+    "UDFOptions",
+    // Are options required?
+    false};
+
+arrow::Status CosineScore(cp::KernelContext* ctx,
+                               const cp::ExecSpan& batch,
+                               cp::ExecResult* out) {
+
+    // Useful for figuring out what exactly is being passed to functions like this
+    // for (int64_t n = 0; n < batch.num_values(); ++n) {
+    // 	std::cout << "Batch: " << n
+    //            << "\tType: " << (batch[n].is_scalar() ? "scalar" : "array") << ", "
+    //            << batch.GetTypes()[n] << std::endl;
+    // }
+
+
+  return arrow::Status::OK();
+}
+
 
 // All search UDFs should be placed here for registration
 arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
-    // Prepare the function for registration
+    // Prepare the functions for registration
     auto tanimoto_func = std::make_shared<cp::ScalarFunction>("tanimoto", cp::Arity(4, false), tanimoto_func_doc);
+    auto cosine_score = std::make_shared<cp::ScalarFunction>("cosine_score", cp::Arity(4, false), cosine_score_doc);
 
     // The kernel links the inputs to a given C++ function. It might be
     // nice to use templates to simplify writing the handling functions
@@ -130,12 +158,24 @@ arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
     tanimoto_kernel.mem_allocation = cp::MemAllocation::PREALLOCATE;
     tanimoto_kernel.null_handling = cp::NullHandling::INTERSECTION;
 
-    // Add the kernal to the function. Multiple kernels may be added to
+    cp::ScalarKernel cosine_score_kernel({
+            cp::InputType(arrow::Type::LARGE_LIST), 
+            cp::InputType(arrow::Type::LARGE_LIST),
+            cp::InputType(arrow::Type::LARGE_LIST),
+            cp::InputType(arrow::Type::LARGE_LIST)},
+            arrow::float32(),
+            CosineScore);
+    cosine_score_kernel.mem_allocation = cp::MemAllocation::PREALLOCATE;
+    cosine_score_kernel.null_handling = cp::NullHandling::INTERSECTION;
+
+    // Add the kernal to the functions. Multiple kernels may be added to
     // a function to make it polymorphic.
     ARROW_RETURN_NOT_OK(tanimoto_func->AddKernel(std::move(tanimoto_kernel)));
+    ARROW_RETURN_NOT_OK(cosine_score->AddKernel(std::move(cosine_score_kernel)));
 
-    // Finally, register the function
+    // Finally, register the functions
     ARROW_RETURN_NOT_OK(registry->AddFunction(std::move(tanimoto_func)));
+    ARROW_RETURN_NOT_OK(registry->AddFunction(std::move(cosine_score)));
 
     return arrow::Status::OK();
 }

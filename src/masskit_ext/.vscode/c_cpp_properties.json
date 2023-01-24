@@ -1,0 +1,20 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${HOME}/code/vcpkg/installed/x64-linux/include",
+                "${HOME}/code/vcpkg/installed/x64-linux/include/python3.10",
+                "${HOME}/.local/lib/python3.11/site-packages/pyarrow/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/lib64/ccache/gcc",
+            "cStandard": "gnu17",
+            "cppStandard": "gnu++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "configurationProvider": "ms-vscode.cmake-tools"
+        }
+    ],
+    "version": 4
+}
