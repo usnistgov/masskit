@@ -19,7 +19,7 @@
 // source.
 const cp::FunctionDoc tanimoto_func_doc{
     // Summary
-    "User-defined-function to usage to perform a tanimoto match",
+    "User-defined-function to perform a tanimoto match",
     // Description
     "returns the tanimoto score for every element for the given query input",
     // Arguments
@@ -117,13 +117,13 @@ arrow::Status TanimotoFunction(cp::KernelContext* ctx,
 
 const cp::FunctionDoc cosine_score_doc{
     // Summary
-    "User-defined-function to usage to calculate the cosine score",
+    "User-defined-function to calculate the cosine score",
     // Description
-    "returns the cosine score for every element for the given query input",
+    "returns the cosine score between the query and elements in the reference set",
     // Arguments
-    { "query_mz", "query_intensity", "mz", "intensity"},
+    { "query_mz", "query_intensity", "query_massinfo", "reference_mz", "reference_intensity", "reference_massinfo"},
     // Options (optional) 
-    "UDFOptions",
+    "CosineScoreOptions",
     // Are options required?
     false};
 
@@ -132,12 +132,19 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
                                cp::ExecResult* out) {
 
     // Useful for figuring out what exactly is being passed to functions like this
-    // for (int64_t n = 0; n < batch.num_values(); ++n) {
-    // 	std::cout << "Batch: " << n
-    //            << "\tType: " << (batch[n].is_scalar() ? "scalar" : "array") << ", "
-    //            << batch.GetTypes()[n] << std::endl;
-    // }
+    for (int64_t n = 0; n < batch.num_values(); ++n) {
+    	std::cout << "Batch: " << n
+               << "\tType: " << (batch[n].is_scalar() ? "scalar" : "array") << ", "
+               << batch.GetTypes()[n] << std::endl;
+    }
 
+    auto query_mz = std::static_pointer_cast<arrow::DoubleArray>
+        ( static_cast<const arrow::LargeListScalar*>(batch[0].scalar)->value );
+    auto query_intensity = std::static_pointer_cast<arrow::DoubleArray>
+        ( static_cast<const arrow::LargeListScalar*>(batch[1].scalar)->value );
+    auto query_massinfo = static_cast<const arrow::StructScalar*>(batch[2].scalar)->value;
+
+    // Check out https://arrow.apache.org/cookbook/cpp/basic.html#using-the-visitor-pattern
 
   return arrow::Status::OK();
 }
@@ -147,7 +154,7 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
 arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
     // Prepare the functions for registration
     auto tanimoto_func = std::make_shared<cp::ScalarFunction>("tanimoto", cp::Arity(4, false), tanimoto_func_doc);
-    auto cosine_score = std::make_shared<cp::ScalarFunction>("cosine_score", cp::Arity(4, false), cosine_score_doc);
+    auto cosine_score = std::make_shared<cp::ScalarFunction>("cosine_score", cp::Arity(6, false), cosine_score_doc);
 
     // The kernel links the inputs to a given C++ function. It might be
     // nice to use templates to simplify writing the handling functions
@@ -161,8 +168,10 @@ arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
     cp::ScalarKernel cosine_score_kernel({
             cp::InputType(arrow::Type::LARGE_LIST), 
             cp::InputType(arrow::Type::LARGE_LIST),
+            cp::InputType(arrow::Type::STRUCT),
             cp::InputType(arrow::Type::LARGE_LIST),
-            cp::InputType(arrow::Type::LARGE_LIST)},
+            cp::InputType(arrow::Type::LARGE_LIST),
+            cp::InputType(arrow::Type::STRUCT)},
             arrow::float32(),
             CosineScore);
     cosine_score_kernel.mem_allocation = cp::MemAllocation::PREALLOCATE;

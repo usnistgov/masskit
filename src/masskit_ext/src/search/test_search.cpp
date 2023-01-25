@@ -36,13 +36,20 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_data(std::string filename) {
     ARROW_ASSIGN_OR_RAISE(auto dataset, factory->Finish());
     // Read specified columns with a row filter
     ARROW_ASSIGN_OR_RAISE(auto scan_builder, dataset->NewScan());
-    ARROW_RETURN_NOT_OK(scan_builder->Project({ "spectrum_fp", "spectrum_fp_count"}));
+    ARROW_RETURN_NOT_OK(scan_builder->Project({ 
+        "id",
+        "product_massinfo",
+        "mz",
+        "intensity",
+        "spectrum_fp",
+        "spectrum_fp_count"
+        }));
     ARROW_ASSIGN_OR_RAISE(auto scanner, scan_builder->Finish());
     return scanner->ToTable();
     //return scanner->Head(50);
 }
 
-arrow::Status Execute(const std::string FILENAME) {
+arrow::Status initialize(const std::string FILENAME, std::shared_ptr<arrow::Table> &table) {
     // Adding compute functions to the central registry is a runtime
     // operation, even arrow does this for itself. At some point we'll
     // have a single function that calls all of the sub-registry
@@ -51,11 +58,55 @@ arrow::Status Execute(const std::string FILENAME) {
     auto registry = cp::GetFunctionRegistry();
     ARROW_RETURN_NOT_OK(RegisterSearchFunctions(registry));
   
-    // Load the two columns we need from the given parquet file.
+    // Load the columns we need from the given parquet file.
     //const std::string FILENAME = "/home/slottad/nist/data/hr_msms_nist.parquet";
-    std::shared_ptr<arrow::Table> table;
-    ARROW_ASSIGN_OR_RAISE(table, read_data(FILENAME));
+    auto result = read_data(FILENAME);
+    //std::shared_ptr<arrow::Table> table;
+    ARROW_ASSIGN_OR_RAISE(table, result);
     std::cout << "Loaded " << table->num_rows() << " rows in " << table->num_columns() << " columns." << std::endl;
+
+    return arrow::Status::OK();
+}
+
+arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
+
+    // The fingerprints to be searched
+    auto mz = table->GetColumnByName("mz");
+    auto intensity = table->GetColumnByName("intensity");
+    auto massinfo = table->GetColumnByName("product_massinfo");
+
+    // The query fingerprint conveniently location in the first position
+    // of our array to be searched. I wonder if it will match anything?
+    ARROW_ASSIGN_OR_RAISE(auto query_mz, mz->GetScalar(0));
+    ARROW_ASSIGN_OR_RAISE(auto query_intensity, intensity->GetScalar(0));
+    ARROW_ASSIGN_OR_RAISE(auto query_massinfo, massinfo->GetScalar(0));
+
+    // The parameters for the compute function are given in the first
+    // array. Since there are a mixture of scalars and arrays, we provide
+    // the size of the return array. 
+    cp::ExecBatch batch( {
+            arrow::Datum(query_mz),
+            arrow::Datum(query_intensity),
+            arrow::Datum(query_massinfo),
+            arrow::Datum(mz),
+            arrow::Datum(intensity),
+            arrow::Datum(massinfo)
+        },
+        table->num_rows() );
+
+    // Use the convenience function we apply the tanimoto UDF to the
+    // previously batched data
+    ARROW_ASSIGN_OR_RAISE(auto cosine_score_results, cp::CallFunction("cosine_score", batch));
+
+    // The type of array returned should match the input arrays
+    // auto tanimoto_results_array = tanimoto_results.make_array(); // segfaults
+    auto cosine_score_results_array = cosine_score_results.chunked_array();
+    std::cout << "Cosine Score Result:" << std::endl << cosine_score_results_array->ToString() << std::endl;
+
+    return arrow::Status::OK();
+}
+
+arrow::Status run_tanimoto(std::shared_ptr<arrow::Table> table) {
 
     // The fingerprints to be searched
     auto spec = table->GetColumnByName("spectrum_fp");
@@ -112,12 +163,28 @@ int main(int argc, char** argv) {
         std::cerr << "\tusage: " << argv[0] << " <input_file> ...\n";
         return EXIT_FAILURE;
     }
+    std::string filename(argv[1]);
+    
+    //std::string filename("/home/djs10/data/hr_msms_nist.parquet");
 
-    auto status = Execute(std::string(argv[1]));
+    std::shared_ptr<arrow::Table> table;
+    auto status = initialize(filename, table);
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
+
+    status = run_cosine_score(table);
+    if (!status.ok()) {
+        std::cerr << "Error occurred : " << status.message() << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    // status = run_tanimoto(table);
+    // if (!status.ok()) {
+    //     std::cerr << "Error occurred : " << status.message() << std::endl;
+    //     return EXIT_FAILURE;
+    // }
 
     return EXIT_SUCCESS;
 }
