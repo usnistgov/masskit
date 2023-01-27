@@ -15,10 +15,11 @@ parser.add_argument('--input', default="")
 parser.add_argument('--output', default="")
 args = parser.parse_args()
 
-with open(args.input) as fin, open(args.output, 'w') as fout:
-    previous_line = ""
-    for line in fin:
-        if line.strip() == '>  <NAME>' and previous_line.strip() != 'M  END':
-            fout.write('M  END\n')
-        fout.write(line)
-        previous_line = line
+with open(args.input) as fin:
+    with open(args.output, 'w') as fout:
+        previous_line = ""
+        for line in fin:
+            if line.strip() == '>  <NAME>' and previous_line.strip() != 'M  END':
+                fout.write('M  END\n')
+            fout.write(line)
+            previous_line = line

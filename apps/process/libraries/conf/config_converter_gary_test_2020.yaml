@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/ei/2020/gary/_227libs_20191111.eval.SDF
+      - ${oc.env:HOME}/data/nist/ei/2020/gary/_227libs_20191111.eval.fixed.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem

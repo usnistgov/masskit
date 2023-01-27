@@ -1007,15 +1007,12 @@ def load_sdf2array(
 
         try:
             mol = masskit.small_molecule.utils.standardize_mol(mol)
-            # mol = dcon.Disconnect(mol)
-            # mol = rdMolStandardize.Cleanup(mol)
         except ValueError as e:
             logging.info(f"Unable to standardize {error_string}")
             continue
         
         if len(mol.GetPropsAsDict()) == 0:
             logging.info(f"All molecular props unavailable {error_string}")
-            # likely due to bug in rdMolStandardize.Cleanup()
             continue
 
         # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
@@ -1074,7 +1071,7 @@ def load_sdf2array(
                 )
                 new_row["num_stereoisomers"] = None
         else:
-            Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
+            # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
             new_row["has_conformer"] = False
 
         # calculate solvent accessible surface area per atom
