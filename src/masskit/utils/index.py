@@ -773,14 +773,18 @@ def make_spectrum(row):
 def make_mol(row):
     attribute = row.get('mol')
     if attribute is not None:
-        return Chem.rdMolInterchange.JSONToMols(attribute())[0]
+        value = attribute()
+        if value is not None:
+            return Chem.rdMolInterchange.JSONToMols(value)[0]
     else:
         return None
 
 def make_shortest_paths(row):
     attribute = row.get('shortest_paths')
     if attribute is not None:
-        return jsonpickle.decode(attribute(), keys=True)
+        value = attribute()
+        if value is not None:
+            return jsonpickle.decode(value, keys=True)
     else:
         return None
 
