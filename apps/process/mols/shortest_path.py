@@ -106,6 +106,11 @@ def path_generator_app(config: DictConfig) -> None:
             rd_mol, config.conversion.max_path_length), keys=True))
 
     table = library_map.to_arrow()
+    # delete shortest_paths column if it already exists
+    try:
+        table = table.remove_column(table.column_names.index("shortest_paths"))
+    except ValueError:
+        pass
     table = table.add_column(table.num_columns,"shortest_paths", pa.array(shortest_paths))
     # output the files
     pq.write_table(table, config.output.file.name)
