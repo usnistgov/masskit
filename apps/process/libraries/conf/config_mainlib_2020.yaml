@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/ei/2020/mainlib_2020.sdf
+      - ${oc.env:HOME}/data/nist/ei/2020/sdf/umainlib_with_exp_and_est_RI_02_12_2020.fixed.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -24,7 +24,7 @@ conversion:
     comment_fields:
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
-    probabilities: [0.01, 0.97, 0.01, 0.01]
+    probabilities: [0.0, 0.99, 0.01, 0.0]
   spectra:
     # min peak intensity allowed in spectral fingerprint
     min_intensity: 0.0
