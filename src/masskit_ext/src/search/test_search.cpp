@@ -80,6 +80,7 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
     ARROW_ASSIGN_OR_RAISE(auto query_mz, mz->GetScalar(0));
     ARROW_ASSIGN_OR_RAISE(auto query_intensity, intensity->GetScalar(0));
     ARROW_ASSIGN_OR_RAISE(auto query_massinfo, massinfo->GetScalar(0));
+    
 
     // The parameters for the compute function are given in the first
     // array. Since there are a mixture of scalars and arrays, we provide
@@ -99,9 +100,13 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
     ARROW_ASSIGN_OR_RAISE(auto cosine_score_results, cp::CallFunction("cosine_score", batch));
 
     // The type of array returned should match the input arrays
-    // auto tanimoto_results_array = tanimoto_results.make_array(); // segfaults
     auto cosine_score_results_array = cosine_score_results.chunked_array();
     std::cout << "Cosine Score Result:" << std::endl << cosine_score_results_array->ToString() << std::endl;
+
+    // cp::CountOptions count_options(cp::CountOptions::CountMode::ALL);
+    // ARROW_ASSIGN_OR_RAISE(auto count_results, cp::CallFunction("hash_distinct", {cosine_score_results}, &count_options));
+    // auto count_results_array = count_results.array();
+    // std::cout << "Count Results:" << std::endl << count_results.ToString() << std::endl;
 
     return arrow::Status::OK();
 }

@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/out/build/linux-debug/src/search/test_search",
-            "args": [ "/home/djs10/data/hr_msms_nist.parquet" ],
+            "args": [ "$HOME/data/hr_msms_nist.parquet" ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
             "environment": [],
