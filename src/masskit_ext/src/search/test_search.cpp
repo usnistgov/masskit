@@ -3,11 +3,48 @@
 #include <arrow/dataset/file_parquet.h>
 #include <arrow/filesystem/filesystem.h>
 #include <iostream>
+#include <chrono>
 
 #include "search.hpp"
 
 namespace ds = arrow::dataset;
 namespace fs = arrow::fs;
+
+class Timer
+{
+public:
+    void start() {
+        m_StartTime = std::chrono::system_clock::now();
+        m_bRunning = true;
+    }
+    
+    void stop() {
+        m_EndTime = std::chrono::system_clock::now();
+        m_bRunning = false;
+    }
+    
+    double elapsedMilliseconds() {
+        std::chrono::time_point<std::chrono::system_clock> endTime;
+        
+        if(m_bRunning) {
+            endTime = std::chrono::system_clock::now();
+        }
+        else {
+            endTime = m_EndTime;
+        }
+        
+        return std::chrono::duration_cast<std::chrono::milliseconds>(endTime - m_StartTime).count();
+    }
+    
+    double elapsedSeconds() {
+        return elapsedMilliseconds() / 1000.0;
+    }
+
+private:
+    std::chrono::time_point<std::chrono::system_clock> m_StartTime;
+    std::chrono::time_point<std::chrono::system_clock> m_EndTime;
+    bool m_bRunning = false;
+};
 
 // Not using <parquet/arrow/reader.h> because of the following error message
 //
@@ -169,27 +206,35 @@ int main(int argc, char** argv) {
         return EXIT_FAILURE;
     }
     std::string filename(argv[1]);
-    
-    //std::string filename("/home/djs10/data/hr_msms_nist.parquet");
+    Timer timer;
 
+    timer.start();
     std::shared_ptr<arrow::Table> table;
     auto status = initialize(filename, table);
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
+    timer.stop();
+    std::cout << "Time to load data: " << timer.elapsedSeconds() << " seconds.\n";
 
+    timer.start();
     status = run_cosine_score(table);
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
+    timer.stop();
+    std::cout << "Time to calculate cosine score: " << timer.elapsedSeconds() << " seconds.\n";
 
+    // timer.start();
     // status = run_tanimoto(table);
     // if (!status.ok()) {
     //     std::cerr << "Error occurred : " << status.message() << std::endl;
     //     return EXIT_FAILURE;
     // }
+    // timer.stop();
+    // std::cout << "Time to run tanimoto fingerprint search: " << timer.elapsedSeconds() << " seconds.\n";
 
     return EXIT_SUCCESS;
 }
