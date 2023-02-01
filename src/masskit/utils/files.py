@@ -935,7 +935,7 @@ def load_sdf2array(
         name_field = ['PUBCHEM_IUPAC_NAME']
     elif source == 'nist_ri':
         if id_field is None:
-            id_field = 'NISTNO'
+            id_field = 1
         if id_field_type is None:
             id_field_type = 'int'
         name_field = ["_NAME", "NAME"]
@@ -1177,7 +1177,7 @@ def load_sdf2array(
             new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
             if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
                 ri_string = mol.GetProp("COLUMN CLASS")
-                if ri_string == 'Semi-standard non-polar' or ri_string == 'All column types':
+                if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
                     new_row['column'] = 'SemiStdNP'
                     new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
                     new_row['experimental_ri_error'] = 0.0

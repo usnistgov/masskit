@@ -15,7 +15,7 @@ converter.py input.file.names=TestUniqSynPho202249.msp output.file.name=TestUniq
 """
 
 
-@hydra.main(config_path="conf", config_name="config_converter")
+@hydra.main(config_path="conf", config_name="config_converter", version_base=None)
 def converter_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)

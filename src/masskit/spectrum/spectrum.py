@@ -3,6 +3,7 @@ import os
 import pickle
 import pyarrow as pa
 import numpy as np
+from masskit.accumulator import Accumulator
 
 from masskit.constants import EPSILON
 from masskit.data_specs.schemas import experimental_fields
@@ -806,7 +807,10 @@ class Ions(ABC):
         number of ions in spectrum
         :return: number of ions in spectrum
         """
-        return len(self.mz)
+        if self.mz is None:
+            return 0
+        else:
+            return len(self.mz)
 
     def ions2array(
             self,
@@ -1233,8 +1237,8 @@ def cosine_score_calc(
     :param spectrum1_intensity: query spectrum intensity
     :param spectrum2_mz: the comparison spectrum2 mz
     :param spectrum2_intensity: the comparison spectrum2 intensity
-    :param index1: matched ions in spectrum1
-    :param index2: matched ions in spectrum2
+    :param index1: matched ions in spectrum1.  may include duplicate matches
+    :param index2: matched ions in spectrum2.  may include duplicate matches
     :param mz_power: what power to raise the mz value for each peak
     :param intensity_power: what power to raise the intensity for each peak
     :param scale: what value to scale the score by
@@ -2699,7 +2703,7 @@ def init_spectrum(
     return spectrum
 
 
-class AccumulatorSpectrum(HiResSpectrum):
+class AccumulatorSpectrum(HiResSpectrum, Accumulator):
     """
     used to contain a spectrum that accumulates the sum of many spectra
     includes calculation of standard deviation
@@ -2724,18 +2728,18 @@ class AccumulatorSpectrum(HiResSpectrum):
         self.count_spectra = count_spectra
         self.take_max = take_max
 
-    def add(self, new_spectrum):
+    def add(self, new_item):
         """
         add a spectrum to the average.  Keeps running total of average and std deviation using
         Welford's algorithm.  This API assumes that the spectrum being added is also evenly spaced
         with the same mz values.  However, the new spectrum doesn't have to have the same max_mz as
         the summation spectrum
 
-        :param new_spectrum: new spectrum to be added
+        :param new_item: new spectrum to be added
         """
         # convert to same scale
         intensity = np.zeros((1, len(self.products.intensity)))
-        new_spectrum.products.ions2array(
+        new_item.products.ions2array(
             intensity,
             0,
             bin_size=self.products.mass_info.tolerance * 2,

@@ -2,18 +2,18 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/ei/2023/sdf/umainlib.SDF
+      - ${oc.env:HOME}/data/nist/ei/2020/sdf/nist_ri.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem
-    source:
+    source: nist_ri
   # number of records to generate
   num:
 
 conversion:
   id:
     # name of the id field, like NISTNO. if an integer and reading sdfs, this is the start value of the ids
-    field: ID
+    field: 1
   small_molecule:
     # maximum bound of 3D conformer in angstroms (0=no limit)
     max_bound: 0.0
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/ei/2023/main_2023.parquet
+    name: ${oc.env:HOME}/data/nist/ei/2020/ri_2020.parquet
     # parquet, msp, mzxml
     types:
 

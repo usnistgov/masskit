@@ -2,11 +2,11 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/ei/2017/sdf/nist_ri.SDF
+      - ${oc.env:HOME}/data/nist/ei/2023/sdf/ureplib.SDF
     # input file type
     type:
     # what is the source of the file? nist or pubchem
-    source: nist_ri
+    source:
   # number of records to generate
   num:
 
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/ei/2017/ri_2017.parquet
+    name: ${oc.env:HOME}/data/nist/ei/2023/rep_2023.parquet
     # parquet, msp, mzxml
     types:
 
