@@ -114,6 +114,43 @@ arrow::Status TanimotoFunction(cp::KernelContext* ctx,
   return arrow::Status::OK();
 }
 
+class CosineScoreOptionsType : public cp::FunctionOptionsType {
+    const char* type_name() const override { return "CosineScoreOptionsType"; }
+    std::string Stringify(const cp::FunctionOptions&) const override {
+        return "CosineScoreOptionsType";
+    }
+    bool Compare(const cp::FunctionOptions&, const cp::FunctionOptions&) const override {
+        return true;
+    }
+    std::unique_ptr<cp::FunctionOptions> Copy(const cp::FunctionOptions&) const override;
+    // optional: support for serialization
+    // Result<std::shared_ptr<Buffer>> Serialize(const FunctionOptions&) const override;
+    // Result<std::unique_ptr<FunctionOptions>> Deserialize(const Buffer&) const override;
+};
+
+cp::FunctionOptionsType* GetCosineScoreOptionsType() {
+    static CosineScoreOptionsType options_type;
+    return &options_type;
+}
+
+std::unique_ptr<cp::FunctionOptions> CosineScoreOptionsType::Copy(
+    const cp::FunctionOptions&) const {
+        return std::make_unique<CosineScoreOptions>();
+}
+
+
+CosineScoreOptions::CosineScoreOptions( float mz_power,
+                                 float intensity_power,
+                                 int scale,
+                                 bool skip_denom,
+                                 TieBreaker tiebreaker )
+        : cp::FunctionOptions(GetCosineScoreOptionsType()),
+          mz_power(mz_power),
+          intensity_power(intensity_power),
+          scale(scale),
+          skip_denom(skip_denom),
+          tiebreaker(tiebreaker) {}
+
 const cp::FunctionDoc cosine_score_doc{
     // Summary
     "User-defined-function to calculate the cosine score",
@@ -135,12 +172,13 @@ bool overlap(tInterval &a, tInterval &b) {
     return (std::max(a.first, b.first) <= std::min(a.second, b.second));
 };
 
-void compute_weight(std::vector<double> &mz,
+void compute_weight(const double *mz,
+                    const double *intensity,
+                    int32_t length,
                     double mz_power,
-                    std::vector<double> &intensity,
                     double intensity_power, 
                     std::vector<double> &weight) {
-    for (int32_t i=0; i<intensity.size(); i++) {
+    for (int32_t i=0; i<length; i++) {
         double val = std::pow(intensity[i],intensity_power);
         if (mz_power > 0) val *= std::pow(mz[i],mz_power);
         weight.push_back(val);
@@ -148,44 +186,52 @@ void compute_weight(std::vector<double> &mz,
 }
 
 struct CSpectrum {
-    std::vector<double> _mz;
-    std::vector<double> _intensity;
-    std::vector<tInterval> _intervals; 
-    double tolerance;
-    Tolerance_Type tol_type;
+    // std::vector<double> m_mz;
+    // std::vector<double> m_intensity;
+    const double *m_mz;
+    const double *m_intensity;
+    int64_t m_length;
+    std::vector<tInterval> m_intervals; 
+    double m_tolerance;
+    Tolerance_Type m_toltype;
 
-    CSpectrum(std::shared_ptr<arrow::DoubleArray> mzArr,
-              std::shared_ptr<arrow::DoubleArray> intensityArr,
-              double tolerance, Tolerance_Type type) 
-              : tolerance(tolerance), tol_type(type) {
-        const double *mzbuf = mzArr->raw_values();
-        const double *intbuf = intensityArr->raw_values();
+    // CSpectrum(std::shared_ptr<arrow::DoubleArray> mzArr,
+    //           std::shared_ptr<arrow::DoubleArray> intensityArr,
+    //           double m_tolerance, Tolerance_Type type) 
+    //           : m_tolerance(m_tolerance), m_toltype(type) {
+    //     const double *mzbuf = mzArr->raw_values();
+    //     const double *intbuf = intensityArr->raw_values();
+    //     // Strip out ions with zero intensities
+    //     for (auto i = 0; i < mzArr->length(); i++) {
+    //         if ( intbuf[i] > 0) {
+    //             m_mz.push_back(mzbuf[i]);
+    //             m_intensity.push_back(intbuf[i]);
+    //         }
+    //     }
+    //     this->create_intervals();
+    // }
+
+    CSpectrum(const double *mzArr, const double *intensityArr, int64_t length,
+              double m_tolerance, Tolerance_Type type) 
+              : m_mz(mzArr), m_intensity(intensityArr), m_length(length), 
+                m_tolerance(m_tolerance), m_toltype(type) {
         // Strip out ions with zero intensities
-        for (auto i = 0; i < mzArr->length(); i++) {
-            if ( intbuf[i] > 0) {
-                _mz.push_back(mzbuf[i]);
-                _intensity.push_back(intbuf[i]);
-            }
-        }
+        // for (auto i = 0; i < length; i++) {
+        //     if ( intensityArr[i] > 0) {
+        //         m_mz.push_back(mzArr[i]);
+        //         m_intensity.push_back(intensityArr[i]);
+        //     }
+        // }
         this->create_intervals();
     }
 
-    CSpectrum(const double mzArr[], const double intensityArr[], int32_t length,
-              double tolerance, Tolerance_Type type) 
-              : tolerance(tolerance), tol_type(type) {
-        // Strip out ions with zero intensities
-        for (auto i = 0; i < length; i++) {
-            if ( intensityArr[i] > 0) {
-                _mz.push_back(mzArr[i]);
-                _intensity.push_back(intensityArr[i]);
-            }
-        }
-        this->create_intervals();
-    }
-
-    double cosine_score(CSpectrum &other) {
+    float cosine_score(CSpectrum &other) {
         std::vector<tMatch> intersections;
         this->intersect(other, intersections);
+
+        //if ((m_length > 2) && (other.m_length > 2) && (intersections.size() < 2))
+        if ((std::min(m_length, other.m_length) > 2) && (intersections.size() < 2))
+            return -42.0;
 
         double mz_power = 0.0;
         double intensity_power = 0.5;
@@ -195,8 +241,8 @@ struct CSpectrum {
         std::vector<double> weight_spec1;
         std::vector<double> weight_spec2;
 
-        compute_weight(_mz, mz_power, _intensity, intensity_power, weight_spec1);
-        compute_weight(other._mz, mz_power, other._intensity, intensity_power, weight_spec2);
+        compute_weight(m_mz, m_intensity, m_length, mz_power, intensity_power, weight_spec1);
+        compute_weight(other.m_mz, other.m_intensity, other.m_length, mz_power, intensity_power, weight_spec2);
 
         double sum = 0;
         for (tMatch match : intersections) {
@@ -210,13 +256,13 @@ struct CSpectrum {
                 d1 += std::pow(weight_spec1[i],2);
             }
             double d2 = 0.0;
-            for (int32_t j = 0; j < weight_spec1.size(); j++) {
+            for (int32_t j = 0; j < weight_spec2.size(); j++) {
                 d2 += std::pow(weight_spec2[j],2);
             }
             score /= (d1 * d2);
         }
 
-        return score * scale;
+        return static_cast<float>(score * scale);
     }
 
     void intersect(CSpectrum &other, std::vector<tMatch> &intersections) {
@@ -224,21 +270,22 @@ struct CSpectrum {
         int32_t curIdx = 0;
         int32_t othMinIdx = 0;
         int32_t othCurIdx = 0;
+        intersections.clear();
 
-        while (curIdx < _intervals.size()) {
+        while (curIdx < m_intervals.size()) {
             othCurIdx = othMinIdx;
-            while ((curIdx < _intervals.size()) &&
-                   (othCurIdx < other._intervals.size()) &&
-                   (_intervals[curIdx].first <= other._intervals[othCurIdx].second)) {
-                if (overlap(_intervals[curIdx], other._intervals[othCurIdx])) {
+            while ((curIdx < m_intervals.size()) &&
+                   (othCurIdx < other.m_intervals.size()) &&
+                   (m_intervals[curIdx].first <= other.m_intervals[othCurIdx].second)) {
+                if (overlap(m_intervals[curIdx], other.m_intervals[othCurIdx])) {
                     intersections.push_back(std::make_pair(curIdx, othCurIdx));
                 }
                 ++othCurIdx;
             }
             ++curIdx;
-            if (curIdx < _intervals.size()) {
-                while ((othMinIdx < other._intervals.size()) &&
-                       (_intervals[curIdx].first > other._intervals[othMinIdx].second)) {
+            if (curIdx < m_intervals.size()) {
+                while ((othMinIdx < other.m_intervals.size()) &&
+                       (m_intervals[curIdx].first > other.m_intervals[othMinIdx].second)) {
                     ++othMinIdx;
                 }
             }
@@ -246,31 +293,34 @@ struct CSpectrum {
     }
 
     double half_tolerance(double mz) {
-        switch (this->tol_type) {
+        switch (this->m_toltype) {
             case NONE: 
                 return 0;
             case PPM:
-                return mz * this->tolerance / 1000000.0;
+                return mz * this->m_tolerance / 1000000.0;
             case DALTONS:
-                return this->tolerance;
+                return this->m_tolerance;
         }
         return 0;
     }
 
     void create_intervals() {
-        _intervals.clear();
-        for (auto mz : _mz) {
-            double hTol = this->half_tolerance(mz);
-            _intervals.push_back(std::make_pair(mz - hTol, mz + hTol));            
+        m_intervals.clear();
+        // for (auto mz : m_mz) {
+        for (int32_t i=0; i<m_length; i++) {
+            double hTol = this->half_tolerance(m_mz[i]);
+            m_intervals.push_back(std::make_pair(m_mz[i] - hTol, m_mz[i] + hTol));            
         }
     }
 
 };
 
 arrow::Status CosineScore(cp::KernelContext* ctx,
-                               const cp::ExecSpan& batch,
-                               cp::ExecResult* out) {
-
+                          const cp::ExecSpan& batch,
+                          cp::ExecResult* out) {
+    // Options
+    //auto opt = std::static_pointer_cast<cp::ScalarKernel>(ctx->state())->options;
+    
     // Query data
     auto query_mz = std::static_pointer_cast<arrow::DoubleArray>(
         batch[0].scalar_as<arrow::LargeListScalar>().value);
@@ -282,7 +332,8 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
         query_massinfo.field("tolerance_type").ValueOrDie()
         )->GetEncodedValue().ValueOrDie()->ToString();
 
-    CSpectrum query(query_mz, query_intensity, query_tol->value, PPM);
+    CSpectrum query(query_mz->raw_values(), query_intensity->raw_values(),
+                    query_mz->length(), query_tol->value, PPM);
 
     // Reference Data
     auto ref_mz = batch[3].array;
@@ -303,8 +354,8 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
     auto out_values = out->array_span()->GetValues<float>(1);
 
     for (int64_t i = 0; i < batch.length; i++) {
-        int32_t mzlength = (ref_mz_offsets[i + 1] - ref_mz_offsets[i]);
-        int32_t intlength = (ref_intensity_offsets[i + 1] - ref_intensity_offsets[i]);
+        int64_t mzlength = (ref_mz_offsets[i + 1] - ref_mz_offsets[i]);
+        int64_t intlength = (ref_intensity_offsets[i + 1] - ref_intensity_offsets[i]);
         if (mzlength != intlength) return arrow::Status::Invalid("Spectrum mz and intensity array lengths do not match");
         const double* mzdata = ref_mz_data.GetValues<double>(1, ref_mz_offsets[i]);
         const double* intensitydata = ref_intensity_data.GetValues<double>(1, ref_intensity_offsets[i]);

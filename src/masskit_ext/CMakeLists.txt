@@ -67,5 +67,12 @@ else()
 	message(STATUS "Linking Arrow libs dynamically")
 endif()
 
+if ((${CMAKE_BUILD_TYPE} MATCHES "Release") OR (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo"))
+	# To show which lines have been automatically vectorized:
+	# SET(GCC_VECTORIZATION_COMPILE_FLAGS "-O3 -ffast-math -mavx -fopt-info-vec-optimized")
+	SET(GCC_VECTORIZATION_COMPILE_FLAGS "-O3 -ffast-math -mavx")
+	SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_VECTORIZATION_COMPILE_FLAGS}")
+endif()
+
 add_subdirectory(src)
 add_subdirectory(examples/cpp)

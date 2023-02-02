@@ -75,6 +75,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_data(std::string filename) {
     ARROW_ASSIGN_OR_RAISE(auto scan_builder, dataset->NewScan());
     ARROW_RETURN_NOT_OK(scan_builder->Project({ 
         "id",
+        "precursor_mz",
         "product_massinfo",
         "mz",
         "intensity",
@@ -107,6 +108,20 @@ arrow::Status initialize(const std::string FILENAME, std::shared_ptr<arrow::Tabl
 
 arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
 
+    double ppm = 20;
+
+    auto precursor_mz = table->GetColumnByName("precursor_mz");
+    ARROW_ASSIGN_OR_RAISE(auto query_precursor_mz, precursor_mz->GetScalar(0));
+    double qPrecursorMZ = (std::static_pointer_cast<arrow::DoubleScalar>(query_precursor_mz))->value;
+    double tol = qPrecursorMZ * ppm / 1000000.0;
+    arrow::Datum maxMZ = arrow::DoubleScalar(qPrecursorMZ + tol);
+    arrow::Datum minMZ = arrow::DoubleScalar(qPrecursorMZ - tol);
+    //auto minMZ = arrow::DoubleScalar(qPrecursorMZ - tol);
+    
+    ARROW_ASSIGN_OR_RAISE(auto minDatum, arrow::compute::CallFunction("greater_equal",{precursor_mz, minMZ}));
+    ARROW_ASSIGN_OR_RAISE(auto maxDatum, arrow::compute::CallFunction("less_equal",{precursor_mz, maxMZ}));
+    ARROW_ASSIGN_OR_RAISE(auto precursorWindow, arrow::compute::And(minMZ, maxMZ));
+    
     // The fingerprints to be searched
     auto mz = table->GetColumnByName("mz");
     auto intensity = table->GetColumnByName("intensity");
@@ -118,6 +133,7 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
     ARROW_ASSIGN_OR_RAISE(auto query_intensity, intensity->GetScalar(0));
     ARROW_ASSIGN_OR_RAISE(auto query_massinfo, massinfo->GetScalar(0));
     
+    CosineScoreOptions cso(0,0.5,999,true,TieBreaker::MZ);
 
     // The parameters for the compute function are given in the first
     // array. Since there are a mixture of scalars and arrays, we provide
@@ -132,13 +148,18 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
         },
         table->num_rows() );
 
-    // Use the convenience function we apply the tanimoto UDF to the
+    // Use the convenience function we apply the cosine score UDF to the
     // previously batched data
-    ARROW_ASSIGN_OR_RAISE(auto cosine_score_results, cp::CallFunction("cosine_score", batch));
+    ARROW_ASSIGN_OR_RAISE(auto cosine_score_results, cp::CallFunction("cosine_score", batch, &cso));
 
     // The type of array returned should match the input arrays
     auto cosine_score_results_array = cosine_score_results.chunked_array();
     std::cout << "Cosine Score Result:" << std::endl << cosine_score_results_array->ToString() << std::endl;
+
+    // cp::ArraySortOptions sort_options(cp::SortOrder::Descending);
+    // ARROW_ASSIGN_OR_RAISE(auto sort_results, cp::CallFunction("array_sort_indices", {cosine_score_results}, &sort_options));
+    // auto sort_results_array = sort_results.chunked_array();
+    // std::cout << "Sort Result:" << std::endl << sort_results_array->ToString() << std::endl;
 
     // cp::CountOptions count_options(cp::CountOptions::CountMode::ALL);
     // ARROW_ASSIGN_OR_RAISE(auto count_results, cp::CallFunction("hash_distinct", {cosine_score_results}, &count_options));
@@ -226,6 +247,11 @@ int main(int argc, char** argv) {
     }
     timer.stop();
     std::cout << "Time to calculate cosine score: " << timer.elapsedSeconds() << " seconds.\n";
+    std::cout << "Rate of cosine score: \n";
+    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows() << " spectra matches/second.\n";
+    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows()*1000.0 << " spectra matches/millisecond.\n";
+    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows()*1000000.0 << " spectra matches/microsecond.\n";
+    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows()*1000000000.0 << " spectra matches/nanosecond.\n";
 
     // timer.start();
     // status = run_tanimoto(table);
