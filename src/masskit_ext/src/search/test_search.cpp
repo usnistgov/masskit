@@ -120,12 +120,7 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
 
     ARROW_ASSIGN_OR_RAISE(auto minDatum, arrow::compute::CallFunction("greater_equal",{precursor_mz, minMZ}));
     ARROW_ASSIGN_OR_RAISE(auto maxDatum, arrow::compute::CallFunction("less_equal",{precursor_mz, maxMZ}));
-    ARROW_ASSIGN_OR_RAISE(auto precursorWindow, arrow::compute::And(minDatum, maxDatum));
-    ARROW_ASSIGN_OR_RAISE(auto precursorMask, arrow::compute::Cast(precursorWindow, arrow::int8()));
-
-    // auto kind = precursorWindow.kind();    
-    // auto mask_array = precursorWindow.chunked_array();
-    // std::cout << mask_array->ToString() << std::endl;
+    ARROW_ASSIGN_OR_RAISE(auto precursorMask, arrow::compute::And(minDatum, maxDatum));
 
     // The fingerprints to be searched
     auto mz = table->GetColumnByName("mz");

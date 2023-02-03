@@ -350,16 +350,13 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
     auto tol_dict = tol_type->dictionary();
     auto tol_idx = std::static_pointer_cast<arrow::Int32Array>(tol_type->indices())->raw_values();
 
-    auto mask_arr = batch[6].array;
-    auto mask = mask_arr.GetValues<int8_t>(1);
-    //auto mask = std::static_pointer_cast<arrow::BooleanArray>(batch[6].array.ToArray());
+    auto mask = std::static_pointer_cast<arrow::BooleanArray>(batch[6].array.ToArray());
 
     // Output array for results
     auto out_values = out->array_span()->GetValues<float>(1);
 
     for (int64_t i = 0; i < batch.length; i++) {
-        //if (mask->GetScalar(i).ValueOrDie()) {
-        if (mask[i]) {
+        if (mask->Value(i)) {
             int64_t mzlength = (ref_mz_offsets[i + 1] - ref_mz_offsets[i]);
             int64_t intlength = (ref_intensity_offsets[i + 1] - ref_intensity_offsets[i]);
             if (mzlength != intlength) return arrow::Status::Invalid("Spectrum mz and intensity array lengths do not match");
@@ -400,7 +397,7 @@ arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
             cp::InputType(arrow::Type::LARGE_LIST),
             cp::InputType(arrow::Type::LARGE_LIST),
             cp::InputType(arrow::Type::STRUCT),
-            cp::InputType(arrow::Type::INT8)},
+            cp::InputType(arrow::Type::BOOL)},
             arrow::float32(),
             CosineScore);
     cosine_score_kernel.mem_allocation = cp::MemAllocation::PREALLOCATE;
