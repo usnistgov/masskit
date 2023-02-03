@@ -157,7 +157,7 @@ const cp::FunctionDoc cosine_score_doc{
     // Description
     "returns the cosine score between the query and elements in the reference set",
     // Arguments
-    { "query_mz", "query_intensity", "query_massinfo", "reference_mz", "reference_intensity", "reference_massinfo"},
+    { "query_mz", "query_intensity", "query_massinfo", "reference_mz", "reference_intensity", "reference_massinfo", "mask"},
     // Options (optional) 
     "CosineScoreOptions",
     // Are options required?
@@ -350,19 +350,28 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
     auto tol_dict = tol_type->dictionary();
     auto tol_idx = std::static_pointer_cast<arrow::Int32Array>(tol_type->indices())->raw_values();
 
+    auto mask_arr = batch[6].array;
+    auto mask = mask_arr.GetValues<int8_t>(1);
+    //auto mask = std::static_pointer_cast<arrow::BooleanArray>(batch[6].array.ToArray());
+
     // Output array for results
     auto out_values = out->array_span()->GetValues<float>(1);
 
     for (int64_t i = 0; i < batch.length; i++) {
-        int64_t mzlength = (ref_mz_offsets[i + 1] - ref_mz_offsets[i]);
-        int64_t intlength = (ref_intensity_offsets[i + 1] - ref_intensity_offsets[i]);
-        if (mzlength != intlength) return arrow::Status::Invalid("Spectrum mz and intensity array lengths do not match");
-        const double* mzdata = ref_mz_data.GetValues<double>(1, ref_mz_offsets[i]);
-        const double* intensitydata = ref_intensity_data.GetValues<double>(1, ref_intensity_offsets[i]);
+        //if (mask->GetScalar(i).ValueOrDie()) {
+        if (mask[i]) {
+            int64_t mzlength = (ref_mz_offsets[i + 1] - ref_mz_offsets[i]);
+            int64_t intlength = (ref_intensity_offsets[i + 1] - ref_intensity_offsets[i]);
+            if (mzlength != intlength) return arrow::Status::Invalid("Spectrum mz and intensity array lengths do not match");
+            const double* mzdata = ref_mz_data.GetValues<double>(1, ref_mz_offsets[i]);
+            const double* intensitydata = ref_intensity_data.GetValues<double>(1, ref_intensity_offsets[i]);
 
-        CSpectrum reference(mzdata, intensitydata, mzlength, tol_idx[i], PPM);
+            CSpectrum reference(mzdata, intensitydata, mzlength, tol_idx[i], PPM);
 
-        *out_values++ = query.cosine_score(reference);
+            *out_values++ = query.cosine_score(reference);
+        } else {
+            *out_values++ = -1.0;
+        }
     }
 
     return arrow::Status::OK();
@@ -373,7 +382,7 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
 arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
     // Prepare the functions for registration
     auto tanimoto_func = std::make_shared<cp::ScalarFunction>("tanimoto", cp::Arity(4, false), tanimoto_func_doc);
-    auto cosine_score = std::make_shared<cp::ScalarFunction>("cosine_score", cp::Arity(6, false), cosine_score_doc);
+    auto cosine_score = std::make_shared<cp::ScalarFunction>("cosine_score", cp::Arity(7, false), cosine_score_doc);
 
     // The kernel links the inputs to a given C++ function. It might be
     // nice to use templates to simplify writing the handling functions
@@ -390,7 +399,8 @@ arrow::Status RegisterSearchFunctions(cp::FunctionRegistry* registry) {
             cp::InputType(arrow::Type::STRUCT),
             cp::InputType(arrow::Type::LARGE_LIST),
             cp::InputType(arrow::Type::LARGE_LIST),
-            cp::InputType(arrow::Type::STRUCT)},
+            cp::InputType(arrow::Type::STRUCT),
+            cp::InputType(arrow::Type::INT8)},
             arrow::float32(),
             CosineScore);
     cosine_score_kernel.mem_allocation = cp::MemAllocation::PREALLOCATE;

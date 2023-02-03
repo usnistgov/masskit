@@ -117,11 +117,16 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
     arrow::Datum maxMZ = arrow::DoubleScalar(qPrecursorMZ + tol);
     arrow::Datum minMZ = arrow::DoubleScalar(qPrecursorMZ - tol);
     //auto minMZ = arrow::DoubleScalar(qPrecursorMZ - tol);
-    
+
     ARROW_ASSIGN_OR_RAISE(auto minDatum, arrow::compute::CallFunction("greater_equal",{precursor_mz, minMZ}));
     ARROW_ASSIGN_OR_RAISE(auto maxDatum, arrow::compute::CallFunction("less_equal",{precursor_mz, maxMZ}));
-    ARROW_ASSIGN_OR_RAISE(auto precursorWindow, arrow::compute::And(minMZ, maxMZ));
-    
+    ARROW_ASSIGN_OR_RAISE(auto precursorWindow, arrow::compute::And(minDatum, maxDatum));
+    ARROW_ASSIGN_OR_RAISE(auto precursorMask, arrow::compute::Cast(precursorWindow, arrow::int8()));
+
+    // auto kind = precursorWindow.kind();    
+    // auto mask_array = precursorWindow.chunked_array();
+    // std::cout << mask_array->ToString() << std::endl;
+
     // The fingerprints to be searched
     auto mz = table->GetColumnByName("mz");
     auto intensity = table->GetColumnByName("intensity");
@@ -144,7 +149,8 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
             arrow::Datum(query_massinfo),
             arrow::Datum(mz),
             arrow::Datum(intensity),
-            arrow::Datum(massinfo)
+            arrow::Datum(massinfo),
+            precursorMask
         },
         table->num_rows() );
 
@@ -248,10 +254,11 @@ int main(int argc, char** argv) {
     timer.stop();
     std::cout << "Time to calculate cosine score: " << timer.elapsedSeconds() << " seconds.\n";
     std::cout << "Rate of cosine score: \n";
-    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows() << " spectra matches/second.\n";
-    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows()*1000.0 << " spectra matches/millisecond.\n";
-    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows()*1000000.0 << " spectra matches/microsecond.\n";
-    std::cout << "\t" << timer.elapsedSeconds()/table->num_rows()*1000000000.0 << " spectra matches/nanosecond.\n";
+    double tps = table->num_rows()/timer.elapsedSeconds();
+    std::cout << "\t" << tps << " spectra matches/second.\n";
+    std::cout << "\t" << tps / 1000.0 << " spectra matches/millisecond.\n";
+    std::cout << "\t" << tps / 1000000.0 << " spectra matches/microsecond.\n";
+    std::cout << "\t" << tps / 1000000000.0 << " spectra matches/nanosecond.\n";
 
     // timer.start();
     // status = run_tanimoto(table);
