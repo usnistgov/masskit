@@ -1,6 +1,6 @@
 ﻿add_subdirectory(search)
 
-if(${USE_PYTHON_LIBS})
+if(${CREATE_PYTHON_LIBS})
     # Add source to this project's executable.
     add_executable (masskit_example "masskit_ext.cpp" "masskit_ext.h")
 

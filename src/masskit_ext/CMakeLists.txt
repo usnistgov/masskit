@@ -24,7 +24,7 @@ find_package(Arrow CONFIG REQUIRED)
 find_package(ArrowDataset CONFIG REQUIRED)
 find_package(pybind11 CONFIG REQUIRED)
 
-set(USE_PYTHON_LIBS ON)
+set(CREATE_PYTHON_LIBS ON)
 if(NOT DEFINED PYARROW_INCLUDE_DIR)
 	#set(PYARROW_INCLUDE_DIR "/home/slottad/miniconda3/envs/masskit/lib/python3.9/site-packages/pyarrow/include")
 	execute_process(COMMAND python -c "import pyarrow as pa;print(pa.get_include(),end='')"
@@ -32,14 +32,9 @@ if(NOT DEFINED PYARROW_INCLUDE_DIR)
                     RESULT_VARIABLE PYARROW_INCLUDE_RESULT
 					OUTPUT_VARIABLE PYARROW_INCLUDE_DIR)
 	if(NOT PYARROW_INCLUDE_RESULT EQUAL "0")
-		# if(EXISTS $ENV{HOME}/.local/lib/python3.11/site-packages/pyarrow/include/arrow/python/pyarrow.h)
-		# 	set(PYARROW_INCLUDE_DIR $ENV{HOME}/.local/lib/python3.11/site-packages/pyarrow/include/)
-		# else()
-		# 	message(FATAL_ERROR "Unable to locate the include directory for pyarrow.h")
-		# endif()
 		message(STATUS "Unable to locate the include directory for pyarrow.h")
 		message(STATUS "    Python support will not be included")
-		set(USE_PYTHON_LIBS OFF)
+		set(CREATE_PYTHON_LIBS OFF)
 	endif()
 endif()
 
@@ -64,7 +59,7 @@ endif()
 # message(STATUS "Arrow version: ${ARROW_VERSION}")
 # message(STATUS "Arrow SO version: ${ARROW_FULL_SO_VERSION}")
 
-if(${USE_PYTHON_LIBS})
+if(${CREATE_PYTHON_LIBS})
 	message(STATUS "pyarrow.h include dir: ${PYARROW_INCLUDE_DIR}")
 endif()
 
