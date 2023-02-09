@@ -12,7 +12,12 @@
             "args": [ "$HOME/data/hr_msms_nist.parquet" ],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",
-            "environment": [],
+            "environment": [
+                { 
+                    "name": "OMP_THREAD_LIMIT", 
+                    "value": "1"
+                } 
+            ],
             "externalConsole": false,
             "MIMode": "gdb",
             "setupCommands": [
