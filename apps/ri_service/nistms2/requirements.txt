@@ -30,7 +30,7 @@ imageio==2.5.0
 ipydatawidgets==4.0.0
 ipykernel==5.1.0
 ipyscales==0.3.0
-ipython==7.4.0
+ipython==8.10.0
 ipython-genutils==0.2.0
 ipyvolume==0.5.1
 ipywebrtc==0.4.3
