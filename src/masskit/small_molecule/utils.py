@@ -2,7 +2,7 @@ try:
     from rdkit import Chem
     from rdkit import DataStructs
     from rdkit.Chem.MolStandardize import rdMolStandardize
-    from molvs import Standardizer
+#    from molvs import Standardizer
 except ImportError:
     pass
 import copy
@@ -285,7 +285,7 @@ def set_dative_bonds(mol, fromAtoms=(7,8)):
 
 def standardize_mol(mol):
     """
-    standardize molecule.  correct valences on aromatic N's and do molvs standardization
+    standardize molecule
 
     :param mol: rdkit mol to standardize
     :return: standardized mol

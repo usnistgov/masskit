@@ -33,7 +33,7 @@ conversion:
     comment_fields:
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
-    probabilities: [0.0, 0.0, 0.1, 0.9]
+    probabilities: [0.0, 0.99, 0.005, 0.005]
   spectra:
     # min peak intensity allowed in spectral fingerprint
     min_intensity: 0.0
