@@ -97,6 +97,7 @@ BASE_PACKAGES="
   jsonpickle \
   jupyter \
   matplotlib \
+  numba \
   numpy \
   pandas \
   pyarrow=10.* \

@@ -30,6 +30,7 @@ if not exist %ENVPATH% (
     jsonpickle^
     jupyter^
     matplotlib^
+    numba^
     numpy^
     pandas^
     parquet-tools^

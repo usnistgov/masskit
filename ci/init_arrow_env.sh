@@ -41,6 +41,7 @@ if ! conda activate $ENVNAME; then
           jsonpickle \
           jupyter \
           matplotlib \
+          numba \
           numpy \
           pandas \
           pyarrow=9.0.* \
