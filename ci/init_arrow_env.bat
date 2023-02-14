@@ -30,8 +30,6 @@ if not exist %ENVPATH% (
     jsonpickle^
     jupyter^
     matplotlib^
-    molvs^
-    numba^
     numpy^
     pandas^
     parquet-tools^
@@ -40,7 +38,6 @@ if not exist %ENVPATH% (
     pynndescent^
     pytest^
     python=3^
-    quaternion^
     rdkit=2023.03.2^
     sqlalchemy^
     sqlparse

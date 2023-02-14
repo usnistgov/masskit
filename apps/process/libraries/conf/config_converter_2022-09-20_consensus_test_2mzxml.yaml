@@ -37,3 +37,13 @@ output:
     name: ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/test.mzxml
     # parquet, msp, mzxml
     types:
+
+hydra:
+  run:
+    # working directory
+    dir: hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+  output_subdir: hydra
+  sweep:
+    dir: hydra_sweep
+  job:
+    chdir: True

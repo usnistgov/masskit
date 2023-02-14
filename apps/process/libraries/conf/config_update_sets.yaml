@@ -9,3 +9,12 @@ output:
     # output file or output file prefix
     name: ${oc.env:HOME}/data/nist/tandem/2020/hr_msms_nist_fixed_set.parquet
   
+hydra:
+  run:
+    # working directory
+    dir: hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+  output_subdir: hydra
+  sweep:
+    dir: hydra_sweep
+  job:
+    chdir: True

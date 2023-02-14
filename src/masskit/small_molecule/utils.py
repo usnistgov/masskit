@@ -1,10 +1,11 @@
 try:
     from rdkit import Chem
     from rdkit import DataStructs
-    # from rdkit.Chem.MolStandardize import rdMolStandardize
-    from molvs import Standardizer
+    from rdkit.Chem.MolStandardize import rdMolStandardize
+#    from molvs import Standardizer
 except ImportError:
     pass
+import copy
 import numpy as np
 import unittest
 
@@ -256,39 +257,90 @@ def get_unspec_double_bonds(m):
             res.append(b.GetIdx())
     return res
 
+def is_transition_metal(at):
+    n = at.GetAtomicNum()
+    return (n>=22 and n<=29) or (n>=40 and n<=47) or (n>=72 and n<=79)
+
+def set_dative_bonds(mol, fromAtoms=(7,8)):
+    """ convert some bonds to dative
+
+    Replaces some single bonds between metals and atoms with atomic numbers in fomAtoms
+    with dative bonds. The replacement is only done if the atom has "too many" bonds.
+
+    Returns the modified molecule.
+
+    """
+    pt = Chem.GetPeriodicTable()
+    rwmol = Chem.RWMol(mol)
+    rwmol.UpdatePropertyCache(strict=False)
+    metals = [at for at in rwmol.GetAtoms() if is_transition_metal(at)]
+    for metal in metals:
+        for nbr in metal.GetNeighbors():
+            if nbr.GetAtomicNum() in fromAtoms and \
+               nbr.GetExplicitValence()>pt.GetDefaultValence(nbr.GetAtomicNum()) and \
+               rwmol.GetBondBetweenAtoms(nbr.GetIdx(),metal.GetIdx()).GetBondType() == Chem.BondType.SINGLE:
+                rwmol.RemoveBond(nbr.GetIdx(),metal.GetIdx())
+                rwmol.AddBond(nbr.GetIdx(),metal.GetIdx(),Chem.BondType.DATIVE)
+    return rwmol
 
 def standardize_mol(mol):
     """
-    standardize molecule.  correct valences on aromatic N's and do molvs standardization
+    standardize molecule
 
     :param mol: rdkit mol to standardize
     :return: standardized mol
     """
-    mol = AdjustAromaticNs(mol)  # allows for explicit H's
+    disconnector = rdMolStandardize.MetalDisconnector()
+    normalizer = rdMolStandardize.Normalizer()
+    reionizer = rdMolStandardize.Reionizer()
+    mol_in = copy.deepcopy(mol)  # copy as AdjustAromaticNs return None on failure
+    mol_props = mol.GetPropsAsDict()
+    # mol = AdjustAromaticNs(mol_in)  # allows for explicit H's
+    if mol is None:
+        mol = mol_in
     try:
-        s = Standardizer()
         # molvs standarizer
+        # s = Standardizer()
         # mol = s.standardize(mol)  # versions of rdkit older than 2019_09_3 arbitrarily delete properties
-
         # molvs standardizer found in rdkit
         # mol = rdMolStandardize.Cleanup(mol)
 
-        # copy of molvs standardizer, modified to ignore valence checks
-        # mol = copy.deepcopy(mol)  # no need to make a copy
+        # only v3000 sdf files support coordinate/dative bonds.  Attempt to detect organometallics, e.g.
+        # CCN1#C[Mo]12(Br)(C#O)(C1C=CC=C1)C#N2CC and CCN1#C[W]1(C#O)(C#O)(C1C=CC=C1)[Ge](Cl)(Cl)Cl
+        # and convert appropriate bonds to coordinate bonds
+        # doesn't yet deal with elements other than C and N nor fix bond order (I think).  So for now,
+        # treat coordinate bonds as convalent.
+        # mol = set_dative_bonds(mol)
+
         # to turn off valence errors, ask rdkit not to call updatePropertyCache on atoms with strict=True, which enforces
         # the valencies in PeriodTable.  To do this, turn off SANITIZE_PROPERTIES
         Chem.SanitizeMol(mol, sanitizeOps=Chem.SANITIZE_ALL ^ Chem.SANITIZE_PROPERTIES)
-        mol = Chem.RemoveHs(mol)
-        mol = s.disconnect_metals(mol)
-        # disconnector = rdMolStandardize.MetalDisconnector()
+
+        # remove Hs but don't sanitize as that will exclude diborane, etc. due to valence checking
+        mol = Chem.RemoveHs(mol, sanitize=False)
+
+        # for now, don't disconnect metals as it cause exceptions to be thrown on organometallics
+        # molvs calls SanitizeMol, which throws an exception on valences it doesn't like
+        # mol = s.disconnect_metals(mol)
         # mol = disconnector.Disconnect(mol)
-        mol = s.normalize(mol)
-        # mol = rdMolStandardize.Normalize(mol)
-        mol = s.reionize(mol)
-        # mol = rdMolStandardize.Reionize(mol)
+
+        # mol = s.normalize(mol)
+        # note that normalize may remove properties
+        mol = normalizer.normalize(mol)
+
+        # mol = s.reionize(mol)
+        # skip reionization from rdkit as it cleans out the property cache.  Also, very much doubt
+        # that there are any free metal ions in the structures, although there should be a check.
+        # rebalancing which atoms are most acidic may be arbitrary in some instances, too.
+        mol = reionizer.reionize(mol)
+
         Chem.AssignStereochemistry(mol, force=True, cleanIt=True)
+        # this is the solution rdkit itself uses to preserve properties.  otherwise properties might be
+        # removed in normalize or reionize
+        for k, v in mol_props.items():
+            mol.SetProp(k, str(v))
     except:
-        raise ValueError(f'unable to standardize')
+        raise
     return mol
 
 
