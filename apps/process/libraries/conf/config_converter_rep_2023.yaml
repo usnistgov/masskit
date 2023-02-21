@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/ei/2023/sdf/ureplib.SDF
+      - ${oc.env:HOME}/data/nist/ei/2023/sdf/ureplib_with_exp_RI.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem
