@@ -149,6 +149,9 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
         },
         table->num_rows() );
 
+    // To simplify debugging
+    ARROW_RETURN_NOT_OK(arrow::SetCpuThreadPoolCapacity(1));
+
     // Use the convenience function we apply the cosine score UDF to the
     // previously batched data
     ARROW_ASSIGN_OR_RAISE(auto cosine_score_results, cp::CallFunction("cosine_score", batch, &cso));
