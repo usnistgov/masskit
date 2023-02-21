@@ -157,10 +157,12 @@ def row_view_raw(table, idx=0):
 
     return inst
 
-def arrow_to_pandas(table):
+def arrow_to_pandas(table, field_list=None):
     """
     converts a pyarrow table to a pandas dataframe with spectrum objects
+
     :param table: The pyarrow table to be converted
+    :param field_list: list of pyarrow fields to convert
     """
     # Create dataframe of spectrums
     rv = row_view(table)
@@ -173,11 +175,13 @@ def arrow_to_pandas(table):
         "spectrum": spectrums})
 
     # dataframe of the remaining subset of columns
-    desired_names = list(map(lambda x: x.name,
-                             ms_schemas.molecule_experimental_fields +
-                             ms_schemas.peptide_fields +
-                             ms_schemas.base_experimental_fields))
-    common_names = set(table.schema.names) & set(desired_names)
+    if field_list is None:
+        field_list = list(map(lambda x: x.name,
+                                ms_schemas.tablemap_fields))
+    else:
+        field_list = list(map(lambda x: x.name,
+                                field_list))
+    common_names = set(table.schema.names) & set(field_list)
     table_df = table.select(common_names).to_pandas()
 
     # merge and return the two dataframes

@@ -41,7 +41,6 @@ if ! conda activate $ENVNAME; then
           jsonpickle \
           jupyter \
           matplotlib \
-          molvs \
           numba \
           numpy \
           pandas \
@@ -50,7 +49,6 @@ if ! conda activate $ENVNAME; then
           pynndescent \
           pytest \
           python=3 \
-          quaternion \
           rdkit=2021.09.4 \
           sqlalchemy \
           sqlparse

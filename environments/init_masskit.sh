@@ -97,7 +97,6 @@ BASE_PACKAGES="
   jsonpickle \
   jupyter \
   matplotlib \
-  molvs \
   numba \
   numpy \
   pandas \
@@ -106,7 +105,6 @@ BASE_PACKAGES="
   pynndescent \
   pytest \
   python=3 \
-  quaternion \
   rdkit=2021.09.4 \
   sqlalchemy \
   sqlparse"

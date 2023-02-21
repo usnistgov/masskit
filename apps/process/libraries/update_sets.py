@@ -14,7 +14,7 @@ python update_sets.py
 """
 
 
-@hydra.main(config_path="conf", config_name="config_update_sets")
+@hydra.main(config_path="conf", config_name="config_update_sets", version_base=None)
 def update_sets_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)

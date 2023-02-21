@@ -5,12 +5,13 @@
     * `cd src/masskit/docs`
     * `sphinx-apidoc -o . ../`
     * `sphinx-build -b html . _build`
+    * `touch _build/.nojekyll`.  The sphinx.ext.githubpages extension is supposed to do this, but doesn't always work.
     * create and use an orphan branch to hold the pages.  First time initialization of this branch is something like
       * 
         ```mkdir masskit_nist-pages
         cd masskit_nist-pages
         git init
-        git remote add origin <url>
+        git remote add origin git@github.com:usnistgov/masskit.git
         git checkout --orphan nist-pages
 
         # copy over the pages
@@ -18,6 +19,12 @@
         git add .
         git commit -m "init"
         git push -u origin nist-pages
+        ```
+      * and updates are
+        ```
+        git add .
+        git commit -m "new pages"
+        git push origin
         ```
 
 * notes
@@ -36,5 +43,7 @@
     * restructuredtext (*.rst) files, which are widely used and the same format used to document functions and classes.
   * autodoc has problems importing some modules.  If these are modules not to be documented, one can mock up the import using the `autodoc_mock_imports` setting in conf.py
   * because sphinx uses directories that start with underscore, this confuses jekyll.  To turn off jekyll, use the `sphinx.ext.githubpages` extension in conf.py
+  * the http response from the webhook when the processing doesn't run properly is 200. If the processing is successful, the response is 202.
+  * [build log](https://pages.nist.gov/masskit/build.log)
 
   
