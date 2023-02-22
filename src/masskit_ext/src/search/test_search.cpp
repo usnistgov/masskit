@@ -108,16 +108,16 @@ arrow::Status initialize(const std::string FILENAME, std::shared_ptr<arrow::Tabl
 
 arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
 
-    double ppm = 20;
-
+    // Create a mask, essentially a column of boolean values to denote which rows will be scored
+    // and which will be skipped. Right now, it is based on the precursor fitting within a given 
+    // window. However, more complex criteria may be used in the future.
+    double ppm = 20; // Should be a parameter
     auto precursor_mz = table->GetColumnByName("precursor_mz");
     ARROW_ASSIGN_OR_RAISE(auto query_precursor_mz, precursor_mz->GetScalar(0));
     double qPrecursorMZ = (std::static_pointer_cast<arrow::DoubleScalar>(query_precursor_mz))->value;
     double tol = qPrecursorMZ * ppm / 1000000.0;
     arrow::Datum maxMZ = arrow::DoubleScalar(qPrecursorMZ + tol);
     arrow::Datum minMZ = arrow::DoubleScalar(qPrecursorMZ - tol);
-    //auto minMZ = arrow::DoubleScalar(qPrecursorMZ - tol);
-
     ARROW_ASSIGN_OR_RAISE(auto minDatum, arrow::compute::CallFunction("greater_equal",{precursor_mz, minMZ}));
     ARROW_ASSIGN_OR_RAISE(auto maxDatum, arrow::compute::CallFunction("less_equal",{precursor_mz, maxMZ}));
     ARROW_ASSIGN_OR_RAISE(auto precursorMask, arrow::compute::And(minDatum, maxDatum));

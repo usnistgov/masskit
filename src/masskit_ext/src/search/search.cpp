@@ -334,6 +334,10 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
     //auto opt = ::arrow::compute::internal::OptionsWrapper<CosineScoreOptions>::Get(ctx);
    
     // Query data
+    // This data is passed in as datums, which makes it a bit easier to extract. However,
+    // in the test case, the intensities and m/z arrays are subsets of a larger columns, they
+    // still appear to be LargeListScalars. We'll need to template this in the future to
+    // accomodate other data sources.
     auto query_mz = std::static_pointer_cast<arrow::DoubleArray>(
         batch[0].scalar_as<arrow::LargeListScalar>().value);
     auto query_intensity = std::static_pointer_cast<arrow::DoubleArray>(
@@ -348,6 +352,10 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
                     query_mz->length(), query_tol->value, PPM);
 
     // Reference Data
+    // This data is passed in as subsets of the large columns, e.g. 5,000 items
+    // long in the current implementation. All items are arrays, an may be easily
+    // interpretated as such, however the m/z and intensities are lists of lists, so
+    // they also contain an array of offsets to denote when their sublists start and stop.
     auto ref_mz = batch[3].array;
     auto ref_mz_offsets = ref_mz.GetValues<int64_t>(1);
     auto ref_mz_data = ref_mz.child_data[0];
