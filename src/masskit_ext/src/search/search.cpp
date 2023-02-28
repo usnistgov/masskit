@@ -114,19 +114,19 @@ arrow::Status TanimotoFunction(cp::KernelContext* ctx,
   return arrow::Status::OK();
 }
 
-class CosineScoreOptionsType : public cp::FunctionOptionsType {
-    const char* type_name() const override { return "CosineScoreOptionsType"; }
-    std::string Stringify(const cp::FunctionOptions&) const override {
-        return "CosineScoreOptionsType";
-    }
-    bool Compare(const cp::FunctionOptions&, const cp::FunctionOptions&) const override {
-        return true;
-    }
-    std::unique_ptr<cp::FunctionOptions> Copy(const cp::FunctionOptions&) const override;
-    // optional: support for serialization
-    // Result<std::shared_ptr<Buffer>> Serialize(const FunctionOptions&) const override;
-    // Result<std::unique_ptr<FunctionOptions>> Deserialize(const Buffer&) const override;
-};
+// class CosineScoreOptionsType : public cp::FunctionOptionsType {
+//     const char* type_name() const override { return "CosineScoreOptionsType"; }
+//     std::string Stringify(const cp::FunctionOptions&) const override {
+//         return "CosineScoreOptionsType";
+//     }
+//     bool Compare(const cp::FunctionOptions&, const cp::FunctionOptions&) const override {
+//         return true;
+//     }
+//     std::unique_ptr<cp::FunctionOptions> Copy(const cp::FunctionOptions&) const override;
+//     // optional: support for serialization
+//     // Result<std::shared_ptr<Buffer>> Serialize(const FunctionOptions&) const override;
+//     // Result<std::unique_ptr<FunctionOptions>> Deserialize(const Buffer&) const override;
+// };
 
 cp::FunctionOptionsType* GetCosineScoreOptionsType() {
     static CosineScoreOptionsType options_type;
@@ -139,17 +139,25 @@ std::unique_ptr<cp::FunctionOptions> CosineScoreOptionsType::Copy(
 }
 
 
-CosineScoreOptions::CosineScoreOptions( float mz_power,
-                                 float intensity_power,
-                                 int scale,
-                                 bool skip_denom,
-                                 TieBreaker tiebreaker )
-        : cp::FunctionOptions(GetCosineScoreOptionsType()),
-          mz_power(mz_power),
-          intensity_power(intensity_power),
-          scale(scale),
-          skip_denom(skip_denom),
-          tiebreaker(tiebreaker) {}
+// CosineScoreOptions::CosineScoreOptions( float mz_power,
+//                                  float intensity_power,
+//                                  int scale,
+//                                  bool skip_denom,
+//                                  TieBreaker tiebreaker )
+//         // : cp::FunctionOptions(
+//         //     GetCosineScoreOptionsType(GetCosineScoreOptionsType(
+//         //         DataMember("mz_power", &CosineScoreOptions::mz_power),
+//         //         DataMember("intensity_power", &CosineScoreOptions::intensity_power),
+//         //         DataMember("scale", &CosineScoreOptions::scale),
+//         //         DataMember("skip_denom", &CosineScoreOptions::skip_denom),
+//         //         DataMember("tiebreaker", &CosineScoreOptions::tiebreaker)
+//         //     )),
+//         : cp::FunctionOptions(GetCosineScoreOptionsType()),
+//           mz_power(mz_power),
+//           intensity_power(intensity_power),
+//           scale(scale),
+//           skip_denom(skip_denom),
+//           tiebreaker(tiebreaker) {}
 
 const cp::FunctionDoc cosine_score_doc{
     // Summary
@@ -315,13 +323,21 @@ struct CSpectrum {
 
 };
 
+using CosineState = MyOptionsWrapper<CosineScoreOptions>;
+
 arrow::Status CosineScore(cp::KernelContext* ctx,
                           const cp::ExecSpan& batch,
                           cp::ExecResult* out) {
     // Options
     //auto opt = std::static_pointer_cast<cp::ScalarKernel>(ctx->state())->options;
-    
+    //auto opt = static_cast<const CosineState*>(ctx->state())->options;
+    //auto opt = ::arrow::compute::internal::OptionsWrapper<CosineScoreOptions>::Get(ctx);
+   
     // Query data
+    // This data is passed in as datums, which makes it a bit easier to extract. However,
+    // in the test case, the intensities and m/z arrays are subsets of a larger columns, they
+    // still appear to be LargeListScalars. We'll need to template this in the future to
+    // accomodate other data sources.
     auto query_mz = std::static_pointer_cast<arrow::DoubleArray>(
         batch[0].scalar_as<arrow::LargeListScalar>().value);
     auto query_intensity = std::static_pointer_cast<arrow::DoubleArray>(
@@ -336,6 +352,10 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
                     query_mz->length(), query_tol->value, PPM);
 
     // Reference Data
+    // This data is passed in as subsets of the large columns, e.g. 5,000 items
+    // long in the current implementation. All items are arrays, an may be easily
+    // interpretated as such, however the m/z and intensities are lists of lists, so
+    // they also contain an array of offsets to denote when their sublists start and stop.
     auto ref_mz = batch[3].array;
     auto ref_mz_offsets = ref_mz.GetValues<int64_t>(1);
     auto ref_mz_data = ref_mz.child_data[0];
