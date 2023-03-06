@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/aiomics/rebuttal/test_half.parquet
+      - ${oc.env:HOME}/data/nist/aiomics/rebuttal/validation_sequential.parquet
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -13,7 +13,7 @@ input:
 conversion:
   id:
     # name of the id field, like NISTNO. if an integer and reading sdfs, this is the start value of the ids
-    field: 10100000000
+    field: 10200000000
   small_molecule:
     # maximum bound of 3D conformer in angstroms (0=no limit)
     max_bound: 0.0
@@ -24,7 +24,7 @@ conversion:
     comment_fields:
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
-    probabilities: [0.0, 0.0, 0.0, 1.0]
+    probabilities: [0.0, 0.0, 1.0, 0.0]
   spectra:
     # min peak intensity allowed in spectral fingerprint
     min_intensity: 0.0
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/aiomics/rebuttal/test_half.mgf
+    name: ${oc.env:HOME}/data/nist/aiomics/rebuttal/validation_sequential.mgf
     # parquet, msp, mzxml
     types:
 
