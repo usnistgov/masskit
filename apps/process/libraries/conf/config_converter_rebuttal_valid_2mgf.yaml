@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/aiomics/rebuttal/validation.parquet
+      - ${oc.env:HOME}/data/nist/aiomics/rebuttal/test_half.parquet
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -24,7 +24,7 @@ conversion:
     comment_fields:
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
-    probabilities: [0.0, 0.0, 1.0, 0.0]
+    probabilities: [0.0, 0.0, 0.0, 1.0]
   spectra:
     # min peak intensity allowed in spectral fingerprint
     min_intensity: 0.0
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/aiomics/rebuttal/validation.mgf
+    name: ${oc.env:HOME}/data/nist/aiomics/rebuttal/test_half.mgf
     # parquet, msp, mzxml
     types:
 
