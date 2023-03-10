@@ -552,24 +552,25 @@ class Ions(ABC):
             return_ions = self.copy()
         else:
             return_ions = self
-        if ord is None:
-            max_intensity = np.max(return_ions.intensity)
-        else:
-            max_intensity = np.linalg.norm(return_ions.intensity, ord=ord)
-        d_type = return_ions.intensity.dtype
-        return_ions.intensity = (
-                return_ions.intensity / float(max_intensity) * max_intensity_in
-        )
-        if return_ions.stddev is not None:
-            return_ions.stddev = (
-                    return_ions.stddev / float(max_intensity) * max_intensity_in
+        if len(return_ions.intensity) != 0:
+            if ord is None:
+                max_intensity = np.max(return_ions.intensity)
+            else:
+                max_intensity = np.linalg.norm(return_ions.intensity, ord=ord)
+            d_type = return_ions.intensity.dtype
+            return_ions.intensity = (
+                    return_ions.intensity / float(max_intensity) * max_intensity_in
             )
-        if keep_type:
-            return_ions.intensity = return_ions.intensity.astype(
-                d_type
-            )  # cast back to original type
             if return_ions.stddev is not None:
-                return_ions.stddev = return_ions.stddev.astype(d_type)
+                return_ions.stddev = (
+                        return_ions.stddev / float(max_intensity) * max_intensity_in
+                )
+            if keep_type:
+                return_ions.intensity = return_ions.intensity.astype(
+                    d_type
+                )  # cast back to original type
+                if return_ions.stddev is not None:
+                    return_ions.stddev = return_ions.stddev.astype(d_type)
         return return_ions
 
     def mask(self, indices, inplace=False):
