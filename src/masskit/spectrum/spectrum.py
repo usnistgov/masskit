@@ -1266,7 +1266,8 @@ def cosine_score_calc(
         mask[index2] = False
         denominator *= np.sum(weighted_spectrum2_intensity[index2]**2) + np.sum(weighted_spectrum2_intensity[mask]**2)
 
-        score /= denominator
+        if denominator != 0:
+            score /= denominator
 
     return score * scale
 

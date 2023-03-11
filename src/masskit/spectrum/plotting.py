@@ -295,6 +295,9 @@ def spectrum_plot(
     :param stddev_color: color of error bars
     :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
     """
+    if len(mz) == 0 or len(intensity) == 0:
+        return
+    
     if title:
         if title_size is not None:
             axis.set_title(title, fontsize=title_size)
@@ -332,6 +335,9 @@ def spectrum_plot(
     if mirror_mz is None:
         mirror_mz = mz
 
+    if len(mirror_mz) == 0 or len(mirror_intensity) == 0:
+        return
+
     if max_mz is None:
         max_mz = max(max(mirror_mz), max(mz))
     if min_mz is None:
@@ -339,30 +345,29 @@ def spectrum_plot(
 
     y_lim_lo = 0
 
-    if mirror_intensity is not None:
-        if normalize:
-            mirror_intensity = normalize_intensity(mirror_intensity, normalize)
+    if normalize:
+        mirror_intensity = normalize_intensity(mirror_intensity, normalize)
 
-        if max_mz is not None and min_mz is not None:
-            y_lim = max(y_lim, max(mirror_intensity[(mirror_mz >= min_mz) & (mirror_mz <= max_mz)]))
-        else:
-            y_lim = max(y_lim, max(mirror_intensity))
+    if max_mz is not None and min_mz is not None:
+        y_lim = max(y_lim, max(mirror_intensity[(mirror_mz >= min_mz) & (mirror_mz <= max_mz)]))
+    else:
+        y_lim = max(y_lim, max(mirror_intensity))
 
-        if mirror:
-            mirror_intensity = -mirror_intensity
-            y_lim_lo = -y_lim
-            axis.axhline(0, color="black", linewidth=1)
-            axis.add_collection(line_plot(mirror_mz, mirror_intensity, mirror_color))
-        if mirror_stddev is not None:
-            axis.add_collection(
-                error_bar_plot_lines(
-                    mirror_mz,
-                    mirror_intensity,
-                    mirror_stddev,
-                    stddev_color,
-                    vertical_cutoff=vertical_cutoff,
-                )
+    if mirror:
+        mirror_intensity = -mirror_intensity
+        y_lim_lo = -y_lim
+        axis.axhline(0, color="black", linewidth=1)
+        axis.add_collection(line_plot(mirror_mz, mirror_intensity, mirror_color))
+    if mirror_stddev is not None:
+        axis.add_collection(
+            error_bar_plot_lines(
+                mirror_mz,
+                mirror_intensity,
+                mirror_stddev,
+                stddev_color,
+                vertical_cutoff=vertical_cutoff,
             )
+        )
 
     axis.set_ylim([y_lim_lo, y_lim])
     axis.set_xlim([min_mz, max_mz])
