@@ -4,7 +4,7 @@ import pickle
 import pyarrow as pa
 import numpy as np
 from masskit.accumulator import Accumulator
-
+import masskit.utils.textalloc as ta
 from masskit.constants import EPSILON
 from masskit.data_specs.schemas import experimental_fields
 from masskit.peptide.encoding import h2o_mass
@@ -994,101 +994,6 @@ class Ions(ABC):
                 tolerance_type="daltons", tolerance=tolerance, evenly_spaced=True
             )
 
-    def plot(
-            self,
-            axis,
-            mirror_ions=None,
-            mirror=True,
-            title=None,
-            xlabel="m/z",
-            ylabel="Intensity",
-            max_mz=2000,
-            min_mz=0,
-            color=(0, 0, 1, 1),
-            mirror_color=(1, 0, 0, 1),
-            normalize=None,
-            plot_stddev=False,
-            vertical_cutoff=0.0,
-    ):
-        """
-        make a spectrum plot using matplotlib.  if mirror_ions is specified, will do a mirror plot
-
-        :param axis: matplotlib axis
-        :param title: title of plot
-        :param xlabel: xlabel of plot
-        :param ylabel: ylabel of plot
-        :param mirror_ions: Ions to mirror plot (optional)
-        :param mirror: if true, mirror the plot if there are two spectra.  Otherwise plot the two spectra together
-        :param max_mz: maximum mz to plot
-        :param min_mz: minimum mz to plot
-        :param normalize: if specified, norm the spectra to this value.
-        :param color: color of spectrum specified as RBGA tuple
-        :param mirror_color: color of mirrored spectrum specified as RGBA tuple
-        :param plot_stddev: if true, plot the standard deviation
-        :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
-        """
-        if mirror_ions:
-            mirror_intensity = mirror_ions.intensity
-            mirror_mz = mirror_ions.mz
-            if plot_stddev:
-                mirror_stddev = mirror_ions.stddev
-            else:
-                mirror_stddev = None
-        else:
-            mirror_intensity = None
-            mirror_mz = None
-            mirror_stddev = None
-        if plot_stddev:
-            stddev = self.stddev
-        else:
-            stddev = None
-
-        spectrum_plot(
-            axis,
-            self.mz,
-            self.intensity,
-            stddev,
-            mirror_mz=mirror_mz,
-            mirror_intensity=mirror_intensity,
-            mirror_stddev=mirror_stddev,
-            mirror=mirror,
-            title=title,
-            xlabel=xlabel,
-            ylabel=ylabel,
-            max_mz=max_mz,
-            min_mz=min_mz,
-            color=color,
-            mirror_color=mirror_color,
-            normalize=normalize,
-            vertical_cutoff=vertical_cutoff,
-        )
-
-    def draw_spectrum(self, fig_format, output):
-        plt.ioff()  # turn off interactive mode
-        fig = plt.figure(figsize=(4, 2))
-        ax = fig.add_subplot(111)
-        self.plot(ax)
-        plt.tight_layout()
-        fig.savefig(output, format=fig_format)
-        plt.close(fig)
-        plt.ion()  # turn on interactive mode
-        return output.getvalue()
-
-    def _repr_png_(self):
-        """
-        png representation of spectrum
-
-        :return: png
-        """
-        return self.draw_spectrum("png", BytesIO())
-
-    def _repr_svg_(self):
-        """
-        png representation of spectrum
-
-        :return: svg
-        """
-        return self.draw_spectrum("svg", StringIO())
 
 
 class HiResIons(Ions):
@@ -2564,56 +2469,139 @@ class BaseSpectrum:
 
     def plot(
             self,
-            axis,
+            axes,
             mirror_spectrum=None,
             mirror=True,
             title=None,
             xlabel="m/z",
             ylabel="Intensity",
-            max_mz=2000,
+            title_size=None,
+            label_size=None,
+            max_mz=None,
             min_mz=0,
             color=(0, 0, 1, 1),
             mirror_color=(1, 0, 0, 1),
+            stddev_color=(0.3, 0.3, 0.3, 0.5),
             normalize=None,
             plot_stddev=False,
             vertical_cutoff=0.0,
-    ):
+            vertical_multiplier=1.1,
+            right_label=None,
+            left_label=None,
+            right_label_size=None,
+            left_label_size=None,
+            no_xticks=False,
+            no_yticks=False,
+            linewidth=None,
+            annotate=False,
+        ):
         """
         make a spectrum plot using matplotlib.  if mirror_spectrum is specified, will do a mirror plot
 
-        :param axis: matplotlib axis
+        :param axes: matplotlib axis
+        :param mirror_spectrum: spectrum to mirror plot (optional)
+        :param mirror: if true, mirror the plot if there are two spectra.  Otherwise plot the two spectra together
         :param title: title of plot
         :param xlabel: xlabel of plot
         :param ylabel: ylabel of plot
-        :param mirror_spectrum: spectrum to mirror plot (optional)
-        :param mirror: if true, mirror the plot if there are two spectra.  Otherwise plot the two spectra together
+        :param title_size: size of title font
+        :param label_size: size of x and y axis label fonts
         :param max_mz: maximum mz to plot
         :param min_mz: minimum mz to plot
-        :param normalize: if specified, norm the spectra to this value.
         :param color: color of spectrum specified as RBGA tuple
         :param mirror_color: color of mirrored spectrum specified as RGBA tuple
+        :param stddev_color: color of error bars
+        :param normalize: if specified, norm the spectra to this value.
         :param plot_stddev: if true, plot the standard deviation
         :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
+        :param vertical_multiplier: multiply times y max values to create white space
+        :param right_label: label for the top right of the fiture
+        :param left_label: label for the top left of the figure
+        :param right_label_size: size of label for the top right of the fiture
+        :param left_label_size: size of label for the top left of the figure
+        :param no_xticks: turn off x ticks and labels
+        :param no_yticks: turn off y ticks and lables
+        :param linewidth: width of plotted lines
+        :param annotate: if peptide spectra, annotate ions
+        :return: peak_collection, mirror_peak_collection sets of peaks for picking
         """
         if mirror_spectrum:
             mirror_ions = mirror_spectrum.products
+            mirror_intensity = mirror_ions.intensity
+            mirror_mz = mirror_ions.mz
+            if plot_stddev:
+                mirror_stddev = mirror_ions.stddev
+            else:
+                mirror_stddev = None
         else:
             mirror_ions = None
-        self.products.plot(
-            axis,
-            mirror_ions,
+            mirror_intensity = None
+            mirror_mz = None
+            mirror_stddev = None
+
+        if plot_stddev:
+            stddev = self.products.stddev
+        else:
+            stddev = None
+
+        line_collections = spectrum_plot(
+            axes,
+            self.products.mz,
+            self.products.intensity,
+            stddev,
+            mirror_mz=mirror_mz,
+            mirror_intensity=mirror_intensity,
+            mirror_stddev=mirror_stddev,
             mirror=mirror,
             title=title,
             xlabel=xlabel,
             ylabel=ylabel,
+            title_size=title_size,
+            label_size=label_size,
             max_mz=max_mz,
             min_mz=min_mz,
             color=color,
             mirror_color=mirror_color,
+            stddev_color=stddev_color,
             normalize=normalize,
-            plot_stddev=plot_stddev,
-            vertical_cutoff=vertical_cutoff
+            vertical_cutoff=vertical_cutoff,
+            vertical_multiplier=vertical_multiplier,
+            right_label=right_label,
+            left_label=left_label,
+            right_label_size=right_label_size,
+            left_label_size=left_label_size,
+            no_xticks=no_xticks,
+            no_yticks=no_yticks,
+            linewidth=linewidth
         )
+
+        if annotate:
+            annots = []
+            xx = []
+            yy = []
+            for j in range(len(self.products)):
+                annot = self.get_ion_annotation(j, show_ppm=False, tex_style=True, show_mz=False)
+                if len(annot) > 0:
+                    annots.append(annot[0])
+                    xx.append(self.products.mz[j])
+                    yy.append(self.products.intensity[j])
+
+            ta.allocate_text(axes,xx,yy,
+                            annots,
+                            x_lines=[np.array([self.products.mz[i],self.products.mz[i]]) for i in range(len(self.products))],
+                            y_lines=[np.array([0,self.products.intensity[i]]) for i in range(len(self.products))], 
+                            textsize=7,
+                            margin=0.0,
+                            min_distance=0.005,
+                            max_distance=0.05,
+                            linewidth=0.7,
+                            nbr_candidates=200,
+                            textcolor="black",
+                            draw_all=False,
+                            ylims=(axes.get_ylim()[1]/20, axes.get_ylim()[1]))
+            
+        return line_collections
+
 
     def __repr__(self):
         """
@@ -2628,13 +2616,24 @@ class BaseSpectrum:
         else:
             return f"<spectrum {self.id}>"
 
+    def draw_spectrum(self, fig_format, output):
+        plt.ioff()  # turn off interactive mode
+        fig = plt.figure(figsize=(4, 2))
+        ax = fig.add_subplot(111)
+        self.plot(ax)
+        plt.tight_layout()
+        fig.savefig(output, format=fig_format)
+        plt.close(fig)
+        plt.ion()  # turn on interactive mode
+        return output.getvalue()
+
     def _repr_png_(self):
         """
         png representation of spectrum
 
         :return: png
         """
-        return self.products._repr_png_()
+        return self.draw_spectrum("png", BytesIO())
 
     def _repr_svg_(self):
         """
@@ -2642,7 +2641,7 @@ class BaseSpectrum:
 
         :return: svg
         """
-        return self.products._repr_svg_()
+        return self.draw_spectrum("svg", StringIO())
 
     def __str__(self):
         if is_notebook():

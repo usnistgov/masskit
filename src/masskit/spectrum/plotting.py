@@ -228,6 +228,7 @@ def spectrum_plot(
     :param left_label_size: size of label for the top left of the figure
     :param no_xticks: turn off x ticks and labels
     :param no_yticks: turn off y ticks and lables
+    :param linewidth: width of plotted lines
     :return: peak_collection, mirror_peak_collection sets of peaks for picking
     """
 
