@@ -1990,61 +1990,93 @@ class BaseSpectrum:
         for i in range(num_peaks):
             ret_value += f"{self.products.mz[i]:.4f}\t{self.products.intensity[i]:.8g}"
             if self.joined_spectra and self.joins:
-                ret_value += '\t'
-                first_match = True
+                ret_value += '\t"'
                 # find join to annotation (for now, just one annotation to scan.  make join property handlers)
                 # may be more than one annotation spectrum -- ignore this for now
-                exp_peaks = self.joins[0].column('exp_peaks')
-                theo_peaks = self.joins[0].column('theo_peaks')
-                # from theo spectrum, get annotation struct.  see ion_annot_fields for fields
-                annotations = self.joined_spectra[0].products.annotations
-                ion_type = annotations.field(0)
-                isotope = annotations.field(2)
-                ion_subtype = annotations.field(3)
-                position = annotations.field(4)
-                end_position = annotations.field(5)
-                product_charge = annotations.field(1)
+
                 #   scan exp_peaks in join table, get matching theo_peaks
-                for j in range(len(exp_peaks)):
-                    if exp_peaks[j].is_valid and theo_peaks[j].is_valid and exp_peaks[j].as_py() == i:
-                        # may be more than one annotation.  if so, print ","
-                        if first_match:
-                            first_match = False
-                            ret_value += '"'
-                        else:
-                            ret_value += ','
-                        theo_peak = theo_peaks[j].as_py()
-                        current_ion_type = ion_type[theo_peak].as_py()
-                        current_ion_subtype = ion_subtype[theo_peak].as_py()
-                        if current_ion_type == 'internalb':
-                            fragment = self.peptide[position[theo_peak].as_py(): end_position[theo_peak].as_py()]
-                            ret_value += f'Int/{fragment}'
-                        elif current_ion_type == 'immonium':
-                            ret_value += f'{current_ion_subtype}'
-                        elif current_ion_type == 'parent':
-                            ret_value += f'p'
-                        else:
-                            ret_value += f'{current_ion_type}{position[theo_peak].as_py()}'
-                        if current_ion_subtype is not None and current_ion_type != 'immonium':
-                            ret_value += f'-{current_ion_subtype}'
-                        if isotope[theo_peak].as_py() == 1:
-                            ret_value += '+i'
-                        elif isotope[theo_peak].as_py() > 1:
-                            ret_value += f'+{isotope[theo_peak].as_py()}i' 
-                        if product_charge[theo_peak].as_py() > 1 and current_ion_type != 'parent':
-                            ret_value += f'^{product_charge[theo_peak].as_py()}'
-                        # calculate ppm
-                        ppm = (self.products.mz[i] - self.joined_spectra[0].products.mz[theo_peaks[j].as_py()]) / self.products.mz[i] * 1000000
-                        ret_value += f"/{ppm:.1f}ppm"
-                # if no annotation, print "?"
-                if first_match:
-                    ret_value += '"?"\n'
+                annotation_strings = self.get_ion_annotation(i)
+                if len(annotation_strings) > 0:
+                    for k, annotation_string in enumerate(annotation_strings):
+                        if k != 0:
+                            ret_value += ","
+                        ret_value += annotation_string
                 else:
-                    ret_value += '"\n'
+                    ret_value += '?'
+                ret_value += '"\n'
             else:
+                # if no annotation, print "?"
                 ret_value += '\t"?"\n'
         ret_value += "\n"
         return ret_value
+
+    def get_ion_annotation(self, i, show_ppm=True, tex_style=False, show_mz=True):
+        """
+        get the text annotations for a given ion
+
+        :param i: index of the ion
+        :param show_ppm: show a calcuated ppm
+        :param tex_style: text annotations use tex for formatting
+        :param show_mz: show mz values in the text
+        """
+        exp_peaks = self.joins[0].column('exp_peaks')
+        theo_peaks = self.joins[0].column('theo_peaks')
+        # from theo spectrum, get annotation struct.  see ion_annot_fields for fields
+        annotations = self.joined_spectra[0].products.annotations
+        ion_type = annotations.field(0)
+        isotope = annotations.field(2)
+        ion_subtype = annotations.field(3)
+        position = annotations.field(4)
+        end_position = annotations.field(5)
+        product_charge = annotations.field(1)
+        annotation_strings = []
+        for j in range(len(exp_peaks)):
+            if exp_peaks[j].is_valid and theo_peaks[j].is_valid and exp_peaks[j].as_py() == i:
+                annotation_string = ""
+                theo_peak = theo_peaks[j].as_py()
+                current_ion_type = ion_type[theo_peak].as_py()
+                current_ion_subtype = ion_subtype[theo_peak].as_py()
+                        
+                if current_ion_type == 'internalb':
+                    fragment = self.peptide[position[theo_peak].as_py(): end_position[theo_peak].as_py()]
+                    annotation_string += f'Int/{fragment}'
+                elif current_ion_type == 'immonium':
+                    annotation_string += f'{current_ion_subtype}'
+                elif current_ion_type == 'parent':
+                    annotation_string += f'p'
+                else:
+                    if tex_style:
+                        annotation_string += f'$\mathregular{{{current_ion_type}_{{{position[theo_peak].as_py()}}}}}$'
+                    else:
+                        annotation_string += f'{current_ion_type}{position[theo_peak].as_py()}'
+
+                if current_ion_subtype is not None and current_ion_type != 'immonium':
+                    if tex_style:
+                        # subscript atom counts
+                        neutral_loss = re.sub(r"(\d+)", r"$\\mathregular{_{\1}}$", current_ion_subtype)
+                        annotation_string += f'-{neutral_loss}'
+                    else:
+                        annotation_string += f'-{current_ion_subtype}'
+
+                if isotope[theo_peak].as_py() == 1:
+                    annotation_string += '+i'
+                elif isotope[theo_peak].as_py() > 1:
+                    annotation_string += f'+{isotope[theo_peak].as_py()}i' 
+                if product_charge[theo_peak].as_py() > 1 and current_ion_type != 'parent':
+                    if tex_style:
+                        annotation_string += f'$\mathregular{{^{{{product_charge[theo_peak].as_py()}+}}}}$'
+                    else:
+                        annotation_string += f'^{product_charge[theo_peak].as_py()}'
+                
+                # calculate ppm
+                if show_ppm:
+                    ppm = (self.products.mz[i] - self.joined_spectra[0].products.mz[theo_peaks[j].as_py()]) / self.products.mz[i] * 1000000
+                    annotation_string += f"/{ppm:.1f}ppm"
+
+                if tex_style and show_mz:
+                    annotation_string += f'\n{self.products.mz[i]:.2f}'
+                annotation_strings.append(annotation_string)
+        return annotation_strings
 
     def from_mol(
             self, mol, skip_expensive=False, id_field="NISTNO", id_field_type="int"
@@ -2380,6 +2412,9 @@ class BaseSpectrum:
             max_intensity=max_intensity,
             inplace=True,
         )
+        # zero out annotations as they are no longer valid
+        return_spectrum.joins = []
+        return_spectrum.joined_spectra = []
         return return_spectrum
 
     def parent_filter(self, h2o=True, inplace=False):
@@ -2397,6 +2432,9 @@ class BaseSpectrum:
         if self.precursor is not None:
             return_spectrum.products.parent_filter(h2o=h2o, precursor_mz=self.precursor.mz, charge=self.charge,
                                                    inplace=True)
+        # zero out annotations as they are no longer valid
+        return_spectrum.joins = []
+        return_spectrum.joined_spectra = []
         return return_spectrum
 
     def windowed_filter(self, mz_window=14, num_ions=5, inplace=False):
@@ -2413,6 +2451,10 @@ class BaseSpectrum:
         else:
             return_spectrum = copy.deepcopy(self)
         return_spectrum.products.windowed_filter(mz_window=mz_window, num_ions=num_ions, inplace=True)
+
+        # zero out annotations as they are no longer valid
+        return_spectrum.joins = []
+        return_spectrum.joined_spectra = []
         return return_spectrum
 
     def norm(self, max_intensity_in=999, keep_type=True, inplace=False, ord=None):
@@ -2447,6 +2489,10 @@ class BaseSpectrum:
         else:
             return_spectrum = copy.deepcopy(self)
         return_spectrum.products.merge(merge_spectrum.products, inplace=True)
+
+        # zero out annotations as they are no longer valid
+        return_spectrum.joins = []
+        return_spectrum.joined_spectra = []
         return return_spectrum
 
     def shift_mz(self, shift, inplace=False):
@@ -2477,6 +2523,10 @@ class BaseSpectrum:
         else:
             return_spectrum = copy.deepcopy(self)
         return_spectrum.products.mask(indices=indices, inplace=True)
+
+        # zero out annotations as they are no longer valid
+        return_spectrum.joins = []
+        return_spectrum.joined_spectra = []
         return return_spectrum
 
     def change_mass_info(self, mass_info, inplace=False, take_max=True):

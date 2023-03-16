@@ -62,6 +62,7 @@ class AnimateSpectrumPlot:
         imageio.mimwrite(file, image_list_final, fps=fps, subrectangles=True)
 
 
+
 def normalize_intensity(intensity, normalize=1.0):
     """
     norm the spectrum to the max peak
@@ -74,7 +75,7 @@ def normalize_intensity(intensity, normalize=1.0):
     return intensity * normalize / (divisor + EPSILON)
 
 
-def line_plot(mz_in, intensity_in, color):
+def line_plot(mz_in, intensity_in, color, linewidth=1):
     """
     create a LineCollection for plotting a spectrum
 
@@ -89,11 +90,11 @@ def line_plot(mz_in, intensity_in, color):
         mz_in[intensity_nonzero], intensity_in[intensity_nonzero]
     ):
         lines.append([(mz_val, intensity_val), (mz_val, 0)])
-    lc = mc.LineCollection(lines, colors=color, linewidths=1)
+    lc = mc.LineCollection(lines, colors=color, linewidths=linewidth)
     return lc
 
 
-def error_bar_plot(mz_in, intensity_in, stddev_in, color):
+def error_bar_plot(mz_in, intensity_in, stddev_in, color, linewidth=1):
     """
     plot spectra as colored error bars
 
@@ -119,11 +120,11 @@ def error_bar_plot(mz_in, intensity_in, stddev_in, color):
                 (mz_val + 8, intensity_val - stddev_val / 2.0),
             ]
         )
-    pc = mc.PolyCollection(vertices, facecolors=color, zorder=-1)
+    pc = mc.PolyCollection(vertices, facecolors=color, zorder=-1, linewidth=linewidth)
     return pc
 
 
-def error_bar_plot_lines(mz_in, intensity_in, stddev_in, color, vertical_cutoff=0.01):
+def error_bar_plot_lines(mz_in, intensity_in, stddev_in, color, vertical_cutoff=0.01, linewidth=1):
     """
     plot spectra as colored error bars using lines
 
@@ -163,8 +164,173 @@ def error_bar_plot_lines(mz_in, intensity_in, stddev_in, color, vertical_cutoff=
                     (mz_val + 6, intensity_val - stddev_val),
                 ]
             )
-    lc = mc.LineCollection(lines, colors=color, linewidths=1, zorder=-1)
+    lc = mc.LineCollection(lines, colors=color, linewidths=linewidth, zorder=-1)
     return lc
+
+
+def spectrum_plot(
+    axis,
+    mz,
+    intensity,
+    stddev=None,
+    mirror_mz=None,
+    mirror_intensity=None,
+    mirror_stddev=None,
+    mirror=True,
+    title=None,
+    xlabel='m/z',
+    ylabel='Intensity',
+    title_size=None,
+    label_size=None,
+    max_mz=None,
+    min_mz=0,
+    color=(0, 0, 1, 1),
+    mirror_color=(1, 0, 0, 1),
+    stddev_color=(0.3, 0.3, 0.3, 0.5),
+    normalize=1000,
+    vertical_cutoff=0.0,
+    vertical_multiplier=1.1,
+    right_label=None,
+    left_label=None,
+    right_label_size=None,
+    left_label_size=None,
+    no_xticks=False,
+    no_yticks=False,
+    linewidth=1
+):
+    """
+    make a spectrum plot using matplotlib.  if mirror_intensity is specified, will do a mirror plot
+
+    :param axis: matplotlib axis
+    :param mz: mz values as array-like
+    :param intensity: intensity as array-like, parallel to mz array
+    :param stddev: standard deviation of the intensities
+    :param title: title of plot
+    :param xlabel: xlabel of plot
+    :param ylabel: ylabel of plot
+    :param title_size: size of title font
+    :param label_size: size of x and y axis label fonts
+    :param mirror_mz: mz values of mirror spectrum, corresponding to mirror_intensity.  If none, uses mz
+    :param mirror_intensity: intensity of mirror spectrum as array-like, parallel to mz array.  If none, don't plot
+    :param mirror_stddev: standard deviation of the intensities
+    :param mirror: if true, mirror the plot if there are two spectra.  Otherwise plot the two spectra together
+    :param max_mz: maximum mz to plot
+    :param min_mz: minimum mz to plot
+    :param normalize: if specified, norm the spectra to this value.
+    :param color: color of spectrum specified as RBGA tuple
+    :param mirror_color: color of mirrored spectrum specified as RGBA tuple
+    :param stddev_color: color of error bars
+    :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
+    :param vertical_multiplier: multiply times y max values to create white space
+    :param right_label: label for the top right of the fiture
+    :param left_label: label for the top left of the figure
+    :param right_label_size: size of label for the top right of the fiture
+    :param left_label_size: size of label for the top left of the figure
+    :param no_xticks: turn off x ticks and labels
+    :param no_yticks: turn off y ticks and lables
+    :return: peak_collection, mirror_peak_collection sets of peaks for picking
+    """
+
+    def finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim):
+        axis.set_ylim([y_lim_lo*vertical_multiplier, y_lim*vertical_multiplier])
+        axis.set_xlim([min_mz, max_mz])
+        if left_label is not None:
+            axis.text(0.02, 0.95, left_label, horizontalalignment='left', verticalalignment='top', transform=axis.transAxes, size=left_label_size)
+        if right_label is not None:
+            axis.text(0.98, 0.95, right_label, horizontalalignment='right', verticalalignment='top', transform=axis.transAxes, size=right_label_size)
+
+
+    # line collections of the peaks, returned for picking
+    peak_collection = None
+    mirror_peak_collection = None
+
+    if xlabel is None:
+        xlabel='m/z'
+    if xlabel is None:
+        ylabel='Intensity'
+    
+    axis.set_xlabel(xlabel, fontsize=label_size)
+    axis.set_ylabel(ylabel, fontsize=label_size)
+
+    if no_xticks:
+        axis.tick_params(axis='x', which='both', bottom=False, top=False, labelbottom=False)
+        axis.set_xlabel(None, fontsize=label_size)
+
+    if no_yticks:
+        axis.tick_params(axis='y', which='both', left=False, right=False, labelleft=False)  
+        axis.set_ylabel(None, fontsize=label_size)      
+
+    if len(mz) == 0 or len(intensity) == 0:
+        return peak_collection, mirror_peak_collection
+    
+    if title is not None:
+        axis.set_title(title, fontsize=title_size)
+
+    y_lim_lo = 0
+
+    # create the bar charts
+    if normalize:
+        intensity = normalize_intensity(intensity, normalize)
+
+    # find max intensity value for y_lim
+    if max_mz is not None and min_mz is not None:
+        y_lim = max(intensity[(mz >= min_mz) & (mz <= max_mz)])
+    else:
+        y_lim = max(intensity)
+
+    if stddev is not None:
+        axis.add_collection(
+            error_bar_plot_lines(
+                mz, intensity, stddev, stddev_color, vertical_cutoff=vertical_cutoff, linewidth=linewidth
+            )
+        )
+    peak_collection = line_plot(mz, intensity, color, linewidth=linewidth)
+    axis.add_collection(peak_collection)
+
+    if mirror_mz is None or mirror_intensity is None or len(mirror_mz) == 0 or len(mirror_intensity) == 0:
+        if max_mz is None:
+            max_mz = max(mz)
+        if min_mz is None:
+            min_mz = min(mz)
+        finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim)
+        return peak_collection, mirror_peak_collection
+
+    if mirror_mz is None:
+        mirror_mz = mz
+
+    if max_mz is None:
+        max_mz = max(max(mirror_mz), max(mz))
+    if min_mz is None:
+        min_mz = min(min(mirror_mz), min(mz))
+
+    if normalize:
+        mirror_intensity = normalize_intensity(mirror_intensity, normalize)
+
+    if max_mz is not None and min_mz is not None:
+        y_lim = max(y_lim, max(mirror_intensity[(mirror_mz >= min_mz) & (mirror_mz <= max_mz)]))
+    else:
+        y_lim = max(y_lim, max(mirror_intensity))
+
+    if mirror:
+        mirror_intensity = -mirror_intensity
+        y_lim_lo = -y_lim
+        mirror_peak_collection = line_plot(mirror_mz, mirror_intensity, mirror_color, linewidth=linewidth)
+        axis.add_collection(mirror_peak_collection)
+        axis.axhline(0, color="black", linewidth=linewidth)
+    if mirror_stddev is not None:
+        axis.add_collection(
+            error_bar_plot_lines(
+                mirror_mz,
+                mirror_intensity,
+                mirror_stddev,
+                stddev_color,
+                vertical_cutoff=vertical_cutoff,
+                linewidth=linewidth
+            )
+        )
+
+    finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim)
+    return peak_collection, mirror_peak_collection
 
 
 def multiple_spectrum_plot(
@@ -248,126 +414,3 @@ def multiple_spectrum_plot(
 
     return fig
 
-
-def spectrum_plot(
-    axis,
-    mz,
-    intensity,
-    stddev=None,
-    mirror_mz=None,
-    mirror_intensity=None,
-    mirror_stddev=None,
-    mirror=True,
-    title=None,
-    xlabel='m/z',
-    ylabel='Intensity',
-    title_size=None,
-    label_size=None,
-    max_mz=2000,
-    min_mz=0,
-    color=(0, 0, 1, 1),
-    mirror_color=(1, 0, 0, 1),
-    stddev_color=(0.3, 0.3, 0.3, 0.5),
-    normalize=None,
-    vertical_cutoff=0.0,
-):
-    """
-    make a spectrum plot using matplotlib.  if mirror_intensity is specified, will do a mirror plot
-
-    :param axis: matplotlib axis
-    :param mz: mz values as array-like
-    :param intensity: intensity as array-like, parallel to mz array
-    :param stddev: standard deviation of the intensities
-    :param title: title of plot
-    :param xlabel: xlabel of plot
-    :param ylabel: ylabel of plot
-    :param title_size: size of title font
-    :param label_size: size of x and y axis label fonts
-    :param mirror_mz: mz values of mirror spectrum, corresponding to mirror_intensity.  If none, uses mz
-    :param mirror_intensity: intensity of mirror spectrum as array-like, parallel to mz array.  If none, don't plot
-    :param mirror_stddev: standard deviation of the intensities
-    :param mirror: if true, mirror the plot if there are two spectra.  Otherwise plot the two spectra together
-    :param max_mz: maximum mz to plot
-    :param min_mz: minimum mz to plot
-    :param normalize: if specified, norm the spectra to this value.
-    :param color: color of spectrum specified as RBGA tuple
-    :param mirror_color: color of mirrored spectrum specified as RGBA tuple
-    :param stddev_color: color of error bars
-    :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
-    """
-    if len(mz) == 0 or len(intensity) == 0:
-        return
-    
-    if title:
-        if title_size is not None:
-            axis.set_title(title, fontsize=title_size)
-        else:
-            axis.set_title(title)
-    if label_size is not None:
-        if xlabel:
-            axis.set_xlabel(xlabel, fontsize=label_size)
-        if ylabel:
-            axis.set_ylabel(ylabel, fontsize=label_size)
-    else:
-        if xlabel:
-            axis.set_xlabel(xlabel)
-        if ylabel:
-            axis.set_ylabel(ylabel)
-
-    # create the bar charts
-    if normalize:
-        intensity = normalize_intensity(intensity, normalize)
-
-    # find max intensity value for y_lim
-    if max_mz is not None and min_mz is not None:
-        y_lim = max(intensity[(mz >= min_mz) & (mz <= max_mz)])
-    else:
-        y_lim = max(intensity)
-
-    if stddev is not None:
-        axis.add_collection(
-            error_bar_plot_lines(
-                mz, intensity, stddev, stddev_color, vertical_cutoff=vertical_cutoff
-            )
-        )
-    axis.add_collection(line_plot(mz, intensity, color))
-
-    if mirror_mz is None:
-        mirror_mz = mz
-
-    if len(mirror_mz) == 0 or len(mirror_intensity) == 0:
-        return
-
-    if max_mz is None:
-        max_mz = max(max(mirror_mz), max(mz))
-    if min_mz is None:
-        min_mz = min(min(mirror_mz), min(mz))
-
-    y_lim_lo = 0
-
-    if normalize:
-        mirror_intensity = normalize_intensity(mirror_intensity, normalize)
-
-    if max_mz is not None and min_mz is not None:
-        y_lim = max(y_lim, max(mirror_intensity[(mirror_mz >= min_mz) & (mirror_mz <= max_mz)]))
-    else:
-        y_lim = max(y_lim, max(mirror_intensity))
-
-    if mirror:
-        mirror_intensity = -mirror_intensity
-        y_lim_lo = -y_lim
-        axis.axhline(0, color="black", linewidth=1)
-        axis.add_collection(line_plot(mirror_mz, mirror_intensity, mirror_color))
-    if mirror_stddev is not None:
-        axis.add_collection(
-            error_bar_plot_lines(
-                mirror_mz,
-                mirror_intensity,
-                mirror_stddev,
-                stddev_color,
-                vertical_cutoff=vertical_cutoff,
-            )
-        )
-
-    axis.set_ylim([y_lim_lo, y_lim])
-    axis.set_xlim([min_mz, max_mz])
