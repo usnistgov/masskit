@@ -462,13 +462,28 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     else:
         analysis = None
     
+    def mod_mass_pos(mod_positions, pos):
+        """
+        at a given pos in the sequence, find any matching modification positions in mod_positions
+        and sum up the masses of the modifications
+        """
+
+        ret_value = 0.0
+        mod_index = np.where(mod_positions == pos)
+        # add in the masses of any modifications that match the position
+        for j in range(len(mod_index[0])):
+            row_index = mod_masses.id2row[mod_names[mod_index[0][j]]]
+            ret_value += mod_masses.df.at[row_index, 'mono_mass']
+        return ret_value
+
     # peptide mass at which monoisotopic and one carbon 13 peaks have some abundance: 1446.94
     # begin by generating cumulative mass arrays that can be used for all ion series except immonium
     peptide_len = len(peptide)
+    # dictionary that contains the forward (N to C) mass ladder (1) and the reverse (C to N) mass ladder (-1)
     cumulative_masses = {1: np.zeros(peptide_len), -1: np.zeros(peptide_len)}
-    cumulative_masses[1][0] = aa_masses[peptide[0]]['mono_mass']
+    cumulative_masses[1][0] = aa_masses[peptide[0]]['mono_mass'] + mod_mass_pos(mod_positions, 0)
     # note that the reverse cumulative masses are still in N to C order
-    cumulative_masses[-1][-1] = aa_masses[peptide[-1]]['mono_mass']
+    cumulative_masses[-1][-1] = aa_masses[peptide[-1]]['mono_mass']  + mod_mass_pos(mod_positions, peptide_len - 1)
     # ion position ordering for both forward and reverse.  starts with 1
     positions = {1: np.arange(1, peptide_len + 1), -1: np.arange(peptide_len, 0, -1)}
 
@@ -478,16 +493,9 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
         mod_mass_reverse = 0.0
 
         if mod_positions is not None:
-            mod_index = np.where(mod_positions == i)
             # add in the masses of any modifications that match the position
-            for j in range(len(mod_index[0])):
-                row_index = mod_masses.id2row[mod_names[mod_index[0][j]]]
-                mod_mass_forward += mod_masses.df.at[row_index, 'mono_mass']
-            mod_index = np.where(mod_positions == peptide_len - i - 1)
-            # add in the masses of any modifications that match the position
-            for j in range(len(mod_index[0])):
-                row_index = mod_masses.id2row[mod_names[mod_index[0][j]]]
-                mod_mass_reverse += mod_masses.df.at[row_index, 'mono_mass']
+            mod_mass_forward += mod_mass_pos(mod_positions, i)
+            mod_mass_reverse += mod_mass_pos(mod_positions, peptide_len - i - 1)
 
         cumulative_masses[1][i] = cumulative_masses[1][i-1] + aa_masses[peptide[i]]['mono_mass'] + mod_mass_forward
         cumulative_masses[-1][peptide_len - i - 1] = cumulative_masses[-1][peptide_len - i] \
