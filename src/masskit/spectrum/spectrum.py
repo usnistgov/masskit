@@ -2482,6 +2482,7 @@ class BaseSpectrum:
             color=(0, 0, 1, 1),
             mirror_color=(1, 0, 0, 1),
             stddev_color=(0.3, 0.3, 0.3, 0.5),
+            left_label_color=(1, 0, 0, 1),
             normalize=None,
             plot_stddev=False,
             vertical_cutoff=0.0,
@@ -2511,6 +2512,7 @@ class BaseSpectrum:
         :param color: color of spectrum specified as RBGA tuple
         :param mirror_color: color of mirrored spectrum specified as RGBA tuple
         :param stddev_color: color of error bars
+        :param left_label_color: color of the left top label
         :param normalize: if specified, norm the spectra to this value.
         :param plot_stddev: if true, plot the standard deviation
         :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
@@ -2563,6 +2565,7 @@ class BaseSpectrum:
             color=color,
             mirror_color=mirror_color,
             stddev_color=stddev_color,
+            left_label_color=left_label_color,
             normalize=normalize,
             vertical_cutoff=vertical_cutoff,
             vertical_multiplier=vertical_multiplier,

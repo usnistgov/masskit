@@ -187,6 +187,7 @@ def spectrum_plot(
     color=(0, 0, 1, 1),
     mirror_color=(1, 0, 0, 1),
     stddev_color=(0.3, 0.3, 0.3, 0.5),
+    left_label_color=(1, 0, 0, 1),
     normalize=1000,
     vertical_cutoff=0.0,
     vertical_multiplier=1.1,
@@ -220,6 +221,7 @@ def spectrum_plot(
     :param color: color of spectrum specified as RBGA tuple
     :param mirror_color: color of mirrored spectrum specified as RGBA tuple
     :param stddev_color: color of error bars
+    :param left_label_color: color of the left top label
     :param vertical_cutoff: if the intensity/max_intensity is below this value, don't plot the vertical line
     :param vertical_multiplier: multiply times y max values to create white space
     :param right_label: label for the top right of the fiture
@@ -232,13 +234,13 @@ def spectrum_plot(
     :return: peak_collection, mirror_peak_collection sets of peaks for picking
     """
 
-    def finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim):
+    def finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim, left_label_color):
         axis.set_ylim([y_lim_lo*vertical_multiplier, y_lim*vertical_multiplier])
         axis.set_xlim([min_mz, max_mz])
         if left_label is not None:
-            axis.text(0.02, 0.95, left_label, horizontalalignment='left', verticalalignment='top', transform=axis.transAxes, size=left_label_size)
+            axis.text(0.02, 0.95, left_label, horizontalalignment='left', verticalalignment='top', transform=axis.transAxes, size=left_label_size, color=left_label_color)
         if right_label is not None:
-            axis.text(0.98, 0.95, right_label, horizontalalignment='right', verticalalignment='top', transform=axis.transAxes, size=right_label_size)
+            axis.text(0.98, 0.95, right_label, horizontalalignment='right', verticalalignment='top', transform=axis.transAxes, size=right_label_size, color=left_label_color)
 
 
     # line collections of the peaks, returned for picking
@@ -293,7 +295,7 @@ def spectrum_plot(
             max_mz = max(mz)
         if min_mz is None:
             min_mz = min(mz)
-        finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim)
+        finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim, left_label_color)
         return peak_collection, mirror_peak_collection
 
     if mirror_mz is None:
@@ -330,7 +332,7 @@ def spectrum_plot(
             )
         )
 
-    finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim)
+    finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim, left_label_color)
     return peak_collection, mirror_peak_collection
 
 
