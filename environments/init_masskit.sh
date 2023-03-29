@@ -106,6 +106,7 @@ BASE_PACKAGES="
   pytest \
   python=3 \
   rdkit=2021.09.4 \
+  rich \
   sqlalchemy \
   sqlparse"
 
