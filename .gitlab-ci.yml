@@ -38,7 +38,7 @@ test masskit:
     - build masskit
   script:
     - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
-    - pip install masskit*.whl
+    - pip install --force-reinstall masskit*.whl
     - cd tests
     - pytest
     - pip uninstall -y masskit
