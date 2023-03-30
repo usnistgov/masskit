@@ -109,11 +109,18 @@ def extract_peptides(cfg):
     for defline, protein in fasta_file:
         # print("protein:", protein)
         for peptide in cleavage(protein, cfg.peptide.length.min, cfg.peptide.length.max, 1):
-            #print("pep:", peptide)
+            # print("pep:", peptide)
             pepset.add(peptide)
     peptides = list(pepset)
     peptides.sort()
     return peptides
+
+def count_rhk(peptide):
+    count = 0
+    for res in peptide:
+        if res == 'R' or res == 'H' or res == 'K':
+            count += 1
+    return count
 
 class pepgen:
 
@@ -123,14 +130,11 @@ class pepgen:
         self.mods = parse_modification_encoding(cfg.peptide.mods.variable)
         self.fixed_mods = parse_modification_encoding(cfg.peptide.mods.fixed)
         self.max_mods = cfg.peptide.mods.max
-        # limits = cfg.charge.split(':')
-        # min = int(limits[0])
-        # max = int(limits[1])
         min = int(cfg.peptide.charge.min)
         max = int(cfg.peptide.charge.max)
         self.charges = list(range(min,max+1))
         self.digest = cfg.protein.cleavage.digest
-
+        self.limit_rhk = cfg.peptide.use_basic_limit
         # initialize data structs
         self.records = empty_records(schema)
         self.tables = []
@@ -156,7 +160,12 @@ class pepgen:
             mod_names, mod_positions = generate_mods(pep, self.mods)
             mods = list(zip(mod_positions, mod_names))
             fixed_mods_names, fixed_mods_positions = generate_mods(pep, self.fixed_mods)
+            if self.limit_rhk:
+                num_rhk = count_rhk(pep)
             for charge in self.charges:
+                if self.limit_rhk:
+                    if num_rhk > charge:
+                        continue
                 for nce in self.nces:
                     row = {
                         "id": spectrum_id,

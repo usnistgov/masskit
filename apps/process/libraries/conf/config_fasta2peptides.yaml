@@ -25,3 +25,5 @@ peptide:
   # List of NCE values to apply to peptides
   nce:
     - 30
+  # If True, do not generate peptides that have more basic residues (RHK) than the precursor charge
+  use_basic_limit: True
