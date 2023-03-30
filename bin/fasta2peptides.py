@@ -4,8 +4,6 @@ import argparse
 import logging
 import hydra
 from omegaconf import DictConfig, OmegaConf
-import gzip
-import bz2
 from itertools import groupby, combinations
 import pyarrow as pa
 import pyarrow.parquet as pq
@@ -109,9 +107,9 @@ def extract_peptides(cfg):
         cleavage = nonspecific
 
     for defline, protein in fasta_file:
-        print("protein:", protein)
+        # print("protein:", protein)
         for peptide in cleavage(protein, cfg.peptide.length.min, cfg.peptide.length.max, 1):
-            print("pep:", peptide)
+            #print("pep:", peptide)
             pepset.add(peptide)
     peptides = list(pepset)
     peptides.sort()
@@ -121,21 +119,17 @@ class pepgen:
 
     def __init__(self, peptides, cfg):
         self.peptides = peptides
-        self.nces = list(map(float, cfg.nce.split(',')))
-        if cfg.mods:
-            self.mods = parse_modification_encoding(cfg.mods)
-        else:
-            self.mods = None
-        if cfg.mods:
-            self.fixed_mods = parse_modification_encoding(cfg.fixed_mods)
-        else:
-            self.fixed_mods = None
-        limits = cfg.charge.split(':')
-        self.max_mods = cfg.max_mods
-        min = int(limits[0])
-        max = int(limits[1])
+        self.nces = list(map(float, cfg.peptide.nce))
+        self.mods = parse_modification_encoding(cfg.peptide.mods.variable)
+        self.fixed_mods = parse_modification_encoding(cfg.peptide.mods.fixed)
+        self.max_mods = cfg.peptide.mods.max
+        # limits = cfg.charge.split(':')
+        # min = int(limits[0])
+        # max = int(limits[1])
+        min = int(cfg.peptide.charge.min)
+        max = int(cfg.peptide.charge.max)
         self.charges = list(range(min,max+1))
-        self.digest = cfg.digest
+        self.digest = cfg.protein.cleavage.digest
 
         # initialize data structs
         self.records = empty_records(schema)
@@ -191,7 +185,7 @@ class pepgen:
 @hydra.main(config_path="conf", config_name="config_fasta2peptides", version_base=None)
 def main(cfg: DictConfig) -> None:
     # print(OmegaConf.to_yaml(cfg))
-    # return
+    # print(list(map(float, cfg.peptide.nce)))
 
     # parser = argparse.ArgumentParser(description='',
     #                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -212,8 +206,8 @@ def main(cfg: DictConfig) -> None:
     # cfg = parser.parse_args()
 
     peptides = extract_peptides(cfg)
-    print(peptides)
-    return
+    # print(peptides)
+    # return
     pg = pepgen(peptides, cfg)
     table = pg.enumerate()
     #print(table.to_pandas())

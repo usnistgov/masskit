@@ -4811,6 +4811,9 @@ def parse_modification_encoding(modification_encoding):
     ret_values = []
     # take out any spaces
     modification_encoding = modification_encoding.replace(" ", "")
+    # Check for empty list
+    if modification_encoding == '':
+        return ret_values   
     # split by commas
     mod_list = modification_encoding.split(',')
     # split by curly brace

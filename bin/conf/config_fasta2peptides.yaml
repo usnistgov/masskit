@@ -13,10 +13,15 @@ peptide:
     min: 2
     max: 4
   mods:
-    # list of post-translational modifications to apply to peptides.
-    types: []
+    # comma separated list of variable modifications to apply to peptides.
+    variable: "Phospho{S}"
+    # comma separated list of fixed modifications to apply to peptides.
+    fixed: ""
     # maximum number of variable modifications per peptide
     max: 4
   length:
     min: 7
     max: 30
+  # List of NCE values to apply to peptides
+  nce:
+    - 30
