@@ -7,27 +7,11 @@ from omegaconf import DictConfig, OmegaConf
 from itertools import groupby, combinations
 import pyarrow as pa
 import pyarrow.parquet as pq
+from masskit.data_specs.schemas import min_peptide_schema
 from masskit.peptide.spectrum_generator import generate_mods
 from masskit.utils.general import open_if_compressed
 from masskit.utils.files import empty_records, add_row_to_records
 from masskit.peptide.encoding import allowable_mods, calc_ions_mz, calc_precursor_mz, parse_modification_encoding
-
-# TODO: this ought to come out of schemas.py
-schema = pa.schema([
-    pa.field("id", pa.uint64()),
-    pa.field("charge", pa.int8()),
-    pa.field("ev", pa.float64(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
-    pa.field("nce", pa.float64(), metadata={'description': 'normalized collision energy'}),
-    pa.field("peptide", pa.string()),
-    pa.field("peptide_len", pa.int32()),
-    pa.field("peptide_type", pa.dictionary(pa.int8(), pa.string())),  # tryptic, semitryptic
-    # note that mod_names should be a list of dictionary arrays but it's not clear how to initialize
-    # this properly with arrays of mod_names, such as in library import.  So for now, just using a list of int16
-    # which matches the modifications dictionary in encoding.py
-    pa.field("mod_names", pa.large_list(pa.int16())),  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
-    pa.field("mod_positions", pa.large_list(pa.int32())),
-    pa.field("precursor_mz", pa.float64()),
-])
 
 """
 Iterate over a fasta file, yields tuples of (header, sequence)
@@ -136,19 +120,19 @@ class pepgen:
         self.digest = cfg.protein.cleavage.digest
         self.limit_rhk = cfg.peptide.use_basic_limit
         # initialize data structs
-        self.records = empty_records(schema)
+        self.records = empty_records(min_peptide_schema)
         self.tables = []
         self.table = []
 
     def add_row(self, row):
         add_row_to_records(self.records, row)
         if len(self.records["id"]) % 25000 == 0:
-            table = pa.table(self.records, schema)
+            table = pa.table(self.records, min_peptide_schema)
             self.tables.append(table)
-            self.records = empty_records(schema)
+            self.records = empty_records(min_peptide_schema)
 
     def finalize_table(self):
-        table = pa.table(self.records, schema)
+        table = pa.table(self.records, min_peptide_schema)
         self.tables.append(table)
         table = pa.concat_tables(self.tables)
         return table

@@ -132,10 +132,15 @@ ion_annot = pa.struct(ion_annot_fields)
 # and pa.list_ uses 32 bit offsets, which overflows for large spectra libraries
 
 # experimental metadata fields shared by all types of experiments
-base_experimental_fields = [
+min_fields = [
     pa.field("id", pa.uint64()),
     pa.field("charge", pa.int8()),
     pa.field("ev", pa.float64(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
+    pa.field("nce", pa.float64(), metadata={'description': 'normalized collision energy'})
+]
+
+# experimental metadata fields shared by many types of experiments
+base_experimental_fields = min_fields + [
     pa.field("instrument", pa.string()),
     pa.field("instrument_type", pa.string()),
     pa.field("instrument_model", pa.string()),
@@ -144,7 +149,6 @@ base_experimental_fields = [
     pa.field("name", pa.string()),
     pa.field("synonyms", pa.string()),
     pa.field("scan", pa.string()),
-    pa.field("nce", pa.float64(), metadata={'description': 'normalized collision energy'}),
     pa.field("collision_energy", pa.float64(), metadata={'description': 'collision energy, either ev or calculated from nce'}),
     pa.field("retention_time", pa.float64(), metadata={'description': 'retention time in seconds'}),
     pa.field("collision_gas", pa.string()),
@@ -153,6 +157,7 @@ base_experimental_fields = [
 ]
 
 # spectrum fields shared by all types of experiments
+precursor_mz_field = pa.field("precursor_mz", pa.float64())
 base_spectrum_fields = [
     pa.field("intensity", pa.large_list(pa.float64())),
     pa.field("stddev", pa.large_list(pa.float64())),
@@ -160,7 +165,7 @@ base_spectrum_fields = [
     pa.field("mz", pa.large_list(pa.float64())),
     pa.field("precursor_intensity", pa.float64()),
     pa.field("precursor_massinfo", massinfo_struct),
-    pa.field("precursor_mz", pa.float64()),
+    precursor_mz_field,
     pa.field("starts", pa.large_list(pa.float64())),
     pa.field("stops", pa.large_list(pa.float64())),
 ]
@@ -181,6 +186,7 @@ base_fields = base_experimental_fields + base_spectrum_fields + base_annotation_
 base_schema = pa.schema(base_fields)
 
 # fields used in peptide experiments that define the experimental molecule
+mod_names_field = pa.field("mod_names", pa.large_list(pa.int16()))  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
 peptide_fields = [
     pa.field("peptide", pa.string()),
     pa.field("peptide_len", pa.int32()),
@@ -188,10 +194,12 @@ peptide_fields = [
     # note that mod_names should be a list of dictionary arrays but it's not clear how to initialize
     # this properly with arrays of mod_names, such as in library import.  So for now, just using a list of int16
     # which matches the modifications dictionary in encoding.py
-    pa.field("mod_names", pa.large_list(pa.int16())),  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
+    mod_names_field,
     pa.field("mod_positions", pa.large_list(pa.int32())),
 ]
-mod_names_field = peptide_fields[3]
+
+# schema specialized for fasta2peptides output.
+min_peptide_schema = pa.schema(min_fields + peptide_fields + [precursor_mz_field])
 
 # fields used in small molecule experiments that define the experimental molecule
 molecule_definition_fields = [
