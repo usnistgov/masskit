@@ -11,7 +11,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from masskit.peptide.spectrum_generator import generate_mods
 from masskit.utils.files import empty_records, add_row_to_records
-from masskit.peptide.encoding import allowable_mods, parse_modification_encoding
+from masskit.peptide.encoding import allowable_mods, calc_ions_mz, calc_precursor_mz, parse_modification_encoding
 
 # TODO: this ought to come out of schemas.py
 schema = pa.schema([
@@ -26,7 +26,8 @@ schema = pa.schema([
     # this properly with arrays of mod_names, such as in library import.  So for now, just using a list of int16
     # which matches the modifications dictionary in encoding.py
     pa.field("mod_names", pa.large_list(pa.int16())),  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
-    pa.field("mod_positions", pa.large_list(pa.int32()))
+    pa.field("mod_positions", pa.large_list(pa.int32())),
+    pa.field("precursor_mz", pa.float64()),
 ])
 
 
@@ -186,7 +187,6 @@ class pepgen:
             mod_names, mod_positions = generate_mods(pep, self.mods)
             mods = list(zip(mod_positions, mod_names))
             fixed_mods_names, fixed_mods_positions = generate_mods(pep, self.fixed_mods)
-            #print(mods)
             for charge in self.charges:
                 for nce in self.nces:
                     row = {
@@ -204,7 +204,7 @@ class pepgen:
                         if modset:
                             row["mod_positions"].extend(list(map(lambda x: x[0], modset)))
                             row["mod_names"].extend(list(map(lambda x: x[1], modset)))
-                        #print(row)
+                        row["precursor_mz"] = calc_precursor_mz(pep, charge, mod_names=row["mod_names"], mod_positions=row["mod_positions"])
                         self.add_row(row)
         return self.finalize_table()
     

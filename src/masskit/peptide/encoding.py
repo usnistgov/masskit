@@ -419,8 +419,63 @@ def calc_named_ions(arrays, analysis=None, named_ion=None, precursor_mass=None, 
             analysis['aa_after_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int8()))
             analysis['ptm_before_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int16()))
             analysis['ptm_after_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int16()))
-        
+
     
+def mod_mass_pos(mod_positions, mod_names, i):
+    """
+    at a given pos in the sequence, find any matching modification positions in mod_positions
+    and sum up the masses of the modifications
+
+    :param mod_positions: mod positions
+    :param mod_names: mod names
+    :param i: position in peptide
+    :return: masses of matching modifications
+    """
+
+    ret_value = 0.0
+    mod_index = np.where(mod_positions == i)
+    # add in the masses of any modifications that match the position
+    for j in range(len(mod_index[0])):
+        row_index = mod_masses.id2row[mod_names[mod_index[0][j]]]
+        ret_value += mod_masses.df.at[row_index, 'mono_mass']
+    return ret_value
+
+
+def calc_precursor_mz(peptide, charge, mod_names=None, mod_positions=None):
+    """
+    calculate m/z of modified peptide
+    
+    :param peptide: the peptide
+    :param charge: the charge of the peptide
+    :param mod_names: the modification ids
+    :param mod_positions: the positions of the modifications
+    :return: the mass
+    """
+    return protonate_mass(calc_precursor_mass(peptide, mod_names=mod_names, mod_positions=mod_positions), charge)
+
+
+def calc_precursor_mass(peptide, mod_names=None, mod_positions=None):
+    """
+    calculate mass of modified peptide
+    
+    :param peptide: the peptide
+    :param mod_names: the modification ids
+    :param mod_positions: the positions of the modifications
+    :return: the mass
+    """
+    ret_value = 0.0
+    mod_positions = np.array(mod_positions)
+    for i in range(len(peptide)):
+        # the mass of any matching modification, for forward ion series and reverse ion series
+        ret_value += aa_masses[peptide[i]]['mono_mass']
+        if mod_names is not None:
+            ret_value += mod_mass_pos(mod_positions, mod_names, i)
+
+    # TODO: h2o_mass may not be correct if there are blocking PTMs at N or C terminus
+    ret_value += h2o_mass      
+    return ret_value
+
+
 def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
                  analysis_annotations=False, precursor_charge=2, num_isotopes=2, max_internal_size=7):
     """
@@ -461,29 +516,15 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
         ])
     else:
         analysis = None
-    
-    def mod_mass_pos(mod_positions, pos):
-        """
-        at a given pos in the sequence, find any matching modification positions in mod_positions
-        and sum up the masses of the modifications
-        """
-
-        ret_value = 0.0
-        mod_index = np.where(mod_positions == pos)
-        # add in the masses of any modifications that match the position
-        for j in range(len(mod_index[0])):
-            row_index = mod_masses.id2row[mod_names[mod_index[0][j]]]
-            ret_value += mod_masses.df.at[row_index, 'mono_mass']
-        return ret_value
 
     # peptide mass at which monoisotopic and one carbon 13 peaks have some abundance: 1446.94
     # begin by generating cumulative mass arrays that can be used for all ion series except immonium
     peptide_len = len(peptide)
     # dictionary that contains the forward (N to C) mass ladder (1) and the reverse (C to N) mass ladder (-1)
     cumulative_masses = {1: np.zeros(peptide_len), -1: np.zeros(peptide_len)}
-    cumulative_masses[1][0] = aa_masses[peptide[0]]['mono_mass'] + mod_mass_pos(mod_positions, 0)
+    cumulative_masses[1][0] = aa_masses[peptide[0]]['mono_mass'] + mod_mass_pos(mod_positions, mod_names, 0)
     # note that the reverse cumulative masses are still in N to C order
-    cumulative_masses[-1][-1] = aa_masses[peptide[-1]]['mono_mass']  + mod_mass_pos(mod_positions, peptide_len - 1)
+    cumulative_masses[-1][-1] = aa_masses[peptide[-1]]['mono_mass']  + mod_mass_pos(mod_positions, mod_names, peptide_len - 1)
     # ion position ordering for both forward and reverse.  starts with 1
     positions = {1: np.arange(1, peptide_len + 1), -1: np.arange(peptide_len, 0, -1)}
 
@@ -494,8 +535,8 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
 
         if mod_positions is not None:
             # add in the masses of any modifications that match the position
-            mod_mass_forward += mod_mass_pos(mod_positions, i)
-            mod_mass_reverse += mod_mass_pos(mod_positions, peptide_len - i - 1)
+            mod_mass_forward += mod_mass_pos(mod_positions, mod_names, i)
+            mod_mass_reverse += mod_mass_pos(mod_positions, mod_names, peptide_len - i - 1)
 
         cumulative_masses[1][i] = cumulative_masses[1][i-1] + aa_masses[peptide[i]]['mono_mass'] + mod_mass_forward
         cumulative_masses[-1][peptide_len - i - 1] = cumulative_masses[-1][peptide_len - i] \
