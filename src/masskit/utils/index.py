@@ -875,7 +875,7 @@ class ArrowLibraryMap(TableMap):
         return self.table
     
     def to_pandas(self):
-        return arrow_to_pandas(self.table, field_list=self.field_list)
+        return arrow_to_pandas(self.table, conversions=["spectrum"], field_list=self.field_list)
 
     def to_parquet(self, file):
         """
