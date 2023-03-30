@@ -4712,32 +4712,6 @@ mod_masses.create_id2row()
 # mods allowed in models.  TODO: this should be taken out of the model config, peptide_nist_mods.yaml
 allowable_mods = ['Phospho','Oxidation','TMT6plex','Gln->pyro-Glu','Glu->pyro-Glu','Pyro-carbamidomethyl','Carbamidomethyl']
 
-"""
-Site encoding of a modification:
-A-Y amino acid
-
-which can be appended with a modification position encoding:
-0 peptide N-terminus
-. peptide C-terminus
-^ protein N-terminus
-$ protein C-terminus
-
-So that 'K.' means lysine at the C-terminus of the peptide.
-The position encoding can be used separately, e.g. '^' means apply to any protein N-terminus,
-regardless of amino acid
-
-A list of modifications is separated by commas:
-Phospho{S},Methyl{0/I},Carbamidomethyl,Deamidated{F^/Q/N}
-
-An optional list of sites is specified within the {} for each modification. 
-If there are no '{}' then a default set of sites is used.  
-Multiple sites are separated by a '/'.
-
-"0" by itself implies "00"
-"." by itself implies ".."
-"^" by itself implies "0^"
-"$" by itself implies ".$"
-"""
 
 def expand_mod_string(mod_string):
     """
@@ -4759,12 +4733,45 @@ def expand_mod_string(mod_string):
     else:
         return (mod_string[0], "")
 
-def parse_modification_encoding(string):
+def parse_modification_encoding(modification_encoding):
+    """
+    Takes a string containing a set of modification strings and creates a list of tuples.
+    The tuples contain the modification name, the site, and the position of the modification.
+    The string has the following format:
+
+    Site encoding of a modification:
+    A-Y amino acid
+
+    which can be appended with a modification position encoding:
+    0 peptide N-terminus
+    . peptide C-terminus
+    ^ protein N-terminus
+    $ protein C-terminus
+
+    So that 'K.' means lysine at the C-terminus of the peptide.
+    The position encoding can be used separately, e.g. '^' means apply to any protein N-terminus,
+    regardless of amino acid
+
+    A list of modifications is separated by commas:
+    Phospho{S},Methyl{0/I},Carbamidomethyl,Deamidated{F^/Q/N}
+
+    An optional list of sites is specified within the {} for each modification. 
+    If there are no '{}' then a default set of sites is used.  
+    Multiple sites are separated by a '/'.
+
+    "0" by itself implies "00"
+    "." by itself implies ".."
+    "^" by itself implies "0^"
+    "$" by itself implies ".$"
+
+    :param modification_encoding: a string containing the above format
+    :return: list of tuples, each tuple has modification name, site, and position
+    """
     ret_values = []
     # take out any spaces
-    string = string.replace(" ", "")
+    modification_encoding = modification_encoding.replace(" ", "")
     # split by commas
-    mod_list = string.split(',')
+    mod_list = modification_encoding.split(',')
     # split by curly brace
     for mod_string in mod_list:
         mod_string = mod_string.replace("}", '')
