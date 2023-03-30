@@ -43,3 +43,8 @@ def test_encoding_charge():
 def test_encoding_ion_type():
     ions = mspe.calc_ions_mz('AAA', (('b', 1), ('y', 1)), num_isotopes=1)
     np.testing.assert_array_almost_equal(ions[0], [143.081504, 90.054955, 161.092069])
+
+def test_parse_modification_encoding():
+    values = mspe.parse_modification_encoding("Phospho{S},Methyl{0/I},Carbamidomethyl,Deamidated{F^/Q/N}")
+    assert set(values) == set([('Phospho', 'S', ''), ('Methyl', '0', '0'), ('Methyl', 'I', ''), ('Carbamidomethyl', 'C', ''), ('Deamidated', 'F', '^'), ('Deamidated', 'Q', ''), ('Deamidated', 'N', '')])
+    pass

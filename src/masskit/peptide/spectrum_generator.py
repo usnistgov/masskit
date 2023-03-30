@@ -1,8 +1,7 @@
 import logging
 import random
 import pandas as pd
-
-from masskit.peptide.encoding import calc_ions_mz, mod_sites, mod_masses
+from masskit.peptide.encoding import mod_masses, parse_modification_encoding
 from masskit.spectrum.theoretical_spectrum import TheoreticalPeptideSpectrum
 
 
@@ -29,6 +28,59 @@ def create_peptide_name(peptide, precursor_charge, mod_names, mod_positions, ev)
     output += f'_eV{ev}'
     return output
     
+def generate_mods(peptide, mod_list, mod_probability=None):
+    """
+    Given a peptide and a list of modifications expressed as tuples, place the
+    allowable modifications on the peptide.
+
+    :param mod_list: the list of allowed modifications, expressed as a string (see encoding.py)
+    :param peptide: the peptide
+    :param mod_probability: the probability of a modification at a particular site.  None=1.0
+    :return: list of modification name, list of modification positions
+    """
+    if mod_list is None or peptide is None:
+        return [], []
+
+    def add_mod(mod_name_in, mod_pos_in, mod_names_in, mod_positions_in):
+        mod_names_in.append(mod_masses.df.at[mod_name_in, 'id'])
+        mod_positions_in.append(mod_pos_in)
+    
+    mod_names = []
+    mod_positions = []
+    length = len(peptide)
+
+    for mod in mod_list:
+        if not mod[1].isalpha():
+            # N term peptide, no specificity
+            if mod[1] == '0' and mod[2] == '0' and (mod_probability is None or random.random() < mod_probability):
+                add_mod(mod[0], 0, mod_names, mod_positions)
+            # C term peptide, no specificity
+            elif mod[1] == '.' and mod[2] == '.' and (mod_probability is None or random.random() < mod_probability):
+                add_mod(mod[0], length - 1, mod_names, mod_positions)
+            # N or C term protein
+            #TODO: need to add machinery to detect if peptide in N or C terminus of protein
+            # elif first_peptide_in_protein and mod[1] == '0' and mod[2] == '^' and random.random() < mod_probability:
+            #     add_mod(mod[0], 0, mod_names, mod_positions)
+            # elif last_peptide_in_protein and mod[1] == '.' and mod[2] == '$' and random.random() < mod_probability:
+            #     add_mod(mod[0], length - 1, mod_names, mod_positions)
+
+        # specific amino acids
+        else:
+            for i, aa in enumerate(peptide):
+                if aa == mod[1] and (mod_probability is None or random.random() < mod_probability):
+                    if mod[2] == "":
+                        add_mod(mod[0], i, mod_names, mod_positions)
+                    elif mod[2] == '0' and i == 0:
+                        add_mod(mod[0], i, mod_names, mod_positions)
+                    elif mod[2] == '.' and i == length-1:
+                        add_mod(mod[0], i, mod_names, mod_positions)
+                    # TODO: N or C protein term specific amino acid mods
+                    # elif first_peptide_in_protein and mod[1] == '^' and i == 0:
+                    #     add_mod(mod[0], i, mod_names, mod_positions)
+                    # elif last_peptide_in_protein and mod[1] == '$' and i == length-1:
+                    #     add_mod(mod[0], i, mod_names, mod_positions)
+    return mod_names, mod_positions
+
 
 def generate_peptide_library(num=100, min_length=5, max_length=30, min_charge=1, max_charge=8, min_ev=10, max_ev=60,
                              mod_list=None, set='train', mod_probability=0.1):
@@ -43,43 +95,28 @@ def generate_peptide_library(num=100, min_length=5, max_length=30, min_charge=1,
     :param max_charge: the maximum charge of the peptides
     :param min_ev: the minimum eV (also used for nce)
     :param max_ev: the maximum eV (also used for nce)
-    :param mod_list: the list of allowed modifications
+    :param mod_list: the list of allowed modifications, expressed as a string (see encoding.py)
     :param mod_probability: the probability of a modification at a particular site
     :return: the dataframe
     """
 
+    mod_list = parse_modification_encoding(mod_list)
     data = {'peptide': [], 'peptide_len': [], 'charge': [], 'ev': [], 'nce': [], 'mod_names': [], 'mod_positions': [], 'spectrum': [], 'id': [], 'name':[]}
     for j in range(num):
         length = random.randint(min_length, max_length)
         peptide = ''.join(random.choices(generator_alphabet, k=length))
         data['peptide'].append(peptide)
-        data['peptide_len'].append(len(peptide))
+        data['peptide_len'].append(length)
         charge = random.randint(min_charge, max_charge)
         data['charge'].append(charge)
         ev = random.uniform(min_ev, max_ev)
         data['ev'].append(ev)
         data['nce'].append(ev)
         data['set'] = set
-        mod_names = []
-        mod_positions = []
+
         # go through list of allowed modifications
-        for mod in mod_list:
-            # for each mod, go through allowed sites
-            for site in mod_sites[mod]['sites']:
-                # N term
-                if site == '0' and random.random() < mod_probability:
-                    mod_names.append(mod_masses.df.at[mod, 'id'])
-                    mod_positions.append(0)
-                # C term
-                elif site == '-1'and random.random() < mod_probability:
-                    mod_names.append(mod_masses.df.at[mod, 'id'])
-                    mod_positions.append(length - 1)
-                # specific amino acids
-                else:
-                    for i, aa in enumerate(peptide):
-                        if aa == site and random.random() < mod_probability:
-                            mod_names.append(mod_masses.df.at[mod, 'id'])
-                            mod_positions.append(i)
+        mod_names, mod_positions = generate_mods(peptide, mod_list, mod_probability=mod_probability)
+
         data['mod_names'].append(mod_names)
         data['mod_positions'].append(mod_positions)
         name = create_peptide_name(peptide, charge, mod_names, mod_positions, ev)

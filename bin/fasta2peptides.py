@@ -9,9 +9,11 @@ import bz2
 from itertools import groupby, combinations
 import pyarrow as pa
 import pyarrow.parquet as pq
+from masskit.peptide.spectrum_generator import generate_mods
 from masskit.utils.files import empty_records, add_row_to_records
-from masskit.peptide.encoding import mod_sites, mod_masses
+from masskit.peptide.encoding import allowable_mods, parse_modification_encoding
 
+# TODO: this ought to come out of schemas.py
 schema = pa.schema([
     pa.field("id", pa.uint64()),
     pa.field("charge", pa.int8()),
@@ -120,9 +122,13 @@ class pepgen:
         self.peptides = peptides
         self.nces = list(map(float, args.nce.split(',')))
         if args.mods:
-            self.mods = args.mods.split(',')
+            self.mods = parse_modification_encoding(args.mods)
         else:
             self.mods = None
+        if args.mods:
+            self.fixed_mods = parse_modification_encoding(args.fixed_mods)
+        else:
+            self.fixed_mods = None
         limits = args.charge.split(':')
         self.max_mods = args.max_mods
         min = int(limits[0])
@@ -152,7 +158,9 @@ class pepgen:
         spectrum_id = 1
         for pep in self.peptides:
             # for mpep in self.modifications(pep):
-            mods = self.get_modlist(pep)
+            mod_names, mod_positions = generate_mods(pep, self.mods)
+            mods = list(zip(mod_positions, mod_names))
+            fixed_mods_names, fixed_mods_positions = generate_mods(pep, self.fixed_mods)
             #print(mods)
             for charge in self.charges:
                 for nce in self.nces:
@@ -166,31 +174,14 @@ class pepgen:
                         "peptide_type": self.digest
                     }
                     for modset in self.permute_mods(pep,mods, max_mods=self.max_mods):
+                        row["mod_names"] = fixed_mods_names.copy()
+                        row["mod_positions"] = fixed_mods_positions.copy()
                         if modset:
-                            row["mod_positions"] = list(map(lambda x: x[0], modset))
-                            row["mod_names"] = list(map(lambda x: x[1], modset))
+                            row["mod_positions"].extend(list(map(lambda x: x[0], modset)))
+                            row["mod_names"].extend(list(map(lambda x: x[1], modset)))
                         #print(row)
                         self.add_row(row)
         return self.finalize_table()
-
-    def get_modlist(self, pep):
-        mods = []
-        if self.mods:
-            for mod in self.mods:
-                # for each mod, go through allowed sites
-                for site in mod_sites[mod]['sites']:
-                    # N term
-                    if site == '0':
-                        mods.append( (0, mod_masses.df.at[mod, 'id']) )
-                    # C term
-                    elif site == '-1':
-                        mods.append( (len(pep)-1, mod_masses.df.at[mod, 'id']) )
-                    # specific amino acids
-                    else:
-                        for i, aa in enumerate(pep):
-                            if aa == site:
-                                mods.append( (i, mod_masses.df.at[mod, 'id']) )
-        return mods
     
     def permute_mods(self, pep, mods, max_mods=4):
         for i in range(min(max_mods, len(mods)+1)):
@@ -209,7 +200,9 @@ def main(cfg: DictConfig) -> None:
     parser.add_argument('-c', '--charge', default='2:4', help='charge range of peptides')
     parser.add_argument('-d', '--digest', default='tryptic', help='enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides. ')
     parser.add_argument('-m', '--mods', type=str, 
-                        help=f'comma separated list of post-translational modifications to apply to peptides. Known modifications: {list((mod_sites.keys()))}')
+                        help=f'comma separated list of variable modifications to apply to peptides. Known modifications: {allowable_mods}')
+    parser.add_argument('-f', '--fixed_mods', type=str, 
+                        help=f'comma separated list of fixed modifications to apply to peptides. Known modifications: {allowable_mods}')
     parser.add_argument('-n', '--nce', default='30', help='comma separated list of NCE values to apply to peptides')
     parser.add_argument('--min', default='7', type=int, help='minimum allowable peptide length')
     parser.add_argument('--max', default='30', type=int, help='maximum allowable peptide length')
