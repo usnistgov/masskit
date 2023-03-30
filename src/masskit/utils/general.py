@@ -2,7 +2,8 @@ import importlib
 import os
 from pathlib import Path
 import numpy as np
-
+import gzip
+import bz2
 
 def class_for_name(module_name_list, class_name):
     """
@@ -28,6 +29,30 @@ def class_for_name(module_name_list, class_name):
         raise ImportError(f"unable to find {class_name}")
     return c
 
+def open_if_compressed(filename):
+    magic_dict = {
+        b"\x1f\x8b\x08": "gzip",
+        b"\x42\x5a\x68": "bzip2"
+    }
+
+    max_len = max(len(x) for x in magic_dict)
+
+    def get_type(filename):
+        with open(filename, "rb") as f:
+            file_start = f.read(max_len)
+        for magic, filetype in magic_dict.items():
+            if file_start.startswith(magic):
+                return filetype
+        return "text"
+
+    file_type = get_type(filename)
+
+    if file_type == "gzip":
+        return gzip.open(filename, "rt")
+    elif file_type == "bzip2":
+        return bz2.open(filename, "rt")
+    else:
+        return open(filename)
 
 def open_if_filename(fp, mode, newline=None):
     """

@@ -10,6 +10,7 @@ from itertools import groupby, combinations
 import pyarrow as pa
 import pyarrow.parquet as pq
 from masskit.peptide.spectrum_generator import generate_mods
+from masskit.utils.general import open_if_compressed
 from masskit.utils.files import empty_records, add_row_to_records
 from masskit.peptide.encoding import allowable_mods, calc_ions_mz, calc_precursor_mz, parse_modification_encoding
 
@@ -30,37 +31,11 @@ schema = pa.schema([
     pa.field("precursor_mz", pa.float64()),
 ])
 
-
-def flex_open(filename):
-    magic_dict = {
-        b"\x1f\x8b\x08": "gzip",
-        b"\x42\x5a\x68": "bzip2"
-    }
-
-    max_len = max(len(x) for x in magic_dict)
-
-    def get_type(filename):
-        with open(filename, "rb") as f:
-            file_start = f.read(max_len)
-        for magic, filetype in magic_dict.items():
-            if file_start.startswith(magic):
-                return filetype
-        return "text"
-
-    file_type = get_type(filename)
-
-    if file_type == "gzip":
-        return gzip.open(filename, "rt")
-    elif file_type == "bzip2":
-        return bz2.open(filename, "rt")
-    else:
-        return open(filename)
-
 """
 Iterate over a fasta file, yields tuples of (header, sequence)
 """
 def fasta(filename):
-    f = flex_open(filename)
+    f = open_if_compressed(filename)
 
     # ditch the boolean (x[0]) and just keep the header or sequence since
     # we know they alternate.
