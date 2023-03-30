@@ -1,5 +1,6 @@
 import pytest
 from pytest import approx
+from masskit.peptide.encoding import parse_modification_encoding
 import masskit.peptide.spectrum_generator as msps
 import numpy as np
 
@@ -12,3 +13,7 @@ def test_generate_peptide_library():
 def test_create_peptide_name():
     output = msps.create_peptide_name("AAS", 3, ['Acetyl', 'Phospho'], np.array([1,2]), 50)
     assert output == 'AAS/3_2(2,A,Acetyl)(3,S,Phospho)_eV50'
+
+def test_generate_mods():
+    output = msps.generate_mods("AAS", parse_modification_encoding('Acetyl{A^},Phospho{S/T},Oxidation{T.}'), n_peptide=True)
+    assert set(zip(*output)) == set([(1, 0), (21, 2)])
