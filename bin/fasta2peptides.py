@@ -76,30 +76,30 @@ def fasta(filename):
 
 
 # The cleavage rule for trypsin is: after R or K, but not before P
-def trypsin(bases):
+def trypsin(residues):
     sub = ''
-    while bases:
-        k, r = bases.find('K'), bases.find('R')
+    while residues:
+        k, r = residues.find('K'), residues.find('R')
         if k > 0 and r > 0:
             cut = min(k, r)+1 
         elif k < 0 and r < 0:
-            yield bases
+            yield residues
             return
         else:
             cut = max(k, r)+1
-        sub += bases[:cut]
-        bases = bases[cut:]
-        if not bases or bases[0] != 'P':
+        sub += residues[:cut]
+        residues = residues[cut:]
+        if not residues or residues[0] != 'P':
             yield sub
             sub = ''
 
 # Semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal side of arginine (R) and lysine (K) by trypsin at one end but not the other. The figure below shows some semi-tryptic peptides.
 # https://massqc.proteomesoftware.com/help/metrics/percent_semi_tryptic#:~:text=Semi%2DTryptic%20Peptides%20are%20peptides,can%20indicate%20digestion%20preparation%20problems.
-def semitryptic(bases):
+def semitryptic(residues):
     pass
 
 # cleave everywhere, given size constraints
-def nonspecific(bases):
+def nonspecific(residues):
     pass
 
 def extract_peptides(args):
