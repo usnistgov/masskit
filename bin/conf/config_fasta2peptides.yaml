@@ -2,8 +2,11 @@
 filename: test.fasta.bz2
 outfile: test.parquet
 protein:
-  # enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides.
-  digest: tryptic
+  cleavage:
+    # enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides.
+    digest: tryptic
+    # Max missed cleavages
+    max_missed: 0
 peptide:
   # charge range of peptides
   charge:

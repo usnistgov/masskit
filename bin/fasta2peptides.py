@@ -93,48 +93,73 @@ def trypsin(residues):
             yield sub
             sub = ''
 
+def tryptic(residues, min, max, missed):
+    for miss in range(missed+1):
+        if miss < 1:
+            for pep in trypsin(residues):
+                if min <= len(pep) <= max:
+                    yield pep
+        else:
+            peptides = list(trypsin(residues))
+            for i in range(len(peptides)+1-miss):
+                pep = "".join(peptides[i:i+miss+1])
+                if min <= len(pep) <= max:
+                    yield pep
+
 # Semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal side of arginine (R) and lysine (K) by trypsin at one end but not the other. The figure below shows some semi-tryptic peptides.
 # https://massqc.proteomesoftware.com/help/metrics/percent_semi_tryptic#:~:text=Semi%2DTryptic%20Peptides%20are%20peptides,can%20indicate%20digestion%20preparation%20problems.
-def semitryptic(residues):
-    pass
+def semitryptic(residues, min, max, missed):
+    for pep in trypsin(residues, min, max, missed):
+        yield pep
+        for i in range(1,len(pep)+1-min):
+            yield pep[i:]
+            yield pep[:-i]
 
 # cleave everywhere, given size constraints
-def nonspecific(residues):
-    pass
+def nonspecific(residues, min, max, missed):
+    for sz in range(min,max+1):
+        for i in range(len(residues)+1-sz):
+            yield residues[i:i+sz]
 
-def extract_peptides(args):
+def extract_peptides(cfg):
     pepset = set()
-    fasta_file = fasta(args.filename)
+    fasta_file = fasta(cfg.filename)
+
+    if cfg.protein.cleavage.digest == "tryptic":
+        cleavage = tryptic
+    elif cfg.protein.cleavage.digest == "semitryptic":
+        cleavage = semitryptic
+    elif cfg.protein.cleavage.digest == "nonspecific":
+        cleavage = nonspecific
+
     for defline, protein in fasta_file:
-        #print(protein)
-        #print(list(trypsin(protein)))
-        for peptide in trypsin(protein):
-            if args.min <= len(peptide) <= args.max:
-                #print(peptide)
-                pepset.add(peptide)
+        print("protein:", protein)
+        for peptide in cleavage(protein, cfg.peptide.length.min, cfg.peptide.length.max, 1):
+            print("pep:", peptide)
+            pepset.add(peptide)
     peptides = list(pepset)
     peptides.sort()
     return peptides
 
 class pepgen:
 
-    def __init__(self, peptides, args):
+    def __init__(self, peptides, cfg):
         self.peptides = peptides
-        self.nces = list(map(float, args.nce.split(',')))
-        if args.mods:
-            self.mods = parse_modification_encoding(args.mods)
+        self.nces = list(map(float, cfg.nce.split(',')))
+        if cfg.mods:
+            self.mods = parse_modification_encoding(cfg.mods)
         else:
             self.mods = None
-        if args.mods:
-            self.fixed_mods = parse_modification_encoding(args.fixed_mods)
+        if cfg.mods:
+            self.fixed_mods = parse_modification_encoding(cfg.fixed_mods)
         else:
             self.fixed_mods = None
-        limits = args.charge.split(':')
-        self.max_mods = args.max_mods
+        limits = cfg.charge.split(':')
+        self.max_mods = cfg.max_mods
         min = int(limits[0])
         max = int(limits[1])
         self.charges = list(range(min,max+1))
-        self.digest = args.digest
+        self.digest = cfg.digest
 
         # initialize data structs
         self.records = empty_records(schema)
@@ -190,37 +215,38 @@ class pepgen:
 
 @hydra.main(config_path="conf", config_name="config_fasta2peptides", version_base=None)
 def main(cfg: DictConfig) -> None:
-    print(OmegaConf.to_yaml(cfg))
+    # print(OmegaConf.to_yaml(cfg))
+    # return
+
+    # parser = argparse.ArgumentParser(description='',
+    #                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+    # parser.add_argument('filename', help='fasta filename')
+    # parser.add_argument('-c', '--charge', default='2:4', help='charge range of peptides')
+    # parser.add_argument('-d', '--digest', default='tryptic', help='enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides. ')
+    # parser.add_argument('-m', '--mods', type=str, 
+    #                     help=f'comma separated list of variable modifications to apply to peptides. Known modifications: {allowable_mods}')
+    # parser.add_argument('-f', '--fixed_mods', type=str, 
+    #                     help=f'comma separated list of fixed modifications to apply to peptides. Known modifications: {allowable_mods}')
+    # parser.add_argument('-n', '--nce', default='30', help='comma separated list of NCE values to apply to peptides')
+    # parser.add_argument('--min', default='7', type=int, help='minimum allowable peptide length')
+    # parser.add_argument('--max', default='30', type=int, help='maximum allowable peptide length')
+    # parser.add_argument('--max_mods', default='4', type=int, help='maximum number of variable modifications per peptide')
+    # parser.add_argument('-o', '--outfile', help='name of output file, defaults to {filename}.parquet')
+
+    # cfg = parser.parse_args()
+
+    peptides = extract_peptides(cfg)
+    print(peptides)
     return
-
-    parser = argparse.ArgumentParser(description='',
-                                     formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('filename', help='fasta filename')
-    parser.add_argument('-c', '--charge', default='2:4', help='charge range of peptides')
-    parser.add_argument('-d', '--digest', default='tryptic', help='enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides. ')
-    parser.add_argument('-m', '--mods', type=str, 
-                        help=f'comma separated list of variable modifications to apply to peptides. Known modifications: {allowable_mods}')
-    parser.add_argument('-f', '--fixed_mods', type=str, 
-                        help=f'comma separated list of fixed modifications to apply to peptides. Known modifications: {allowable_mods}')
-    parser.add_argument('-n', '--nce', default='30', help='comma separated list of NCE values to apply to peptides')
-    parser.add_argument('--min', default='7', type=int, help='minimum allowable peptide length')
-    parser.add_argument('--max', default='30', type=int, help='maximum allowable peptide length')
-    parser.add_argument('--max_mods', default='4', type=int, help='maximum number of variable modifications per peptide')
-    parser.add_argument('-o', '--outfile', help='name of output file, defaults to {filename}.parquet')
-
-    args = parser.parse_args()
-
-    peptides = extract_peptides(args)
-    #print(peptides)
-    pg = pepgen(peptides, args)
+    pg = pepgen(peptides, cfg)
     table = pg.enumerate()
     #print(table.to_pandas())
     #data = schema.empty_table().to_pydict()
-    if args.outfile:
-        outfile = args.outfile
+    if cfg.outfile:
+        outfile = cfg.outfile
     else:
-        outfile = args.filename + ".parquet"
+        outfile = cfg.filename + ".parquet"
     pq.write_table(table,outfile,row_group_size=50000)
 
 
