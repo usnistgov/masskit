@@ -28,13 +28,15 @@ def create_peptide_name(peptide, precursor_charge, mod_names, mod_positions, ev)
     output += f'_eV{ev}'
     return output
     
-def generate_mods(peptide, mod_list, mod_probability=None):
+def generate_mods(peptide, mod_list, n_peptide=False, c_peptide=False, mod_probability=None):
     """
     Given a peptide and a list of modifications expressed as tuples, place the
     allowable modifications on the peptide.
 
     :param mod_list: the list of allowed modifications, expressed as a string (see encoding.py)
     :param peptide: the peptide
+    :param n_peptide: is the peptide at the N terminus of the protein?
+    :param c_peptide: is the peptide at the C terminus of the protein?
     :param mod_probability: the probability of a modification at a particular site.  None=1.0
     :return: list of modification name, list of modification positions
     """
@@ -58,11 +60,10 @@ def generate_mods(peptide, mod_list, mod_probability=None):
             elif mod[1] == '.' and mod[2] == '.' and (mod_probability is None or random.random() < mod_probability):
                 add_mod(mod[0], length - 1, mod_names, mod_positions)
             # N or C term protein
-            #TODO: need to add machinery to detect if peptide in N or C terminus of protein
-            # elif first_peptide_in_protein and mod[1] == '0' and mod[2] == '^' and random.random() < mod_probability:
-            #     add_mod(mod[0], 0, mod_names, mod_positions)
-            # elif last_peptide_in_protein and mod[1] == '.' and mod[2] == '$' and random.random() < mod_probability:
-            #     add_mod(mod[0], length - 1, mod_names, mod_positions)
+            elif n_peptide and mod[1] == '0' and mod[2] == '^' and (mod_probability is None or random.random() < mod_probability):
+                add_mod(mod[0], 0, mod_names, mod_positions)
+            elif c_peptide and mod[1] == '.' and mod[2] == '$' and (mod_probability is None or random.random() < mod_probability):
+                add_mod(mod[0], length - 1, mod_names, mod_positions)
 
         # specific amino acids
         else:
@@ -70,17 +71,17 @@ def generate_mods(peptide, mod_list, mod_probability=None):
                 if aa == mod[1] and (mod_probability is None or random.random() < mod_probability):
                     if mod[2] == "":
                         add_mod(mod[0], i, mod_names, mod_positions)
+                    # N or C peptide term specific amino acid mods
                     elif mod[2] == '0' and i == 0:
                         add_mod(mod[0], i, mod_names, mod_positions)
                     elif mod[2] == '.' and i == length-1:
                         add_mod(mod[0], i, mod_names, mod_positions)
-                    # TODO: N or C protein term specific amino acid mods
-                    # elif first_peptide_in_protein and mod[1] == '^' and i == 0:
-                    #     add_mod(mod[0], i, mod_names, mod_positions)
-                    # elif last_peptide_in_protein and mod[1] == '$' and i == length-1:
-                    #     add_mod(mod[0], i, mod_names, mod_positions)
+                    # N or C protein term specific amino acid mods
+                    elif n_peptide and mod[2] == '^' and i == 0:
+                        add_mod(mod[0], i, mod_names, mod_positions)
+                    elif c_peptide and mod[2] == '$' and i == length-1:
+                        add_mod(mod[0], i, mod_names, mod_positions)
     return mod_names, mod_positions
-
 
 def generate_peptide_library(num=100, min_length=5, max_length=30, min_charge=1, max_charge=8, min_ev=10, max_ev=60,
                              mod_list=None, set='train', mod_probability=0.1):
