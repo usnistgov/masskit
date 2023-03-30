@@ -1,0 +1,19 @@
+# fasta filename
+filename: test.fasta.bz2
+outfile: test.parquet
+protein:
+  # enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides.
+  digest: tryptic
+peptide:
+  # charge range of peptides
+  charge:
+    min: 2
+    max: 4
+  mods:
+    # list of post-translational modifications to apply to peptides.
+    types: []
+    # maximum number of variable modifications per peptide
+    max: 4
+  length:
+    min: 7
+    max: 30

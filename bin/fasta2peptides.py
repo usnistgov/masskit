@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 
 import argparse
+import logging
+import hydra
+from omegaconf import DictConfig, OmegaConf
 import gzip
 import bz2
 from itertools import groupby, combinations
@@ -194,7 +197,11 @@ class pepgen:
             for m in combinations(mods,i):
                 yield m
 
-def main():
+@hydra.main(config_path="conf", config_name="config_fasta2peptides", version_base=None)
+def main(cfg: DictConfig) -> None:
+    print(OmegaConf.to_yaml(cfg))
+    return
+
     parser = argparse.ArgumentParser(description='',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
