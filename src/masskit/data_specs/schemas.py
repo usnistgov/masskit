@@ -184,14 +184,14 @@ base_schema = pa.schema(base_fields)
 peptide_fields = [
     pa.field("peptide", pa.string()),
     pa.field("peptide_len", pa.int32()),
+    pa.field("peptide_type", pa.dictionary(pa.int8(), pa.string())),  # tryptic, semitryptic
     # note that mod_names should be a list of dictionary arrays but it's not clear how to initialize
     # this properly with arrays of mod_names, such as in library import.  So for now, just using a list of int16
     # which matches the modifications dictionary in encoding.py
     pa.field("mod_names", pa.large_list(pa.int16())),  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
     pa.field("mod_positions", pa.large_list(pa.int32())),
-    pa.field("peptide_type", pa.dictionary(pa.int8(), pa.string())),  # tryptic, semitryptic
 ]
-mod_names_field = peptide_fields[1]
+mod_names_field = peptide_fields[3]
 
 # fields used in small molecule experiments that define the experimental molecule
 molecule_definition_fields = [
