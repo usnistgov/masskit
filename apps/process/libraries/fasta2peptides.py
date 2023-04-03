@@ -216,24 +216,6 @@ def main(cfg: DictConfig) -> None:
     # print(OmegaConf.to_yaml(cfg))
     # print(list(map(float, cfg.peptide.nce)))
 
-    # parser = argparse.ArgumentParser(description='',
-    #                                  formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    # parser.add_argument('filename', help='fasta filename')
-    # parser.add_argument('-c', '--charge', default='2:4', help='charge range of peptides')
-    # parser.add_argument('-d', '--digest', default='tryptic', help='enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides. ')
-    # parser.add_argument('-m', '--mods', type=str, 
-    #                     help=f'comma separated list of variable modifications to apply to peptides. Known modifications: {allowable_mods}')
-    # parser.add_argument('-f', '--fixed_mods', type=str, 
-    #                     help=f'comma separated list of fixed modifications to apply to peptides. Known modifications: {allowable_mods}')
-    # parser.add_argument('-n', '--nce', default='30', help='comma separated list of NCE values to apply to peptides')
-    # parser.add_argument('--min', default='7', type=int, help='minimum allowable peptide length')
-    # parser.add_argument('--max', default='30', type=int, help='maximum allowable peptide length')
-    # parser.add_argument('--max_mods', default='4', type=int, help='maximum number of variable modifications per peptide')
-    # parser.add_argument('-o', '--outfile', help='name of output file, defaults to {filename}.parquet')
-
-    # cfg = parser.parse_args()
-
     peptides = extract_peptides(cfg)
     # print(peptides)
     # return
