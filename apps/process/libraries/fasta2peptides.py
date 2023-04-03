@@ -36,33 +36,40 @@ def fasta(filename):
 # The cleavage rule for trypsin is: after R or K, but not before P
 def trypsin(residues):
     sub = ''
+    cterm = True
+    nterm = False
     while residues:
         k, r = residues.find('K'), residues.find('R')
         if k > 0 and r > 0:
             cut = min(k, r)+1 
         elif k < 0 and r < 0:
-            yield residues
+            nterm = True
+            yield (cterm, residues, nterm)
             return
         else:
             cut = max(k, r)+1
         sub += residues[:cut]
         residues = residues[cut:]
         if not residues or residues[0] != 'P':
-            yield sub
+            if not residues: nterm = True
+            yield (cterm, sub, nterm)
+            cterm = False
             sub = ''
 
 def tryptic(residues, min, max, missed):
     for miss in range(missed+1):
         if miss < 1:
-            for pep in trypsin(residues):
-                if min <= len(pep) <= max:
-                    yield pep
+            for pepTuple in trypsin(residues):
+                if min <= len(pepTuple[1]) <= max:
+                    yield pepTuple
         else:
             peptides = list(trypsin(residues))
             for i in range(len(peptides)+1-miss):
-                pep = "".join(peptides[i:i+miss+1])
+                tups = peptides[i:i+miss+1]
+                #pep = "".join(peptides[i:i+miss+1])
+                pep = "".join( [ i[1] for i in tups ] )
                 if min <= len(pep) <= max:
-                    yield pep
+                    yield (tups[0][0], pep, tups[-1][2])
 
 # Semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal side of arginine (R) and lysine (K) by trypsin at one end but not the other. The figure below shows some semi-tryptic peptides.
 # https://massqc.proteomesoftware.com/help/metrics/percent_semi_tryptic#:~:text=Semi%2DTryptic%20Peptides%20are%20peptides,can%20indicate%20digestion%20preparation%20problems.
@@ -80,7 +87,10 @@ def nonspecific(residues, min, max, missed):
             yield residues[i:i+sz]
 
 def extract_peptides(cfg):
+    ctermset = set()
     pepset = set()
+    ntermset = set()
+    bothset = set()
     fasta_file = fasta(cfg.filename)
 
     if cfg.protein.cleavage.digest == "tryptic":
@@ -91,13 +101,29 @@ def extract_peptides(cfg):
         cleavage = nonspecific
 
     for defline, protein in fasta_file:
-        # print("protein:", protein)
-        for peptide in cleavage(protein, cfg.peptide.length.min, cfg.peptide.length.max, 1):
-            # print("pep:", peptide)
-            pepset.add(peptide)
+        #print("protein:", protein)
+        for (cterm, pep, nterm) in cleavage(protein, 
+                                            cfg.peptide.length.min, 
+                                            cfg.peptide.length.max, 
+                                            cfg.protein.cleavage.max_missed):
+            #print("pep:", peptide)
+            if cterm and nterm:
+                bothset.add(pep)
+            elif cterm:
+                ctermset.add(pep)
+            elif nterm:
+                ntermset.add(pep)
+            else:
+                pepset.add(pep)
+    cterm = list(ctermset)
+    cterm.sort()
     peptides = list(pepset)
     peptides.sort()
-    return peptides
+    nterm = list(ntermset)
+    nterm.sort()
+    both = list(bothset)
+    both.sort()
+    return (cterm, peptides, nterm, both)
 
 def count_rhk(peptide):
     count = 0
