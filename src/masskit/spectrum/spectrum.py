@@ -1,6 +1,4 @@
 import math
-import os
-import pickle
 import pyarrow as pa
 import numpy as np
 from masskit.accumulator import Accumulator
@@ -14,7 +12,6 @@ import scipy.stats as sts
 import logging
 import copy
 import random
-
 from masskit.utils.fingerprints import SpectrumTanimotoFingerPrint
 from abc import ABC, abstractmethod
 from masskit.spectrum.plotting import spectrum_plot
@@ -2469,7 +2466,7 @@ class BaseSpectrum:
 
     def plot(
             self,
-            axes,
+            axes=None,
             mirror_spectrum=None,
             mirror=True,
             title=None,
@@ -2527,6 +2524,7 @@ class BaseSpectrum:
         :param annotate: if peptide spectra, annotate ions
         :return: peak_collection, mirror_peak_collection sets of peaks for picking
         """
+        #TODO: move this code into plotting.py so that it can use matplotlib, e.g use the default axes.
         if mirror_spectrum:
             mirror_ions = mirror_spectrum.products
             mirror_intensity = mirror_ions.intensity

@@ -234,6 +234,9 @@ def spectrum_plot(
     :return: peak_collection, mirror_peak_collection sets of peaks for picking
     """
 
+    if axis is None:
+        axis = plt.gca()
+
     def finalize_plot(axis, max_mz, min_mz, vertical_multiplier, right_label, left_label, right_label_size, left_label_size, y_lim_lo, y_lim, left_label_color):
         axis.set_ylim([y_lim_lo*vertical_multiplier, y_lim*vertical_multiplier])
         axis.set_xlim([min_mz, max_mz])
