@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-import argparse
 import logging
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -10,10 +8,9 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from masskit.data_specs.schemas import peptide_schema
 from masskit.peptide.spectrum_generator import generate_mods
-from masskit.spectrum.spectrum import MassInfo
 from masskit.utils.general import open_if_compressed
 from masskit.utils.files import empty_records, add_row_to_records
-from masskit.peptide.encoding import allowable_mods, calc_ions_mz, calc_precursor_mz, parse_modification_encoding
+from masskit.peptide.encoding import calc_precursor_mz, parse_modification_encoding
 
 PepTuple = namedtuple('PepTuple', ['nterm', 'pep', 'cterm'])
 
