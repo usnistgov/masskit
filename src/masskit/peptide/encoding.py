@@ -4793,8 +4793,8 @@ def parse_modification_encoding(modification_encoding):
     The position encoding can be used separately, e.g. '^' means apply to any protein N-terminus,
     regardless of amino acid
 
-    A list of modifications is separated by commas:
-    Phospho{S},Methyl{0/I},Carbamidomethyl,Deamidated{F^/Q/N}
+    A list of modifications is separated by hashes:
+    Phospho{S}#Methyl{0/I}#Carbamidomethyl#Deamidated{F^/Q/N}
 
     An optional list of sites is specified within the {} for each modification. 
     If there are no '{}' then a default set of sites is used.  
@@ -4814,8 +4814,8 @@ def parse_modification_encoding(modification_encoding):
     # Check for empty list
     if modification_encoding == '':
         return ret_values   
-    # split by commas
-    mod_list = modification_encoding.split(',')
+    # split by hashes (commas confuse hydra)
+    mod_list = modification_encoding.split('#')
     # split by curly brace
     for mod_string in mod_list:
         mod_string = mod_string.replace("}", '')

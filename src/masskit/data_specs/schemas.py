@@ -134,13 +134,10 @@ ion_annot = pa.struct(ion_annot_fields)
 # experimental metadata fields shared by all types of experiments
 min_fields = [
     pa.field("id", pa.uint64()),
-    pa.field("charge", pa.int8()),
-    pa.field("ev", pa.float64(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
-    pa.field("nce", pa.float64(), metadata={'description': 'normalized collision energy'})
 ]
 
 # experimental metadata fields shared by many types of experiments
-base_experimental_fields = min_fields + [
+base_experimental_fields = [
     pa.field("instrument", pa.string()),
     pa.field("instrument_type", pa.string()),
     pa.field("instrument_model", pa.string()),
@@ -154,21 +151,31 @@ base_experimental_fields = min_fields + [
     pa.field("collision_gas", pa.string()),
     pa.field("insource_voltage", pa.int64()),
     pa.field("sample_inlet", pa.string()),
+    pa.field("ev", pa.float64(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
+    pa.field("nce", pa.float64(), metadata={'description': 'normalized collision energy'})
 ]
 
-# spectrum fields shared by all types of experiments
-precursor_mz_field = pa.field("precursor_mz", pa.float64())
-base_spectrum_fields = [
+# large measured spectrum fields shared by all types of experiments
+base_spectrum_large_fields = [
     pa.field("intensity", pa.large_list(pa.float64())),
     pa.field("stddev", pa.large_list(pa.float64())),
     pa.field("product_massinfo", massinfo_struct),
     pa.field("mz", pa.large_list(pa.float64())),
     pa.field("precursor_intensity", pa.float64()),
     pa.field("precursor_massinfo", massinfo_struct),
-    precursor_mz_field,
     pa.field("starts", pa.large_list(pa.float64())),
     pa.field("stops", pa.large_list(pa.float64())),
 ]
+
+# small measured spectrum fields shared by all types of experiments
+precursor_mz_field = pa.field("precursor_mz", pa.float64())
+base_spectrum_small_fields = [
+    pa.field("charge", pa.int8()),
+    precursor_mz_field,
+]
+
+# measured spectrum fields shared by all types of experiments
+base_spectrum_fields = base_spectrum_large_fields + base_spectrum_small_fields
 
 # annotations on spectra, shared by all types of experiments
 base_annotation_fields = [
@@ -182,12 +189,18 @@ base_annotation_fields = [
     pa.field("composition", pa.dictionary(pa.int8(), pa.string())),  # bestof, consensus
 ]
 
-base_fields = base_experimental_fields + base_spectrum_fields + base_annotation_fields
+# base experimental metadata
+base_metadata_fields = base_experimental_fields
+
+base_fields = min_fields + base_metadata_fields + base_spectrum_fields + base_annotation_fields
 base_schema = pa.schema(base_fields)
+
+# base fields minus the big fields used for spectra
+base_fields_small = min_fields + base_metadata_fields + base_spectrum_small_fields + base_annotation_fields
 
 # fields used in peptide experiments that define the experimental molecule
 mod_names_field = pa.field("mod_names", pa.large_list(pa.int16()))  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
-peptide_fields = [
+peptide_definition_fields = [
     pa.field("peptide", pa.string()),
     pa.field("peptide_len", pa.int32()),
     pa.field("peptide_type", pa.dictionary(pa.int8(), pa.string())),  # tryptic, semitryptic
@@ -198,15 +211,17 @@ peptide_fields = [
     pa.field("mod_positions", pa.large_list(pa.int32())),
 ]
 
-# schema specialized for fasta2peptides output.
-min_peptide_schema = pa.schema(min_fields + peptide_fields + [precursor_mz_field])
+# peptide experimental metadata
+peptide_metadata_fields = peptide_definition_fields
+# all fields that describe peptides
+peptide_fields = peptide_metadata_fields
 
 # fields used in small molecule experiments that define the experimental molecule
 molecule_definition_fields = [
     pa.field("mol", pa.string()),  # rdkit molecule expressed as MolInterchange JSON
 ]
 
-# experimental metadata fields used in small molecule experiments
+# experimental metadata fields used in small molecule experiments, measured or recorded
 molecule_experimental_fields = [
     pa.field("column", pa.string()),
     pa.field("experimental_ri", pa.float64()),
@@ -221,7 +236,7 @@ molecule_experimental_fields = [
     pa.field("vial_id", pa.int64())
 ]
 
-# annotation fields used in small molecule experiments
+# annotation fields used in small molecule experiments that are calculated from structure
 molecule_annotation_fields = [
     pa.field("aromatic_rings", pa.int64()),
     pa.field("ecfp4", pa.large_list(pa.uint8())),
@@ -246,18 +261,20 @@ molecule_annotation_fields = [
     pa.field("shortest_paths", pa.string()),  # shortest paths between atoms in molecule
 ]
 
-# fields that describe small molecules and associated spectra.  used in file schemas
-molecule_fields = molecule_definition_fields + molecule_annotation_fields + molecule_experimental_fields
+# small molecule experimental metadata
+molecule_metadata_fields = molecule_definition_fields + molecule_experimental_fields
+# all fields that describe small molecules and associated spectra.  used in file schemas
+molecule_fields = molecule_metadata_fields + molecule_annotation_fields
 
 # used to convert an arrow table for a peptide spectra to a spectrum object
-# it omits the calcuated molecule_annotation_fields in part to avoid adding large fields to the spectrum
-experimental_fields = molecule_experimental_fields + peptide_fields + base_experimental_fields
+# it omits the annotation fields and large fields in part to avoid adding large fields to the spectrum
+experimental_fields = min_fields + base_metadata_fields + base_spectrum_small_fields + molecule_metadata_fields + peptide_metadata_fields 
 
-# fields used in arrow tables
-tablemap_fields = molecule_experimental_fields + peptide_fields + base_experimental_fields + molecule_annotation_fields + molecule_definition_fields
+# fields used in arrow tables.  omits some of the larger spectra fields
+tablemap_fields = base_fields_small + peptide_fields + molecule_fields
 
 # schema for standard spectral file formats which do not include a molecular connectivity graph
-spectrums_schema = pa.schema(base_fields + peptide_fields)
+peptide_schema = pa.schema(base_fields + peptide_fields)
 
 # schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
 molecules_schema = pa.schema(base_fields + molecule_fields)

@@ -24,8 +24,8 @@ def create_peptide_name(peptide, precursor_charge, mod_names, mod_positions, ev)
     for mod in range(len(mod_names)):
         if mod == 0:
             output += f'_{len(mod_names)}'
-        output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{mod_names[mod]})'
-    output += f'_eV{ev}'
+        output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{mod_masses.id2row[mod_names[mod]]})'
+    output += f'_{ev}'
     return output
     
 def generate_mods(peptide, mod_list, n_peptide=False, c_peptide=False, mod_probability=None):

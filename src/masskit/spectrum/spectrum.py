@@ -4,7 +4,7 @@ import numpy as np
 from masskit.accumulator import Accumulator
 import masskit.utils.textalloc as ta
 from masskit.constants import EPSILON
-from masskit.data_specs.schemas import experimental_fields
+from masskit.data_specs.schemas import tablemap_fields
 from masskit.peptide.encoding import h2o_mass
 from masskit.spectrum.ipython import is_notebook
 import re
@@ -1691,17 +1691,20 @@ class BaseSpectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in experimental_fields:
+        for field in tablemap_fields:
             attribute = row.get(field.name)
             if attribute is not None:
                 setattr(self, field.name, attribute())
+        
+        self.charge = row.charge() if row.get('charge') is not None else None
 
         stddev = row.stddev() if row.get('stddev') is not None else None
         annotations = row.annotations() if row.get('annotations') is not None else None
+        precursor_intensity = row.precursor_intensity() if row.get('precursor_intensity') is not None else None        
 
         self.precursor = self.precursor_class(
             mz=row.precursor_mz(),
-            intensity=row.precursor_intensity(),
+            intensity=precursor_intensity,
             mass_info=MassInfo(arrow_struct=row.precursor_massinfo),
         )
 
