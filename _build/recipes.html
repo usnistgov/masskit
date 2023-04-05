@@ -1,0 +1,197 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>Recipes &#8212; masskit 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Tables of spectra" href="demo_peptide.html" />
+<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+  <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  //Regex to find address that start with https
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href');
+    if(re_nist.test(url) || !re_absolute_address.test(url)){
+      $(this).addClass('local');
+    }else{
+      //This a href appears to be external, so tag it
+      $(this).addClass('external');
+    }
+  });
+  // Add leaveNotice to external A elements
+  $('a.external').leaveNotice();
+});
+</script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo_peptide.html" title="Tables of spectra"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="recipes">
+<h1>Recipes<a class="headerlink" href="#recipes" title="Permalink to this heading">¶</a></h1>
+<section id="library-generation">
+<h2>Library generation<a class="headerlink" href="#library-generation" title="Permalink to this heading">¶</a></h2>
+<section id="protein-sequences-to-peptide-library">
+<h3>Protein sequences to peptide library<a class="headerlink" href="#protein-sequences-to-peptide-library" title="Permalink to this heading">¶</a></h3>
+<p>To generate a library of peptides, which is typically the first step in generating a peptide
+spectral library, use the program <code class="docutils literal notranslate"><span class="pre">fasta2peptides.py</span></code>. This program takes protein sequences
+in fasta format and generates a peptide library in parquet format. The configuration for this program is
+contained in the <code class="docutils literal notranslate"><span class="pre">conf/config_fasta2peptides.yaml</span></code> file in the same directory as
+<code class="docutils literal notranslate"><span class="pre">fasta2peptides.py</span></code>.</p>
+<ul class="simple">
+<li><p>to change the name of the input file, specify <code class="docutils literal notranslate"><span class="pre">input.file=myfilename.fasta</span></code> on the
+command line.</p></li>
+<li><p>to change the name of the output file, specify <code class="docutils literal notranslate"><span class="pre">output.file=myfilename.parquet</span></code> on
+the command line.</p></li>
+<li><p>the program supports the following options:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">protein.cleavage.digest=tryptic</span></code> where the digest can be tryptic, semitryptic, or nonspecific</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">protein.cleavage.max_missed=1</span></code> which is the number of missed cleavages allowed</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.charge.min=2</span></code> and <code class="docutils literal notranslate"><span class="pre">peptide.charge.max=4</span></code> sets the range of charges generated</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.mods.fixed=Carbamidomethyl</span></code> is a list of fixed modifications, using a <span class="xref myst">string format</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.mods.variable=Phospho{S/T}#Oxidation#Acetyl{^}</span></code> is a list of variable modifications, using a <span class="xref myst">string format</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.length.min=7</span></code> and <code class="docutils literal notranslate"><span class="pre">peptide.length.max=30</span></code> are the minimum and maximum sizes of
+the peptide generated.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.nce=[30]</span></code> is a list of NCE values to generate per peptide</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.use_basic_limit=True</span></code> limits the max charge of a peptide to the number of basic residues</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="modification-specification">
+<h2>Modification specification<a class="headerlink" href="#modification-specification" title="Permalink to this heading">¶</a></h2>
+<p>Modifications in Masskit are taken from <a class="reference external" href="https://www.unimod.org">Unimod</a> and identified using either
+the <code class="docutils literal notranslate"><span class="pre">Interim</span> <span class="pre">name</span></code> for naming by string or the <code class="docutils literal notranslate"><span class="pre">Accession</span> <span class="pre">#</span></code> for naming by integer.</p>
+<p>Site encoding of a modification:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">A</span></code>-<code class="docutils literal notranslate"><span class="pre">Y</span></code> amino acid</p></li>
+</ul>
+<p>which can be appended with a modification position encoding:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">0</span></code> peptide N-terminus</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">.</span></code> peptide C-terminus</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">^</span></code> protein N-terminus</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">$</span></code> protein C-terminus</p></li>
+</ul>
+<p>So that <code class="docutils literal notranslate"><span class="pre">K.</span></code> means lysine at the C-terminus of the peptide.
+The position encoding can be used separately, e.g. <code class="docutils literal notranslate"><span class="pre">^</span></code> means apply to any protein N-terminus,
+regardless of amino acid</p>
+<p>A list of modifications is separated by hashes:
+<code class="docutils literal notranslate"><span class="pre">Phospho{S}#Methyl{0/I}#Carbamidomethyl#Deamidated{F^/Q/N}</span></code></p>
+<p>An optional list of sites is specified within the <code class="docutils literal notranslate"><span class="pre">{}</span></code> for each modification.
+If there are no <code class="docutils literal notranslate"><span class="pre">{}</span></code> then a default set of sites is used.<br />
+Multiple sites are separated by a <code class="docutils literal notranslate"><span class="pre">/</span></code>.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Recipes</a><ul>
+<li><a class="reference internal" href="#library-generation">Library generation</a><ul>
+<li><a class="reference internal" href="#protein-sequences-to-peptide-library">Protein sequences to peptide library</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#modification-specification">Modification specification</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="demo_peptide.html"
+                          title="previous chapter">Tables of spectra</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/recipes.md.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="demo_peptide.html" title="Tables of spectra"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    </div>
+  </body>
+</html>
