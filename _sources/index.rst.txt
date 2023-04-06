@@ -11,10 +11,9 @@ Welcome to masskit's documentation!
    :caption: Contents:
    :glob:
 
+   spectra
    demo_peptide
-   examine_predictions
-   ion_analysis
-   README
+   recipes
 
 .. automodule:: modules
     :members:

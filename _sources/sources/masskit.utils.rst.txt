@@ -1,0 +1,93 @@
+masskit.utils package
+=====================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.utils.textalloc
+
+Submodules
+----------
+
+masskit.utils.arrow module
+--------------------------
+
+.. automodule:: masskit.utils.arrow
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.files module
+--------------------------
+
+.. automodule:: masskit.utils.files
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.fingerprints module
+---------------------------------
+
+.. automodule:: masskit.utils.fingerprints
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.general module
+----------------------------
+
+.. automodule:: masskit.utils.general
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.hitlist module
+----------------------------
+
+.. automodule:: masskit.utils.hitlist
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.index module
+--------------------------
+
+.. automodule:: masskit.utils.index
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.search module
+---------------------------
+
+.. automodule:: masskit.utils.search
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.setup module
+--------------------------
+
+.. automodule:: masskit.utils.setup
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.tables module
+---------------------------
+
+.. automodule:: masskit.utils.tables
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: masskit.utils
+   :members:
+   :undoc-members:
+   :show-inheritance:

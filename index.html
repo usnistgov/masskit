@@ -17,7 +17,7 @@
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Use of the spectrum object and spectral library dataframe" href="demo_peptide.html" />
+    <link rel="next" title="Use of the spectrum object" href="spectra.html" />
 <link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
   <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
   <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
@@ -58,7 +58,7 @@ $(document).ready(function(){
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="demo_peptide.html" title="Use of the spectrum object and spectral library dataframe"
+          <a href="spectra.html" title="Use of the spectrum object"
              accesskey="N">next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">masskit 0.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to masskit’s documentation!</a></li> 
@@ -75,91 +75,48 @@ $(document).ready(function(){
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="demo_peptide.html">Use of the spectrum object and spectral library dataframe</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Load-a-pandas-dataframe-from-the-sql-version-of-a-spectral-library">Load a pandas dataframe from the sql version of a spectral library</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Take-the-top-10-lines-of-the-dataframe-and-display-in-html">Take the top 10 lines of the dataframe and display in html</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#List-columns">List columns</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Iterating-through-a-dataframe">Iterating through a dataframe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Extract-a-single-spectrum-from-the-second-row-of-the-dataframe">Extract a single spectrum from the second row of the dataframe</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="demo_peptide.html#Iterate-through-the-product-ions">Iterate through the product ions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Iterate-by-index-through-the-product-ions">Iterate by index through the product ions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Access-underlying-numpy-arrays">Access underlying numpy arrays</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Access-mass-tolerance-and-type">Access mass tolerance and type</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Query-on-the-dataframe-to-return-a-dataframe-containing-rows-that-match-the-query,-then-display-the-new-dataframe">Query on the dataframe to return a dataframe containing rows that match the query, then display the new dataframe</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Select-one-spectrum-from-the-new-dataframe,-filter-out-low-m/z-peaks,-normalize-the-base-intensity-to-1.0">Select one spectrum from the new dataframe, filter out low m/z peaks, normalize the base intensity to 1.0</a></li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Aggregation-functions">Aggregation functions</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Number-of-ions">Number of ions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Total-ion-current">Total ion current</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Operations-on-pairs-of-spectra">Operations on pairs of spectra</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#First,-take-a-second-spectra-from-the-new-dataframe">First, take a second spectra from the new dataframe</a></li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Cosine-score-between-two-spectra">Cosine score between two spectra</a></li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Cosine-score-between-mz-subranges">Cosine score between mz subranges</a></li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Merge-two-spectra,-first-by-creating-a-filter-spectrum">Merge two spectra, first by creating a filter spectrum</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="demo_peptide.html#Then-merge-with-previous-spectrum">Then merge with previous spectrum</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spectra.html">Use of the spectrum object</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="spectra.html#Spectrum-properties">Spectrum properties</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectra.html#Spectrum-mass-tolerance-information">Spectrum mass tolerance information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectra.html#Operations-on-spectra">Operations on spectra</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spectra.html#Operations-on-pairs-of-spectra">Operations on pairs of spectra</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="spectra.html#Cosine-score-between-two-spectra">Cosine score between two spectra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectra.html#Cosine-score-between-mz-subranges">Cosine score between mz subranges</a></li>
+<li class="toctree-l3"><a class="reference internal" href="spectra.html#Merge-two-spectra,-first-by-creating-a-filter-spectrum">Merge two spectra, first by creating a filter spectrum</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="spectra.html#Then-merge-with-previous-spectrum">Then merge with previous spectrum</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Input/output">Input/output</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#MSP">MSP</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="demo_peptide.html#save-a-single-spectrum-at-row-0-as-an-msp-file">save a single spectrum at row 0 as an msp file</a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#MGF">MGF</a></li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#SDF">SDF</a></li>
-<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#PKL-(python-pickle)">PKL (python pickle)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="demo_peptide.html">Tables of spectra</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Pandas-dataframes">Pandas dataframes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Load-a-pandas-dataframe-from-the-sql-version-of-a-spectral-library">Load a pandas dataframe from the sql version of a spectral library</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Take-the-top-10-lines-of-the-dataframe-and-display-in-html">Take the top 10 lines of the dataframe and display in html</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#List-columns">List columns</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Iterating-through-a-dataframe">Iterating through a dataframe</a></li>
+<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Query-on-the-dataframe-to-return-a-dataframe-containing-rows-that-match-the-query,-then-display-the-new-dataframe">Query on the dataframe to return a dataframe containing rows that match the query, then display the new dataframe</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#CSV">CSV</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="examine_predictions.html">Read and analyze predicted spectra</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Display-first-10-rows">Display first 10 rows</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Plot-two-spectra,-one-with-error-bars">Plot two spectra, one with error bars</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Plot-two-spectra-with-a-mirror-plot,-no-error-bars">Plot two spectra with a mirror plot, no error bars</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Plot-relationship-between-cosine-score-and-various-spectrum-properties">Plot relationship between cosine score and various spectrum properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Compute-the-cosine-score,-which-automatically-changes-the-mass-tolerance-of-the-experimental-spectra-to-evenly-spaced-bins-instead-of-ppm">Compute the cosine score, which automatically changes the mass tolerance of the experimental spectra to evenly spaced bins instead of ppm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Access-mz,-intensity,-and-std-deviation-of-the-intensity-for-an-example-spectrum">Access mz, intensity, and std deviation of the intensity for an example spectrum</a></li>
-<li class="toctree-l2"><a class="reference internal" href="examine_predictions.html#Save-predicted-spectra-as-msp">Save predicted spectra as msp</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="examine_predictions.html#All-predicted-spectra">All predicted spectra</a></li>
-<li class="toctree-l3"><a class="reference internal" href="examine_predictions.html#The-predicted-spectrum-at-row-0">The predicted spectrum at row 0</a></li>
+<li class="toctree-l2"><a class="reference internal" href="demo_peptide.html#Select-one-spectrum-from-the-new-dataframe,-filter-out-low-m/z-peaks,-normalize-the-base-intensity-to-1.0">Select one spectrum from the new dataframe, filter out low m/z peaks, normalize the base intensity to 1.0</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="demo_peptide.html#Input/output">Input/output</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="demo_peptide.html#MSP">MSP</a></li>
+<li class="toctree-l4"><a class="reference internal" href="demo_peptide.html#MGF">MGF</a></li>
+<li class="toctree-l4"><a class="reference internal" href="demo_peptide.html#PKL-(python-pickle)">PKL (python pickle)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="demo_peptide.html#CSV">CSV</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="ion_analysis.html">Read and analyze predicted spectra</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Join-experimental,-predicted-and-theoretical-spectra-by-matching-peaks">Join experimental, predicted and theoretical spectra by matching peaks</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Examine-join-results">Examine join results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Examine-join-results-of-phosphopeptides">Examine join results of phosphopeptides</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Examine-join-results-of-peptides-that-do-not-end-in-K-or-R">Examine join results of peptides that do not end in K or R</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Query-on-ion-annotations">Query on ion annotations</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Mean-intensity-for-b-ions-with-charge-1">Mean intensity for b ions with charge 1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Mean-z-score-for-b-ions-with-charge-1">Mean z score for b ions with charge 1</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Mean-z-score-for-ions-with-one-carbon-13">Mean z score for ions with one carbon 13</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Mean-z-score-for-immonium-ions">Mean z score for immonium ions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Note-that-the-type-of-immonium-ion-is-kept-in-the-neutral_loss-column">Note that the type of immonium ion is kept in the neutral_loss column</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Mean-z-score-for-internal-ions">Mean z score for internal ions</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#Mean-z-score-for-parent-ions">Mean z score for parent ions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="recipes.html">Recipes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#library-generation">Library generation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recipes.html#protein-sequences-to-peptide-library">Protein sequences to peptide library</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Plot-two-spectra,-one-with-error-bars">Plot two spectra, one with error bars</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Plot-two-spectra-with-a-mirror-plot,-no-error-bars">Plot two spectra with a mirror plot, no error bars</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Plot-relationship-between-cosine-score-and-various-spectrum-properties">Plot relationship between cosine score and various spectrum properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Compute-the-cosine-score,-which-automatically-changes-the-mass-tolerance-of-the-experimental-spectra-to-evenly-spaced-bins-instead-of-ppm">Compute the cosine score, which automatically changes the mass tolerance of the experimental spectra to evenly spaced bins instead of ppm</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Access-mz,-intensity,-and-std-deviation-of-the-intensity-for-an-example-spectrum">Access mz, intensity, and std deviation of the intensity for an example spectrum</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ion_analysis.html#Save-predicted-spectra-as-msp">Save predicted spectra as msp</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#All-predicted-spectra">All predicted spectra</a></li>
-<li class="toctree-l3"><a class="reference internal" href="ion_analysis.html#The-predicted-spectrum-at-row-0">The predicted spectrum at row 0</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="recipes.html#modification-specification">Modification specification</a></li>
 </ul>
 </li>
 </ul>
@@ -191,8 +148,8 @@ $(document).ready(function(){
   </div>
   <div>
     <h4>Next topic</h4>
-    <p class="topless"><a href="demo_peptide.html"
-                          title="next chapter">Use of the spectrum object and spectral library dataframe</a></p>
+    <p class="topless"><a href="spectra.html"
+                          title="next chapter">Use of the spectrum object</a></p>
   </div>
   <div role="note" aria-label="source link">
     <h3>This Page</h3>
@@ -225,7 +182,7 @@ $(document).ready(function(){
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
         <li class="right" >
-          <a href="demo_peptide.html" title="Use of the spectrum object and spectral library dataframe"
+          <a href="spectra.html" title="Use of the spectrum object"
              >next</a> |</li>
         <li class="nav-item nav-item-0"><a href="#">masskit 0.1 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Welcome to masskit’s documentation!</a></li> 

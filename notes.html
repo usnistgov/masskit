@@ -76,11 +76,12 @@ $(document).ready(function(){
 <li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">src/masskit/docs</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span> <span class="pre">-o</span> <span class="pre">.</span> <span class="pre">../</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sphinx-build</span> <span class="pre">-b</span> <span class="pre">html</span> <span class="pre">.</span> <span class="pre">_build</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">touch</span> <span class="pre">_build/.nojekyll</span></code>.  The sphinx.ext.githubpages extension is supposed to do this, but doesn’t always work.</p></li>
 <li><p>create and use an orphan branch to hold the pages.  First time initialization of this branch is something like
 *</p>
 <div class="highlight-mkdir notranslate"><div class="highlight"><pre><span></span>cd masskit_nist-pages
 git init
-git remote add origin &lt;url&gt;
+git remote add origin git@github.com:usnistgov/masskit.git
 git checkout --orphan nist-pages
 
 # copy over the pages
@@ -90,6 +91,15 @@ git commit -m &quot;init&quot;
 git push -u origin nist-pages
 </pre></div>
 </div>
+<ul>
+<li><p>and updates are</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">.</span>
+<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;new pages&quot;</span>
+<span class="n">git</span> <span class="n">push</span> <span class="n">origin</span>
+</pre></div>
+</div>
+</li>
+</ul>
 </li>
 </ul>
 </li>
@@ -124,6 +134,8 @@ docs/index.rst underneath “toctree”.</p></li>
 </li>
 <li><p>autodoc has problems importing some modules.  If these are modules not to be documented, one can mock up the import using the <code class="docutils literal notranslate"><span class="pre">autodoc_mock_imports</span></code> setting in conf.py</p></li>
 <li><p>because sphinx uses directories that start with underscore, this confuses jekyll.  To turn off jekyll, use the <code class="docutils literal notranslate"><span class="pre">sphinx.ext.githubpages</span></code> extension in conf.py</p></li>
+<li><p>the http response from the webhook when the processing doesn’t run properly is 200. If the processing is successful, the response is 202.</p></li>
+<li><p><a class="reference external" href="https://pages.nist.gov/masskit/build.log">build log</a></p></li>
 </ul>
 </li>
 </ul>

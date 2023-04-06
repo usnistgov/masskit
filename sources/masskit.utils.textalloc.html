@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+    <title>masskit.utils.textalloc package &#8212; masskit 0.1 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+  <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  //Regex to find address that start with https
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href');
+    if(re_nist.test(url) || !re_absolute_address.test(url)){
+      $(this).addClass('local');
+    }else{
+      //This a href appears to be external, so tag it
+      $(this).addClass('external');
+    }
+  });
+  // Add leaveNotice to external A elements
+  $('a.external').leaveNotice();
+});
+</script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+
+
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">masskit.utils.textalloc package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="masskit-utils-textalloc-package">
+<h1>masskit.utils.textalloc package<a class="headerlink" href="#masskit-utils-textalloc-package" title="Permalink to this heading">¶</a></h1>
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-masskit.utils.textalloc.candidates">
+<span id="masskit-utils-textalloc-candidates-module"></span><h2>masskit.utils.textalloc.candidates module<a class="headerlink" href="#module-masskit.utils.textalloc.candidates" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.candidates.generate_candidates">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.candidates.</span></span><span class="sig-name descname"><span class="pre">generate_candidates</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmindistance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymindistance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmaxdistance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymaxdistance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbr_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.candidates.generate_candidates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates 36 candidate boxes</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>w (float): width of box
+h (float): height of box
+x (float): xmin of box
+y (float): ymin of box
+xmindistance (float): fraction of the x-dimension to use as margins for text bboxes
+ymindistance (float): fraction of the y-dimension to use as margins for text bboxes
+xmaxdistance (float): fraction of the x-dimension to use as max distance for text bboxes
+ymaxdistance (float): fraction of the y-dimension to use as max distance for text bboxes
+nbr_candidates (int): nbr of candidates to use. If &lt;1 or &gt;36 uses all 36</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: candidate boxes array</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.utils.textalloc.non_overlapping_boxes">
+<span id="masskit-utils-textalloc-non-overlapping-boxes-module"></span><h2>masskit.utils.textalloc.non_overlapping_boxes module<a class="headerlink" href="#module-masskit.utils.textalloc.non_overlapping_boxes" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.non_overlapping_boxes.get_non_overlapping_boxes">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.non_overlapping_boxes.</span></span><span class="sig-name descname"><span class="pre">get_non_overlapping_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_boxes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylims</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbr_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scatter_xy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines_xyxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#masskit.utils.textalloc.non_overlapping_boxes.get_non_overlapping_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds boxes that do not have an overlap with any other objects.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>original_boxes (np.ndarray): original boxes containing texts.
+xlims (Tuple[float, float]): x-limits of plot gotten from ax.get_ylim()
+ylims (Tuple[float, float]): y-limits of plot gotten from ax.get_ylim()
+margin (float): parameter for margins between objects. Increase for larger margins to points and lines.
+min_distance (float): parameter for max distance between text and origin.
+max_distance (float): parameter for max distance between text and origin.
+verbose (bool): prints progress using tqdm.
+nbr_candidates (int): Sets the number of candidates used.
+draw_all (bool): Draws all texts after allocating as many as possible despit overlap.
+scatter_xy (np.ndarray, optional): 2d array of scattered points in plot.
+lines_xyxy (np.ndarray, optional): 2d array of line segments in plot.</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple[List[Tuple[float, float, float, float, str, int]], List[int]]: data of non-overlapping boxes and indices of overlapping boxes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.utils.textalloc.overlap_functions">
+<span id="masskit-utils-textalloc-overlap-functions-module"></span><h2>masskit.utils.textalloc.overlap_functions module<a class="headerlink" href="#module-masskit.utils.textalloc.overlap_functions" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.overlap_functions.ccw">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.overlap_functions.</span></span><span class="sig-name descname"><span class="pre">ccw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x1y1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x2y2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x3y3</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cand</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.overlap_functions.ccw" title="Permalink to this definition">¶</a></dt>
+<dd><p>CCW used in line intersect</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x1y1 (np.ndarray):
+x2y2 (np.ndarray):
+x3y3 (np.ndarray):
+cand (bool): using candidate positions (different broadcasting)</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray:</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.overlap_functions.inside_plot">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.overlap_functions.</span></span><span class="sig-name descname"><span class="pre">inside_plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmin_bound</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin_bound</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmax_bound</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymax_bound</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.overlap_functions.inside_plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds candidates that are inside the plot bounds</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>xmin_bound (float):
+ymin_bound (float):
+xmax_bound (float):
+ymax_bound (float):
+candidates (np.ndarray): candidate boxes</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Boolean array of shape (K,) with True for non-overlapping candidates with boxes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.overlap_functions.line_intersect">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.overlap_functions.</span></span><span class="sig-name descname"><span class="pre">line_intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cand_xyxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lines_xyxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.overlap_functions.line_intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks if line segments intersect for all line segments and candidates.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>cand_xyxy (np.ndarray): line segments in candidates
+lines_xyxy (np.ndarray): line segments plotted</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Boolean array with True for non-overlapping candidate segments with line segments.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.overlap_functions.non_overlapping_with_boxes">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.overlap_functions.</span></span><span class="sig-name descname"><span class="pre">non_overlapping_with_boxes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">box_arr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmargin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymargin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.overlap_functions.non_overlapping_with_boxes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds candidates not overlapping with allocated boxes.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>box_arr (np.ndarray): array with allocated boxes
+candidates (np.ndarray): candidate boxes
+xmargin (float): fraction of the x-dimension to use as margins for text boxes
+ymargin (float): fraction of the y-dimension to use as margins for text boxes</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Boolean array of shape (K,) with True for non-overlapping candidates with boxes.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.overlap_functions.non_overlapping_with_lines">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.overlap_functions.</span></span><span class="sig-name descname"><span class="pre">non_overlapping_with_lines</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lines_xyxy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmargin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymargin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.overlap_functions.non_overlapping_with_lines" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds candidates not overlapping with lines</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>lines_xyxy (np.ndarray): line segments
+candidates (np.ndarray): candidate boxes
+xmargin (float): fraction of the x-dimension to use as margins for text boxes
+ymargin (float): fraction of the y-dimension to use as margins for text boxes</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Boolean array of shape (K,) with True for non-overlapping candidates with lines.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.overlap_functions.non_overlapping_with_points">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.overlap_functions.</span></span><span class="sig-name descname"><span class="pre">non_overlapping_with_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">scatter_xy</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xmargin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymargin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.overlap_functions.non_overlapping_with_points" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds candidates not overlapping with points.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>scatter_xy (np.ndarray): Array of shape (N,2) containing coordinates for all scatter-points
+candidates (np.ndarray): Array of shape (K,4) with K candidate boxes
+xmargin (float): fraction of the x-dimension to use as margins for text boxes
+ymargin (float): fraction of the y-dimension to use as margins for text boxes</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: Boolean array of shape (K,) with True for non-overlapping candidates with points</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-masskit.utils.textalloc">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.utils.textalloc" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.allocate_text">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.</span></span><span class="sig-name descname"><span class="pre">allocate_text</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ax</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_list</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_scatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_scatter</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">textsize</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">10</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">margin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.015</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_distance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linecolor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'r'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">draw_all</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nbr_candidates</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">textcolor</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'k'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylims</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.textalloc.allocate_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main function of allocating text-boxes in matplotlib plot</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>fig (_type_): matplotlib figure used for rendering textbox-sizes.
+ax (_type_): matplotlib axes used for plotting.
+x (Union[np.ndarray, List[float]]): x-coordinates of texts 1d array/list.
+y (Union[np.ndarray, List[float]]): y-coordinates of texts 1d array/list.
+text_list (List[str]): list of texts.
+x_scatter (Union[np.ndarray, List[float]], optional): x-coordinates of all scattered points in plot 1d array/list. Defaults to None.
+y_scatter (Union[np.ndarray, List[float]], optional): y-coordinates of all scattered points in plot 1d array/list. Defaults to None.
+x_lines (List[Union[np.ndarray, List[float]]], optional): x-coordinates of all lines in plot list of 1d arrays/lists. Defaults to None.
+y_lines (List[Union[np.ndarray, List[float]]], optional): y-coordinates of all lines in plot list of 1d arrays/lists. Defaults to None.
+textsize (int, optional): size of text. Defaults to 10.
+margin (float, optional): parameter for margins between objects. Increase for larger margins to points and lines. Defaults to 0.01.
+min_distance (float, optional): parameter for min distance between text and origin. Defaults to 0.015.
+max_distance (float, optional): parameter for max distance between text and origin. Defaults to 0.07.
+verbose (bool, optional): prints progress using tqdm. Defaults to False.
+draw_lines (bool, optional): draws lines from original points to textboxes. Defaults to True.
+linecolor (str, optional): color code of the lines between points and text-boxes. Defaults to “r”.
+draw_all (bool, optional): Draws all texts after allocating as many as possible despit overlap. Defaults to True.
+nbr_candidates (int, optional): Sets the number of candidates used. Defaults to 0.
+linewidth (float, optional): width of line. Defaults to 1.
+textcolor (str, optional): color code of the text. Defaults to “k”.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.find_nearest_point_on_box">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.</span></span><span class="sig-name descname"><span class="pre">find_nearest_point_on_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xmin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ymin</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">w</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">h</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">float</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#masskit.utils.textalloc.find_nearest_point_on_box" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds nearest point on box from point.
+Returns None,None if point inside box</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>xmin (float): xmin of box
+ymin (float): ymin of box
+w (float): width of box
+h (float): height of box
+x (float): x-coordinate of point
+y (float): y-coordinate of point</p>
+</dd>
+<dt>Returns:</dt><dd><p>Tuple[float, float]: x,y coordinate of nearest point</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.textalloc.lines_to_segments">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.textalloc.</span></span><span class="sig-name descname"><span class="pre">lines_to_segments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_lines</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">ndarray</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#masskit.utils.textalloc.lines_to_segments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>x_lines (List[np.ndarray]): x-coordinates of all lines in plot list of 1d arrays
+y_lines (List[np.ndarray]): y-coordinates of all lines in plot list of 1d arrays</p>
+</dd>
+<dt>Returns:</dt><dd><p>np.ndarray: 2d array of line segments</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <div>
+    <h3><a href="../index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">masskit.utils.textalloc package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc.candidates">masskit.utils.textalloc.candidates module</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc.non_overlapping_boxes">masskit.utils.textalloc.non_overlapping_boxes module</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc.overlap_functions">masskit.utils.textalloc.overlap_functions module</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/sources/masskit.utils.textalloc.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">masskit.utils.textalloc package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    </div>
+  </body>
+</html>
