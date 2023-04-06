@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Notes on building documentation from python notebooks and python source files &#8212; masskit 0.1 documentation</title>
+    <title>Notes on building documentation from python notebooks and python source files &#8212; masskit 1.0.0-2-gf71e19b documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -56,7 +56,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-2-gf71e19b documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notes on building documentation from python notebooks and python source files</a></li> 
       </ul>
     </div>  
@@ -74,28 +74,34 @@ $(document).ready(function(){
 <li><p>use an environment with sphinx, myst-parser, and nbsphinx installed, then run</p>
 <ul>
 <li><p><code class="docutils literal notranslate"><span class="pre">cd</span> <span class="pre">src/masskit/docs</span></code></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span> <span class="pre">-o</span> <span class="pre">.</span> <span class="pre">../</span></code></p></li>
+<li><p>tag the release, e.g. <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">tag</span> <span class="pre">v1.0.0</span></code>  conf.py will use the tag to label the docs</p></li>
+<li><p>if you want to clean out previous files: <code class="docutils literal notranslate"><span class="pre">rm</span> <span class="pre">-r</span> <span class="pre">masskit*.rst</span> <span class="pre">modules.rst</span> <span class="pre">_build</span> <span class="pre">sources</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sphinx-apidoc</span> <span class="pre">-o</span> <span class="pre">sources</span> <span class="pre">../</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">sphinx-build</span> <span class="pre">-b</span> <span class="pre">html</span> <span class="pre">.</span> <span class="pre">_build</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">touch</span> <span class="pre">_build/.nojekyll</span></code>.  The sphinx.ext.githubpages extension is supposed to do this, but doesn’t always work.</p></li>
 <li><p>create and use an orphan branch to hold the pages.  First time initialization of this branch is something like
 *</p>
-<div class="highlight-mkdir notranslate"><div class="highlight"><pre><span></span>cd masskit_nist-pages
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>mkdir masskit_nist-pages
+<span class="nb">cd</span> masskit_nist-pages
 git init
 git remote add origin git@github.com:usnistgov/masskit.git
 git checkout --orphan nist-pages
 
-# copy over the pages
+<span class="c1"># copy over the pages</span>
 
 git add .
-git commit -m &quot;init&quot;
+git commit -m <span class="s2">&quot;init&quot;</span>
 git push -u origin nist-pages
 </pre></div>
 </div>
 <ul>
 <li><p>and updates are</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">add</span> <span class="o">.</span>
-<span class="n">git</span> <span class="n">commit</span> <span class="o">-</span><span class="n">m</span> <span class="s2">&quot;new pages&quot;</span>
-<span class="n">git</span> <span class="n">push</span> <span class="n">origin</span>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span> masskit_nist-pages
+rm -r *
+cp -rp ../masskit/src/masskit/docs/_build/* .
+git add .
+git commit -m <span class="s2">&quot;new pages&quot;</span>
+git push origin
 </pre></div>
 </div>
 </li>
@@ -178,7 +184,7 @@ docs/index.rst underneath “toctree”.</p></li>
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 0.1 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-2-gf71e19b documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Notes on building documentation from python notebooks and python source files</a></li> 
       </ul>
     </div>
