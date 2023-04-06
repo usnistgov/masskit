@@ -3,14 +3,14 @@
 * to build docs
   * use an environment with sphinx, myst-parser, and nbsphinx installed, then run
     * `cd src/masskit/docs`
-    * if you want to clean out previous files: `rm -r masskit*.rst modules.rst _build/*`
+    * if you want to clean out previous files: `rm -r masskit*.rst modules.rst _build sources`
     * `sphinx-apidoc -o sources ../`
     * `sphinx-build -b html . _build`
     * `touch _build/.nojekyll`.  The sphinx.ext.githubpages extension is supposed to do this, but doesn't always work.
     * create and use an orphan branch to hold the pages.  First time initialization of this branch is something like
       *
 
-        ```
+        ```bash
         mkdir masskit_nist-pages
         cd masskit_nist-pages
         git init
@@ -26,7 +26,7 @@
 
       * and updates are
 
-        ```
+        ```bash
         cd masskit_nist-pages
         rm -r *
         cp -rp ../masskit/src/masskit/docs/_build/* .
