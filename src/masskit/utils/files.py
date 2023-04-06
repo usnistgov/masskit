@@ -69,8 +69,7 @@ def load_mgf2array(
     :param start_spectrum_id: the spectrum id to begin with
     :param set_probabilities: how to divide into dev, train, valid, test
     :param row_entries: dict containing additional row columns
-    :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE
-    regex match group 1 is the value
+    :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE regex match group 1 is the value
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :return: one dataframe
