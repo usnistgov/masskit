@@ -48,7 +48,7 @@ def test_calc_precursor_mz():
     assert mspe.calc_precursor_mz('SAA', 2, mod_names=[21], mod_positions=[0]) == approx(164.5489)
 
 def test_parse_modification_encoding():
-    values = mspe.parse_modification_encoding("Phospho{S},Methyl{0/I},Carbamidomethyl,Deamidated{F^/Q/N}")
+    values = mspe.parse_modification_encoding("Phospho{S}#Methyl{0/I}#Carbamidomethyl#Deamidated{F^/Q/N}")
     assert set(values) == set([('Phospho', 'S', ''), ('Methyl', '0', '0'), ('Methyl', 'I', ''), ('Carbamidomethyl', 'C', ''), ('Deamidated', 'F', '^'), ('Deamidated', 'Q', ''), ('Deamidated', 'N', '')])
     pass
 

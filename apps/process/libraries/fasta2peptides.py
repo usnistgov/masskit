@@ -1,6 +1,4 @@
 #!/usr/bin/env python
-
-import argparse
 import logging
 import hydra
 from omegaconf import DictConfig, OmegaConf
@@ -8,11 +6,11 @@ from itertools import groupby, combinations
 from collections import namedtuple
 import pyarrow as pa
 import pyarrow.parquet as pq
-from masskit.data_specs.schemas import min_peptide_schema
+from masskit.data_specs.schemas import peptide_schema
 from masskit.peptide.spectrum_generator import generate_mods
 from masskit.utils.general import open_if_compressed
 from masskit.utils.files import empty_records, add_row_to_records
-from masskit.peptide.encoding import allowable_mods, calc_ions_mz, calc_precursor_mz, parse_modification_encoding
+from masskit.peptide.encoding import calc_precursor_mz, parse_modification_encoding
 
 PepTuple = namedtuple('PepTuple', ['nterm', 'pep', 'cterm'])
 
@@ -101,7 +99,7 @@ def extract_peptides(cfg):
         'cterm': set(),
         'both': set()
     }
-    fasta_file = fasta(cfg.filename)
+    fasta_file = fasta(cfg.input.file)
 
     if cfg.protein.cleavage.digest == "tryptic":
         cleavage = tryptic
@@ -152,19 +150,19 @@ class pepgen:
         self.digest = cfg.protein.cleavage.digest
         self.limit_rhk = cfg.peptide.use_basic_limit
         # initialize data structs
-        self.records = empty_records(min_peptide_schema)
+        self.records = empty_records(peptide_schema)
         self.tables = []
         self.table = []
 
     def add_row(self, row):
         add_row_to_records(self.records, row)
         if len(self.records["id"]) % 25000 == 0:
-            table = pa.table(self.records, min_peptide_schema)
+            table = pa.table(self.records, peptide_schema)
             self.tables.append(table)
-            self.records = empty_records(min_peptide_schema)
+            self.records = empty_records(peptide_schema)
 
     def finalize_table(self):
-        table = pa.table(self.records, min_peptide_schema)
+        table = pa.table(self.records, peptide_schema)
         self.tables.append(table)
         table = pa.concat_tables(self.tables)
         return table
@@ -199,7 +197,7 @@ class pepgen:
                             "nce": nce,
                             "peptide": pep,
                             "peptide_len": len(pep),
-                            "peptide_type": self.digest
+                            "peptide_type": self.digest,
                         }
                         for modset in self.permute_mods(pep,mods, max_mods=self.max_mods):
                             row["mod_names"] = fixed_mods_names.copy()
@@ -228,10 +226,10 @@ def main(cfg: DictConfig) -> None:
     table = pg.enumerate()
     #print(table.to_pandas())
     #data = schema.empty_table().to_pydict()
-    if cfg.outfile:
-        outfile = cfg.outfile
+    if cfg.output.file:
+        outfile = cfg.output.file
     else:
-        outfile = cfg.filename + ".parquet"
+        outfile = cfg.input.file + ".parquet"
     pq.write_table(table,outfile,row_group_size=50000)
 
 

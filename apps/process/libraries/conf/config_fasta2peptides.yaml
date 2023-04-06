@@ -1,12 +1,14 @@
 # fasta filename
-filename: test.fasta.bz2
-outfile: test.parquet
+input:
+  file: test.fasta.bz2
+output:
+  file: test.parquet
 protein:
   cleavage:
     # enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides.
     digest: tryptic
     # Max missed cleavages
-    max_missed: 0
+    max_missed: 1
 peptide:
   # charge range of peptides
   charge:
@@ -14,11 +16,11 @@ peptide:
     max: 4
   mods:
     # comma separated list of variable modifications to apply to peptides.
-    variable: "Phospho{S}"
+    variable: "Phospho{S/T}#Oxidation#Acetyl{^}"
     # comma separated list of fixed modifications to apply to peptides.
-    fixed: ""
+    fixed: "Carbamidomethyl"
     # maximum number of variable modifications per peptide
-    max: 4
+    max: 3
   length:
     min: 7
     max: 30

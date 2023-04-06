@@ -800,11 +800,12 @@ class ArrowLibraryMap(TableMap):
 
     """
 
-    def __init__(self, table_in, column_name=None, num=0, *args, **kwargs):
+    def __init__(self, table_in, column_name=None, num=0, conversions=None, *args, **kwargs):
         """
         :param table_in: parquet table
         :param column_name: name of the spectrum column
         :param num: number of rows to use
+        :param conversions: conversions when converting to pandas dataframe. None=['spectrum']
         """
         super().__init__(column_name=column_name, *args, **kwargs)
         self.table = table_in
@@ -815,6 +816,10 @@ class ArrowLibraryMap(TableMap):
         self.ids = self.table['id'].combine_chunks().to_numpy()
         self.sort_indices = np.argsort(self.ids)
         self.sorted_ids = self.ids[self.sort_indices]
+        if conversions == None:
+            self.conversions = ['spectrum']
+        else:
+            self.conversions = conversions
 
     def __len__(self):
         return self.length
@@ -875,7 +880,7 @@ class ArrowLibraryMap(TableMap):
         return self.table
     
     def to_pandas(self):
-        return arrow_to_pandas(self.table, conversions=["spectrum"], field_list=self.field_list)
+        return arrow_to_pandas(self.table, conversions=self.conversions, field_list=self.field_list)
 
     def to_parquet(self, file):
         """

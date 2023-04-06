@@ -13,7 +13,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import json
 from masskit.constants import SET_NAMES, EPSILON
-from masskit.data_specs.schemas import spectrums_schema, molecules_schema, set_field_int_metadata, \
+from masskit.data_specs.schemas import peptide_schema, molecules_schema, set_field_int_metadata, \
     mod_names_field, hitlist_schema
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
@@ -81,7 +81,7 @@ def load_mgf2array(
     # sample is from filename  _Urine3667_
     # ionization, energy, date, sample, run#, from filename
 
-    records = empty_records(spectrums_schema)
+    records = empty_records(peptide_schema)
     tables = []
 
     fp = open_if_filename(fp, 'r')
@@ -174,14 +174,14 @@ def load_mgf2array(
             logging.info(f"read record {len(records['id'])}, spectrum_id={spectrum_id}")
         # check to see if we have enough records to add to the pyarrow table
         if len(records["id"]) % 25000 == 0:
-            table = pa.table(records, spectrums_schema)
+            table = pa.table(records, peptide_schema)
             tables.append(table)
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(spectrums_schema)
+            records = empty_records(peptide_schema)
         if num is not None and len(records['id']) >= num:
             break
 
-    table = pa.table(records, spectrums_schema)
+    table = pa.table(records, peptide_schema)
     tables.append(table)
     logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
@@ -226,7 +226,7 @@ def spectra_to_array(spectra, min_intensity=0, max_mz=2000, write_starts_stops=F
     :param write_starts_stops: put the starts and stops arrays into the arrow Table
     :return: arrow table of spectra
     """
-    records = empty_records(spectrums_schema)
+    records = empty_records(peptide_schema)
 
     for s in spectra:
         row = {}
@@ -263,7 +263,7 @@ def spectra_to_array(spectra, min_intensity=0, max_mz=2000, write_starts_stops=F
         row['mod_names'] = s.mod_names
         row['mod_positions'] = s.mod_positions
         add_row_to_records(records, row)
-    table = pa.table(records, spectrums_schema)
+    table = pa.table(records, peptide_schema)
     return table
 
 
@@ -545,7 +545,7 @@ def load_msp2array(
 
     fp = open_if_filename(fp, 'r')
     tables = []
-    records = empty_records(spectrums_schema)
+    records = empty_records(peptide_schema)
 
     spectrum_id = id_field  # a made up integer spectrum id
     # move forward to first begin ions
@@ -703,14 +703,14 @@ def load_msp2array(
             logging.info(f"read record {len(records['id'])}, spectrum_id={spectrum_id}")
         # check to see if we have enough records to add to the pyarrow table
         if len(records["id"]) % 25000 == 0:
-            table = pa.table(records, spectrums_schema)
+            table = pa.table(records, peptide_schema)
             tables.append(table)
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(spectrums_schema)
+            records = empty_records(peptide_schema)
         if num is not None and len(records['id']) >= num:
             break
 
-    table = pa.table(records, spectrums_schema)
+    table = pa.table(records, peptide_schema)
     tables.append(table)
     logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
