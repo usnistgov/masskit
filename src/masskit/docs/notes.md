@@ -3,6 +3,7 @@
 * to build docs
   * use an environment with sphinx, myst-parser, and nbsphinx installed, then run
     * `cd src/masskit/docs`
+    * tag the release, e.g. `git tag v1.0.0`  conf.py will use the tag to label the docs
     * if you want to clean out previous files: `rm -r masskit*.rst modules.rst _build sources`
     * `sphinx-apidoc -o sources ../`
     * `sphinx-build -b html . _build`
