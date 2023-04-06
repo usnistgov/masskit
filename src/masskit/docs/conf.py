@@ -12,6 +12,7 @@
 #
 import os
 import sys
+import re
 sys.path.insert(0, os.path.abspath('../..'))
 
 
@@ -24,7 +25,7 @@ html_show_sphinx = False
 author = 'MSDC'
 
 # The full version, including alpha/beta/rc tags
-release = '0.1'
+release = re.sub('^v', '', os.popen('git describe --tags').read().strip())
 
 
 # -- General configuration ---------------------------------------------------
