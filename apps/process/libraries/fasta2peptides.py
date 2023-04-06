@@ -76,21 +76,26 @@ def tryptic(residues, min, max, missed):
 # Semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal side of arginine (R) and lysine (K) by trypsin at one end but not the other. The figure below shows some semi-tryptic peptides.
 # https://massqc.proteomesoftware.com/help/metrics/percent_semi_tryptic#:~:text=Semi%2DTryptic%20Peptides%20are%20peptides,can%20indicate%20digestion%20preparation%20problems.
 def semitryptic(residues, min, max, missed):
-    p = PepTuple(nterm=False, pep="", cterm=False)
-    for peptup in trypsin(residues, min, max, missed):
+    for peptup in tryptic(residues, min, max, missed):
         yield peptup
         for i in range(1,len(peptup.pep)+1-min):
-            yield p._replace(pep=peptup.pep[i:], cterm=peptup.cterm)
+            yield PepTuple(nterm=False, pep=peptup.pep[i:], cterm=peptup.cterm)
             if i == 1:
-                yield p._replace(nterm=peptup.nterm, pep=peptup.pep[:-i])
+                yield PepTuple(nterm=peptup.nterm, pep=peptup.pep[:-i], cterm=False)
             else:
-                yield p._replace(pep=peptup.pep[:-i])
+                yield PepTuple(nterm=False, pep=peptup.pep[:-i], cterm=False)
 
 # cleave everywhere, given size constraints
 def nonspecific(residues, min, max, missed):
+    p = PepTuple(nterm=False, pep="", cterm=False)
     for sz in range(min,max+1):
-        for i in range(len(residues)+1-sz):
-            yield residues[i:i+sz]
+        last_residue = len(residues)-sz
+        for i in range(last_residue+1):
+            nterm = False
+            cterm = False
+            if i == 0: nterm = True
+            if i == last_residue: cterm = True
+            yield PepTuple(nterm=nterm, pep=residues[i:i+sz], cterm=cterm)
 
 def extract_peptides(cfg):
     peps = {
@@ -109,12 +114,12 @@ def extract_peptides(cfg):
         cleavage = nonspecific
 
     for defline, protein in fasta_file:
-        #print("protein:", protein)
+        print("protein:", protein)
         for p in cleavage(protein, 
                           cfg.peptide.length.min, 
                           cfg.peptide.length.max, 
                           cfg.protein.cleavage.max_missed):
-            #print("pep:", p)
+            print("pep:", p)
             if p.cterm and p.nterm:
                 peps['both'].add(p.pep)
             elif p.cterm:
