@@ -13,7 +13,7 @@ Welcome to masskit's documentation!
 
    spectra
    demo_peptide
-
+   recipes
 
 .. automodule:: modules
     :members:

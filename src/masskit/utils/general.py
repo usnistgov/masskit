@@ -1,9 +1,17 @@
 import importlib
 import os
+import logging
 from pathlib import Path
 import numpy as np
 import gzip
 import bz2
+from urllib import request
+from urllib.parse import urlparse
+try:
+    import boto3
+except ImportError:
+    logging.debug("Unable to import boto3")
+    boto3 = None
 
 def class_for_name(module_name_list, class_name):
     """
@@ -100,3 +108,39 @@ def search_for_file(filename, directories):
         if path.is_file():
             return path
     return None
+
+
+def get_file(filename, cache_directory=None, search_path=None):
+    """
+    for a given file, return the path (downloading file if necessary)
+
+    :param filename: name of the file
+    :param cache_directory: where files are cached (config.paths.cache_directory)
+    :param search_path: list of where to search for files (config.paths.search_path)
+    :return: path
+    """
+    if cache_directory is None:
+        cache_directory = Path.home() / Path('.massspec_cache')
+    if search_path is None:
+        search_path = Path.home() / Path('.massspec_cache')
+
+    url = urlparse(filename, allow_fragments=False)
+    if url.scheme in ["s3", "http", "https"]:
+        path = search_for_file(url.path.lstrip("/"), search_path)
+        # if the file doesn't exist in the cache, download it
+        if path is None or not path.is_file():
+            path = Path(cache_directory, url.path.lstrip("/"))
+            path.parent.mkdir(
+                parents=True, exist_ok=True
+            )  # make the cache directory
+            if url.scheme == "s3":
+                s3 = boto3.client("s3")
+                with open(path, "wb") as f:
+                    s3.download_fileobj(url.netloc, url.path.lstrip("/"), f)
+            else:
+                request.urlretrieve(filename, path)
+    else:
+        path = Path(filename)
+
+    return path
+
