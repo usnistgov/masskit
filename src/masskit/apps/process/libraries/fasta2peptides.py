@@ -45,15 +45,16 @@ def trypsin(residues):
             cut = min(k, r)+1 
         elif k < 0 and r < 0:
             cterm = True
-            yield PepTuple(nterm, residues, cterm)
+            yield PepTuple(nterm=nterm, pep=residues, cterm=cterm)
             return
         else:
             cut = max(k, r)+1
         sub += residues[:cut]
         residues = residues[cut:]
         if not residues or residues[0] != 'P':
-            if not residues: cterm = True
-            yield PepTuple(nterm, sub, cterm)
+            if not residues: 
+                cterm = True
+            yield PepTuple(nterm=nterm, pep=sub, cterm=cterm)
             nterm = False
             sub = ''
 
@@ -70,22 +71,31 @@ def tryptic(residues, min, max, missed):
                 #pep = "".join(peptides[i:i+miss+1])
                 pep = "".join( [ i.pep for i in tups ] )
                 if min <= len(pep) <= max:
-                    yield PepTuple(tups[0].nterm, pep, tups[-1].cterm)
+                    yield PepTuple(nterm=tups[0].nterm, pep=pep, cterm=tups[-1].cterm)
 
 # Semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal side of arginine (R) and lysine (K) by trypsin at one end but not the other. The figure below shows some semi-tryptic peptides.
 # https://massqc.proteomesoftware.com/help/metrics/percent_semi_tryptic#:~:text=Semi%2DTryptic%20Peptides%20are%20peptides,can%20indicate%20digestion%20preparation%20problems.
 def semitryptic(residues, min, max, missed):
-    for pep in trypsin(residues, min, max, missed):
-        yield pep
-        for i in range(1,len(pep)+1-min):
-            yield pep[i:]
-            yield pep[:-i]
+    for peptup in tryptic(residues, min, max, missed):
+        yield peptup
+        for i in range(1,len(peptup.pep)+1-min):
+            yield PepTuple(nterm=False, pep=peptup.pep[i:], cterm=peptup.cterm)
+            if i == 1:
+                yield PepTuple(nterm=peptup.nterm, pep=peptup.pep[:-i], cterm=False)
+            else:
+                yield PepTuple(nterm=False, pep=peptup.pep[:-i], cterm=False)
 
 # cleave everywhere, given size constraints
 def nonspecific(residues, min, max, missed):
+    p = PepTuple(nterm=False, pep="", cterm=False)
     for sz in range(min,max+1):
-        for i in range(len(residues)+1-sz):
-            yield residues[i:i+sz]
+        last_residue = len(residues)-sz
+        for i in range(last_residue+1):
+            nterm = False
+            cterm = False
+            if i == 0: nterm = True
+            if i == last_residue: cterm = True
+            yield PepTuple(nterm=nterm, pep=residues[i:i+sz], cterm=cterm)
 
 def extract_peptides(cfg):
     peps = {
@@ -104,12 +114,12 @@ def extract_peptides(cfg):
         cleavage = nonspecific
 
     for defline, protein in fasta_file:
-        #print("protein:", protein)
+        print("protein:", protein)
         for p in cleavage(protein, 
                           cfg.peptide.length.min, 
                           cfg.peptide.length.max, 
                           cfg.protein.cleavage.max_missed):
-            #print("pep:", p)
+            print("pep:", p)
             if p.cterm and p.nterm:
                 peps['both'].add(p.pep)
             elif p.cterm:
