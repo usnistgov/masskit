@@ -82,6 +82,29 @@ def massinfo2struct(mass_info):
                                        [mass_info.neutral_loss_charge],
                                        [mass_info.evenly_spaced]], fields=massinfo_struct)
 
+def compose_fields(*field_lists):
+    """
+    Compose field lists, retaining order but removing redundancies
+
+    :param field_lists: variable number of field lists
+    :return: combined noin-redundant field list
+    """
+    unique_names = set()
+    unique_fields = set()
+    ret_fields = []
+    for field_list in field_lists:
+        for field in field_list:
+            if field.name not in unique_names:
+                if field not in unique_fields:
+                    ret_fields.append(field)
+            elif field not in unique_fields:
+                # The name has already been seen, but with a different type signature
+                # This should never happen and is an error in the schema specifications
+                raise TypeError
+            unique_names.add(field.name)
+            unique_fields.add(field)
+    return ret_fields
+
 
 # :param tolerance: mass tolerance.  If 0.5 daltons, this is unit mass
 # :param tolerance_type: type of tolerance: "ppm", "daltons"
@@ -192,11 +215,11 @@ base_annotation_fields = [
 # base experimental metadata
 base_metadata_fields = base_experimental_fields
 
-base_fields = min_fields + base_metadata_fields + base_spectrum_fields + base_annotation_fields
+base_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_fields, base_annotation_fields)
 base_schema = pa.schema(base_fields)
 
 # base fields minus the big fields used for spectra
-base_fields_small = min_fields + base_metadata_fields + base_spectrum_small_fields + base_annotation_fields
+base_fields_small = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields, base_annotation_fields)
 
 # fields used in peptide experiments that define the experimental molecule
 mod_names_field = pa.field("mod_names", pa.large_list(pa.int16()))  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
@@ -262,22 +285,22 @@ molecule_annotation_fields = [
 ]
 
 # small molecule experimental metadata
-molecule_metadata_fields = molecule_definition_fields + molecule_experimental_fields
+molecule_metadata_fields = compose_fields(molecule_definition_fields, molecule_experimental_fields)
 # all fields that describe small molecules and associated spectra.  used in file schemas
-molecule_fields = molecule_metadata_fields + molecule_annotation_fields
+molecule_fields = compose_fields(molecule_metadata_fields, molecule_annotation_fields)
 
 # used to convert an arrow table for a peptide spectra to a spectrum object
 # it omits the annotation fields and large fields in part to avoid adding large fields to the spectrum
-experimental_fields = min_fields + base_metadata_fields + base_spectrum_small_fields + molecule_metadata_fields + peptide_metadata_fields 
+experimental_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields,  molecule_metadata_fields, peptide_metadata_fields)
 
 # fields used in arrow tables.  omits some of the larger spectra fields
-tablemap_fields = base_fields_small + peptide_fields + molecule_fields
+tablemap_fields = compose_fields(base_fields_small, peptide_fields, molecule_fields)
 
 # schema for standard spectral file formats which do not include a molecular connectivity graph
-peptide_schema = pa.schema(base_fields + peptide_fields)
+peptide_schema = pa.schema(compose_fields(base_fields, peptide_fields))
 
 # schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
-molecules_schema = pa.schema(base_fields + molecule_fields)
+molecules_schema = pa.schema(compose_fields(base_fields, molecule_fields))
 
 # Useful lists of fields
 # minimal set of spectrum fields
@@ -396,3 +419,16 @@ hitlist_fields = [
 ]
 
 hitlist_schema = pa.schema(hitlist_fields)
+
+
+if __name__ == "__main__":
+    f1 = molecule_definition_fields
+    f1.append(pa.field("junk", pa.int16()))
+    f2 = molecule_experimental_fields
+    f1.append(pa.field("junk", pa.uint16()))
+
+    print(compose_fields(molecule_definition_fields,molecule_experimental_fields)) # This should not throw an exception
+    print()
+    print(molecule_metadata_fields)
+    print("\n----\n")
+    print(compose_fields(f1,f2)) # This should throw an exception
