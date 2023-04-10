@@ -1,8 +1,8 @@
 # fasta filename
 input:
-  file: test.fasta.bz2
+  file:
 output:
-  file: test.parquet
+  file:
 protein:
   cleavage:
     # enzyme-style digestion (tryptic, semitryptic, or nonspecific) used to generate peptides.

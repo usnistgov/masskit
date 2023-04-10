@@ -1,0 +1,24 @@
+input:
+  file:
+    # list of input file names
+    name:
+  # number of records to generate
+  num:
+
+conversion:
+  max_path_length: 5
+
+output:
+  file:
+    # output file or output file prefix
+    name:
+
+hydra:
+  run:
+    # working directory
+    dir: hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+  output_subdir: hydra
+  sweep:
+    dir: hydra_sweep
+  job:
+    chdir: True
