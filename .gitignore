@@ -19,8 +19,6 @@ __pycache__/
 .ipynb_checkpoints/
 *.py.swp
 *.egg-info
-# nist caching directory
-.massspec_cache/
 # python build directories
 build/
 src/masskit_ext/out/

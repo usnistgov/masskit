@@ -24,7 +24,7 @@ the command line.
   * `peptide.nce=[30]` is a list of NCE values to generate per peptide
   * `peptide.use_basic_limit=True` limits the max charge of a peptide to the number of basic residues
 
-An example usage of this program would be `fasta2peptides input.file=uniprot.fasta output.file=uniprot_peptides.parquet`
+An example command line: `fasta2peptides input.file=uniprot.fasta output.file=uniprot_peptides.parquet`
 
 ## Modification specification
 

@@ -21,4 +21,4 @@ hydra:
   sweep:
     dir: hydra_sweep
   job:
-    chdir: True
+    chdir: False

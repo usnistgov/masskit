@@ -243,7 +243,7 @@ class pepgen:
 
         :return: The completed pyarrow table
         """
-        spectrum_id = 1
+        spectrum_id = 0
         for ptype, peps in self.peptides.items():
             # print(ptype, len(peps))
             args = {}
@@ -268,7 +268,6 @@ class pepgen:
                             continue
                     for nce in self.nces:
                         row = {
-                            "id": spectrum_id,
                             "charge": charge,
                             "ev": nce,
                             "nce": nce,
@@ -279,6 +278,7 @@ class pepgen:
                         for modset in self.permute_mods(pep, 
                                                         mods, 
                                                         max_mods=self.max_mods):
+                            row["id"] = spectrum_id
                             row["mod_names"] = fixed_mods_names.copy()
                             row["mod_positions"] = fixed_mods_positions.copy()
                             if modset:
@@ -291,6 +291,7 @@ class pepgen:
                                                                     mod_names=row["mod_names"], 
                                                                     mod_positions=row["mod_positions"])
                             self.add_row(row)
+                            spectrum_id += 1
         return self.finalize_table()
     
     def permute_mods(self, pep, mods, max_mods=4):

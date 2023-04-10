@@ -197,7 +197,7 @@ def arrow_to_pandas(table, conversions=None, field_list=None):
 
     # merge all dataframes
     for mt in merge_tables:
-        table_df = pd.merge(mt, table_df, how='inner', on='id')
+        table_df = pd.merge(mt, table_df, how='inner', on='id', validate='one_to_one')
 
     return table_df
     

@@ -775,6 +775,8 @@ class Ions(ABC):
         :param tiebreaker: how to deal with one to multiple matches to peaks in self. mz is closest mz value, intensity is closest intensity, None is no tiebreaking
         :return: cosine score
         """
+        if self.mz is None or ion2.mz is None:
+            return 0.0
         
         # if necessary, screen out any zero intensity peaks as zero intensity peaks mess up the cosine
         # score calculation when there are many to many matches of peaks
@@ -843,6 +845,8 @@ class Ions(ABC):
         :param stddev_channel: which channel contains the std dev.  None means no std dev
         :param take_sqrt: take the square root of the intensity
         """
+        if self.mz is None:
+            return
         last_which_bin = -1
         last_intensity = -1
         last_stddev = -1
