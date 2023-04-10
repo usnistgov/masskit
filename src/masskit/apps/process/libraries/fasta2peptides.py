@@ -39,8 +39,8 @@ def fasta(filename):
 
 def trypsin(residues):
     """
-    Follow the rules for a tryptic digestion enzyme to yield peptides from a given protein
-    string.The cleavage rule for trypsin is: after R or K, but not before P
+    Follow the rules for a tryptic digestion enzyme to yield peptides from a given
+    protein string. The cleavage rule for trypsin is: after R or K, but not before P
 
     :param residues: protein string
     :return: yield peptides in order
@@ -122,14 +122,15 @@ def nonspecific(residues, min, max, missed):
     :param missed: maximum number of possible missed cleavages
     :return: yield peptides in order
     """
-    p = PepTuple(nterm=False, pep="", cterm=False)
     for sz in range(min,max+1):
         last_residue = len(residues)-sz
         for i in range(last_residue+1):
             nterm = False
             cterm = False
-            if i == 0: nterm = True
-            if i == last_residue: cterm = True
+            if i == 0: 
+                nterm = True
+            if i == last_residue: 
+                cterm = True
             yield PepTuple(nterm=nterm, pep=residues[i:i+sz], cterm=cterm)
 
 def extract_peptides(cfg):
@@ -256,7 +257,9 @@ class pepgen:
             for pep in peps:
                 mod_names, mod_positions = generate_mods(pep, self.mods, **args)
                 mods = list(zip(mod_positions, mod_names))
-                fixed_mods_names, fixed_mods_positions = generate_mods(pep, self.fixed_mods, **args)
+                fixed_mods_names, fixed_mods_positions = generate_mods(pep, 
+                                                                       self.fixed_mods,
+                                                                       **args)
                 if self.limit_rhk:
                     num_rhk = count_rhk(pep)
                 for charge in self.charges:
@@ -273,13 +276,20 @@ class pepgen:
                             "peptide_len": len(pep),
                             "peptide_type": self.digest,
                         }
-                        for modset in self.permute_mods(pep,mods, max_mods=self.max_mods):
+                        for modset in self.permute_mods(pep, 
+                                                        mods, 
+                                                        max_mods=self.max_mods):
                             row["mod_names"] = fixed_mods_names.copy()
                             row["mod_positions"] = fixed_mods_positions.copy()
                             if modset:
-                                row["mod_positions"].extend(list(map(lambda x: x[0], modset)))
-                                row["mod_names"].extend(list(map(lambda x: x[1], modset)))
-                            row["precursor_mz"] = calc_precursor_mz(pep, charge, mod_names=row["mod_names"], mod_positions=row["mod_positions"])
+                                row["mod_positions"].extend(
+                                    list(map(lambda x: x[0], modset)))
+                                row["mod_names"].extend(
+                                    list(map(lambda x: x[1], modset)))
+                            row["precursor_mz"] = calc_precursor_mz(pep, 
+                                                                    charge, 
+                                                                    mod_names=row["mod_names"], 
+                                                                    mod_positions=row["mod_positions"])
                             self.add_row(row)
         return self.finalize_table()
     
