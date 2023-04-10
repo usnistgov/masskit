@@ -1,0 +1,10 @@
+masskit.apps.process.libraries.conf package
+===========================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.apps.process.libraries.conf
+   :members:
+   :undoc-members:
+   :show-inheritance:

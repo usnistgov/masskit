@@ -7,6 +7,7 @@ Subpackages
 .. toctree::
    :maxdepth: 4
 
+   masskit.apps
    masskit.data_specs
    masskit.peptide
    masskit.small_molecule

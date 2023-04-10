@@ -1,0 +1,29 @@
+masskit.apps.process.mols package
+=================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.apps.process.mols.conf
+
+Submodules
+----------
+
+masskit.apps.process.mols.shortest\_path module
+-----------------------------------------------
+
+.. automodule:: masskit.apps.process.mols.shortest_path
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: masskit.apps.process.mols
+   :members:
+   :undoc-members:
+   :show-inheritance:

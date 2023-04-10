@@ -5,10 +5,9 @@
 ### Protein sequences to peptide library
 
 To generate a library of peptides, which is typically the first step in generating a peptide
-spectral library, use the program `fasta2peptides.py`. This program takes protein sequences
-in fasta format and generates a peptide library in parquet format. The configuration for this program is
-contained in the `conf/config_fasta2peptides.yaml` file in the same directory as
-`fasta2peptides.py`.
+spectral library, use the program `fasta2peptides`. This program takes protein sequences
+in fasta format and generates a peptide library in parquet format. The default configuration for this program is
+contained in the `masskit/src/masskit/apps/process/libraries/conf/config_fasta2peptides.yaml` file.
 
 * to change the name of the input file, specify `input.file=myfilename.fasta` on the
 command line.
@@ -24,6 +23,8 @@ the command line.
   the peptide generated.
   * `peptide.nce=[30]` is a list of NCE values to generate per peptide
   * `peptide.use_basic_limit=True` limits the max charge of a peptide to the number of basic residues
+
+An example command line: `fasta2peptides input.file=uniprot.fasta output.file=uniprot_peptides.parquet`
 
 ## Modification specification
 

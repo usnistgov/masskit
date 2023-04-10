@@ -1,0 +1,77 @@
+masskit.apps.process.libraries package
+======================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.apps.process.libraries.conf
+
+Submodules
+----------
+
+masskit.apps.process.libraries.converter module
+-----------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.fasta2peptides module
+----------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.fasta2peptides
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.optimize\_parquet module
+-------------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.optimize_parquet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.parquet\_info module
+---------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.parquet_info
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.pepsearch2parquet module
+-------------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.pepsearch2parquet
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.rewrite\_sdf module
+--------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.rewrite_sdf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.update\_sets module
+--------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.update_sets
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: masskit.apps.process.libraries
+   :members:
+   :undoc-members:
+   :show-inheritance:

@@ -1,0 +1,10 @@
+masskit.apps.process.mols.conf package
+======================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.apps.process.mols.conf
+   :members:
+   :undoc-members:
+   :show-inheritance:

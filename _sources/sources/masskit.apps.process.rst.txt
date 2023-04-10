@@ -1,0 +1,19 @@
+masskit.apps.process package
+============================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.apps.process.libraries
+   masskit.apps.process.mols
+
+Module contents
+---------------
+
+.. automodule:: masskit.apps.process
+   :members:
+   :undoc-members:
+   :show-inheritance:

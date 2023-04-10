@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Recipes &#8212; masskit 1.0.0-2-gf71e19b documentation</title>
+    <title>Recipes &#8212; masskit 1.0.0-18-g33eee63 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -60,7 +60,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="demo_peptide.html" title="Tables of spectra"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-2-gf71e19b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-18-g33eee63 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
       </ul>
     </div>  
@@ -77,10 +77,9 @@ $(document).ready(function(){
 <section id="protein-sequences-to-peptide-library">
 <h3>Protein sequences to peptide library<a class="headerlink" href="#protein-sequences-to-peptide-library" title="Permalink to this heading">¶</a></h3>
 <p>To generate a library of peptides, which is typically the first step in generating a peptide
-spectral library, use the program <code class="docutils literal notranslate"><span class="pre">fasta2peptides.py</span></code>. This program takes protein sequences
-in fasta format and generates a peptide library in parquet format. The configuration for this program is
-contained in the <code class="docutils literal notranslate"><span class="pre">conf/config_fasta2peptides.yaml</span></code> file in the same directory as
-<code class="docutils literal notranslate"><span class="pre">fasta2peptides.py</span></code>.</p>
+spectral library, use the program <code class="docutils literal notranslate"><span class="pre">fasta2peptides</span></code>. This program takes protein sequences
+in fasta format and generates a peptide library in parquet format. The default configuration for this program is
+contained in the <code class="docutils literal notranslate"><span class="pre">masskit/src/masskit/apps/process/libraries/conf/config_fasta2peptides.yaml</span></code> file.</p>
 <ul class="simple">
 <li><p>to change the name of the input file, specify <code class="docutils literal notranslate"><span class="pre">input.file=myfilename.fasta</span></code> on the
 command line.</p></li>
@@ -100,6 +99,7 @@ the peptide generated.</p></li>
 </ul>
 </li>
 </ul>
+<p>An example command line: <code class="docutils literal notranslate"><span class="pre">fasta2peptides</span> <span class="pre">input.file=uniprot.fasta</span> <span class="pre">output.file=uniprot_peptides.parquet</span></code></p>
 </section>
 </section>
 <section id="modification-specification">
@@ -187,7 +187,7 @@ Multiple sites are separated by a <code class="docutils literal notranslate"><sp
         <li class="right" >
           <a href="demo_peptide.html" title="Tables of spectra"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-2-gf71e19b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-18-g33eee63 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
       </ul>
     </div>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>masskit.utils package &#8212; masskit 1.0.0-2-gf71e19b documentation</title>
+    <title>masskit.utils package &#8212; masskit 1.0.0-18-g33eee63 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -56,7 +56,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-2-gf71e19b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-18-g33eee63 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils package</a></li> 
       </ul>
     </div>  
@@ -969,7 +969,7 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.general.get_file">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.get_file" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">get_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_directory</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">search_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tgz_extension</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.get_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>for a given file, return the path (downloading file if necessary)</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -977,12 +977,14 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 <li><p><strong>filename</strong> – name of the file</p></li>
 <li><p><strong>cache_directory</strong> – where files are cached (config.paths.cache_directory)</p></li>
 <li><p><strong>search_path</strong> – list of where to search for files (config.paths.search_path)</p></li>
+<li><p><strong>tgz_extension</strong> – if a tgz file to be downloaded, the extension of the unarchived file</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>path</p>
 </dd>
 </dl>
+<p>Notes: we don’t support zip files as the python api for zip files doesn’t support symlinks</p>
 </dd></dl>
 
 <dl class="py function">
@@ -2351,7 +2353,7 @@ canonical SMILES</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-2-gf71e19b documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-18-g33eee63 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils package</a></li> 
       </ul>
     </div>
