@@ -15,12 +15,12 @@ from masskit.peptide.encoding import calc_precursor_mz, parse_modification_encod
 PepTuple = namedtuple('PepTuple', ['nterm', 'pep', 'cterm'])
 
 def fasta(filename):
-"""
-Iterate over a fasta file, yields tuples of (header, sequence)
+    """
+    Iterate over a fasta file, yields tuples of (header, sequence)
 
-:param filename: name of fasta file
-:return: 
-"""
+    :param filename: name of fasta file
+    :return: 
+    """
     f = open_if_compressed(filename)
 
     # ditch the boolean (x[0]) and just keep the header or sequence since
@@ -38,13 +38,13 @@ Iterate over a fasta file, yields tuples of (header, sequence)
 
 
 def trypsin(residues):
-"""
-Follow the rules for a tryptic digestion enzyme to yield peptides from a given protein
-string.The cleavage rule for trypsin is: after R or K, but not before P
+    """
+    Follow the rules for a tryptic digestion enzyme to yield peptides from a given protein
+    string.The cleavage rule for trypsin is: after R or K, but not before P
 
-:param residues: protein string
-:return: yield peptides in order
-"""
+    :param residues: protein string
+    :return: yield peptides in order
+    """
 
     sub = ''
     nterm = True
@@ -69,15 +69,15 @@ string.The cleavage rule for trypsin is: after R or K, but not before P
             sub = ''
 
 def tryptic(residues, min, max, missed):
-"""
-Control a tryptic digest by limiting the length and allowing for missed cleavages
+    """
+    Control a tryptic digest by limiting the length and allowing for missed cleavages
 
-:param residues: protein string
-:param min: minimum length for returned peptides
-:param max: maximum length for returned peptides
-:param missed: maximum number of possible missed cleavages
-:return: yield peptides in order
-"""
+    :param residues: protein string
+    :param min: minimum length for returned peptides
+    :param max: maximum length for returned peptides
+    :param missed: maximum number of possible missed cleavages
+    :return: yield peptides in order
+    """
     for miss in range(missed+1):
         if miss < 1:
             for pepTuple in trypsin(residues):
@@ -93,16 +93,16 @@ Control a tryptic digest by limiting the length and allowing for missed cleavage
                     yield PepTuple(nterm=tups[0].nterm, pep=pep, cterm=tups[-1].cterm)
 
 def semitryptic(residues, min, max, missed):
-"""
-Yield semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal
-side of arginine (R) and lysine (K) by trypsin at one end but not the other. 
+    """
+    Yield semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal
+    side of arginine (R) and lysine (K) by trypsin at one end but not the other. 
 
-:param residues: protein string
-:param min: minimum length for returned peptides
-:param max: maximum length for returned peptides
-:param missed: maximum number of possible missed cleavages
-:return: yield peptides in order
-"""
+    :param residues: protein string
+    :param min: minimum length for returned peptides
+    :param max: maximum length for returned peptides
+    :param missed: maximum number of possible missed cleavages
+    :return: yield peptides in order
+    """
     for peptup in tryptic(residues, min, max, missed):
         yield peptup
         for i in range(1,len(peptup.pep)+1-min):
@@ -113,15 +113,15 @@ side of arginine (R) and lysine (K) by trypsin at one end but not the other.
                 yield PepTuple(nterm=False, pep=peptup.pep[:-i], cterm=False)
 
 def nonspecific(residues, min, max, missed):
-"""
-Yield eptides are peptides which were cleaved at every location. 
+    """
+    Yield eptides are peptides which were cleaved at every location. 
 
-:param residues: protein string
-:param min: minimum length for returned peptides
-:param max: maximum length for returned peptides
-:param missed: maximum number of possible missed cleavages
-:return: yield peptides in order
-"""
+    :param residues: protein string
+    :param min: minimum length for returned peptides
+    :param max: maximum length for returned peptides
+    :param missed: maximum number of possible missed cleavages
+    :return: yield peptides in order
+    """
     p = PepTuple(nterm=False, pep="", cterm=False)
     for sz in range(min,max+1):
         last_residue = len(residues)-sz
@@ -133,13 +133,13 @@ Yield eptides are peptides which were cleaved at every location.
             yield PepTuple(nterm=nterm, pep=residues[i:i+sz], cterm=cterm)
 
 def extract_peptides(cfg):
-"""
-Breakdown all peptides from all of the proteins in a fasta file according to the
-specified digestion strategy.
+    """
+    Breakdown all peptides from all of the proteins in a fasta file according to the
+    specified digestion strategy.
 
-:param cfg: configuration parameters
-:return: non-redundant list of peptides.
-"""
+    :param cfg: configuration parameters
+    :return: non-redundant list of peptides.
+    """
     peps = {
         'nterm': set(),
         'neither': set(),
@@ -177,12 +177,12 @@ specified digestion strategy.
     return retval
 
 def count_rhk(peptide):
-"""
-Return a count of the basic residues in a peptide
+    """
+    Return a count of the basic residues in a peptide
 
-:param peptide:
-:return: count of basic residues
-"""
+    :param peptide:
+    :return: count of basic residues
+    """
     count = 0
     for res in peptide:
         if res == 'R' or res == 'H' or res == 'K':
@@ -192,12 +192,12 @@ Return a count of the basic residues in a peptide
 class pepgen:
 
     def __init__(self, peptides, cfg):
-    """
-    initialize the decorated peptide generator
+        """
+        initialize the decorated peptide generator
 
-    :param peptides: list of all peptide strings
-    :return: peptide generator object
-    """
+        :param peptides: list of all peptide strings
+        :return: peptide generator object
+        """
         self.peptides = peptides
         self.nces = list(map(float, cfg.peptide.nce))
         self.mods = parse_modification_encoding(cfg.peptide.mods.variable)
@@ -214,11 +214,11 @@ class pepgen:
         self.table = []
 
     def add_row(self, row):
-    """
-    add row to row cache
+        """
+        add row to row cache
 
-    :param row: the new row
-    """
+        :param row: the new row
+        """
         add_row_to_records(self.records, row)
         if len(self.records["id"]) % 25000 == 0:
             table = pa.table(self.records, peptide_schema)
@@ -226,22 +226,22 @@ class pepgen:
             self.records = empty_records(peptide_schema)
 
     def finalize_table(self):
-    """
-    retrieve the completed table
+        """
+        retrieve the completed table
 
-    :return: a pyarrow table
-    """
+        :return: a pyarrow table
+        """
         table = pa.table(self.records, peptide_schema)
         self.tables.append(table)
         table = pa.concat_tables(self.tables)
         return table
 
     def enumerate(self):
-    """
-    Perform the work to generate all of the decorated peptides
+        """
+        Perform the work to generate all of the decorated peptides
 
-    :return: The completed pyarrow table
-    """
+        :return: The completed pyarrow table
+        """
         spectrum_id = 1
         for ptype, peps in self.peptides.items():
             # print(ptype, len(peps))
@@ -284,15 +284,15 @@ class pepgen:
         return self.finalize_table()
     
     def permute_mods(self, pep, mods, max_mods=4):
-    """
-    Yield all of the possible permutations of the set of modifications
-    applied to the given peptide
+        """
+        Yield all of the possible permutations of the set of modifications
+        applied to the given peptide
 
-    :param pep: a peptide string
-    :param mods: list of mods
-    :param max_mods: maximum number of modifications to apply at one time
-    :return: yield a peptide with modifications applied
-    """
+        :param pep: a peptide string
+        :param mods: list of mods
+        :param max_mods: maximum number of modifications to apply at one time
+        :return: yield a peptide with modifications applied
+        """
         for i in range(min(max_mods, len(mods)+1)):
             for m in combinations(mods,i):
                 yield m
