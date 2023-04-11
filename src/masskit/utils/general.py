@@ -1,7 +1,7 @@
 import importlib
 import os
 import logging
-from pathlib import Path, PosixPath
+from pathlib import Path, PurePosixPath
 import tarfile
 import numpy as np
 import gzip
@@ -126,16 +126,17 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
     if cache_directory is None:
         cache_directory = Path.home() / Path('.masskit_cache')
     else:
-        cache_directory = Path(cache_directory)
+        cache_directory = Path(cache_directory).expanduser()  # expand tilde notation
     if search_path is None:
         search_path = [Path.home() / Path('.masskit_cache')]
     if cache_directory not in search_path:
         search_path.append(cache_directory)
+    search_path = [Path(x).expanduser() for x in search_path]  # expand tilde notation
 
     # treat as an url
     url = urlparse(filename, allow_fragments=False)
     is_url = url.scheme in ["s3", "http", "https"]
-    url_path = PosixPath(url.path)
+    url_path = PurePosixPath(url.path)
     is_tgz = tgz_extension is not None and url_path.suffix == '.tgz'
 
     # treat as a file, get the path
@@ -178,42 +179,3 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
             return cache_directory / final_filename
 
     return None
-
-
-    # if url, the download to cache directory
-        # if tgz, untar it
-        # return the non-tgz version
-
-    path = cache_directory / PosixPath(url.path).name
-    if url.scheme in ["s3", "http", "https"]:
-        url_path = PosixPath(url.path)
-        if tgz_extension is not None and url_path.suffix == '.tgz':
-            final_path = path.with_suffix(tgz_extension)
-        else:
-            final_path = path
-        file_path = search_for_file(final_path.name, search_path)
-        # if the file doesn't exist in the cache, download it
-        if file_path is None or not file_path.is_file():
-            cache_directory.mkdir(parents=True, exist_ok=True)  # make the cache directory if necessary
-
-            if url.scheme == "s3":
-                s3 = boto3.client("s3")
-                with open(path, "wb") as f:
-                    s3.download_fileobj(url.netloc, url.path, f)
-            else: 
-                request.urlretrieve(url.geturl(), path)
-
-            if tgz_extension is not None and url_path.suffix == '.tgz':
-                with tarfile.open(path, 'r:gz') as tgz_ref:
-                    tgz_ref.extractall(cache_directory)
-                os.remove(path)
-            path = final_path
-        else:
-            path = file_path
-    else:
-        path = Path(filename)
-
-    if not path.exists():
-        raise FileNotFoundError(f'unable to find {path}')
-    return path
-
