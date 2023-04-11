@@ -121,8 +121,8 @@ class CMakeBuild(build_ext):
         subprocess.check_call(["cmake", "--build", "."] + build_args, cwd=build_temp)
 
 
-# Mixing cython in does not work, rip it all out
+# comment out masskit_ext until build works for windows
 setup(
-    ext_modules = [ CMakeExtension("masskit_ext", sourcedir="src/masskit_ext") ],
-    cmdclass={"build_ext": CMakeBuild}
+#    ext_modules = [ CMakeExtension("masskit_ext", sourcedir="src/masskit_ext") ],
+#    cmdclass={"build_ext": CMakeBuild}
 )

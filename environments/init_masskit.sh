@@ -86,12 +86,13 @@ fi
 # The gxx package is installed because the arrow-cpp package is built with 
 # a newer version than both AL2022 and the rest of conda-forge 
 # (11.3 at the time of this comment) Why? I dunno.
+# take out gxx until we have a window specific script   gxx>12 \
+
 BASE_PACKAGES="
   arrow-cpp=10.* \
   conda-build \
   cmake \
   cython \
-  gxx>12 \
   hydra-core \
   imageio \
   jsonpickle \
@@ -100,6 +101,7 @@ BASE_PACKAGES="
   numba \
   numpy \
   pandas \
+  pip \
   pyarrow=10.* \
   pybind11 \
   pynndescent \
@@ -139,7 +141,7 @@ if ! conda activate $ENVNAME; then
     echo "Creating conda environment"
     conda create -y -n $ENVNAME
     mamba install -y -n $ENVNAME ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
-    conda activate $ENVNAME
+    echo to activate this environment, do: conda activate $ENVNAME
     
     # # Check for bayesian_torch
     # (python -c "import bayesian_torch" 2> /dev/null) && has_lib=1 || has_lib=0
