@@ -235,7 +235,9 @@ peptide_definition_fields = [
 ]
 
 # peptide experimental metadata
-peptide_metadata_fields = peptide_definition_fields
+protein_id_field = pa.field("protein_id", pa.large_list(pa.string()))
+peptide_metadata_fields = compose_fields(peptide_definition_fields, [protein_id_field])
+
 # all fields that describe peptides
 peptide_fields = peptide_metadata_fields
 

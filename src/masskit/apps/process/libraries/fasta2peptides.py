@@ -36,6 +36,18 @@ def fasta(filename):
 
         yield (headerStr, seq)
 
+def fasta_parse_id(header):
+    """
+    Extract an accession from a UniProt fasta file header string
+    The UniProtKB uses the following format:
+    >db|UniqueIdentifier|EntryName ProteinName OS=OrganismName OX=OrganismIdentifier \
+                                [GN=GeneName ]PE=ProteinExistence SV=SequenceVersion
+
+    :param header: UniProt formated fasta header string
+    :return: accession string
+    """
+    db, uid, remainder = header.split("|", 2)
+    return db + '|' + uid
 
 def trypsin(residues):
     """
@@ -156,13 +168,22 @@ def extract_peptides(cfg):
     elif cfg.protein.cleavage.digest == "nonspecific":
         cleavage = nonspecific
 
+    pep2proteins = {}
     for defline, protein in fasta_file:
-        print("protein:", protein)
+        protein_id = fasta_parse_id(defline)
+        # print("protein id:", protein_id)
+        # print("protein:", protein)
         for p in cleavage(protein, 
                           cfg.peptide.length.min, 
                           cfg.peptide.length.max, 
                           cfg.protein.cleavage.max_missed):
-            print("pep:", p)
+            # print("pep:", p)
+            # Add protein to mapping
+            if p.pep in pep2proteins:
+                pep2proteins[p.pep].add(protein_id)
+            else:
+                pep2proteins[p.pep] = { protein_id }
+
             if p.cterm and p.nterm:
                 peps['both'].add(p.pep)
             elif p.cterm:
@@ -175,7 +196,7 @@ def extract_peptides(cfg):
     for k in peps.keys():
         retval[k] = list(peps[k])
         retval[k].sort()
-    return retval
+    return retval, pep2proteins
 
 def count_rhk(peptide):
     """
@@ -192,14 +213,16 @@ def count_rhk(peptide):
 
 class pepgen:
 
-    def __init__(self, peptides, cfg):
+    def __init__(self, peptides, pep2proteins, cfg):
         """
         initialize the decorated peptide generator
 
         :param peptides: list of all peptide strings
+        :param pep2proteins: dict mapping pep string to set of protein identifiers
         :return: peptide generator object
         """
         self.peptides = peptides
+        self.pep2proteins = pep2proteins
         self.nces = list(map(float, cfg.peptide.nce))
         self.mods = parse_modification_encoding(cfg.peptide.mods.variable)
         self.fixed_mods = parse_modification_encoding(cfg.peptide.mods.fixed)
@@ -290,6 +313,7 @@ class pepgen:
                                                                     charge, 
                                                                     mod_names=row["mod_names"], 
                                                                     mod_positions=row["mod_positions"])
+                            row["protein_id"] = list(self.pep2proteins[pep])
                             self.add_row(row)
                             spectrum_id += 1
         return self.finalize_table()
@@ -313,10 +337,10 @@ def main(cfg: DictConfig) -> None:
     # print(OmegaConf.to_yaml(cfg))
     # print(list(map(float, cfg.peptide.nce)))
 
-    peptides = extract_peptides(cfg)
+    peptides, pep2proteins = extract_peptides(cfg)
     # print(peptides)
     # return
-    pg = pepgen(peptides, cfg)
+    pg = pepgen(peptides, pep2proteins, cfg)
     table = pg.enumerate()
     #print(table.to_pandas())
     #data = schema.empty_table().to_pydict()
