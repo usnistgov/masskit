@@ -24,13 +24,12 @@ Masskit does this by taking advantage of modern software and hardware architectu
 
 ## Installation
 
-On a Linux, Windows or macOS computer that has [Anaconda](https://www.anaconda.com/) and [Git](https://git-scm.com/) installed, run on the command line:
+On a Linux or macOS computer that has [Anaconda](https://www.anaconda.com/) and [Git](https://git-scm.com/) installed, run on the command line:
 
+- change to a directory that will hold the masskit directory
 - `git clone https://github.com/usnistgov/masskit.git`
 - `cd masskit`
-- if using Windows, run `bash`
-- in the masskit directory, run `source environments/init_masskit.sh -m`.
-  - if you wish to use a cpu-only version of the library, run `source environments/init_masskit.sh -c` instead.
-- if using Windows, `control-D` to exit bash
-- run `conda activate masskit_ai`
+- if you are going to use [Masskit_ai](https://github.com/usnistgov/masskit_ai.git), run `source environments/init_masskit.sh -m`, otherwise run
+`source environments/init_masskit.sh`
+  - if you are going to use [Masskit_ai](https://github.com/usnistgov/masskit_ai.git) in cpu-only mode, run `source environments/init_masskit.sh -c` instead.
 - run `pip install -e .`
