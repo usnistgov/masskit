@@ -116,7 +116,10 @@ def row_view(table, idx=0):
         def fn_list(self):
             values = self.table.column(name).slice(self.idx, 1)[0].values
             if values:
-                return values.to_numpy()
+                try:
+                    return values.to_numpy()
+                except pa.ArrowInvalid:
+                    return values.to_numpy(zero_copy_only=False)
             return None
 
         def fn_scalar(self):

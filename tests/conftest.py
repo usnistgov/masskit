@@ -1,0 +1,1 @@
+pytest_plugins = ("masskit.test_fixtures", )
