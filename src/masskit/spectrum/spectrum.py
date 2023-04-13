@@ -1555,6 +1555,14 @@ class BaseSpectrum:
         self.props["peptide_len"] = value
 
     @property
+    def protein_id(self):
+        return self.props.get("protein_id")
+
+    @protein_id.setter
+    def protein_id(self, value):
+        self.props["protein_id"] = value
+
+    @property
     def mod_names(self):
         return self.props.get("mod_names")
 
@@ -1892,6 +1900,8 @@ class BaseSpectrum:
             ret_value += f"eV: {self.ev}\n"
         if hasattr(self, "nce") and self.nce:
             ret_value += f"NCE: {self.nce}\n"
+        if hasattr(self, "protein_id") and self.protein_id:
+            ret_value += f"ProteinId: {','.join(self.protein_id)}\n"
         ret_value += f"DB#: {self.id}\n"
         # spectrum = self.copy(min_mz=1.0, min_intensity=min_intensity)
         num_peaks = len(self.products.mz)

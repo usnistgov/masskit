@@ -259,6 +259,7 @@ def spectra_to_array(spectra, min_intensity=0, max_mz=2000, write_starts_stops=F
         row['spectrum_fp_count'] = fingerprint.get_num_on_bits()
         row['peptide'] = s.peptide
         row['peptide_len'] = s.peptide_len
+        row['protein_id'] = s.protein_id
         row['mod_names'] = s.mod_names
         row['mod_positions'] = s.mod_positions
         add_row_to_records(records, row)
@@ -620,6 +621,8 @@ def load_msp2array(
                         row["ionization"] = values[1].rstrip()
                     elif values[0] == "Precursor_type":
                         row["precursor_type"] = values[1].rstrip()
+                    elif values[0] == "ProteinId":
+                            row["protein_id"] = values[1].rstrip().split(',')
                     elif values[0] == "Comment":
                         # iterate through name=value pairs.  If the value is bracketed by quotes, the regex
                         # takes the whole value
@@ -685,6 +688,7 @@ def load_msp2array(
             spectrum.charge = row.get('charge', None)
             spectrum.peptide = row.get('peptide', None)
             spectrum.peptide_len = row.get('peptide_len', None)
+            spectrum.protein_id = row.get('protein_id')
             spectrum.mod_names = row.get('mod_names', None)
             spectrum.mod_positions = row.get('mod_positions', None)
             row['product_massinfo'] = spectrum.product_mass_info.__dict__
