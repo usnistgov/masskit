@@ -82,6 +82,7 @@ def massinfo2struct(mass_info):
                                        [mass_info.neutral_loss_charge],
                                        [mass_info.evenly_spaced]], fields=massinfo_struct)
 
+
 def compose_fields(*field_lists):
     """
     Compose field lists, retaining order but removing redundancies
@@ -215,7 +216,10 @@ base_annotation_fields = [
 # base experimental metadata
 base_metadata_fields = base_experimental_fields
 
-base_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_fields, base_annotation_fields)
+# fields treated as properties
+base_property_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields, base_annotation_fields)
+
+base_fields = compose_fields(base_property_fields, base_spectrum_large_fields)
 base_schema = pa.schema(base_fields)
 
 # base fields minus the big fields used for spectra
@@ -238,12 +242,13 @@ peptide_definition_fields = [
 protein_id_field = pa.field("protein_id", pa.large_list(pa.string()))
 peptide_metadata_fields = compose_fields(peptide_definition_fields, [protein_id_field])
 
-# all fields that describe peptides
-peptide_fields = peptide_metadata_fields
+# all property fields that are specific for describing peptides
+peptide_property_fields = peptide_metadata_fields
 
 # fields used in small molecule experiments that define the experimental molecule
 molecule_definition_fields = [
     pa.field("mol", pa.string()),  # rdkit molecule expressed as MolInterchange JSON
+    pa.field("shortest_paths", pa.string()),  # shortest paths between atoms in molecule
 ]
 
 # experimental metadata fields used in small molecule experiments, measured or recorded
@@ -283,26 +288,29 @@ molecule_annotation_fields = [
     pa.field("rotatable_bonds", pa.int64()),
     pa.field("smiles", pa.string()),
     pa.field("tpsa", pa.float64()),
-    pa.field("shortest_paths", pa.string()),  # shortest paths between atoms in molecule
 ]
 
 # small molecule experimental metadata
 molecule_metadata_fields = compose_fields(molecule_definition_fields, molecule_experimental_fields)
-# all fields that describe small molecules and associated spectra.  used in file schemas
-molecule_fields = compose_fields(molecule_metadata_fields, molecule_annotation_fields)
 
-# used to convert an arrow table for a peptide spectra to a spectrum object
-# it omits the annotation fields and large fields in part to avoid adding large fields to the spectrum
-experimental_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields,  molecule_metadata_fields, peptide_metadata_fields)
+# all property fields that describe small molecules and associated spectra.  used in file schemas
+molecule_property_fields = compose_fields(molecule_metadata_fields, molecule_annotation_fields)
 
-# fields used in arrow tables.  omits some of the larger spectra fields
-tablemap_fields = compose_fields(base_fields_small, peptide_fields, molecule_fields)
+# all property fields. Use to populate properties in spectra, Accumulators, and columns in arrow tables.
+property_fields = compose_fields(base_property_fields, peptide_property_fields, molecule_property_fields)
+
+accumulator_fields = [
+    pa.field('predicted_mean', pa.float64()),
+    pa.field('predicted_stddev', pa.float64()),
+    ]
+# all property fields plus accumulator fields.
+accumulator_property_fields = compose_fields(property_fields, accumulator_fields)
 
 # schema for standard spectral file formats which do not include a molecular connectivity graph
-peptide_schema = pa.schema(compose_fields(base_fields, peptide_fields))
+peptide_schema = pa.schema(compose_fields(base_fields, peptide_property_fields))
 
 # schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
-molecules_schema = pa.schema(compose_fields(base_fields, molecule_fields))
+molecules_schema = pa.schema(compose_fields(base_fields, molecule_property_fields))
 
 # Useful lists of fields
 # minimal set of spectrum fields
@@ -421,6 +429,42 @@ hitlist_fields = [
 ]
 
 hitlist_schema = pa.schema(hitlist_fields)
+
+
+def create_getter(name):
+    """ 
+    create a generic property getter on the props dictionary of an object
+
+    :param name: name of the property
+    :return: getter function
+    """
+    def getter(self):
+        return self.props.get(name, None)
+    return getter
+
+
+def create_setter(name):
+    """ 
+    create a generic property setter on the props dictionary of an object
+
+    :param name: name of the property
+    :return: setter function
+    """
+    def setter(self, data):
+        self.props[name] = data
+    return setter
+
+
+def populate_properties(class_in, fields=property_fields):
+    """
+    given a class (or any object), create a set of properties from a list of fields
+    
+    :param class_in: the class/object to be modified
+    :param fields: a list of pyarrow fields whose names will be used to create properties
+    """
+    print(fields)
+    for field in fields:
+        setattr(class_in, field.name, property(create_getter(field.name),create_setter(field.name)))
 
 
 if __name__ == "__main__":

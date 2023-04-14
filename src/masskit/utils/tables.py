@@ -190,7 +190,7 @@ def arrow_to_pandas(table, conversions=None, field_list=None):
     # dataframe of the remaining subset of columns
     if field_list is None:
         field_list = list(map(lambda x: x.name,
-                                ms_schemas.tablemap_fields))
+                                ms_schemas.property_fields))
         # TODO: remove columns for converted objects
     else:
         field_list = list(map(lambda x: x.name,

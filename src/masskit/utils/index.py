@@ -6,7 +6,7 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from scipy import sparse
 from masskit.spectrum.spectrum import init_spectrum
-from masskit.data_specs.schemas import min_spectrum_fields, tablemap_fields
+from masskit.data_specs.schemas import min_spectrum_fields, property_fields
 import masskit.utils.files as msuf
 from masskit.utils.general import open_if_filename
 #from masskit.utils.search import tanimoto_search
@@ -668,7 +668,7 @@ class TableMap(ABC):
         else:
             self.column_name = column_name
         # fields to report
-        self.field_list = tablemap_fields
+        self.field_list = property_fields
 
     def __getitem__(self, key):
         """

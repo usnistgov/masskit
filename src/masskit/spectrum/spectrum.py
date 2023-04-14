@@ -4,7 +4,7 @@ import numpy as np
 from masskit.accumulator import Accumulator
 import masskit.utils.textalloc as ta
 from masskit.constants import EPSILON
-from masskit.data_specs.schemas import tablemap_fields
+from masskit.data_specs.schemas import populate_properties, property_fields
 from masskit.peptide.encoding import h2o_mass
 from masskit.spectrum.ipython import is_notebook
 import re
@@ -1362,6 +1362,7 @@ class BaseSpectrum:
         """
         return self.props.get(name)
 
+    """
     @property
     def id(self):
         return self.props.get("id")
@@ -1681,6 +1682,7 @@ class BaseSpectrum:
     @vial_id.setter
     def vial_id(self, value):
         self.props["vial_id"] = value
+    """
 
     def add_join(self, join, joined_spectrum):
         """
@@ -1703,7 +1705,7 @@ class BaseSpectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in tablemap_fields:
+        for field in property_fields:
             attribute = row.get(field.name)
             if attribute is not None:
                 setattr(self, field.name, attribute())
@@ -2681,6 +2683,9 @@ class BaseSpectrum:
         fp.object2fingerprint(self)
         return fp
 
+
+# Add properties from the schema to BaseSpectrum
+populate_properties(BaseSpectrum)
 
 class HiResSpectrum(BaseSpectrum):
     """

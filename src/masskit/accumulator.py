@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 import math
+from masskit.data_specs.schemas import populate_properties, accumulator_property_fields
+import pyarrow as pa
 
 class Accumulator(ABC):
     """
@@ -47,8 +49,8 @@ class AccumulatorProperty(Accumulator):
         super().__init__(*args, **kwargs)
         # keep count of the number samples
         self.count = 0
-        self.mean = 0.0
-        self.stddev = 0.0
+        self.predicted_mean = 0.0
+        self.predicted_stddev = 0.0
 
     def add(self, new_item):
         """
@@ -57,16 +59,18 @@ class AccumulatorProperty(Accumulator):
 
         :param new_spectrum: new item to be added
         """
-        delta = new_item - self.mean
+        delta = new_item - self.predicted_mean
         # increment the count, dealing with case where new spectrum is longer than the summation spectrum
         self.count += 1
-        self.mean += delta / self.count
-        delta2 = new_item - self.mean
-        self.stddev += delta * delta2
+        self.predicted_mean += delta / self.count
+        delta2 = new_item - self.predicted_mean
+        self.predicted_stddev += delta * delta2
 
     def finalize(self):
         """
         finalize the std deviation after all the the spectra have been added
         """
-        self.stddev = math.sqrt(self.stddev / self.count)
+        self.predicted_stddev = math.sqrt(self.predicted_stddev / self.count)
 
+
+populate_properties(AccumulatorProperty, fields=accumulator_property_fields)
