@@ -1,6 +1,6 @@
 package:
-  name:
-  version:
+  name: masskit
+  version: 1.0
 
 source:
   git_rev:
@@ -10,13 +10,33 @@ requirements:
   build:
     - python
     - setuptools
+    - cmake
+    - cython
+    - numba
+    - numpy
+    - pandas
+    - pyarrow=10.*
+    - pybind11
+    - pynndescent
+    - rdkit=2021.09.4
+    - rich
+    - sqlalchemy
+    - sqlparse
 
   run:
     - python
 
 test:
   imports:
-    -
+    - masskit
 
 about:
-  home:
+  home: https://github.com/usnistgov/masskit
+  license: NIST
+  license_file: LICENSE.md
+  summary: Efficient and flexible computing on mass spectra
+  description: |
+    Masskit is a Python package for easy-to-use, efficient and flexible
+    computing on mass spectra. Masskit does this by taking advantage of modern
+    software and hardware architectures.
+  doc_url: https://pages.nist.gov/masskit/
