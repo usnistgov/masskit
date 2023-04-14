@@ -109,6 +109,7 @@ BASE_PACKAGES="
   python=3 \
   rdkit=2021.09.4 \
   rich \
+  ruff \
   sqlalchemy \
   sqlparse"
 
