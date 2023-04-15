@@ -11,9 +11,27 @@ IF DEFINED ARG (
         SHIFT
         GOTO processargs
     )
+    IF "%ARG%"=="/force" (
+        SET REMOVE=1
+        SHIFT
+        GOTO processargs
+    )
+    IF "%ARG%"=="/m" (
+        SET ENVNAME=masskit_ai
+        SET USE_ML=1
+        SHIFT
+        GOTO processargs
+    )
     IF "%ARG%"=="/ml" (
         SET ENVNAME=masskit_ai
         SET USE_ML=1
+        SHIFT
+        GOTO processargs
+    )
+    IF "%ARG%"=="/c" (
+        SET ENVNAME=masskit_ai_cpu
+        SET USE_ML=1
+        SET CPUONLY=1
         SHIFT
         GOTO processargs
     )
@@ -24,13 +42,19 @@ IF DEFINED ARG (
         SHIFT
         GOTO processargs
     )
+    IF "%ARG%"=="/s" (
+        SHIFT
+        SET SUFFIX=%2
+        SHIFT
+        GOTO processargs
+    )
     IF "%ARG%"=="/suffix" (
         SHIFT
         SET SUFFIX=%2
         SHIFT
         GOTO processargs
     )
-    ECHO Unknown argument: %ARG%    
+    ECHO Unknown argument: %ARG%
     SHIFT
     GOTO processargs
 )
