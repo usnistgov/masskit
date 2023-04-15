@@ -4,7 +4,7 @@ import numpy as np
 from masskit.accumulator import Accumulator
 import masskit.utils.textalloc as ta
 from masskit.constants import EPSILON
-from masskit.data_specs.schemas import populate_properties, property_fields
+from masskit.data_specs.schemas import populate_properties, property_fields, spectrum_accumulator_fields
 from masskit.peptide.encoding import h2o_mass
 from masskit.spectrum.ipython import is_notebook
 import re
@@ -1299,6 +1299,7 @@ class BaseSpectrum:
         self.joins = []  # join data structures
         self.joined_spectra = []  # corresponding spectra to joins
         self.props = {}
+        self.prop_names = None
         self.precursor_class = Ions
         self.precursor_mass_info = precursor_mass_info
         self.product_class = Ions
@@ -1361,328 +1362,24 @@ class BaseSpectrum:
         :return: value
         """
         return self.props.get(name)
+    
+    def get_props(self):
+        """
+        returns back all properties for this object
 
-    """
-    @property
-    def id(self):
-        return self.props.get("id")
+        :return: list of properties
+        """
+        return [p for p in dir(self.__class__) if isinstance(getattr(self.__class__, p), property)]
 
-    @id.setter
-    def id(self, value):
-        self.props["id"] = value
-
-    @property
-    def name(self):
-        return self.props.get("name")
-
-    @name.setter
-    def name(self, value):
-        self.props["name"] = value
-
-    @property
-    def scan(self):
-        return self.props.get("scan")
-
-    @scan.setter
-    def scan(self, value):
-        self.props["scan"] = value
-
-    @property
-    def column(self):
-        return self.props.get("column")
-
-    @column.setter
-    def column(self, value):
-        self.props["column"] = value
-
-    @property
-    def experimental_ri(self):
-        return self.props.get("experimental_ri")
-
-    @experimental_ri.setter
-    def experimental_ri(self, value):
-        self.props["experimental_ri"] = value
-
-    @property
-    def experimental_ri_error(self):
-        return self.props.get("experimental_ri_error")
-
-    @experimental_ri_error.setter
-    def experimental_ri_error(self, value):
-        self.props["experimental_ri_error"] = value
-
-    @property
-    def experimental_ri_data(self):
-        return self.props.get("experimental_ri_data")
-
-    @experimental_ri_data.setter
-    def experimental_ri_data(self, value):
-        self.props["experimental_ri_data"] = value
-
-    @property
-    def stdnp(self):
-        return self.props.get("stdnp")
-
-    @stdnp.setter
-    def stdnp(self, value):
-        self.props["stdnp"] = value
-
-    @property
-    def stdnp_error(self):
-        return self.props.get("stdnp_error")
-
-    @stdnp_error.setter
-    def stdnp_error(self, value):
-        self.props["stdnp_error"] = value
-
-    @property
-    def stdnp_data(self):
-        return self.props.get("stdnp_data")
-
-    @stdnp_data.setter
-    def stdnp_data(self, value):
-        self.props["stdnp_data"] = value
-
-    @property
-    def stdpolar(self):
-        return self.props.get("stdpolar")
-
-    @stdpolar.setter
-    def stdpolar(self, value):
-        self.props["stdpolar"] = value
-
-    @property
-    def stdpolar_error(self):
-        return self.props.get("stdpolar_error")
-
-    @stdpolar_error.setter
-    def stdpolar_error(self, value):
-        self.props["stdpolar_error"] = value
-
-    @property
-    def stdpolar_data(self):
-        return self.props.get("stdpolar_data")
-
-    @stdpolar_data.setter
-    def stdpolar_data(self, value):
-        self.props["stdpolar_data"] = value
-
-    @property
-    def estimated_ri(self):
-        return self.props.get("estimated_ri")
-
-    @estimated_ri.setter
-    def estimated_ri(self, value):
-        self.props["estimated_ri"] = value
-
-    @property
-    def estimated_ri_error(self):
-        return self.props.get("estimated_ri_error")
-
-    @estimated_ri_error.setter
-    def estimated_ri_error(self, value):
-        self.props["estimated_ri_error"] = value
-
-    @property
-    def retention_time(self):
-        return self.props.get("retention_time")
-
-    @retention_time.setter
-    def retention_time(self, value):
-        self.props["retention_time"] = value
-
-    @property
-    def inchi_key(self):
-        return self.props.get("inchi_key")
-
-    @inchi_key.setter
-    def inchi_key(self, value):
-        self.props["inchi_key"] = value
-
-    @property
-    def formula(self):
-        return self.props.get("formula")
-
-    @formula.setter
-    def formula(self, value):
-        self.props["formula"] = value
-
-    @property
-    def synonyms(self):
-        return self.props.get("synonyms")
-
-    @synonyms.setter
-    def synonyms(self, value):
-        self.props["synonyms"] = value
-
-    @property
-    def exact_mass(self):
-        return self.props.get("exact_mass")
-
-    @exact_mass.setter
-    def exact_mass(self, value):
-        self.props["exact_mass"] = value
-
-    @property
-    def ion_mode(self):
-        return self.props.get("ion_mode")
-
-    @ion_mode.setter
-    def ion_mode(self, value):
-        self.props["ion_mode"] = value
-
-    @property
-    def charge(self):
-        return self.props.get("charge")
-
-    @charge.setter
-    def charge(self, value):
-        self.props["charge"] = value
-
-    @property
-    def peptide(self):
-        return self.props.get("peptide")
-
-    @peptide.setter
-    def peptide(self, value):
-        self.props["peptide"] = value
+    def copy_props_from_dict(self, dict_in):
+        """
+        given a dictionary, e.g. a row, copy allowed properties in the spectrum props
         
-    @property
-    def peptide_len(self):
-        return self.props.get("peptide_len")
-
-    @peptide_len.setter
-    def peptide_len(self, value):
-        self.props["peptide_len"] = value
-
-    @property
-    def protein_id(self):
-        return self.props.get("protein_id")
-
-    @protein_id.setter
-    def protein_id(self, value):
-        self.props["protein_id"] = value
-
-    @property
-    def mod_names(self):
-        return self.props.get("mod_names")
-
-    @mod_names.setter
-    def mod_names(self, value):
-        self.props["mod_names"] = value
-
-    @property
-    def mod_positions(self):
-        return self.props.get("mod_positions")
-
-    @mod_positions.setter
-    def mod_positions(self, value):
-        self.props["mod_positions"] = value
-
-    @property
-    def instrument(self):
-        return self.props.get("instrument")
-
-    @instrument.setter
-    def instrument(self, value):
-        self.props["instrument"] = value
-
-    @property
-    def instrument_type(self):
-        return self.props.get("instrument_type")
-
-    @instrument_type.setter
-    def instrument_type(self, value):
-        self.props["instrument_type"] = value
-
-    @property
-    def instrument_model(self):
-        return self.props.get("instrument_model")
-
-    @instrument_model.setter
-    def instrument_model(self, value):
-        self.props["instrument_model"] = value
-
-    @property
-    def ionization(self):
-        return self.props.get("ionization")
-
-    @ionization.setter
-    def ionization(self, value):
-        self.props["ionization"] = value
-
-    @property
-    def collision_energy(self):
-        return self.props.get("collision_energy")
-
-    @collision_energy.setter
-    def collision_energy(self, value):
-        self.props["collision_energy"] = value
-
-    @property
-    def nce(self):
-        return self.props.get("nce")
-
-    @nce.setter
-    def nce(self, value):
-        self.props["nce"] = value
-
-    @property
-    def ev(self):
-        return self.props.get("ev")
-
-    @ev.setter
-    def ev(self, value):
-        self.props["ev"] = value
-
-    @property
-    def insource_voltage(self):
-        return self.props.get("insource_voltage")
-
-    @insource_voltage.setter
-    def insource_voltage(self, value):
-        self.props["insource_voltage"] = value
-
-    @property
-    def collision_gas(self):
-        return self.props.get("collision_gas")
-
-    @collision_gas.setter
-    def collision_gas(self, value):
-        self.props["collision_gas"] = value
-
-    @property
-    def sample_inlet(self):
-        return self.props.get("sample_inlet")
-
-    @sample_inlet.setter
-    def sample_inlet(self, value):
-        self.props["sample_inlet"] = value
-
-    @property
-    def spectrum_type(self):
-        return self.props.get("spectrum_type")
-
-    @spectrum_type.setter
-    def spectrum_type(self, value):
-        self.props["spectrum_type"] = value
-
-    @property
-    def precursor_type(self):
-        return self.props.get("precursor_type")
-
-    @precursor_type.setter
-    def precursor_type(self, value):
-        self.props["precursor_type"] = value
-
-    @property
-    def vial_id(self):
-        return self.props.get("vial_id")
-
-    @vial_id.setter
-    def vial_id(self, value):
-        self.props["vial_id"] = value
-    """
+        :param dict_in: the input dictionary.  Allowed properties are in self.prop_names
+        """
+        for prop in dict_in:
+            if prop in self.get_props():
+                self.props[prop] = copy.deepcopy(dict_in[prop])        
 
     def add_join(self, join, joined_spectrum):
         """
@@ -2782,13 +2479,15 @@ class AccumulatorSpectrum(HiResSpectrum, Accumulator):
     used to contain a spectrum that accumulates the sum of many spectra
     includes calculation of standard deviation
     """
+    prop_names = None
 
-    def __init__(self, mz=None, tolerance=None, count_spectra=False, take_max=True, *args, **kwargs):
+    def __init__(self, mz=None, tolerance=None, precursor_mz=None, count_spectra=False, take_max=True, *args, **kwargs):
         """
         initialize predicted spectrum
 
         :param mz: array of mz values
         :param tolerance: mass tolerance in daltons
+        :param precursor_mz: m/z of precursor
         :param count_spectra: count peaks instead of summing intensity
         :param take_max: when converting new_spectrum to evenly spaced bins, take max value per bin, otherwise sum
         :param args:
@@ -2798,7 +2497,9 @@ class AccumulatorSpectrum(HiResSpectrum, Accumulator):
         # keep count of the number of spectra being averaged into each bin
         self.count = np.zeros_like(mz)
         self.from_arrays(mz, np.zeros_like(mz), stddev=np.zeros_like(mz),
-                         product_mass_info=MassInfo(tolerance, "daltons", "monoisotopic", evenly_spaced=True), )
+                         product_mass_info=MassInfo(tolerance, "daltons", "monoisotopic", evenly_spaced=True), 
+                         precursor_mz=precursor_mz, precursor_intensity=1.0,
+                         precursor_mass_info=MassInfo(0.0, "ppm", "monoisotopic"))
         self.count_spectra = count_spectra
         self.take_max = take_max
 
@@ -2851,3 +2552,6 @@ class AccumulatorSpectrum(HiResSpectrum, Accumulator):
         del self.count_spectra
         del self.take_max
         self.__class__ = HiResSpectrum
+
+
+populate_properties(AccumulatorSpectrum, fields=spectrum_accumulator_fields)

@@ -10,7 +10,7 @@ The amino acids used to generate the theoretical peptides
 """
 generator_alphabet = 'ARNDCQEGHILKMFPSTWYV'
 
-def create_peptide_name(peptide, precursor_charge, mod_names, mod_positions, ev):
+def create_peptide_name(peptide, precursor_charge, mod_names=None, mod_positions=None, ev=None):
     """_
     create the name of a peptide spectrum
 
@@ -21,11 +21,13 @@ def create_peptide_name(peptide, precursor_charge, mod_names, mod_positions, ev)
     :param ev: collision energy in ev
     """
     output = peptide + '/' + str(precursor_charge)
-    for mod in range(len(mod_names)):
-        if mod == 0:
-            output += f'_{len(mod_names)}'
-        output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{mod_masses.id2row[mod_names[mod]]})'
-    output += f'_{ev}'
+    if mod_names is not None and mod_positions is not None:
+        for mod in range(len(mod_names)):
+            if mod == 0:
+                output += f'_{len(mod_names)}'
+            output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{mod_masses.id2row[mod_names[mod]]})'
+    if ev is not None:
+        output += f'_{ev}'
     return output
     
 def generate_mods(peptide, mod_list, n_peptide=False, c_peptide=False, mod_probability=None):

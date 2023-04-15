@@ -306,6 +306,10 @@ accumulator_fields = [
 # all property fields plus accumulator fields.
 accumulator_property_fields = compose_fields(property_fields, accumulator_fields)
 
+spectrum_accumulator_fields = [
+    pa.field('cosine_score', pa.float64()),
+]
+
 # schema for standard spectral file formats which do not include a molecular connectivity graph
 peptide_schema = pa.schema(compose_fields(base_fields, peptide_property_fields))
 
@@ -462,7 +466,6 @@ def populate_properties(class_in, fields=property_fields):
     :param class_in: the class/object to be modified
     :param fields: a list of pyarrow fields whose names will be used to create properties
     """
-    print(fields)
     for field in fields:
         setattr(class_in, field.name, property(create_getter(field.name),create_setter(field.name)))
 
