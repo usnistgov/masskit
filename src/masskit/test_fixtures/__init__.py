@@ -20,7 +20,8 @@ def data_dir():
     the directory containing the test data files
     """
     test_dir, _ = os.path.splitext(__file__)
-    return Path(__file__).parents[1] / Path("../../tests/data")
+    #return Path(__file__).parents[1] / Path("../../tests/data")
+    return Path("data")
 
 @pytest.fixture(scope="session")
 def human_uniprot_trunc_parquet(tmpdir_factory):
