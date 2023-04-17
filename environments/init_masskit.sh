@@ -117,7 +117,7 @@ ML_CHANNELS=
 ML_PACKAGES=
 if [ $USE_ML -eq 1 ]; then
   ML_CHANNELS="-c pytorch -c nvidia"
-  CUDATOOLKIT=cudatoolkit\=11.3
+  CUDATOOLKIT="cudatoolkit=11.*"
   if [ $CPUONLY -eq 1 ]; then
     CUDATOOLKIT=cpuonly
   fi

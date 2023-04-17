@@ -104,7 +104,7 @@ SET ML_PACKAGES=
 
 IF DEFINED USE_ML (
   SET ML_CHANNELS=-c pytorch -c nvidia
-  SET CUDATOOLKIT=cudatoolkit=11.3
+  SET CUDATOOLKIT=cudatoolkit=11.*
   IF DEFINED CPUONLY (
     SET CUDATOOLKIT=cpuonly
   )
