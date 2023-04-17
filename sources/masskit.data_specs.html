@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>masskit.data_specs package &#8212; masskit 1.0.0-21-g5a9f5cb documentation</title>
+    <title>masskit.data_specs package &#8212; masskit 1.0.0-39-g40057f8 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -56,7 +56,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-21-g5a9f5cb documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-39-g40057f8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.data_specs package</a></li> 
       </ul>
     </div>  
@@ -106,6 +106,20 @@ $(document).ready(function(){
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="masskit.data_specs.schemas.create_getter">
+<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">create_getter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.create_getter" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a generic property getter on the props dictionary of an object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – name of the property</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>getter function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="masskit.data_specs.schemas.create_scalar">
 <span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">create_scalar</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">value</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.create_scalar" title="Permalink to this definition">¶</a></dt>
 <dd><p>create a scalar from a python or numpy value</p>
@@ -119,6 +133,20 @@ $(document).ready(function(){
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>arrow scalar</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.data_specs.schemas.create_setter">
+<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">create_setter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.create_setter" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a generic property setter on the props dictionary of an object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – name of the property</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>setter function</p>
 </dd>
 </dl>
 </dd></dl>
@@ -172,6 +200,20 @@ $(document).ready(function(){
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="masskit.data_specs.schemas.populate_properties">
+<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">populate_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.populate_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a class (or any object), create a set of properties from a list of fields</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>class_in</strong> – the class/object to be modified</p></li>
+<li><p><strong>fields</strong> – a list of pyarrow fields whose names will be used to create properties</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="masskit.data_specs.schemas.set_field_int_metadata">
 <span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">set_field_int_metadata</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">schema</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.set_field_int_metadata" title="Permalink to this definition">¶</a></dt>
 <dd><p>returns arrow schema with metadata with name set to int value
@@ -192,38 +234,8 @@ in the metadata of field</p>
 </dd></dl>
 
 </section>
-<section id="module-masskit.data_specs.spectral_library">
-<span id="masskit-data-specs-spectral-library-module"></span><h2>masskit.data_specs.spectral_library module<a class="headerlink" href="#module-masskit.data_specs.spectral_library" title="Permalink to this heading">¶</a></h2>
-<dl class="py class">
-<dt class="sig sig-object py" id="masskit.data_specs.spectral_library.LibraryAccessor">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.spectral_library.</span></span><span class="sig-name descname"><span class="pre">LibraryAccessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pandas_obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.spectral_library.LibraryAccessor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>the base pandas accessor class.  To use the accessor, import LibraryAccessor into your code.</p>
-<p>Notes:
-= to add info to the dataframe itself, use  _obj.tandem_peptide_library.__dict__[‘info’] = info
-- in the future, by caching the record id, the serialization functions can be modified to read in chunks</p>
-<dl class="py method">
-<dt class="sig sig-object py" id="masskit.data_specs.spectral_library.LibraryAccessor.copy">
-<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.spectral_library.LibraryAccessor.copy" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="masskit.data_specs.spectral_library.LibraryAccessor.display">
-<span class="sig-name descname"><span class="pre">display</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.spectral_library.LibraryAccessor.display" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="masskit.data_specs.spectral_library.LibraryAccessor.to_mgf">
-<span class="sig-name descname"><span class="pre">to_mgf</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.spectral_library.LibraryAccessor.to_mgf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="masskit.data_specs.spectral_library.LibraryAccessor.to_msp">
-<span class="sig-name descname"><span class="pre">to_msp</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.spectral_library.LibraryAccessor.to_msp" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-</dd></dl>
-
+<section id="masskit-data-specs-spectral-library-module">
+<h2>masskit.data_specs.spectral_library module<a class="headerlink" href="#masskit-data-specs-spectral-library-module" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-masskit.data_specs">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.data_specs" title="Permalink to this heading">¶</a></h2>
@@ -243,7 +255,7 @@ in the metadata of field</p>
 <li><a class="reference internal" href="#">masskit.data_specs package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-masskit.data_specs.schemas">masskit.data_specs.schemas module</a></li>
-<li><a class="reference internal" href="#module-masskit.data_specs.spectral_library">masskit.data_specs.spectral_library module</a></li>
+<li><a class="reference internal" href="#masskit-data-specs-spectral-library-module">masskit.data_specs.spectral_library module</a></li>
 <li><a class="reference internal" href="#module-masskit.data_specs">Module contents</a></li>
 </ul>
 </li>
@@ -280,7 +292,7 @@ in the metadata of field</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-21-g5a9f5cb documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-39-g40057f8 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.data_specs package</a></li> 
       </ul>
     </div>

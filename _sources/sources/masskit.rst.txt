@@ -12,6 +12,7 @@ Subpackages
    masskit.peptide
    masskit.small_molecule
    masskit.spectrum
+   masskit.test_fixtures
    masskit.utils
 
 Submodules

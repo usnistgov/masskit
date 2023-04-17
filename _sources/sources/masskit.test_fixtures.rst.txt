@@ -1,0 +1,10 @@
+masskit.test\_fixtures package
+==============================
+
+Module contents
+---------------
+
+.. automodule:: masskit.test_fixtures
+   :members:
+   :undoc-members:
+   :show-inheritance:
