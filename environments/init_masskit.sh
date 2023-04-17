@@ -89,7 +89,7 @@ fi
 # gxx is not available on windows
 
 BASE_PACKAGES="
-  arrow-cpp=10.* \
+  arrow-cpp=11.* \
   conda-build \
   cmake \
   cython \
@@ -102,7 +102,7 @@ BASE_PACKAGES="
   numba \
   numpy \
   pandas \
-  pyarrow=10.* \
+  pyarrow=11.* \
   pybind11 \
   pynndescent \
   pytest \
