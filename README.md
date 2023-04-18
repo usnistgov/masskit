@@ -46,4 +46,4 @@ following from the Anconda prompt:
 - if you are going to use [Masskit_ai](https://github.com/usnistgov/masskit_ai.git), run `call init_masskit.bat /ml`, otherwise run
 `call init_masskit.bat`
   - if you are going to use [Masskit_ai](https://github.com/usnistgov/masskit_ai.git) in cpu-only mode, run `call init_masskit.bat /cpu` instead.
-  - run `pip install masskit-1.0.1-cp39-cp39-win_amd64.whl`
+- run `pip install masskit-1.0.1-cp39-cp39-win_amd64.whl`
