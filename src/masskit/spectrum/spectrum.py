@@ -1572,19 +1572,19 @@ class BaseSpectrum:
         #todo: check to see if annotation should be turned on
 
         ret_value = ""
-        if hasattr(self, "name") and self.name:
+        if hasattr(self, "name") and self.name is not None:
             ret_value += f"Name: {self.name}\n"
         else:
             ret_value += f"Name: {self.id}\n"
-        if hasattr(self, "precursor") and self.precursor is not None and hasattr(self.precursor, "mz"):
+        if hasattr(self, "precursor") and self.precursor is not None and hasattr(self.precursor, "mz") and self.precursor.mz is not None:
             ret_value += f"PRECURSORMZ: {self.precursor.mz}\n"
-        if hasattr(self, "formula") and self.formula:
+        if hasattr(self, "formula") and self.formula is not None:
             ret_value += f"Formula: {self.formula}\n"
-        if hasattr(self, "ev") and self.ev:
+        if hasattr(self, "ev") and self.ev is not None:
             ret_value += f"eV: {self.ev}\n"
-        if hasattr(self, "nce") and self.nce:
+        if hasattr(self, "nce") and self.nce is not None:
             ret_value += f"NCE: {self.nce}\n"
-        if hasattr(self, "protein_id") and self.protein_id:
+        if hasattr(self, "protein_id") and self.protein_id is not None:
             ret_value += f"ProteinId: {','.join(self.protein_id)}\n"
         ret_value += f"DB#: {self.id}\n"
         # spectrum = self.copy(min_mz=1.0, min_intensity=min_intensity)
