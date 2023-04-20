@@ -1273,21 +1273,6 @@ def dedup_matches(products1, products2, index1, index2, tiebreaker='mz', skip_no
     
     return join_1_2, join_2_1 
 
-
-class SpectralSearchConfig:
-    """
-    configuration for spectral similarity search
-    """
-
-    cosine_threshold = 200  # the minimum cosine score to place in results
-    minimum_match = 2  # the minimum number of matched ions for matching two spectra
-    minimum_mz = 50  # when filtering, accept no mz value below this setting
-    minimum_intensity = 10  # when filtering, the minimum intensity value allowed
-    identity_name = False  # for identity matching, require the name to match in addition to the inchi_key
-    identity_energy = False  # for identity matching, require the collision_energy to match in addition to the inchi_key
-    fp_tanimoto_threshold = 0.0  # use the spectra fingerprint and this tanimoto cutoff to speed up searching. 0=none
-
-
 class BaseSpectrum:
     """
     Base class for spectrum with called ions.
