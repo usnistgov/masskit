@@ -2,14 +2,14 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/chinese_hamster_hcd_selected.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/human_hcd_labelfree_phospho_selected_passed.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/human_hcd_tryp_best.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/human_hcd_tryp_good.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/human_synthetic_hcd_selected.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/human_hcd_semitryp.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/cptac2_mouse_hcd_selected.msp
-      - ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/raw/cptac3_tmt_selected_passed_best.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/chinese_hamster_hcd_selected.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/human_hcd_labelfree_phospho_selected_passed.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/human_hcd_tryp_best.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/human_hcd_tryp_good.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/human_synthetic_hcd_selected.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/human_hcd_semitryp.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/cptac2_mouse_hcd_selected.msp
+      - ~/data/nist/aiomics/take_two/consensus/raw/cptac3_tmt_selected_passed_best.msp
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -41,7 +41,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/aiomics/take_two/consensus/2022-10-06_consensus.parquet
+    name: ~/data/nist/aiomics/take_two/consensus/2022-10-06_consensus.parquet
     # parquet, msp, mzxml
     types:
 

@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import hydra
 from omegaconf import DictConfig
 from masskit.data_specs.spectral_library import *
@@ -25,7 +26,7 @@ def converter_app(config: DictConfig) -> None:
     else:
         comment_fields = None
 
-    output_file_root, output_file_extension = parse_filename(config.output.file.name)
+    output_file_root, output_file_extension = parse_filename(Path(config.output.file.name).expanduser())
     if config.output.file.types:
         output_file_extension = config.output.file.types if type(config.output.file.types) is list else\
             [config.output.file.types]
@@ -42,6 +43,7 @@ def converter_app(config: DictConfig) -> None:
     id_field = config.conversion.id.field
 
     for input_file in input_files:
+        input_file = str(Path(input_file).expanduser())
         # use the file extension to determine file type unless specified in the arguments
         input_file_root, input_file_extension = parse_filename(input_file)
         if config.input.file.type:
@@ -97,13 +99,13 @@ def converter_app(config: DictConfig) -> None:
     # output the files
     for output_extension in output_file_extension:
         if output_extension == "mzxml":
-            library_map.to_mzxml(output_file_root + ".mzxml")
+            library_map.to_mzxml(output_file_root.with_suffix(".mzxml"))
         elif output_extension == "parquet":
-            library_map.to_parquet(output_file_root + ".parquet")
+            library_map.to_parquet(output_file_root.with_suffix(".parquet"))
         elif output_extension == "msp":
-            library_map.to_msp(output_file_root + ".msp")
+            library_map.to_msp(output_file_root.with_suffix(".msp"))
         elif output_extension == "mgf":
-            library_map.to_mgf(output_file_root + ".mgf")
+            library_map.to_mgf(output_file_root.with_suffix(".mgf"))
 
 
 if __name__ == "__main__":

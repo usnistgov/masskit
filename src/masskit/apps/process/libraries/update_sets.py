@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 import hydra
 from omegaconf import DictConfig
 import pyarrow as pa
@@ -18,15 +19,17 @@ python update_sets.py
 def update_sets_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)
+    input_source = Path(config.input_source.file.name).expanduser()
+    input_update = Path(config.input_update.file.name).expanduser()
 
-    print(f"File with new set info: {config.input_source.file.name}")
-    print(f"File to be updated: {config.input_update.file.name}")
+    print(f"File with new set info: {input_source}")
+    print(f"File to be updated: {input_update}")
     
-    source_table = pq.read_table(config.input_source.file.name, columns=['inchi_key', 'set'])
+    source_table = pq.read_table(input_source, columns=['inchi_key', 'set'])
     source_table = source_table.append_column("connectivity",
                                               pc.utf8_slice_codeunits(source_table['inchi_key'],0,14))
 
-    update_table = pq.read_table(config.input_update.file.name, columns=['inchi_key', 'set'])
+    update_table = pq.read_table(input_update, columns=['inchi_key', 'set'])
     update_table = update_table.append_column("connectivity",
                                               pc.utf8_slice_codeunits(update_table['inchi_key'],0,14))
 
@@ -47,12 +50,13 @@ def update_sets_app(config: DictConfig) -> None:
     print(f"Updated rows: {update_table.num_rows}")
 
     print("Reading full dataset")
-    update_table = pq.read_table(config.input_update.file.name)
+    update_table = pq.read_table(input_update)
     idx = update_table.column_names.index('set')
     print(f"Replacing column: {idx}")
     update_table = update_table.set_column(idx, 'set', set_array)
-    print(f"Writing new dataset to {config.output.file.name}")
-    pq.write_table(update_table, config.output.file.name, row_group_size=5000)
+    output_file = Path(config.output.file.name).expanduser()
+    print(f"Writing new dataset to {output_file}")
+    pq.write_table(update_table, output_file, row_group_size=5000)
     
 if __name__ == "__main__":
     update_sets_app()
