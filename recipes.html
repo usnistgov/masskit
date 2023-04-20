@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Recipes &#8212; masskit 1.0.0-39-g40057f8 documentation</title>
+    <title>Recipes &#8212; masskit 1.0.0-44-gffab90d documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -60,7 +60,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="demo_peptide.html" title="Tables of spectra"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-39-g40057f8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
       </ul>
     </div>  
@@ -90,8 +90,8 @@ the command line.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">protein.cleavage.digest=tryptic</span></code> where the digest can be tryptic, semitryptic, or nonspecific</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">protein.cleavage.max_missed=1</span></code> which is the number of missed cleavages allowed</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">peptide.charge.min=2</span></code> and <code class="docutils literal notranslate"><span class="pre">peptide.charge.max=4</span></code> sets the range of charges generated</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">peptide.mods.fixed=Carbamidomethyl</span></code> is a list of fixed modifications, using a <span class="xref myst">string format</span></p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">peptide.mods.variable=Phospho{S/T}#Oxidation#Acetyl{^}</span></code> is a list of variable modifications, using a <span class="xref myst">string format</span></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.mods.fixed=Carbamidomethyl</span></code> is a list of fixed modifications, using a <span class="xref myst">string format</span>.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">peptide.mods.variable=Phospho{S/T}#Oxidation#Acetyl{^}</span></code> is a list of variable modifications, using a <span class="xref myst">string format</span>.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">peptide.length.min=7</span></code> and <code class="docutils literal notranslate"><span class="pre">peptide.length.max=30</span></code> are the minimum and maximum sizes of
 the peptide generated.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">peptide.nce=[30]</span></code> is a list of NCE values to generate per peptide</p></li>
@@ -125,6 +125,8 @@ regardless of amino acid</p>
 <p>An optional list of sites is specified within the <code class="docutils literal notranslate"><span class="pre">{}</span></code> for each modification.
 If there are no <code class="docutils literal notranslate"><span class="pre">{}</span></code> then a default set of sites is used.<br />
 Multiple sites are separated by a <code class="docutils literal notranslate"><span class="pre">/</span></code>.</p>
+<p>Note that this string may have be escaped when
+using a command line like bash, e.g. <code class="docutils literal notranslate"><span class="pre">peptide.mods.fixed='&quot;TMT6plex#Carbamidomethyl&quot;'</span></code></p>
 </section>
 </section>
 
@@ -187,7 +189,7 @@ Multiple sites are separated by a <code class="docutils literal notranslate"><sp
         <li class="right" >
           <a href="demo_peptide.html" title="Tables of spectra"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-39-g40057f8 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
       </ul>
     </div>
