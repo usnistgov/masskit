@@ -513,9 +513,8 @@ class Ions(ABC):
             return return_ions
 
         mask = np.full(self.mz.shape, True)
-        for i in range(1, len(self.rank) + 1):
-            # get position of matching rank
-            pos = np.where(self.rank == i)
+        rank_indices = np.argsort(self.rank)
+        for pos in rank_indices:
             # if already masked, ignore
             if not mask[pos]:
                 continue
