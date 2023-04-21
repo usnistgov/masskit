@@ -11,6 +11,20 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
+[tool.ruff]
+extend-select = [
+  "B",    # flake8-bugbear
+  "B904",
+  "I",    # isort
+  "PGH",  # pygrep-hooks
+  "RUF",  # Ruff-specific
+  "UP",   # pyupgrade
+]
+extend-ignore = [
+  "E501",   # Line too long
+]
+target-version = "py39"
+
 # [tool.autopep8]
 # max_line_length = 120
 # ignore = "E501,W6"  # or ["E501", "W6"]
