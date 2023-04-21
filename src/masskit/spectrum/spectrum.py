@@ -521,10 +521,12 @@ class Ions(ABC):
                 continue
             # create mask of ions around ps
             windowed_ions = (self.mz < self.mz[pos] + mz_window) & (self.mz > self.mz[pos] - mz_window)
-            # sort the rank of the windowed ions
-            sorted_ranks = np.sort(self.rank[windowed_ions])
+            # get the ranks of the windowed ions
+            windowed_ranks = self.rank[windowed_ions]
             # if there are more ions than allowed in the window
-            if len(sorted_ranks) > num_ions:
+            if len(windowed_ranks) > num_ions:
+                # sort the rank of the windowed ions
+                sorted_ranks = np.sort(windowed_ranks)
                 # find the rank value of the first peak to be deleted
                 partition_rank = sorted_ranks[num_ions]
                 # create mask of all peaks to be deleted
