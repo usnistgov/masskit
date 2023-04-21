@@ -2365,6 +2365,12 @@ class BaseSpectrum:
         fp = SpectrumTanimotoFingerPrint(dimension=max_mz)
         fp.object2fingerprint(self)
         return fp
+    
+    def finalize(self):
+        """
+        function used to clean up spectrum after creation
+        """
+        pass
 
 
 # Add properties from the schema to BaseSpectrum
