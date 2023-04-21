@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/aiomics/rebuttal/validation_sequential.parquet
+      - ~/data/nist/aiomics/rebuttal/validation_sequential.parquet
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/aiomics/rebuttal/validation_sequential.mgf
+    name: ~/data/nist/aiomics/rebuttal/validation_sequential.mgf
     # parquet, msp, mzxml
     types:
 

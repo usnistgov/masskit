@@ -1,3 +1,4 @@
+from pathlib import Path
 import jsonpickle
 import logging
 import hydra
@@ -93,10 +94,8 @@ def path_generator_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)
 
-    library_map = ArrowLibraryMap.from_parquet(
-                 config.input.file.name,
-                num=config.input.num,
-            )
+    input_file = Path(config.input.file.name).expanduser()
+    library_map = ArrowLibraryMap.from_parquet(input_file, num=config.input.num)
 
     shortest_paths = []
 
@@ -113,7 +112,8 @@ def path_generator_app(config: DictConfig) -> None:
         pass
     table = table.add_column(table.num_columns,"shortest_paths", pa.array(shortest_paths))
     # output the files
-    pq.write_table(table, config.output.file.name)
+    output_file = Path(config.output.file.name).expanduser()
+    pq.write_table(table, output_file)
 
 if __name__ == "__main__":
     path_generator_app()

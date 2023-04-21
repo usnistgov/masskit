@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/tandem/2020/hr_msms_nist.SDF
+      - ~/data/nist/tandem/2020/hr_msms_nist.SDF
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/tandem/2020/hr_msms_nist.parquet
+    name: ~/data/nist/tandem/2020/hr_msms_nist.parquet
     # parquet, msp, mzxml
     types:
 

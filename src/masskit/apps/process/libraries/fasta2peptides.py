@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import logging
+from pathlib import Path
 import hydra
 from omegaconf import DictConfig, OmegaConf
 from itertools import groupby, combinations
@@ -159,7 +160,7 @@ def extract_peptides(cfg):
         'cterm': set(),
         'both': set()
     }
-    fasta_file = fasta(cfg.input.file)
+    fasta_file = fasta(Path(cfg.input.file).expanduser())
 
     if cfg.protein.cleavage.digest == "tryptic":
         cleavage = tryptic
@@ -345,9 +346,9 @@ def main(cfg: DictConfig) -> None:
     #print(table.to_pandas())
     #data = schema.empty_table().to_pydict()
     if cfg.output.file:
-        outfile = cfg.output.file
+        outfile = Path(cfg.output.file).expanduser()
     else:
-        outfile = cfg.input.file + ".parquet"
+        outfile = Path(cfg.input.file).expanduser().with_suffix(".parquet")
     pq.write_table(table,outfile,row_group_size=50000)
 
 

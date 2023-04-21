@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/ei/2020/replib_2020.sdf
+      - ~/data/nist/ei/2020/replib_2020.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/ei/2020/replib_2020.parquet
+    name: ~/data/nist/ei/2020/replib_2020.parquet
     # parquet, msp, mzxml
     types:
 

@@ -19,7 +19,7 @@ def create_object_id(filename, filters):
         object_name += str(filters)
     return hashlib.sha1(object_name.encode('utf-8'))
 
-def save_to_arrow(filename, columns, filters):
+def save_to_arrow(filename, columns=None, filters=None, tempdir=None):
     """
     Load a parquet file and save it as a temp arrow file after applying
     filters and column lists.  Load it as a memmap if the temp arrow file
@@ -28,10 +28,14 @@ def save_to_arrow(filename, columns, filters):
     :param filename: parquet file
     :param columns: columns to load
     :param filters: parquet file filters
+    :param tempdir: tempdir to use for memmap, otherwise use python default
     :return: ArrowLibraryMap
     """
     obj_id = create_object_id(filename, filters).hexdigest() + '.arrow'
-    temp_file_path = Path(tempfile.gettempdir()) / obj_id
+    if tempdir is None:
+        temp_file_path = Path(tempfile.gettempdir()) / obj_id
+    else:
+        temp_file_path = Path(tempdir) / obj_id
     data = None
 
     # need to use a file lock here as the file might be partially written

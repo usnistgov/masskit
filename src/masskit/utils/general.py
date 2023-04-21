@@ -89,11 +89,8 @@ def parse_filename(filename: str):
     :param filename: filename
     :return: root, extension
     """
-    file_extension = os.path.splitext(filename)[1][1:].lower()
-    file_root = os.path.splitext(filename)[0]
-    if file_extension in ["pickle", "pck", "pcl", "pkl"]:
-        file_extension = "pkl"
-    return file_root, file_extension
+    path = Path(filename).expanduser()
+    return path.with_suffix(""), path.suffix[1:]
 
 
 def search_for_file(filename, directories):

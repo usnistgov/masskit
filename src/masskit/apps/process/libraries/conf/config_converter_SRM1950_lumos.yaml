@@ -2,16 +2,16 @@ input:
   file:
     # list of input file names
     names:
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD10_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD20_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD25_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD30_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD50_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD10_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD20_mp210_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD25_mp211_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD30_mp211_structures.SDF
-      - ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD50_mp211_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD10_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD20_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD25_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD30_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_negHCD50_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD10_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD20_mp210_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD25_mp211_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD30_mp211_structures.SDF
+      - ~/data/nist/tandem/SRM1950/SRM1950_lumos_posHCD50_mp211_structures.SDF
     # input file type
     type:
     # what is the source of the file? nist or pubchem
@@ -43,7 +43,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ${oc.env:HOME}/data/nist/tandem/SRM1950/SRM1950_lumos.parquet
+    name: ~/data/nist/tandem/SRM1950/SRM1950_lumos.parquet
     # parquet, msp, mzxml
     types:
 

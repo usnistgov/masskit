@@ -17,8 +17,8 @@ the command line.
   * `protein.cleavage.digest=tryptic` where the digest can be tryptic, semitryptic, or nonspecific
   * `protein.cleavage.max_missed=1` which is the number of missed cleavages allowed
   * `peptide.charge.min=2` and `peptide.charge.max=4` sets the range of charges generated
-  * `peptide.mods.fixed=Carbamidomethyl` is a list of fixed modifications, using a [string format](#modification-specification)
-  * `peptide.mods.variable=Phospho{S/T}#Oxidation#Acetyl{^}` is a list of variable modifications, using a [string format](#modification-specification)
+  * `peptide.mods.fixed=Carbamidomethyl` is a list of fixed modifications, using a [string format](#modification-specification).
+  * `peptide.mods.variable=Phospho{S/T}#Oxidation#Acetyl{^}` is a list of variable modifications, using a [string format](#modification-specification).
   * `peptide.length.min=7` and `peptide.length.max=30` are the minimum and maximum sizes of
   the peptide generated.
   * `peptide.nce=[30]` is a list of NCE values to generate per peptide
@@ -52,3 +52,6 @@ A list of modifications is separated by hashes:
 An optional list of sites is specified within the `{}` for each modification.
 If there are no `{}` then a default set of sites is used.  
 Multiple sites are separated by a `/`.
+
+Note that this string may have be escaped when
+using a command line like bash, e.g. `peptide.mods.fixed='"TMT6plex#Carbamidomethyl"'`

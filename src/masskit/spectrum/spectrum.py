@@ -513,18 +513,19 @@ class Ions(ABC):
             return return_ions
 
         mask = np.full(self.mz.shape, True)
-        for i in range(1, len(self.rank) + 1):
-            # get position of matching rank
-            pos = np.where(self.rank == i)
+        rank_indices = np.argsort(self.rank)
+        for pos in rank_indices:
             # if already masked, ignore
             if not mask[pos]:
                 continue
             # create mask of ions around ps
             windowed_ions = (self.mz < self.mz[pos] + mz_window) & (self.mz > self.mz[pos] - mz_window)
-            # sort the rank of the windowed ions
-            sorted_ranks = np.sort(self.rank[windowed_ions])
+            # get the ranks of the windowed ions
+            windowed_ranks = self.rank[windowed_ions]
             # if there are more ions than allowed in the window
-            if len(sorted_ranks) > num_ions:
+            if len(windowed_ranks) > num_ions:
+                # sort the rank of the windowed ions
+                sorted_ranks = np.sort(windowed_ranks)
                 # find the rank value of the first peak to be deleted
                 partition_rank = sorted_ranks[num_ions]
                 # create mask of all peaks to be deleted
@@ -1273,21 +1274,6 @@ def dedup_matches(products1, products2, index1, index2, tiebreaker='mz', skip_no
     
     return join_1_2, join_2_1 
 
-
-class SpectralSearchConfig:
-    """
-    configuration for spectral similarity search
-    """
-
-    cosine_threshold = 200  # the minimum cosine score to place in results
-    minimum_match = 2  # the minimum number of matched ions for matching two spectra
-    minimum_mz = 50  # when filtering, accept no mz value below this setting
-    minimum_intensity = 10  # when filtering, the minimum intensity value allowed
-    identity_name = False  # for identity matching, require the name to match in addition to the inchi_key
-    identity_energy = False  # for identity matching, require the collision_energy to match in addition to the inchi_key
-    fp_tanimoto_threshold = 0.0  # use the spectra fingerprint and this tanimoto cutoff to speed up searching. 0=none
-
-
 class BaseSpectrum:
     """
     Base class for spectrum with called ions.
@@ -1587,19 +1573,19 @@ class BaseSpectrum:
         #todo: check to see if annotation should be turned on
 
         ret_value = ""
-        if hasattr(self, "name") and self.name:
+        if hasattr(self, "name") and self.name is not None:
             ret_value += f"Name: {self.name}\n"
         else:
             ret_value += f"Name: {self.id}\n"
-        if hasattr(self, "precursor") and self.precursor is not None and hasattr(self.precursor, "mz"):
+        if hasattr(self, "precursor") and self.precursor is not None and hasattr(self.precursor, "mz") and self.precursor.mz is not None:
             ret_value += f"PRECURSORMZ: {self.precursor.mz}\n"
-        if hasattr(self, "formula") and self.formula:
+        if hasattr(self, "formula") and self.formula is not None:
             ret_value += f"Formula: {self.formula}\n"
-        if hasattr(self, "ev") and self.ev:
+        if hasattr(self, "ev") and self.ev is not None:
             ret_value += f"eV: {self.ev}\n"
-        if hasattr(self, "nce") and self.nce:
+        if hasattr(self, "nce") and self.nce is not None:
             ret_value += f"NCE: {self.nce}\n"
-        if hasattr(self, "protein_id") and self.protein_id:
+        if hasattr(self, "protein_id") and self.protein_id is not None:
             ret_value += f"ProteinId: {','.join(self.protein_id)}\n"
         ret_value += f"DB#: {self.id}\n"
         # spectrum = self.copy(min_mz=1.0, min_intensity=min_intensity)
@@ -2379,6 +2365,12 @@ class BaseSpectrum:
         fp = SpectrumTanimotoFingerPrint(dimension=max_mz)
         fp.object2fingerprint(self)
         return fp
+    
+    def finalize(self):
+        """
+        function used to clean up spectrum after creation
+        """
+        pass
 
 
 # Add properties from the schema to BaseSpectrum
