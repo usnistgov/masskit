@@ -1,8 +1,13 @@
 import base64
 import copy
 import csv
+from functools import partial
+from io import StringIO
 import logging
+from multiprocessing import Pool
+import os
 import re
+from typing import List, Union
 import zlib
 from collections import OrderedDict
 import masskit.small_molecule
@@ -18,6 +23,7 @@ from masskit.data_specs.schemas import peptide_schema, molecules_schema, set_fie
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
 from masskit.spectrum.spectrum import init_spectrum
+from masskit.utils.tables import row_view
 try:
     from rdkit import Chem
     from rdkit.Chem import AllChem
@@ -54,7 +60,7 @@ def empty_records(schema):
 def load_mgf2array(
     fp,
     num=0,
-    start_spectrum_id=0,
+    id_field=0,
     set_probabilities=(0.01, 0.97, 0.01, 0.01),
     row_entries=None,
     title_fields=None,
@@ -66,7 +72,7 @@ def load_mgf2array(
 
     :param fp: stream or filename
     :param num: the maximum number of records to generate (0=all)
-    :param start_spectrum_id: the spectrum id to begin with
+    :param id_field: the spectrum id to begin with
     :param set_probabilities: how to divide into dev, train, valid, test
     :param row_entries: dict containing additional row columns
     :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE regex match group 1 is the value
@@ -85,7 +91,7 @@ def load_mgf2array(
 
     fp = open_if_filename(fp, 'r')
 
-    spectrum_id = start_spectrum_id  # a made up integer spectrum id
+    spectrum_id = id_field  # a made up integer spectrum id
     # move forward to first begin ions
     for line in fp:
         mz = []
@@ -1378,6 +1384,165 @@ def load_mzTab(fp, dedup=True, decoy_func=None):
     mztr = MzTab_Reader(fp, dedup, decoy_func)
     return mztr.get_hitlist()
 
+
+class BatchFileReader:
+    def __init__(self, filename: Union[str, os.PathLike],
+                 format:str=None, row_batch_size:int=5000,
+                 id_field: Union[str, int]=0,
+                 comment_fields:str=None,
+                 ) -> None:
+        """
+        read files in batches of pyarrow Tables
+
+        :param filename: input file
+        :param format: format of the input file
+        :param row_batch_size: size of batches to read (except parquet files, which use existing batches)
+        :param id_field: the integer start value or string name of the id fields
+        :param comment_fields: used for parsing msp file Comment lines
+        """
+        super().__init__()
+        self.format = format
+        self.row_batch_size = row_batch_size
+        self.id_field = id_field
+        self.filename = str(filename)
+        self.comment_fields = comment_fields
+        if format == 'parquet':
+            self.dataset = pq.ParquetFile(filename)
+        elif format =='arrow':
+            self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
+        elif format in ['mgf', 'msp']:
+            self.dataset = open(filename, mode="r")
+        else:
+            raise ValueError(f'Unknown format {self.format}')
+        
+    def iter_tables(self) -> pa.Table:
+        """
+        read batch generator, returns a Table
+        """
+        if self.format == 'parquet':
+            for batch in self.dataset.iter_batches():
+                table = pa.Table.from_batches(batch)  # schema is inferred from batch
+                yield table 
+        elif self.format == 'arrow':
+            # the entire table is memmapped as self.dataset
+            # get the length, which is computed from the number of rows in all batches
+            # not clear if this goes through the entire memmap -- need to test
+            start = 0
+            while True:
+                table = self.dataset.slice(start, self.row_batch_size)
+                if len(table) == 0:
+                    break
+                start += self.row_batch_size
+                yield table
+        elif self.format == 'msp':
+            while True:
+                batch = load_msp2array(self.dataset, 
+                                       num=self.row_batch_size, 
+                                       id_field=self.id_field,
+                                       comment_fields=self.comment_fields)
+                if len(batch) == 0:
+                    break
+                if isinstance(self.id_field, int):
+                    self.id_field += len(batch)
+                yield batch
+        elif self.format == 'mgf':
+            while True:
+                batch = load_mgf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                if len(batch) == 0:
+                    break
+                if isinstance(self.id_field, int):
+                    self.id_field += len(batch)
+                yield batch
+        else:
+            raise ValueError(f'Unknown format {self.format}')
+        
+
+class BatchFileWriter:
+    def __init__(self, filename: Union[str, os.PathLike], 
+                 format:str=None, annotate:bool=False, 
+                 row_batch_size:int=5000,
+                 num_workers:int=7) -> None:
+        """
+        write batches of pyarrow Tables to files
+
+        :param filename: output file
+        :param format: format of the output file
+        :param annotate: whether to annotate the output file
+        :param row_batch_size: size of batches to write 
+        :param num_workers: number of threads for processing
+=        """
+        super().__init__()
+        self.format = format
+        self.row_batch_size = row_batch_size
+        self.filename = str(filename)
+        self.annotate = annotate
+        self.num_workers = num_workers
+        if format in ['parquet','arrow']:
+            self.dataset = None  # set this up in writer as it needs the schema 
+        elif format in ['mgf', 'msp']:
+            self.dataset = open(self.filename, mode="w")
+        else:
+            raise ValueError(f'Unknown format {self.format}')
+        
+    def table2spectra(self, table:pa.Table) -> List:
+        """
+        convert a table to a list of spectra
+        
+        :param table: pyarrow table to convert
+        """
+        row = row_view(table)
+        spectra = []
+        for idx in range(len(table)):
+            row.idx = idx
+            spectra.append(init_spectrum().from_arrow(row))
+        return spectra
+        
+    def write_table(self, table:pa.Table) -> None:
+        """
+        write a table out
+
+        :param table: table to write
+        """
+        if self.format == 'parquet':
+            if self.dataset == None:
+                self.dataset = pq.ParquetWriter(pa.OSFile(self.filename, 'wb'), table.schema)
+            self.dataset.write_table(table)
+        elif self.format == 'arrow':
+            if self.dataset == None:
+                self.dataset = pa.RecordBatchFileWriter(pa.OSFile(self.filename, 'wb'), table.schema)
+            self.dataset.write_table(table)
+        elif self.format == 'msp':
+            spectra = self.table2spectra(table)
+            with Pool(self.num_workers) as p:
+                spectra = p.map(partial(spectrum2msp, annotate=self.annotate), spectra)
+            for spectrum in spectra:
+                self.dataset.write(spectrum)
+            self.dataset.flush()
+        elif self.format == 'mgf':
+            spectra = self.table2spectra(table)
+            with Pool(self.num_workers) as p:
+                spectra = p.map(spectrum2mgf, spectra)
+            for spectrum in spectra:
+                self.dataset.write(spectrum)
+            self.dataset.flush()
+        else:
+            raise ValueError(f'Unknown format {self.format}')
+            
+    def __del__(self):
+        # for some reason, need to explictly close RecordBatchFileWriter
+        if self.dataset is not None:
+            self.dataset.close()
+
+
+def spectrum2msp(spectrum, annotate=False):
+    output = StringIO()
+    spectra_to_msp(output, [spectrum], annotate)
+    return output.getvalue() 
+
+def spectrum2mgf(spectrum):
+    output = StringIO()
+    spectra_to_mgf(output, [spectrum])
+    return output.getvalue() 
 
 """
 Notes:

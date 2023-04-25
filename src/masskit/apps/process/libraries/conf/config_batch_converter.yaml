@@ -10,9 +10,6 @@ input:
   num:
 
 conversion:
-  id:
-    # name of the id field, like NISTNO. if an integer and reading sdfs, this is the start value of the ids
-    field: NISTNO
   small_molecule:
     # maximum bound of 3D conformer in angstroms (0=no limit)
     max_bound: 0.0
@@ -21,6 +18,25 @@ conversion:
     # "--comment_fields \"{'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}\""
     #  where the format is {comment_field_name: (regex, type, field_name)}
     comment_fields:
+    id:
+      field:
+      initial_value: 0
+  sdf:
+    id:
+      field: NISTNO
+      initial_value: 0
+  mgf:
+    id:
+      field:
+      initial_value: 0
+  arrow:
+    id:
+      field:
+      initial_value: 0
+  parquet:
+    id:
+      field:
+      initial_value: 0
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
     probabilities: [0.0, 1.0, 0.0, 0.0]
@@ -33,6 +49,7 @@ conversion:
   row_batch_size: 5000
   # whether to annotate the output
   annotate: True
+  num_workers: 7  # number of threads for processing
 
 output:
   file:
