@@ -19,7 +19,7 @@ def data_dir():
     """
     the directory containing the test data files
     """
-    test_dir, _ = os.path.splitext(__file__)
+    # test_dir, _ = os.path.splitext(__file__)
     #return Path(__file__).parents[1] / Path("../../tests/data")
     return Path("data")
 
@@ -43,3 +43,21 @@ def config_fasta2peptides(human_uniprot_trunc_parquet, human_uniprot_trunc_fasta
 def create_peptide_parquet_file(config_fasta2peptides):
     fasta2peptides.main(config_fasta2peptides)
     return config_fasta2peptides.output.file
+
+@pytest.fixture(scope="session")
+def predicted_arrow_file(data_dir):
+    return data_dir / "test.arrow"
+
+@pytest.fixture(scope="session")
+def batch_converted_files(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted'
+
+@pytest.fixture(scope="session")
+def config_batch_converter(predicted_arrow_file, batch_converted_files):
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={predicted_arrow_file}",
+                                 f"output.file.name={batch_converted_files}",
+                                 f"output.file.types=[msp,arrow,parquet,mgf]",
+                                 f"conversion.row_batch_size=100"])
+        return cfg
