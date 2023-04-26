@@ -8,7 +8,6 @@
       "default-features": false,
       "features": [ "csv", "filesystem", "json", "parquet", "dataset" ]
     },
-    "parquet",
     "pybind11"
   ]
 }

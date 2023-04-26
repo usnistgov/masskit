@@ -127,7 +127,7 @@ class CMakeBuild(build_ext):
 # comment out masskit_ext until build works for windows
 setup(
     ext_modules = [ CMakeExtension("masskit_ext", sourcedir="src/masskit_ext") ],
-    cmdclass={"build_ext": CMakeBuild}
+    cmdclass={"build_ext": CMakeBuild},
     zip_safe=False,
     extras_require={"test": ["pytest>=7.0"]},
     python_requires=">=3.9"
