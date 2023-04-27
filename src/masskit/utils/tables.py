@@ -5,6 +5,7 @@ import masskit.data_specs.schemas as ms_schemas
 import string
 import string
 from types import MethodType
+from masskit.spectrum.spectrum import Spectrum
 
 ALPHABET = np.array(list(string.ascii_letters))
 
