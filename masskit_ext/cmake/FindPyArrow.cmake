@@ -89,6 +89,7 @@ set(PYARROW_INCLUDE_DIR "${PYARROW_INCLUDE_DIR}")
 set(PYARROW_LIBRARY "${PYARROW_LIBRARY}")
 
 message(STATUS "Found PyArrowLib: ${PYARROW_LIBRARY} (found version \"${PYARROW_VERSION_STRING}\")")
+message(STATUS "pyarrow.h include dir: ${PYARROW_INCLUDE_DIR}")
 
 set(PYARROW_FOUND TRUE)
 

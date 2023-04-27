@@ -96,6 +96,7 @@ arrow-cpp=11.*^
  rdkit=2021.09.4^
  rich^
  ruff^
+ scikit-build-core^
  sqlalchemy^
  sqlparse
 

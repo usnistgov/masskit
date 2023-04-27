@@ -110,6 +110,7 @@ BASE_PACKAGES="
   rdkit=2021.09.4 \
   rich \
   ruff \
+  scikit-build-core \
   sqlalchemy \
   sqlparse"
 

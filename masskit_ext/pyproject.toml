@@ -1,0 +1,54 @@
+[build-system]
+requires = [
+    "scikit-build-core",
+    "pybind11",
+    "pyarrow>=11"
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "masskit_ext"
+version = "1.0.1"
+authors = [
+    { name = "Douglas Slotta", email = "douglas.slotta@nist.gov" },
+    { name = "Lewis Geer", email = "lewis.geer@nist.gov" },
+]
+description = "Extensions for masskit based on C++"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Topic :: Scientific/Engineering",
+    "Topic :: Software Development :: Build Tools",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Development Status :: 4 - Beta",
+    "Typing :: Typed",
+]
+
+[tool.ruff]
+extend-select = [
+  "B",    # flake8-bugbear
+  "B904",
+  "I",    # isort
+  "PGH",  # pygrep-hooks
+  "RUF",  # Ruff-specific
+  "UP",   # pyupgrade
+]
+extend-ignore = [
+  "E501",   # Line too long
+]
+target-version = "py39"
+
+# [tool.autopep8]
+# max_line_length = 120
+# ignore = "E501,W6"  # or ["E501", "W6"]
+# in-place = true
+# recursive = true
