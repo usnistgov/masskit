@@ -12,7 +12,7 @@ def theo_spectrum():
 
 @pytest.fixture
 def exp_spectrum():
-    return mss.HiResSpectrum().from_arrays(
+    return mss.Spectrum().from_arrays(
         [175.0536, 290.0805, 88.0304, 1000.051, 366.0966, 263.0874, 148.0604, 183.5519, 132.0473, 74.533, 74.544],
         [60, 90, 20, 999, 100, 80, 50, 70, 30, 10, 11],
         row={
@@ -28,7 +28,7 @@ def exp_spectrum():
 
 @pytest.fixture
 def pred_spectrum():
-    return mss.HiResSpectrum().from_arrays(
+    return mss.Spectrum().from_arrays(
         [175.1, 290.1, 88.0, 1000.0, 366.1, 263.1, 148.1, 1100.0, 1000.1],
         [60, 90, 20, 999, 100, 80, 50, 888, 777],
         product_mass_info=mss.MassInfo(
@@ -41,7 +41,7 @@ def pred_spectrum():
 
 @pytest.fixture
 def pred_spectrum_2():
-    return mss.HiResSpectrum().from_arrays(
+    return mss.Spectrum().from_arrays(
         [175.1, 290.1, 88.0, 1000.0, 366.1, 263.1, 148.1, 1100.0, 74.5],
         [60, 90, 20, 999, 100, 80, 50, 888, 777],
         product_mass_info=mss.MassInfo(

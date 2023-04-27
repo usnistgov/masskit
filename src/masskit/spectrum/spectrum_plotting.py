@@ -420,3 +420,23 @@ def multiple_spectrum_plot(
 
     return fig
 
+def draw_spectrum(spectrum, fig_format, output, figsize=(4, 2)):
+    """
+    spectrum thumbnail plotting code called by the spectrum object
+    writes to a stream
+    
+    :param spectrum: spectrum to plot
+    :param fig_format: format of the figure e.g. 'png'
+    :param output: output stream
+    :param figsize: the size of the figure in inches
+    """
+
+    plt.ioff()  # turn off interactive mode
+    fig = plt.figure(figsize=figsize)
+    ax = fig.add_subplot(111)
+    spectrum.plot(ax)
+    plt.tight_layout()
+    fig.savefig(output, format=fig_format)
+    plt.close(fig)
+    plt.ion()  # turn on interactive mode
+    return output.getvalue()

@@ -543,14 +543,14 @@ class SpectrumTanimotoFingerPrint(SpectrumFingerprint):
 
 if __name__ == "__main__":
     import unittest
-    from masskit.spectrum.spectrum import HiResSpectrum, MassInfo
+    from masskit.spectrum.spectrum import Spectrum, MassInfo
 
     class TestFingerprintMethods(unittest.TestCase):
         """
         unit tests for fingerprints
         """
 
-        predicted_spectrum1 = HiResSpectrum()
+        predicted_spectrum1 = Spectrum()
         predicted_spectrum1.from_arrays(
             [173.1, 201.1, 527.3, 640.4, 769.5, 856.5, 955.6],
             [
@@ -570,7 +570,7 @@ if __name__ == "__main__":
             )
         )
 
-        spectrum1 = HiResSpectrum()
+        spectrum1 = Spectrum()
         spectrum1.from_arrays(
             [173.0928, 201.088, 527.3327, 640.4177, 769.4603, 856.4924, 955.5608],
             [
@@ -590,7 +590,7 @@ if __name__ == "__main__":
             )
         )
 
-        spectrum2 = HiResSpectrum()
+        spectrum2 = Spectrum()
         spectrum2.from_arrays(
             [173.0928, 527.3327, 955.5608],
             [

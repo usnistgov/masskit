@@ -200,7 +200,7 @@ if __name__ == '__main__':
 
     class TestReactionMethods(unittest.TestCase):
         """
-        unit tests for the NISTSpectrum and NISTPeaks classes
+        unit tests
         """
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)

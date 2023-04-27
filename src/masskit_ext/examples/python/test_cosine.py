@@ -1,7 +1,7 @@
 import masskit.spectrum.spectrum as mss
 
 def predicted_spectrum1():
-    ps = mss.HiResSpectrum()
+    ps = mss.Spectrum()
     ps.from_arrays(
         [173.1, 201.1, 527.3, 640.4, 769.5, 856.5, 955.6],
         [
@@ -23,7 +23,7 @@ def predicted_spectrum1():
     return ps
 
 def spectrum1():
-    s = mss.HiResSpectrum()
+    s = mss.Spectrum()
     s.from_arrays(
         [173.0928, 201.088, 527.3327, 640.4177, 769.4603, 856.4924, 955.5608],
         [

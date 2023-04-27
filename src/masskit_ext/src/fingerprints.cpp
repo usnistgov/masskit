@@ -27,7 +27,7 @@ def fetch_mz(idx):
 def fetch_spectrum(idx):
     x = pc.list_flatten(table.column("mz").slice(idx,1)).to_numpy()
     y = pc.list_flatten(table.column("intensity").slice(idx,1)).to_numpy()
-    return spectrum.init_spectrum(True, mz=x, intensity=y)
+    return Spectrum(mz=x, intensity=y)
 
 def calc_fingerprint(mz):
     def calc_bit(a, b):

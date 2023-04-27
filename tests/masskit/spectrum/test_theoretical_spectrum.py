@@ -138,7 +138,7 @@ def peptide_spectrum():
         775.3386,
     ]
 
-    spectrum = mss.HiResSpectrum()
+    spectrum = mss.Spectrum()
     spectrum.from_arrays(
         mz_values,
         [1.0] * len(mz_values),
@@ -163,7 +163,7 @@ def peptide_parent_spectrum():
         736.7285,
         ]
 
-    spectrum = mss.HiResSpectrum()
+    spectrum = mss.Spectrum()
     spectrum.from_arrays(
         mz_values,
         [1.0] * len(mz_values),

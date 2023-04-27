@@ -14,7 +14,7 @@ import masskit_ext
 
 FILENAME = "test.msp"
 
-hi_res1 = spec.HiResSpectrum()
+hi_res1 = spec.Spectrum()
 hi_res1.from_arrays(
     [100.0001, 200.0002, 300.0003],
     [999, 1, 50],
@@ -30,7 +30,7 @@ hi_res1.from_arrays(
 # print(hi_res1.products.starts.tolist())
 # print(hi_res1.products.stops.tolist())
 
-hi_res2 = spec.HiResSpectrum()
+hi_res2 = spec.Spectrum()
 hi_res2.from_arrays(
     [100.0002, 200.0062, 500.0, 300.0009],
     [999, 1, 50, 120],
@@ -43,7 +43,7 @@ hi_res2.from_arrays(
     product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
 )
 
-dup1 = spec.HiResSpectrum().from_arrays(
+dup1 = spec.Spectrum().from_arrays(
     np.array([100.0001, 200.0002, 300.0003, 200.0000]),
     np.array([1, 3, 4, 2]),
     row={
@@ -55,7 +55,7 @@ dup1 = spec.HiResSpectrum().from_arrays(
     product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
     copy_arrays=False)
 
-dup2 = spec.HiResSpectrum().from_arrays(
+dup2 = spec.Spectrum().from_arrays(
     np.array([100.0001, 100.0001, 200.0, 200.0002, 400.0003]),
     np.array([1, 1, 2, 3, 4]),
     row={

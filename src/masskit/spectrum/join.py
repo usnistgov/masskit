@@ -131,7 +131,7 @@ class PairwiseJoin(Join):
     """
     def __init__(self, exp_lib_map, theo_lib_map, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if issubclass(type(exp_lib_map), mss.HiResSpectrum) and issubclass(type(theo_lib_map), mss.HiResSpectrum):
+        if issubclass(type(exp_lib_map), mss.Spectrum) and issubclass(type(theo_lib_map), mss.Spectrum):
             # allow for joining just two spectra
             self.exp_lib_map = msui.ListLibraryMap([exp_lib_map])
             self.theo_lib_map = msui.ListLibraryMap([theo_lib_map])
@@ -175,8 +175,8 @@ class ThreewayJoin(Join):
     """
     def __init__(self, exp_lib_map, pred_lib_map, theo_lib_map, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if issubclass(type(exp_lib_map), mss.HiResSpectrum) and issubclass(type(theo_lib_map), mss.HiResSpectrum) and \
-                issubclass(pred_lib_map, mss.HiResSpectrum):
+        if issubclass(type(exp_lib_map), mss.Spectrum) and issubclass(type(theo_lib_map), mss.Spectrum) and \
+                issubclass(pred_lib_map, mss.Spectrum):
             # allow for joining just two spectra
             self.exp_lib_map = msui.ListLibraryMap([exp_lib_map])
             self.pred_lib_map = msui.ListLibraryMap([pred_lib_map])

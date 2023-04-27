@@ -2,14 +2,9 @@ import logging
 from pathlib import Path
 import hydra
 from omegaconf import DictConfig
-from masskit.spectrum.spectrum import init_spectrum
 from masskit.utils.files import BatchFileReader, BatchFileWriter, load_mgf2array, load_msp2array, spectra_to_msp, spectra_to_mgf
 from masskit.utils.general import parse_filename
-import pyarrow as pa
-import pyarrow.parquet as pq
 from masskit.utils.tables import row_view
-import os
-from typing import Union
 from pyarrow import Table
 from collections.abc import Iterable
 

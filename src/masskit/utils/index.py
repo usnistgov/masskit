@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from abc import ABC, abstractmethod
 from scipy import sparse
-from masskit.spectrum.spectrum import init_spectrum
+from masskit.spectrum.spectrum import Spectrum
 from masskit.data_specs.schemas import min_spectrum_fields, property_fields
 import masskit.utils.files as msuf
 from masskit.utils.general import open_if_filename
@@ -768,7 +768,7 @@ It would be useful to (a) include the names of these fields in the TableMap fiel
 """
 
 def make_spectrum(row):
-    return init_spectrum().from_arrow(row)
+    return Spectrum(row=row)
 
 def make_mol(row):
     attribute = row.get('mol')
@@ -849,7 +849,7 @@ class ArrowLibraryMap(TableMap):
 
         # create the spectrum
         if self.column_name is not None:
-            return_val[self.column_name] = init_spectrum().from_arrow(self.row)
+            return_val[self.column_name] = Spectrum(row=self.row)
         return return_val
 
     def getitem_by_id(self, key):
@@ -874,7 +874,7 @@ class ArrowLibraryMap(TableMap):
     def getspectrum_by_row(self, key):
         assert (0 <= key < len(self))
         self.row.idx = key
-        return init_spectrum().from_arrow(self.row)
+        return Spectrum(row=self.row)
 
     def to_arrow(self):
         return self.table

@@ -6,7 +6,7 @@ from rdkit import Chem
 
 
 def test_load_spectrum():
-    spectrum = mss.HiResSpectrum()
+    spectrum = mss.Spectrum()
     spectrum.from_arrays(
         [100.1, 200.2],
         [999, 1],
@@ -27,7 +27,7 @@ def test_load_spectrum():
 def test_rdkit():
     suppl = Chem.SDMolSupplier("data/test.new.sdf", sanitize=False)
     for mol in suppl:
-        spectrum = mss.HiResSpectrum()
+        spectrum = mss.Spectrum()
         spectrum.from_mol(mol)
         assert spectrum.precursor.mz == 180
         assert spectrum.products.mz.size == 74
@@ -36,7 +36,7 @@ def test_rdkit():
 
 @pytest.fixture
 def hi_res1():
-    hr = mss.HiResSpectrum()
+    hr = mss.Spectrum()
     hr.from_arrays(
         [100.0001, 200.0002, 300.0003],
         [999, 1, 50],
@@ -53,7 +53,7 @@ def hi_res1():
 
 @pytest.fixture
 def hi_res2():
-    hr = mss.HiResSpectrum()
+    hr = mss.Spectrum()
     hr.from_arrays(
         [100.0002, 200.0062, 500.0, 300.0009],
         [999, 1, 50, 120],
@@ -69,7 +69,7 @@ def hi_res2():
 
 @pytest.fixture
 def predicted_spectrum1():
-    ps = mss.HiResSpectrum()
+    ps = mss.Spectrum()
     ps.from_arrays(
         [173.1, 201.1, 527.3, 640.4, 769.5, 856.5, 955.6],
         [
@@ -92,7 +92,7 @@ def predicted_spectrum1():
 
 @pytest.fixture
 def spectrum1():
-    s = mss.HiResSpectrum()
+    s = mss.Spectrum()
     s.from_arrays(
         [173.0928, 201.088, 527.3327, 640.4177, 769.4603, 856.4924, 955.5608],
         [
@@ -115,7 +115,7 @@ def spectrum1():
 
 @pytest.fixture
 def spectrum2():
-    s = mss.HiResSpectrum()
+    s = mss.Spectrum()
     s.from_arrays(
         [173.0928, 201.088, 527.3327, 640.4177, 769.4603, 856.4924, 955.5608, 955.6],
         [
@@ -139,7 +139,7 @@ def spectrum2():
 
 @pytest.fixture
 def hi_res3():
-    hr = mss.HiResSpectrum()
+    hr = mss.Spectrum()
     hr.from_arrays(
         np.array([100.0001, 200.0002, 300.0003]),
         np.array([999, 1, 50]),
@@ -163,13 +163,13 @@ def test_intersect_hires_spectrum(hi_res1, hi_res2):
     return
 
 def test_intersect_hires_spectrum_duplicates():
-    dup1 = mss.HiResSpectrum().from_arrays(
+    dup1 = mss.Spectrum().from_arrays(
         np.array([100.0001, 200.0002, 300.0003, 200.0000]),
         np.array([1, 3, 4, 2]),
         product_mass_info=mss.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
         copy_arrays=False)
 
-    dup2 = mss.HiResSpectrum().from_arrays(
+    dup2 = mss.Spectrum().from_arrays(
         np.array([100.0001, 100.0001, 200.0, 200.0002, 400.0003]),
         np.array([1, 1, 2, 3, 4]),
         product_mass_info=mss.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
