@@ -22,7 +22,7 @@ from masskit.data_specs.schemas import peptide_schema, molecules_schema, set_fie
     mod_names_field, hitlist_schema
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
-from masskit.spectrum.spectrum import init_spectrum
+from masskit.spectrum.spectrum import Spectrum
 from masskit.utils.tables import row_view
 try:
     from rdkit import Chem
@@ -158,7 +158,7 @@ def load_mgf2array(
         if len(mz) != 0:      
             row['mz'] = mz
             row['intensity'] = intensity
-            spectrum = init_spectrum(mz, intensity, row=row, precursor_mz=row['precursor_mz'],
+            spectrum = Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
                                      precursor_intensity=row.get('precursor_intensity', None))
             spectrum.charge = row.get('charge', None)
             spectrum.peptide = row.get('peptide', None)
@@ -689,7 +689,7 @@ def load_msp2array(
         if len(mz) != 0:
             row['mz'] = mz
             row['intensity'] = intensity
-            spectrum = init_spectrum(mz, intensity, row={}, precursor_mz=row['precursor_mz'],
+            spectrum = Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
                                      precursor_intensity=row.get('precursor_intensity', None))
             spectrum.charge = row.get('charge', None)
             spectrum.peptide = row.get('peptide', None)
@@ -1125,7 +1125,7 @@ def load_sdf2array(
         spectrum = None
         if source == "nist":
             # create the mass spectrum
-            spectrum = init_spectrum(product_mass_info=product_mass_info,
+            spectrum = Spectrum(product_mass_info=product_mass_info,
                                      precursor_mass_info=precursor_mass_info)
             spectrum.from_mol(
                 mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
@@ -1494,7 +1494,7 @@ class BatchFileWriter:
         spectra = []
         for idx in range(len(table)):
             row.idx = idx
-            spectra.append(init_spectrum().from_arrow(row))
+            spectra.append(Spectrum(row=row))
         return spectra
         
     def write_table(self, table:pa.Table) -> None:

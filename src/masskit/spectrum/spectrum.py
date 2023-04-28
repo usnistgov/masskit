@@ -14,8 +14,7 @@ import copy
 import random
 from masskit.utils.fingerprints import SpectrumTanimotoFingerPrint
 from abc import ABC, abstractmethod
-from masskit.spectrum.plotting import spectrum_plot
-import matplotlib.pyplot as plt
+from masskit.spectrum.spectrum_plotting import draw_spectrum, spectrum_plot
 from io import StringIO, BytesIO
 from base64 import b64encode
 
@@ -1274,22 +1273,61 @@ def dedup_matches(products1, products2, index1, index2, tiebreaker='mz', skip_no
     
     return join_1_2, join_2_1 
 
-class BaseSpectrum:
+class Spectrum:
     """
     Base class for spectrum with called ions.
     The props attribute is a dict that contains any structured data
     """
+    """
+        mz=None,
+        intensity=None,
+        row=None,  # different kind of row!
+        precursor_mz=None,
+        precursor_intensity=None,
+        stddev=None,
+        annotations=None,
+        starts=None,
+        stops=None,
+
+        row=None,
+        copy_arrays=False
+    """
 
     def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, 
-                 ev=None, nce=None, charge=None):
+                 ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None,
+                 row=None, precursor_mz=None, precursor_intensity=None, stddev=None,
+                 annotations=None, starts=None, stops=None, copy_arrays=False):
+        """
+        construct a spectrum.  Can initialize with arrays (mz, intensity) or arrow row object
+
+        :param mz: mz array
+        :param intensity: intensity array
+        :param stddev: standard deviation of intensity
+        :param row: dict containing parameters and precursor info or arrow row object
+        :param precursor_mz: precursor_mz value, used preferentially to row
+        :param precursor_intensity: precursor intensity, optional
+        :param annotations: annotations on the ions
+        :param precursor_mass_info: MassInfo mass measurement information for the precursor
+        :param product_mass_info: MassInfo mass measurement information for the product
+        :param starts: starts array
+        :param stops: stops array
+        :param copy_arrays: if the inputs are numpy arrays, make copies
+        """
+        
         self.joins = []  # join data structures
         self.joined_spectra = []  # corresponding spectra to joins
         self.props = {}
         self.prop_names = None
-        self.precursor_class = Ions
-        self.precursor_mass_info = precursor_mass_info
-        self.product_class = Ions
-        self.product_mass_info = product_mass_info
+        self.precursor_class = ion_class
+        self.product_class = ion_class
+        if precursor_mass_info is None:
+            self.precursor_mass_info = MassInfo(20.0, "ppm", "monoisotopic", "", 1)
+        else:
+            self.precursor_mass_info = precursor_mass_info
+        if product_mass_info is None:
+            self.product_mass_info = MassInfo(20.0, "ppm", "monoisotopic", "", 1)
+        else:
+            self.product_mass_info = product_mass_info
         self.name = name
         self.id = id
         self.charge = charge
@@ -1298,6 +1336,25 @@ class BaseSpectrum:
         self.precursor = None
         self.products = None
         self.filtered = None  # filtered version of self.products
+
+        if mz is not None and intensity is not None:
+            self.from_arrays(
+                mz,
+                intensity,
+                row=row,
+                precursor_mz=precursor_mz,
+                precursor_intensity=precursor_intensity,
+                stddev=stddev,
+                annotations=annotations,
+                precursor_mass_info=precursor_mass_info,
+                product_mass_info=product_mass_info,
+                copy_arrays=copy_arrays,
+                starts=starts,
+                stops=stops,
+                )
+        elif row is not None:
+            self.from_arrow(row, copy_arrays=copy_arrays)
+        
 
     # def __getstate__(self):
     #     """
@@ -2320,15 +2377,7 @@ class BaseSpectrum:
             return f"<spectrum {self.id}>"
 
     def draw_spectrum(self, fig_format, output):
-        plt.ioff()  # turn off interactive mode
-        fig = plt.figure(figsize=(4, 2))
-        ax = fig.add_subplot(111)
-        self.plot(ax)
-        plt.tight_layout()
-        fig.savefig(output, format=fig_format)
-        plt.close(fig)
-        plt.ion()  # turn on interactive mode
-        return output.getvalue()
+        return draw_spectrum(self, fig_format, output)
 
     def _repr_png_(self):
         """
@@ -2372,22 +2421,8 @@ class BaseSpectrum:
         """
         pass
 
-
-# Add properties from the schema to BaseSpectrum
-populate_properties(BaseSpectrum)
-
-class HiResSpectrum(BaseSpectrum):
-    """
-    class for a high resolution spectrum
-    """
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.precursor_class = HiResIons
-        self.product_class = HiResIons
-
     def evenly_space(self, tolerance=None, take_max=True, max_mz=None, include_zeros=False, inplace=False,
-                     take_sqrt=False):
+                    take_sqrt=False):
         """
         convert product ions to product ions with evenly spaced m/z bins.  The m/z bins are centered on
         multiples of tolerance * 2.  Multiple ions that map to the same bin are either summed or the max taken of the
@@ -2407,66 +2442,14 @@ class HiResSpectrum(BaseSpectrum):
             return_spectrum = copy.deepcopy(self)
 
         return_spectrum.products.evenly_space(tolerance=tolerance, take_max=take_max, max_mz=max_mz,
-                                              include_zeros=include_zeros, take_sqrt=take_sqrt)
+                                                include_zeros=include_zeros, take_sqrt=take_sqrt)
         return return_spectrum
 
 
-def init_spectrum(
-        mz=None,
-        intensity=None,
-        row=None,
-        precursor_mz=None,
-        precursor_intensity=None,
-        stddev=None,
-        annotations=None,
-        precursor_mass_info=None,
-        product_mass_info=None,
-        starts=None,
-        stops=None
-):
-    """
-    Spectrum factory
-    if mz and intensity are provided, initialize from the arrays and the information in rows.  precursor information
-    is pulled from rows unless precursor_mz and/or procursor_intensity are provided.
+# Add properties from the schema to Spectrum
+populate_properties(Spectrum)
 
-    :param mz: mz array
-    :param intensity: intensity array
-    :param stddev: standard deviation of intensity
-    :param row: dict containing parameters and precursor info
-    :param precursor_mz: precursor_mz value, used preferentially to row
-    :param precursor_intensity: precursor intensity, optional
-    :param annotations: annotations on the ions
-    :param precursor_mass_info: MassInfo mass measurement information for the precursor
-    :param product_mass_info: MassInfo mass measurement information for the product
-    :param starts: start array
-    :param stops: stop array
-    :return: spectrum object
-    """
-
-    if precursor_mass_info is None:
-        precursor_mass_info = MassInfo(20.0, "ppm", "monoisotopic", "", 1)
-    if product_mass_info is None:
-        product_mass_info = MassInfo(20.0, "ppm", "monoisotopic", "", 1)
-    spectrum = HiResSpectrum(
-        precursor_mass_info=precursor_mass_info,
-        product_mass_info=product_mass_info,
-    )
-    if mz is not None and intensity is not None:
-        spectrum.from_arrays(
-            mz=mz,
-            intensity=intensity,
-            row=row,
-            precursor_mz=precursor_mz,
-            precursor_intensity=precursor_intensity,
-            stddev=stddev,
-            annotations=annotations,
-            starts=starts,
-            stops=stops
-        )
-    return spectrum
-
-
-class AccumulatorSpectrum(HiResSpectrum, Accumulator):
+class AccumulatorSpectrum(Spectrum, Accumulator):
     """
     used to contain a spectrum that accumulates the sum of many spectra
     includes calculation of standard deviation
@@ -2543,7 +2526,7 @@ class AccumulatorSpectrum(HiResSpectrum, Accumulator):
         del self.count
         del self.count_spectra
         del self.take_max
-        self.__class__ = HiResSpectrum
+        self.__class__ = Spectrum
 
 
 populate_properties(AccumulatorSpectrum, fields=spectrum_accumulator_fields)

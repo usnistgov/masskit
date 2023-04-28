@@ -24,7 +24,7 @@ def annotate_peptide_spectrum(spectrum, peptide=None, precursor_charge=None, ion
     spectrum.add_join(join.results, theo_spectrum)
 
 
-class TheoreticalSpectrum(sp.HiResSpectrum):
+class TheoreticalSpectrum(sp.Spectrum):
     """
     base class to contain a theoretical spectrum
     """

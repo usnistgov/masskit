@@ -21,7 +21,7 @@ def table_small_mol():
 
 @pytest.fixture
 def hi_res3():
-    spectrum = mss.HiResSpectrum()
+    spectrum = mss.Spectrum()
     spectrum.from_arrays(
         np.array([100.0, 100.1, 300.5]),
         np.array([100, 200, 999]),

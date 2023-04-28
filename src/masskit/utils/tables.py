@@ -1,11 +1,11 @@
 import numpy as np
 import pyarrow as pa
 import pandas as pd
-from masskit.spectrum.spectrum import init_spectrum
 import masskit.data_specs.schemas as ms_schemas
 import string
 import string
 from types import MethodType
+from masskit.spectrum.spectrum import Spectrum
 
 ALPHABET = np.array(list(string.ascii_letters))
 
@@ -166,7 +166,7 @@ def convert_spectra(table):
     spectrums = []
     for i in range(table.num_rows):
         rv.idx = i
-        spectrums.append(init_spectrum().from_arrow(rv))
+        spectrums.append(Spectrum(row=rv))
     spectrum_df = pd.DataFrame({
         "id": table['id'].to_pandas(),
         "spectrum": spectrums})
