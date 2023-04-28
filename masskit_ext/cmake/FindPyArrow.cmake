@@ -74,21 +74,35 @@ _pybind11_get_if_undef(_PYARROW_VALUES 1 PYARROW_INCLUDE_DIR)
 _pybind11_get_if_undef(_PYARROW_VALUES 2 PYARROW_LIB)
 _pybind11_get_if_undef(_PYARROW_VALUES 3 PYARROW_LIBDIRS)
 
-# Make sure all directory separators are '/'
-#string(REGEX REPLACE "\\\\" "/" PYARROW_INCLUDE_DIR "${PYARROW_INCLUDE_DIR}")
-#string(REGEX REPLACE "\\\\" "/" PYARROW_LIBDIRS "${PYARROW_LIBDIRS}")
-string(REGEX REPLACE "\\|" " " PYARROW_LIBDIRS ${PYARROW_LIBDIRS})
+# use the host’s native path separator (; on Windows and : on UNIX)
+if(${CMAKE_HOST_SYSTEM_NAME} MATCHES "Windows")
+  string(REGEX REPLACE "\\|" ";" PYARROW_LIBDIRS ${PYARROW_LIBDIRS})
+else()
+  string(REGEX REPLACE "\\|" ":" PYARROW_LIBDIRS ${PYARROW_LIBDIRS})
+endif()
+
+# Helpful for debugging 
+#message(STATUS "${CMAKE_FIND_LIBRARY_PREFIXES}[library]${CMAKE_FIND_LIBRARY_SUFFIXES}")
+#message(STATUS "libs: ${PYARROW_LIB} ${PYARROW_LIB}.lib")
+#message(STATUS "dirs: ${PYARROW_LIBDIRS}")
 
 find_library(
   PYARROW_LIBRARY
-  NAMES "${PYARROW_LIB}"
-  HINTS ${PYARROW_LIBDIRS}
-  NO_DEFAULT_PATH)
+  NAMES "${PYARROW_LIB}" "${PYARROW_LIB}.lib"
+  PATHS ${PYARROW_LIBDIRS}
+  #HINTS ${PYARROW_LIBDIRS}
+  NO_DEFAULT_PATH
+)
 
+if (NOT PYARROW_LIBRARY)
+  message(STATUS "PyArrow not found.")
+  set(PYARROW_FOUND FALSE)
+  return()
+endif()
 set(PYARROW_INCLUDE_DIR "${PYARROW_INCLUDE_DIR}")
 set(PYARROW_LIBRARY "${PYARROW_LIBRARY}")
 
-message(STATUS "Found PyArrowLib: ${PYARROW_LIBRARY} (found version \"${PYARROW_VERSION_STRING}\")")
+message(STATUS "Found PyArrow Lib: ${PYARROW_LIBRARY} (found version \"${PYARROW_VERSION_STRING}\")")
 message(STATUS "pyarrow.h include dir: ${PYARROW_INCLUDE_DIR}")
 
 set(PYARROW_FOUND TRUE)

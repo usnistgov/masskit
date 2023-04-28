@@ -29,6 +29,12 @@ project ("masskit-ext")
 
 find_package(Arrow CONFIG REQUIRED)
 find_package(ArrowDataset CONFIG REQUIRED)
+if(${ARROW_BUILD_STATIC})
+    message(STATUS "Linking Arrow libs statically")
+else()
+    message(STATUS "Linking Arrow libs dynamically")
+endif()
+
 find_package(pybind11 CONFIG)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -57,12 +63,6 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE RelWithDebInfo)
 endif()
 
-if(${ARROW_BUILD_STATIC})
-    message(STATUS "Linking Arrow libs statically")
-else()
-    message(STATUS "Linking Arrow libs dynamically")
-endif()
-
 if ((${CMAKE_BUILD_TYPE} MATCHES "Release") OR (${CMAKE_BUILD_TYPE} MATCHES "RelWithDebInfo"))
     # To show which lines have been automatically vectorized:
     # SET(GCC_VECTORIZATION_COMPILE_FLAGS "-O3 -ffast-math -mavx -fopt-info-vec-optimized")
@@ -75,4 +75,6 @@ endif()
 add_subdirectory(src)
 add_subdirectory(examples/cpp)
 
-install(TARGETS masskit_ext LIBRARY DESTINATION .)
+if (${PYARROW_FOUND})
+    install(TARGETS masskit_ext LIBRARY DESTINATION .)
+endif()
