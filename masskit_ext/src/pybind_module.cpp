@@ -9,7 +9,7 @@ PYBIND11_MODULE(masskit_ext, m) {
     m.def("numpy_add", &numpy_add, "Add two NumPy arrays");
     // m.def("mz_fingerprint", &mz_fingerprint);
     m.def("calc_start_stops", &calc_start_stops, "Add start and stop columns to arrow table");
-    m.def("tanimoto_search", &tanimoto_search, "Perform a Tanimoto search on a given table");
+    //m.def("tanimoto_search", &tanimoto_search, "Perform a Tanimoto search on a given table");
     py::class_<BruteForceIndex>(m, "BruteForceIndex")
         .def(py::init<const std::string &>())
         .def("create", &BruteForceIndex::create)
