@@ -7,7 +7,7 @@ import logging
 from multiprocessing import Pool
 import os
 import re
-from typing import List, Union
+from typing import Dict, List, Union
 import zlib
 from collections import OrderedDict
 import masskit.small_molecule
@@ -883,6 +883,212 @@ def parse_glycopeptide_annot(annots, peak_index):
             )
     return parsed_annots
 
+
+
+def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None, 
+            name_field:str=None, max_size:int=0, skip_expensive:bool=True) -> Dict:
+    """
+    Convert an rdkit Mol into a row
+    
+    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum
+    :param id_field_type: the id field type, such as int or str
+    :param name_field: list of the possible name fields
+    :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
+    :param skip_expensive: skip expensive calculations for better perf
+    :return: row as dict
+    """
+    error_string = ""
+    ecfp4 = ECFPFingerprint()
+    # smarts for tms for substructure matching
+    tms = Chem.MolFromSmarts("[#14]([CH3])([CH3])[CH3]")
+    # only enumerate unique stereoisomers
+    opts = StereoEnumerationOptions(unique=True)
+    # fingerprint generator that respects counts but not chirality as mass spec tends to be chirality blind
+
+    if id_field is None:
+        id_field = 'NISTNO'
+    if id_field_type is None:
+        id_field_type = 'int'
+    if name_field is None:
+        name_field = ["_NAME", "NAME"]
+
+    if mol is None or mol.GetNumAtoms() < 1:
+        logging.info(f"Unable to create molecule object for {error_string}")
+        return None
+
+    # get ids for error reporting
+    if type(id_field) is not int and mol.HasProp(id_field):
+        if id_field_type == 'int':
+            current_id = int(mol.GetProp(id_field))
+        else:
+            current_id = mol.GetProp(id_field)
+
+    if current_id is not None:
+        error_string += "id=" + str(current_id)
+
+    for field in name_field:
+        if mol.HasProp(field):
+            current_name = mol.GetProp(field)
+            break
+
+    if current_name is not None:
+        error_string += " name=" + current_name
+    else:
+        logging.info(f"{error_string} does not have a NAME or _NAME property")
+
+    try:
+        mol = masskit.small_molecule.utils.standardize_mol(mol)
+    except ValueError as e:
+        logging.info(f"Unable to standardize {error_string}")
+        return None
+    
+    if len(mol.GetPropsAsDict()) == 0:
+        logging.info(f"All molecular props unavailable {error_string}")
+        return None
+
+    # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
+    # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
+    new_row = {
+        "has_2d": True,
+        "inchi_key": Chem.inchi.MolToInchiKey(mol),
+        "isomeric_smiles": Chem.MolToSmiles(mol),
+        "smiles": Chem.MolToSmiles(mol, isomericSmiles=False),
+    }
+
+    # todo: note that MolToInchiKey may generate a different value than what is in the spectrum.
+    # a replib example is 75992
+    # this may be fixed by workarounds with rdkit inchi generation created on 10/23/2019. need to check
+
+    if not skip_expensive:
+        mol, conformer_ids, return_value = threed.create_conformer(mol)
+        if return_value == -1:
+            logging.info(f"Not able to create conformer for {error_string}")
+            return None
+        # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
+
+        # calculation MMFF94 partial charges
+        partial_charges = []
+        try:
+            mol_copy = copy.deepcopy(
+                mol
+            )  # the MMFF calculation sanitizes the molecule
+            fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
+            if fps is not None:
+                for atom_num in range(0, mol_copy.GetNumAtoms()):
+                    partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
+        except ValueError:
+            logging.info(f"unable to run MMFF for {error_string}")
+        new_row["num_conformers"] = len(conformer_ids)
+        new_row["partial_charges"] = partial_charges
+        bounding_box = threed.bounding_box(mol)
+        new_row["min_x"] = bounding_box[0, 0]
+        new_row["max_x"] = bounding_box[0, 1]
+        new_row["min_y"] = bounding_box[1, 0]
+        new_row["max_y"] = bounding_box[1, 1]
+        new_row["min_z"] = bounding_box[2, 0]
+        new_row["max_z"] = bounding_box[2, 1]
+        new_row["has_conformer"] = True
+        new_row["max_bound"] = np.max(np.abs(bounding_box))
+        if max_size != 0 and new_row["max_bound"] > max_size:
+            logging.info(f"{error_string} is larger than the max bound")
+            return None
+        try:
+            new_row["num_stereoisomers"] = len(
+                tuple(EnumerateStereoisomers(mol, options=opts))
+            )  # GetStereoisomerCount(mol)
+        except RuntimeError as err:
+            logging.info(
+                f"Unable to create stereoisomer count for {error_string}, error = {err}"
+            )
+            new_row["num_stereoisomers"] = None
+    else:
+        # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
+        new_row["has_conformer"] = False
+
+    # calculate solvent accessible surface area per atom
+    # try:
+    #     radii = []
+    #     for atom in mol.GetAtoms():
+    #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
+    #     rdFreeSASA.CalcSASA(mol, radii=radii)
+    # except:
+    #     logging.info("unable to create sasa")
+    new_row["has_tms"] = len(
+        mol.GetSubstructMatches(tms)
+    )  # count of trimethylsilane matches
+    new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
+    new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
+    new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
+    new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
+    new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
+    new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
+    new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
+    new_row["mol"] = Chem.rdMolInterchange.MolToJSON(mol)
+    new_row["num_atoms"] = mol.GetNumAtoms()
+    ecfp4.object2fingerprint(mol)  # expressed as a bit vector
+    new_row["ecfp4"] = ecfp4.to_numpy()
+    new_row["ecfp4_count"] = ecfp4.get_num_on_bits()
+    # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
+    # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
+    # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
+    # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
+    # number of undefined stereoisomers
+    new_row[
+        "num_undef_stereo"
+    ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
+    # get number of unspecified double bonds
+    new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+
+    return new_row
+
+
+def load_smile2array(
+    filename,
+    num=None,
+    skip_expensive=True,
+    set_probabilities=(0.01, 0.97, 0.01, 0.01),
+    suppress_rdkit_warnings=True
+):
+    tables = []
+    # create arrow schema and batch table
+    records_schema = molecules_schema
+    ecfp4_size = 4096  # size of ecfp4 fingerprint
+    spectrum_fp_size = int(max_mz)  # size of spectrum fingerprint
+    records_schema = set_field_int_metadata(records_schema, "ecfp4", "fp_size", ecfp4_size)
+    records_schema = set_field_int_metadata(records_schema, "spectrum_fp", "fp_size", spectrum_fp_size)
+    records = empty_records(records_schema)
+
+    # Turn off RDKit error messages
+    if suppress_rdkit_warnings:
+        RDLogger.DisableLog('rdApp.*')
+
+    for smiles in filename:
+
+        new_row["id"] = current_id
+        new_row["name"] = current_name
+        if type(id_field) is int:
+            current_id += 1
+
+        add_row_to_records(records, new_row)
+        if i % 10000 == 0:
+            logging.info(f"processed record {i}")
+        # check to see if we have enough records to add to the pyarrow table
+        if len(records["id"]) % 25000 == 0:
+            tables.append(pa.table(records, records_schema))
+            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+            records = empty_records(records_schema)
+
+        if num is not None and num == i:
+            break
+
+    if records:
+        tables.append(pa.table(records, records_schema))
+    logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
+    table = pa.concat_tables(tables)
+
+    return table
+
+
 def load_sdf2array(
     filename,
     max_size=0,
@@ -923,8 +1129,6 @@ def load_sdf2array(
     - argon has no structure
     - hydrogen causes CanonicalizeMol to fail
     - some molecules fail parsing
-    - some molecules fail AdjustAromaticNs
-    - some molecules fail Sanitize
     - some have empty spectra
     """
     if source == None:
@@ -974,12 +1178,6 @@ def load_sdf2array(
     if suppress_rdkit_warnings:
         RDLogger.DisableLog('rdApp.*')
 
-    # smarts for tms for substructure matching
-    tms = Chem.MolFromSmarts("[#14]([CH3])([CH3])[CH3]")
-    # only enumerate unique stereoisomers
-    opts = StereoEnumerationOptions(unique=True)
-    # fingerprint generator that respects counts but not chirality as mass spec tends to be chirality blind
-    ecfp4 = ECFPFingerprint()
 
     #dcon = rdMolStandardize.MetalDisconnector()
 
@@ -988,140 +1186,12 @@ def load_sdf2array(
     # 2020-02-27  on the other hand, molvs does call sanitization in standardize_mol, so move to threed.standardize_mol
     for i, mol in enumerate(Chem.SDMolSupplier(filename, sanitize=False)):
 
-        error_string = f"index={i} "
-
-        if mol is None or mol.GetNumAtoms() < 1:
-            logging.info(f"Unable to create molecule object for {error_string}")
+        new_row = mol2row(mol, id_field, id_field_type, name_field, max_size)
+        if new_row is None:
             continue
-
-        # get ids for error reporting
-        if type(id_field) is not int and mol.HasProp(id_field):
-            if id_field_type == 'int':
-                current_id = int(mol.GetProp(id_field))
-            else:
-                current_id = mol.GetProp(id_field)
-
-        if current_id is not None:
-            error_string += "id=" + str(current_id)
-
-        for field in name_field:
-            if mol.HasProp(field):
-                current_name = mol.GetProp(field)
-                break
-
-        if current_name is not None:
-            error_string += " name=" + current_name
-        else:
-            logging.info(f"{error_string} does not have a NAME or _NAME property")
-
-        try:
-            mol = masskit.small_molecule.utils.standardize_mol(mol)
-        except ValueError as e:
-            logging.info(f"Unable to standardize {error_string}")
-            continue
-        
-        if len(mol.GetPropsAsDict()) == 0:
-            logging.info(f"All molecular props unavailable {error_string}")
-            continue
-
-        # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
-        # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
-        new_row = {
-            "has_2d": True,
-            "inchi_key": Chem.inchi.MolToInchiKey(mol),
-            "isomeric_smiles": Chem.MolToSmiles(mol),
-            "smiles": Chem.MolToSmiles(mol, isomericSmiles=False),
-        }
-
-        # todo: note that MolToInchiKey may generate a different value than what is in the spectrum.
-        # a replib example is 75992
-        # this may be fixed by workarounds with rdkit inchi generation created on 10/23/2019. need to check
-
-        if not skip_expensive:
-            mol, conformer_ids, return_value = threed.create_conformer(mol)
-            if return_value == -1:
-                logging.info(f"Not able to create conformer for {error_string}")
-                continue
-            # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
-
-            # calculation MMFF94 partial charges
-            partial_charges = []
-            try:
-                mol_copy = copy.deepcopy(
-                    mol
-                )  # the MMFF calculation sanitizes the molecule
-                fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
-                if fps is not None:
-                    for atom_num in range(0, mol_copy.GetNumAtoms()):
-                        partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
-            except ValueError:
-                logging.info(f"unable to run MMFF for {error_string}")
-            new_row["num_conformers"] = len(conformer_ids)
-            new_row["partial_charges"] = partial_charges
-            bounding_box = threed.bounding_box(mol)
-            new_row["min_x"] = bounding_box[0, 0]
-            new_row["max_x"] = bounding_box[0, 1]
-            new_row["min_y"] = bounding_box[1, 0]
-            new_row["max_y"] = bounding_box[1, 1]
-            new_row["min_z"] = bounding_box[2, 0]
-            new_row["max_z"] = bounding_box[2, 1]
-            new_row["has_conformer"] = True
-            new_row["max_bound"] = np.max(np.abs(bounding_box))
-            if max_size != 0 and new_row["max_bound"] > max_size:
-                logging.info(f"{error_string} is larger than the max bound")
-                continue
-            try:
-                new_row["num_stereoisomers"] = len(
-                    tuple(EnumerateStereoisomers(mol, options=opts))
-                )  # GetStereoisomerCount(mol)
-            except RuntimeError as err:
-                logging.info(
-                    f"Unable to create stereoisomer count for {error_string}, error = {err}"
-                )
-                new_row["num_stereoisomers"] = None
-        else:
-            # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
-            new_row["has_conformer"] = False
-
-        # calculate solvent accessible surface area per atom
-        # try:
-        #     radii = []
-        #     for atom in mol.GetAtoms():
-        #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
-        #     rdFreeSASA.CalcSASA(mol, radii=radii)
-        # except:
-        #     logging.info("unable to create sasa")
-        new_row["has_tms"] = len(
-            mol.GetSubstructMatches(tms)
-        )  # count of trimethylsilane matches
-        new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
-        new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
-        new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
-        new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
-        new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
-        new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
-        new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
-        new_row["mol"] = Chem.rdMolInterchange.MolToJSON(mol)
-        new_row["num_atoms"] = mol.GetNumAtoms()
-        ecfp4.object2fingerprint(mol)  # expressed as a bit vector
-        new_row["ecfp4"] = ecfp4.to_numpy()
-        new_row["ecfp4_count"] = ecfp4.get_num_on_bits()
-        # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
-        # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
-        # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
-        # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
-        # number of undefined stereoisomers
-        new_row[
-            "num_undef_stereo"
-        ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
-        # get number of unspecified double bonds
-        new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
 
         # create useful set labels for training
-        new_row["set"] = np.random.choice(
-            ["dev", "train", "valid", "test"], p=set_probabilities
-        )
-
+        new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=set_probabilities)
         spectrum = None
         if source == "nist":
             # create the mass spectrum
@@ -1395,7 +1465,7 @@ class BatchFileReader:
         read files in batches of pyarrow Tables
 
         :param filename: input file
-        :param format: format of the input file
+        :param format: format of the input file: mgf, msp, sdf, smiles
         :param row_batch_size: size of batches to read (except parquet files, which use existing batches)
         :param id_field: the integer start value or string name of the id fields
         :param comment_fields: used for parsing msp file Comment lines
@@ -1410,7 +1480,7 @@ class BatchFileReader:
             self.dataset = pq.ParquetFile(filename)
         elif format =='arrow':
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
-        elif format in ['mgf', 'msp']:
+        elif format in ['mgf', 'msp', 'sdf', 'smiles']:
             self.dataset = open(filename, mode="r")
         else:
             raise ValueError(f'Unknown format {self.format}')
@@ -1448,6 +1518,14 @@ class BatchFileReader:
         elif self.format == 'mgf':
             while True:
                 batch = load_mgf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                if len(batch) == 0:
+                    break
+                if isinstance(self.id_field, int):
+                    self.id_field += len(batch)
+                yield batch
+        elif self.format == 'sdf':
+            while True:
+                batch = load_sdf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
                 if len(batch) == 0:
                     break
                 if isinstance(self.id_field, int):

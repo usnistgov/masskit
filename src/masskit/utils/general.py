@@ -137,7 +137,7 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
     is_tgz = tgz_extension is not None and url_path.suffix == '.tgz'
 
     # treat as a file, get the path
-    file_path = Path(filename)
+    file_path = Path(filename).expanduser()
 
     # create non-tgz version of file name
     if is_url:

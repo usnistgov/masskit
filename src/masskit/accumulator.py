@@ -73,4 +73,4 @@ class AccumulatorProperty(Accumulator):
         self.predicted_stddev = math.sqrt(self.predicted_stddev / self.count)
 
 
-populate_properties(AccumulatorProperty, fields=accumulator_property_fields)
+# populate_properties(AccumulatorProperty, fields=accumulator_property_fields)
