@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 import tempfile
-from masskit.utils.index import ArrowLibraryMap
+from masskit.utils.tablemap import ArrowLibraryMap
 import hashlib
 import pyarrow as pa
 from filelock import FileLock

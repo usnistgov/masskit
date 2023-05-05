@@ -1,8 +1,6 @@
 try:
     from rdkit import Chem
-    from rdkit import DataStructs
     from rdkit.Chem.MolStandardize import rdMolStandardize
-#    from molvs import Standardizer
 except ImportError:
     pass
 import copy
@@ -290,7 +288,7 @@ def standardize_mol(mol):
     :param mol: rdkit mol to standardize
     :return: standardized mol
     """
-    disconnector = rdMolStandardize.MetalDisconnector()
+    # disconnector = rdMolStandardize.MetalDisconnector()
     normalizer = rdMolStandardize.Normalizer()
     reionizer = rdMolStandardize.Reionizer()
     mol_in = copy.deepcopy(mol)  # copy as AdjustAromaticNs return None on failure

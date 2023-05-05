@@ -4,7 +4,7 @@ import hydra
 from omegaconf import DictConfig
 from masskit.data_specs.spectral_library import *
 from masskit.utils.general import parse_filename
-from masskit.utils.index import ArrowLibraryMap
+from masskit.utils.tablemap import ArrowLibraryMap
 import pyarrow as pa
 
 """

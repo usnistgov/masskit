@@ -1,4 +1,4 @@
-from masskit.utils.index import ArrowLibraryMap
+from masskit.utils.tablemap import ArrowLibraryMap
 import pytest
 from pytest import approx
 import masskit.spectrum.spectrum as mss
@@ -183,12 +183,12 @@ def peptide_parent_spectrum():
 @pytest.fixture
 def peptide_exp_spectrum():
     arrow_map = ArrowLibraryMap.from_msp("data/Exp_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_57eV_NCE40_msp.txt")
-    return arrow_map.getspectrum_by_row(0)
+    return arrow_map[0]['spectrum']
 
 @pytest.fixture
 def peptide_pred_spectrum():
     arrow_map = ArrowLibraryMap.from_msp("data/Predicted_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_msp.txt")
-    return arrow_map.getspectrum_by_row(0)
+    return arrow_map[0]['spectrum']
 
 def test_annotate_peptide_exp_spectrum(peptide_exp_spectrum):
     msts.annotate_peptide_spectrum(peptide_exp_spectrum)

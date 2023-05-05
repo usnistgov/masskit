@@ -73,10 +73,10 @@ class CosineScore(Score):
             if query_id != query_id_old:
                 query_id_old = query_id
                 # retrieve query spectrum
-                query_spectrum = self.query_table_map.getspectrum_by_id(query_id)
+                query_spectrum = self.query_table_map.getitem_by_id(query_id)['spectrum']
             hit_id = hit_ids[j]
             # retrieve hit spectrum
-            hit_spectrum = self.hit_table_map.getspectrum_by_id(hit_id)
+            hit_spectrum = self.hit_table_map.getitem_by_id(hit_id)['spectrum']
             # calculate score
             cosine_scores[j] = query_spectrum.cosine_score(hit_spectrum, scale=self.scale)
         hitlist[self.score_name] = cosine_scores

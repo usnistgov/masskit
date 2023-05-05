@@ -27,7 +27,6 @@ from masskit.utils.tables import row_view
 try:
     from rdkit import Chem
     from rdkit.Chem import AllChem
-    from rdkit.Chem.MolStandardize import rdMolStandardize
     from rdkit.Chem.EnumerateStereoisomers import StereoEnumerationOptions, EnumerateStereoisomers
     from rdkit import RDLogger
 except ImportError:
@@ -883,8 +882,6 @@ def parse_glycopeptide_annot(annots, peak_index):
             )
     return parsed_annots
 
-
-
 def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None, 
             name_field:str=None, max_size:int=0, skip_expensive:bool=True) -> Dict:
     """
@@ -1042,9 +1039,10 @@ def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None,
     return new_row
 
 
-def load_smile2array(
-    filename,
+def load_smiles2array(
+    fp,
     num=None,
+    id_field=0,
     skip_expensive=True,
     set_probabilities=(0.01, 0.97, 0.01, 0.01),
     suppress_rdkit_warnings=True
@@ -1053,21 +1051,28 @@ def load_smile2array(
     # create arrow schema and batch table
     records_schema = molecules_schema
     ecfp4_size = 4096  # size of ecfp4 fingerprint
-    spectrum_fp_size = int(max_mz)  # size of spectrum fingerprint
     records_schema = set_field_int_metadata(records_schema, "ecfp4", "fp_size", ecfp4_size)
-    records_schema = set_field_int_metadata(records_schema, "spectrum_fp", "fp_size", spectrum_fp_size)
     records = empty_records(records_schema)
+
+    # generate id using id_field as start
+    if type(id_field) is int:
+        current_id = id_field
+    else:
+        current_id = 0
 
     # Turn off RDKit error messages
     if suppress_rdkit_warnings:
         RDLogger.DisableLog('rdApp.*')
 
-    for smiles in filename:
+    fp = open_if_filename(fp, 'r')
+    for i,smiles in enumerate(fp):
+        mol = Chem.MolFromSmiles(smiles)
+        new_row = mol2row(mol)
+        if new_row is None:
+            continue
 
         new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
+        current_id += 1
 
         add_row_to_records(records, new_row)
         if i % 10000 == 0:
@@ -1090,7 +1095,7 @@ def load_smile2array(
 
 
 def load_sdf2array(
-    filename,
+    fp,
     max_size=0,
     num=None,
     source=None,
@@ -1108,7 +1113,7 @@ def load_sdf2array(
     """
     Read file in SDF format and return as Lists of Dicts.
 
-    :param filename: name of the file to read
+    :param fp: name of the file to read or a file object
     :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
     :param num: the maximum number of records to generate (None=all)
     :param source: where did the sdf come from?  pubchem, nist, ?
@@ -1178,13 +1183,11 @@ def load_sdf2array(
     if suppress_rdkit_warnings:
         RDLogger.DisableLog('rdApp.*')
 
-
-    #dcon = rdMolStandardize.MetalDisconnector()
+    fp = open_if_filename(fp, 'r')
 
     # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
     # there is only one stereoisomer per molecule.
-    # 2020-02-27  on the other hand, molvs does call sanitization in standardize_mol, so move to threed.standardize_mol
-    for i, mol in enumerate(Chem.SDMolSupplier(filename, sanitize=False)):
+    for i, mol in enumerate(Chem.ForwardSDMolSupplier(fp, sanitize=False)):
 
         new_row = mol2row(mol, id_field, id_field_type, name_field, max_size)
         if new_row is None:
@@ -1243,7 +1246,7 @@ def load_sdf2array(
                 new_row["spectrum_fp"] = fingerprint.to_numpy()
                 new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
             except AttributeError:
-                logging.info('attribute error from spectrum: ' + error_string)
+                logging.info('attribute error from spectrum: ' + spectrum.id)
                 raise
         elif source == "pubchem":
             if mol.HasProp("PUBCHEM_XLOGP3"):
@@ -1524,6 +1527,14 @@ class BatchFileReader:
                     self.id_field += len(batch)
                 yield batch
         elif self.format == 'sdf':
+            while True:
+                batch = load_sdf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                if len(batch) == 0:
+                    break
+                if isinstance(self.id_field, int):
+                    self.id_field += len(batch)
+                yield batch
+        elif self.format == 'smiles':
             while True:
                 batch = load_sdf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
                 if len(batch) == 0:

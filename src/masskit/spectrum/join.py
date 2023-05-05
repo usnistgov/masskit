@@ -7,7 +7,7 @@ import pyarrow.compute as pc
 import pandas as pd
 from masskit.data_specs.schemas import ion_annot_fields
 import masskit.spectrum.spectrum as mss
-import masskit.utils.index as msui
+import masskit.utils.tablemap as msut
 
 
 class Join(ABC):
@@ -133,8 +133,8 @@ class PairwiseJoin(Join):
         super().__init__(*args, **kwargs)
         if issubclass(type(exp_lib_map), mss.Spectrum) and issubclass(type(theo_lib_map), mss.Spectrum):
             # allow for joining just two spectra
-            self.exp_lib_map = msui.ListLibraryMap([exp_lib_map])
-            self.theo_lib_map = msui.ListLibraryMap([theo_lib_map])
+            self.exp_lib_map = msut.ListLibraryMap([exp_lib_map])
+            self.theo_lib_map = msut.ListLibraryMap([theo_lib_map])
         else:
             self.exp_lib_map = exp_lib_map
             self.theo_lib_map = theo_lib_map
@@ -154,8 +154,8 @@ class PairwiseJoin(Join):
         assert(len(self.exp_lib_map) == len(self.theo_lib_map))
 
         for i in range(len(self.exp_lib_map)):
-            result = self.join_2_spectra(self.exp_lib_map.getspectrum_by_row(i),
-                                         self.theo_lib_map.getspectrum_by_row(i), tiebreaker=tiebreaker)
+            result = self.join_2_spectra(self.exp_lib_map[i][self.exp_lib_map.column_name],
+                                         self.theo_lib_map[i][self.theo_lib_map.column_name], tiebreaker=tiebreaker)
             update_join_lists(result, self.exp_lib_map.get_ids()[i], self.theo_lib_map.get_ids()[i])
 
         self.results = pa.Table.from_arrays([Join.list2uint64(experimental_list_id),
@@ -178,9 +178,9 @@ class ThreewayJoin(Join):
         if issubclass(type(exp_lib_map), mss.Spectrum) and issubclass(type(theo_lib_map), mss.Spectrum) and \
                 issubclass(pred_lib_map, mss.Spectrum):
             # allow for joining just two spectra
-            self.exp_lib_map = msui.ListLibraryMap([exp_lib_map])
-            self.pred_lib_map = msui.ListLibraryMap([pred_lib_map])
-            self.theo_lib_map = msui.ListLibraryMap([theo_lib_map])
+            self.exp_lib_map = msut.ListLibraryMap([exp_lib_map])
+            self.pred_lib_map = msut.ListLibraryMap([pred_lib_map])
+            self.theo_lib_map = msut.ListLibraryMap([theo_lib_map])
         else:
             self.exp_lib_map = exp_lib_map
             self.pred_lib_map = pred_lib_map
@@ -218,9 +218,9 @@ class ThreewayJoin(Join):
         assert(len(self.exp_lib_map) == len(self.theo_lib_map) == len(self.pred_lib_map))
 
         for i in range(len(self.exp_lib_map)):
-            experimental_spectrum = self.exp_lib_map.getspectrum_by_row(i).norm(max_intensity_in=1.0)
-            predicted_spectrum = self.pred_lib_map.getspectrum_by_row(i).norm(max_intensity_in=1.0)
-            theoretical_spectrum = self.theo_lib_map.getspectrum_by_row(i).norm(max_intensity_in=1.0)
+            experimental_spectrum = self.exp_lib_map[i][self.exp_lib_map.column_name].norm(max_intensity_in=1.0)
+            predicted_spectrum = self.pred_lib_map[i][self.pred_lib_map.column_name].norm(max_intensity_in=1.0)
+            theoretical_spectrum = self.theo_lib_map[i][self.theo_lib_map.column_name].norm(max_intensity_in=1.0)
 
             result = self.join_3_spectra(experimental_spectrum,
                                          predicted_spectrum,
@@ -272,7 +272,7 @@ class ThreewayJoin(Join):
                 # z_score.append(pa.array(predicted_spectrum.products.intensity/predicted_spectrum.products.stddev,
                 #                         type=pa.float64()).take(pa.array(result[1], type=pa.int64())))
             # per spectrum values
-            row = self.exp_lib_map.getitem_by_row(i)
+            row = self.exp_lib_map[i]
             if 'peptide' in row:
                 peptide = row['peptide']
                 peptide_length.extend([len(peptide)] * len(result[0]))

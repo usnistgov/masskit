@@ -4,7 +4,7 @@ import logging
 import hydra
 from omegaconf import DictConfig
 from masskit.utils.general import parse_filename
-from masskit.utils.index import ArrowLibraryMap
+from masskit.utils.tablemap import ArrowLibraryMap
 import pyarrow as pa
 import pyarrow.parquet as pq
 from rdkit import Chem
@@ -100,7 +100,7 @@ def path_generator_app(config: DictConfig) -> None:
     shortest_paths = []
 
     for i in range(len(library_map)):
-        rd_mol = library_map.getitem_by_row(i)['mol']
+        rd_mol = library_map[i]['mol']
         shortest_paths.append(jsonpickle.encode(get_shortest_paths(
             rd_mol, config.conversion.max_path_length), keys=True))
 

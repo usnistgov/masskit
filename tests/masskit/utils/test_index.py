@@ -6,6 +6,7 @@ import numpy as np
 import masskit.spectrum.spectrum as mss
 import pyarrow.parquet as pq
 from masskit.utils.index import *
+from masskit.utils.tablemap import ArrowLibraryMap
 import random
 import logging
 
@@ -51,7 +52,7 @@ class Helpers:
 
         objects = []
         for i in queries:
-            objects.append(table_in[i])
+            objects.append(table_in[i][table_in.column_name])
 
         hitlist = index.search(objects, id_list=table_in.get_ids(), hitlist_size=hitlist_size, epsilon=0.1)
 
@@ -120,7 +121,7 @@ def test_tanimoto_from_fingerprint(table_small_mol, tmpdir):
                           fingerprint_factory=ECFPFingerprint)
     lib = ArrowLibraryMap(table_small_mol, num=10)
     index.create_from_fingerprint(lib)
-    hitlist = index.search(lib.getitem_by_row(0)['ecfp4'], id_list=lib.get_ids(),
+    hitlist = index.search(lib[0]['ecfp4'], id_list=lib.get_ids(),
                            id_list_query=lib.get_ids(), hitlist_size=10, epsilon=0.01)
     assert hitlist.hitlist.index[0][0] == hitlist.hitlist.index[0][1]
     assert hitlist.hitlist.iloc[0]['tanimoto'] == 1.0
@@ -129,16 +130,16 @@ def test_nnd_from_fingerprint(table_small_mol):
     index = DescentIndex(fingerprint_factory=ECFPFingerprint)
     lib = ArrowLibraryMap(table_small_mol)
     index.create_from_fingerprint(lib)
-    hitlist = index.search(lib.getitem_by_row(0)['ecfp4'], id_list=lib.get_ids(),
+    hitlist = index.search(lib[0]['ecfp4'], id_list=lib.get_ids(),
                            id_list_query=lib.get_ids(), hitlist_size=30, epsilon=0.1)
     TanimotoScore(lib, query_table_map=lib).score(hitlist)
     hitlist.sort('tanimoto')
-    assert lib.getspectrum_by_id(hitlist.hitlist.index[0][0]).name == lib.getspectrum_by_id(hitlist.hitlist.index[0][1]).name
+    assert lib.getitem_by_id(hitlist.hitlist.index[0][0])['spectrum'].name == lib.getitem_by_id(hitlist.hitlist.index[0][1])['spectrum'].name
     assert hitlist.hitlist.iloc[0]['tanimoto'] == 1.0
     
     predicate = np.zeros(len(lib), dtype=np.uint8)
     predicate[::2] = 1
-    hitlist = index.search(lib.getitem_by_row(0)['ecfp4'], id_list=lib.get_ids(),
+    hitlist = index.search(lib[0]['ecfp4'], id_list=lib.get_ids(),
                            id_list_query=lib.get_ids(), hitlist_size=30, epsilon=0.1, predicate=predicate)
     TanimotoScore(lib, query_table_map=lib).score(hitlist)
     hitlist.sort('tanimoto')
@@ -181,7 +182,7 @@ def test_compare_brute_fast_search(table, helpers, tmpdir):
     comparison = CompareRecallDCG()(descent_hitlist, brute_hitlist)
 
 def test_table(table):
-    item = ArrowLibraryMap(table).getitem_by_row(0)
+    item = ArrowLibraryMap(table)[0]
 
 # @pytest.fixture
 # def table_ei():
