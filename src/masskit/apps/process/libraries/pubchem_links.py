@@ -40,6 +40,7 @@ class Download:
             TransferSpeedColumn(),
             "•",
             TimeRemainingColumn(),
+            transient=True,
         )
 
         with self.progress:
@@ -98,17 +99,16 @@ class PubChemWiki:
             rjson = self.pubchem_wiki(s, 1)
             annots.extend(rjson['Annotation'])
             total_pages = rjson['TotalPages']
-            for pageno in track(range(2, total_pages+1), description="Fetching Wikipedia entries:"):
+            for pageno in track(range(2, total_pages+1), transient=True, description="Fetching Wikipedia entries:"):
                 rjson = self.pubchem_wiki(s, pageno)
                 annots.extend(rjson['Annotation'])
         return annots
 
-    # Broken!!! FIXME!!!    
     def use_cache(self, filename):
         path = Path(filename).expanduser()
         if (not path.is_file()):
             Path(path.parent).mkdir(parents=True, exist_ok=True)
-            data = source(*src_args)
+            data = self.get_pubchem_wiki()
             fresh_data = json.dumps(data)
             if len(fresh_data)>0:
                 with path.open('w') as f:
@@ -123,7 +123,7 @@ class PubChemWiki:
         self.path = Path(self.cfg.cache.dir).expanduser()
         #cache_file = f"{self.cfg.cache.dir}/{self.cfg.wikipedia.file}"
         cache_file = self.path / self.cfg.wikipedia.file
-        wikidata = self.use_cache(cache_file, self.get_pubchem_wiki)
+        wikidata = self.use_cache(cache_file)
 
         self.cid2url = dict()
         for entry in wikidata:
