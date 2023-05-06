@@ -8,48 +8,64 @@ import requests
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
+from concurrent.futures import ThreadPoolExecutor
+import signal
+from functools import partial
+from threading import Event
+from typing import Iterable
 
-def print_progress(curval=0, maxval=10, width=50):
-    percent = int(curval/maxval*100)
-    left = width * percent // 100
-    right = width - left
-    print('\r[', '#' * left, ' ' * right, ']',
-          f' {percent:.0f}%',
-          sep='', end='', flush=True)
+from rich.progress import (
+    BarColumn,
+    DownloadColumn,
+    Progress,
+    TaskID,
+    TextColumn,
+    TimeRemainingColumn,
+    track,
+    TransferSpeedColumn,
+)
 
-def use_cache(filename, source, *src_args):
-    path = Path(filename).expanduser()
-    if (not path.is_file()):
-        Path(path.parent).mkdir(parents=True, exist_ok=True)
-        data = source(*src_args)
-        fresh_data = json.dumps(data)
-        if len(fresh_data)>0:
-            with path.open('w') as f:
-                f.write(fresh_data)
-    else:
-        print(f"Using cache file {filename}")
-    with path.open('r') as f:
-        cache_data = json.load(f)
-    return cache_data
+class Download:
 
-# To get progress bar:
-#   https://stackoverflow.com/questions/37573483/progress-bar-while-download-file-over-http-with-requests
-def download_file(url, cfg):
-    path = Path(cfg.cache.dir).expanduser()
-    print(f"Downloading {url}\n    to {path}")
-    path.mkdir(parents=True, exist_ok=True)
-    local_file = path / url.split('/')[-1]
-    # NOTE the stream=True parameter below
-    with requests.get(url, stream=True) as r:
-        r.raise_for_status()
-        with local_file.open('wb') as f:
-            for chunk in r.iter_content(chunk_size=8192): 
-                # If you have chunk encoded response uncomment if
-                # and set chunk_size parameter to None.
-                #if chunk: 
-                f.write(chunk)
-    print("Download complete")
-    return local_file
+    def __init__(self, urls: Iterable[str], dest_dir: str):
+        """Download multiple files to the given directory."""
+
+        self.progress = Progress(
+            TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
+            BarColumn(bar_width=None),
+            "[progress.percentage]{task.percentage:>3.1f}%",
+            "•",
+            DownloadColumn(),
+            "•",
+            TransferSpeedColumn(),
+            "•",
+            TimeRemainingColumn(),
+        )
+
+        with self.progress:
+            with ThreadPoolExecutor(max_workers=4) as pool:
+                for url in urls:
+                    filename = url.split("/")[-1]
+                    dest_path = dest_dir / filename
+                    task_id = self.progress.add_task("download", filename=filename, start=False)
+                    pool.submit(self.download_url, task_id, url, dest_path)
+
+
+    def download_url(self, task_id: TaskID, url: str, path):
+        with requests.get(url, stream=True) as r:
+            r.raise_for_status()
+            # The download display will break if the response doesn't contain content length
+            total_size_in_bytes= int(r.headers.get('content-length', 0))
+            self.progress.update(task_id, total=total_size_in_bytes)
+            with path.open('wb') as f:
+                self.progress.start_task(task_id)
+                for chunk in r.iter_content(chunk_size=32768): 
+                    f.write(chunk)
+                    self.progress.update(task_id, advance=len(chunk))
+        self.progress.console.log(f"Downloaded {path}")
+
+
+
 
 class PubChemWiki:
 
@@ -72,27 +88,42 @@ class PubChemWiki:
         r.raise_for_status()
         #print(f"  page: {rjson['Page']} of {rjson['TotalPages']}", end='\r')
         rjson = r.json()['Annotations']
-        print_progress(rjson['Page'], rjson['TotalPages'])
+        #print_progress(rjson['Page'], rjson['TotalPages'])
         return rjson
 
 
     def get_pubchem_wiki(self):
-        print("Fetching compounds with Wikipedia entries from PubChem:")
         annots = []
         with requests.Session() as s:
             rjson = self.pubchem_wiki(s, 1)
             annots.extend(rjson['Annotation'])
             total_pages = rjson['TotalPages']
-            for pageno in range(2, total_pages+1):
+            for pageno in track(range(2, total_pages+1), description="Fetching Wikipedia entries:"):
                 rjson = self.pubchem_wiki(s, pageno)
                 annots.extend(rjson['Annotation'])
-        print()
         return annots
-    
+
+    # Broken!!! FIXME!!!    
+    def use_cache(self, filename):
+        path = Path(filename).expanduser()
+        if (not path.is_file()):
+            Path(path.parent).mkdir(parents=True, exist_ok=True)
+            data = source(*src_args)
+            fresh_data = json.dumps(data)
+            if len(fresh_data)>0:
+                with path.open('w') as f:
+                    f.write(fresh_data)
+        else:
+            print(f"Using cache file {filename}")
+        with path.open('r') as f:
+            cache_data = json.load(f)
+        return cache_data
+
     def parse_json(self):
-        cache_file = f"{self.cfg.cache.dir}/{self.cfg.wikipedia.file}"
-        wikidata = use_cache(cache_file, self.get_pubchem_wiki)
-        #print(len(wikidata))
+        self.path = Path(self.cfg.cache.dir).expanduser()
+        #cache_file = f"{self.cfg.cache.dir}/{self.cfg.wikipedia.file}"
+        cache_file = self.path / self.cfg.wikipedia.file
+        wikidata = self.use_cache(cache_file, self.get_pubchem_wiki)
 
         self.cid2url = dict()
         for entry in wikidata:
@@ -107,8 +138,6 @@ class PubChemWiki:
                         self.cid2url[cid].add(url)
                     else:
                         self.cid2url[cid] = set({url})
-            #print(f"{name}\t{cid}\t{url}")
-            #print(f"{url}")
         CIDs = set(self.cid2url.keys())
 
 def get_pubchem_inchi(CIDs):
@@ -138,9 +167,22 @@ def get_pubchem_inchi(CIDs):
 @hydra.main(config_path="conf", config_name="config_pubchem_links", version_base=None)
 def main(cfg: DictConfig) -> int:
     wikidata = PubChemWiki(cfg)
-    print(len(wikidata.cid2url))
+    #print(len(wikidata.cid2url))
     #inchi_data = use_cache(CID_INCHI_FILE, get_pubchem_inchi, sorted(CIDs))
-    download_file(cfg.pubchem.inchi.url, cfg)
+
+    dlpath = Path(cfg.cache.dir).expanduser()
+    dlpath.mkdir(parents=True, exist_ok=True)
+    dlurls = []
+    for key in cfg.pubchem.keys():
+        dlurl = cfg.pubchem[key].url
+        filename = dlurl.split('/')[-1]
+        local_file = dlpath / filename
+        if not local_file.is_file():
+            dlurls.append(dlurl)
+        else:
+            print(f"Using cache file {local_file}")
+    if len(dlurls) > 0:
+        Download(dlurls, dlpath)
 
     return 0
 
