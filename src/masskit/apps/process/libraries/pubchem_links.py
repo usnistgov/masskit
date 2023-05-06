@@ -3,16 +3,21 @@ import sys
 import json
 import time
 import math
+
+from collections import namedtuple
 from pathlib import Path
+from typing import Iterable
+
 import requests
+
 import hydra
 from omegaconf import DictConfig, OmegaConf
 
+import pyarrow as pa
+import pyarrow.csv as pv
+import pyarrow.parquet as pq
+
 from concurrent.futures import ThreadPoolExecutor
-import signal
-from functools import partial
-from threading import Event
-from typing import Iterable
 
 from rich.progress import (
     BarColumn,
@@ -40,7 +45,7 @@ class Download:
             TransferSpeedColumn(),
             "•",
             TimeRemainingColumn(),
-            transient=True,
+            transient=False,
         )
 
         with self.progress:
@@ -87,9 +92,7 @@ class PubChemWiki:
         #print(r.url)
         #print(r.headers)
         r.raise_for_status()
-        #print(f"  page: {rjson['Page']} of {rjson['TotalPages']}", end='\r')
         rjson = r.json()['Annotations']
-        #print_progress(rjson['Page'], rjson['TotalPages'])
         return rjson
 
 
@@ -99,7 +102,7 @@ class PubChemWiki:
             rjson = self.pubchem_wiki(s, 1)
             annots.extend(rjson['Annotation'])
             total_pages = rjson['TotalPages']
-            for pageno in track(range(2, total_pages+1), transient=True, description="Fetching Wikipedia entries:"):
+            for pageno in track(range(2, total_pages+1), transient=False, description="Fetching Wikipedia entries:"):
                 rjson = self.pubchem_wiki(s, pageno)
                 annots.extend(rjson['Annotation'])
         return annots
@@ -140,49 +143,61 @@ class PubChemWiki:
                         self.cid2url[cid] = set({url})
         CIDs = set(self.cid2url.keys())
 
-def get_pubchem_inchi(CIDs):
+# Obsolete function to get the InChI data for a set of CIDs
+# Now we are downloading the complete list from a file they publish.
+def get_pubchem_inchi(CIDs, cfg):
     print(f"Fetching InChI from PubChem for {len(CIDs)} CIDs:")
     annots = []
-    num_groups = math.ceil(len(CIDs)/CID_GROUP_SIZE)
+    num_groups = math.ceil(len(CIDs)/cfg.queries.cid2inchi.group_size)
     cid_str = [str(x) for x in CIDs]
 
     with requests.Session() as s:
-        for i in range(num_groups):
-            cid = ",".join(cid_str[i:i+CID_GROUP_SIZE])
+        for i in track(range(num_groups), transient=False, description="Fetching PubChem InChI entries:"):
+            cid = ",".join(cid_str[i:i+cfg.queries.cid2inchi.group_size])
             req = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/InChI,InChIKey/JSON"
             r = s.get(req,timeout=5)
             r.raise_for_status()
             rjson = r.json()['PropertyTable']
             annots.extend(rjson['Properties'])
-            print_progress(i,num_groups)
-            time.sleep(1/CID_REQUESTS_PER_SECOND)
+            time.sleep(1/cfg.queries.cid2inchi.group_size.reqs_per_second)
     print()
     return annots
+
+def cache_pubchem_files(cfg: DictConfig):
+    dlpath = Path(cfg.cache.dir).expanduser()
+    dlpath.mkdir(parents=True, exist_ok=True)
+    dlurls = []
+    xformfiles = []
+
+    for key in cfg.pubchem.keys():
+        dlurl = cfg.pubchem[key].url
+        filename = dlurl.split('/')[-1]
+        csv_file = dlpath / filename
+        if not csv_file.is_file():
+            dlurls.append(dlurl)
+        else:
+            print(f"Using cache file {csv_file}")
+        pqfile = dlpath / cfg.pubchem[key].parquet
+        xformfiles.append( (csv_file,pqfile) )        
+    if len(dlurls) > 0:
+        Download(dlurls, dlpath)
+    for xfile in xformfiles:
+        if not xfile[1].is_file():
+            print(f"transforming {xfile[0].name} -> {xfile[1].name}")
+            table = pv.read_csv(xfile[0], parse_options=pv.ParseOptions(delimiter='\t'))
+            print(table)
+            pq.write_table(table, xfile[1])
+
 
 # Join arrow tables:
 # https://stackoverflow.com/questions/72122461/join-two-pyarrow-tables
 
-
-
 @hydra.main(config_path="conf", config_name="config_pubchem_links", version_base=None)
 def main(cfg: DictConfig) -> int:
+    cache_pubchem_files(cfg)
     wikidata = PubChemWiki(cfg)
-    #print(len(wikidata.cid2url))
-    #inchi_data = use_cache(CID_INCHI_FILE, get_pubchem_inchi, sorted(CIDs))
 
-    dlpath = Path(cfg.cache.dir).expanduser()
-    dlpath.mkdir(parents=True, exist_ok=True)
-    dlurls = []
-    for key in cfg.pubchem.keys():
-        dlurl = cfg.pubchem[key].url
-        filename = dlurl.split('/')[-1]
-        local_file = dlpath / filename
-        if not local_file.is_file():
-            dlurls.append(dlurl)
-        else:
-            print(f"Using cache file {local_file}")
-    if len(dlurls) > 0:
-        Download(dlurls, dlpath)
+
 
     return 0
 
