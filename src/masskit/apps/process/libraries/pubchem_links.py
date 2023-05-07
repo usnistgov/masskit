@@ -18,7 +18,7 @@ import pyarrow.csv as pv
 import pyarrow.parquet as pq
 
 from concurrent.futures import ThreadPoolExecutor
-
+from rich.console import Console
 from rich.progress import (
     BarColumn,
     DownloadColumn,
@@ -29,6 +29,8 @@ from rich.progress import (
     track,
     TransferSpeedColumn,
 )
+
+global_console = Console()
 
 class Download:
 
@@ -46,6 +48,7 @@ class Download:
             "•",
             TimeRemainingColumn(),
             transient=False,
+            console=global_console,
         )
 
         with self.progress:
@@ -77,6 +80,15 @@ class PubChemWiki:
 
     def __init__(self, cfg):
         self.cfg = cfg
+        self.progress = Progress(
+            TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
+            BarColumn(bar_width=None),
+            "[progress.percentage]{task.percentage:>3.1f}%",
+            "•",
+            TimeRemainingColumn(),
+            transient=False,
+            console=global_console,
+            )
         self.parse_json()
 
     def pubchem_wiki(self, session, page):
@@ -97,14 +109,24 @@ class PubChemWiki:
 
 
     def get_pubchem_wiki(self):
-        annots = []
+        annots = []        
         with requests.Session() as s:
             rjson = self.pubchem_wiki(s, 1)
             annots.extend(rjson['Annotation'])
             total_pages = rjson['TotalPages']
-            for pageno in track(range(2, total_pages+1), transient=False, description="Fetching Wikipedia entries:"):
+            task_id = self.progress.add_task(
+                "download",
+                filename=self.cfg.wikipedia.file, 
+                start=True,
+                total=total_pages,
+                )
+            self.progress.update(task_id, advance=1)
+            for pageno in range(2, total_pages+1):
+                # description="Fetching Wikipedia entries:"):
                 rjson = self.pubchem_wiki(s, pageno)
                 annots.extend(rjson['Annotation'])
+                self.progress.update(task_id, advance=1)
+        self.progress.console.log(f"Downloaded {self.cfg.wikipedia.file}")
         return annots
 
     def use_cache(self, filename):
@@ -117,7 +139,7 @@ class PubChemWiki:
                 with path.open('w') as f:
                     f.write(fresh_data)
         else:
-            print(f"Using cache file {filename}")
+            self.progress.console.log(f"Using cache file {filename}")
         with path.open('r') as f:
             cache_data = json.load(f)
         return cache_data
@@ -176,16 +198,16 @@ def cache_pubchem_files(cfg: DictConfig):
         if not csv_file.is_file():
             dlurls.append(dlurl)
         else:
-            print(f"Using cache file {csv_file}")
+            global_console.log(f"Using cache file {csv_file}")
         pqfile = dlpath / cfg.pubchem[key].parquet
         xformfiles.append( (csv_file,pqfile) )        
     if len(dlurls) > 0:
         Download(dlurls, dlpath)
     for xfile in xformfiles:
         if not xfile[1].is_file():
-            print(f"transforming {xfile[0].name} -> {xfile[1].name}")
+            global_console.log(f"transforming {xfile[0].name} -> {xfile[1].name}")
             table = pv.read_csv(xfile[0], parse_options=pv.ParseOptions(delimiter='\t'))
-            print(table)
+            #global_console.log(table)
             pq.write_table(table, xfile[1])
 
 
@@ -194,10 +216,8 @@ def cache_pubchem_files(cfg: DictConfig):
 
 @hydra.main(config_path="conf", config_name="config_pubchem_links", version_base=None)
 def main(cfg: DictConfig) -> int:
-    cache_pubchem_files(cfg)
     wikidata = PubChemWiki(cfg)
-
-
+    cache_pubchem_files(cfg)
 
     return 0
 
