@@ -11,14 +11,23 @@ import pyarrow as pa
 takes a variety of inputs, including parquet, mgf and msp formatted files and converts them to
 msp, sdf and parquet formatted files.
 
-converter.py --config config_converter
+converter.py --config[-path|-name|-dir] config_converter
 converter.py input.file.names=TestUniqSynPho202249.msp output.file.name=TestUniqSynPho202249.mzxml
 """
+
+def disable_console_logging():
+    log = logging.getLogger()
+    xhdl = None
+    for hdl in log.handlers:
+        if hdl.name == "console":
+            xhdl = hdl
+    if xhdl: log.removeHandler(xhdl)
 
 
 @hydra.main(config_path="conf", config_name="config_converter", version_base=None)
 def converter_app(config: DictConfig) -> None:
 
+    disable_console_logging()
     logging.getLogger().setLevel(logging.INFO)
 
     if config.conversion.msp.comment_fields:

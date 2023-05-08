@@ -36,6 +36,18 @@ from masskit.utils.fingerprints import ECFPFingerprint
 from masskit.utils.general import open_if_filename
 from masskit.utils.hitlist import Hitlist
 import masskit.spectrum.theoretical_spectrum as msts
+import rich.progress
+# from rich.progress import (
+#     BarColumn,
+#     DownloadColumn,
+#     MofNCompleteColumn,
+#     Progress,
+#     TaskID,
+#     TextColumn,
+#     TimeRemainingColumn,
+#     track,
+#     TransferSpeedColumn,
+# )
 
 float_match = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'  # regex used for matching floating point numbers
 
@@ -986,238 +998,240 @@ def load_sdf2array(
     # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
     # there is only one stereoisomer per molecule.
     # 2020-02-27  on the other hand, molvs does call sanitization in standardize_mol, so move to threed.standardize_mol
-    for i, mol in enumerate(Chem.SDMolSupplier(filename, sanitize=False)):
+    with rich.progress.open(filename, "rb", description=f"Reading {filename}") as fileobj:
+        #for i, mol in enumerate(Chem.SDMolSupplier(filename, sanitize=False)):
+        for i, mol in enumerate(Chem.ForwardSDMolSupplier(fileobj, sanitize=False)):
+            #print(i,mol)
+            error_string = f"index={i} "
 
-        error_string = f"index={i} "
+            if mol is None or mol.GetNumAtoms() < 1:
+                logging.info(f"Unable to create molecule object for {error_string}")
+                continue
 
-        if mol is None or mol.GetNumAtoms() < 1:
-            logging.info(f"Unable to create molecule object for {error_string}")
-            continue
+            # get ids for error reporting
+            if type(id_field) is not int and mol.HasProp(id_field):
+                if id_field_type == 'int':
+                    current_id = int(mol.GetProp(id_field))
+                else:
+                    current_id = mol.GetProp(id_field)
 
-        # get ids for error reporting
-        if type(id_field) is not int and mol.HasProp(id_field):
-            if id_field_type == 'int':
-                current_id = int(mol.GetProp(id_field))
+            if current_id is not None:
+                error_string += "id=" + str(current_id)
+
+            for field in name_field:
+                if mol.HasProp(field):
+                    current_name = mol.GetProp(field)
+                    break
+
+            if current_name is not None:
+                error_string += " name=" + current_name
             else:
-                current_id = mol.GetProp(id_field)
+                logging.info(f"{error_string} does not have a NAME or _NAME property")
 
-        if current_id is not None:
-            error_string += "id=" + str(current_id)
-
-        for field in name_field:
-            if mol.HasProp(field):
-                current_name = mol.GetProp(field)
-                break
-
-        if current_name is not None:
-            error_string += " name=" + current_name
-        else:
-            logging.info(f"{error_string} does not have a NAME or _NAME property")
-
-        try:
-            mol = masskit.small_molecule.utils.standardize_mol(mol)
-        except ValueError as e:
-            logging.info(f"Unable to standardize {error_string}")
-            continue
-        
-        if len(mol.GetPropsAsDict()) == 0:
-            logging.info(f"All molecular props unavailable {error_string}")
-            continue
-
-        # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
-        # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
-        new_row = {
-            "has_2d": True,
-            "inchi_key": Chem.inchi.MolToInchiKey(mol),
-            "isomeric_smiles": Chem.MolToSmiles(mol),
-            "smiles": Chem.MolToSmiles(mol, isomericSmiles=False),
-        }
-
-        # todo: note that MolToInchiKey may generate a different value than what is in the spectrum.
-        # a replib example is 75992
-        # this may be fixed by workarounds with rdkit inchi generation created on 10/23/2019. need to check
-
-        if not skip_expensive:
-            mol, conformer_ids, return_value = threed.create_conformer(mol)
-            if return_value == -1:
-                logging.info(f"Not able to create conformer for {error_string}")
-                continue
-            # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
-
-            # calculation MMFF94 partial charges
-            partial_charges = []
             try:
-                mol_copy = copy.deepcopy(
-                    mol
-                )  # the MMFF calculation sanitizes the molecule
-                fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
-                if fps is not None:
-                    for atom_num in range(0, mol_copy.GetNumAtoms()):
-                        partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
-            except ValueError:
-                logging.info(f"unable to run MMFF for {error_string}")
-            new_row["num_conformers"] = len(conformer_ids)
-            new_row["partial_charges"] = partial_charges
-            bounding_box = threed.bounding_box(mol)
-            new_row["min_x"] = bounding_box[0, 0]
-            new_row["max_x"] = bounding_box[0, 1]
-            new_row["min_y"] = bounding_box[1, 0]
-            new_row["max_y"] = bounding_box[1, 1]
-            new_row["min_z"] = bounding_box[2, 0]
-            new_row["max_z"] = bounding_box[2, 1]
-            new_row["has_conformer"] = True
-            new_row["max_bound"] = np.max(np.abs(bounding_box))
-            if max_size != 0 and new_row["max_bound"] > max_size:
-                logging.info(f"{error_string} is larger than the max bound")
+                mol = masskit.small_molecule.utils.standardize_mol(mol)
+            except ValueError as e:
+                logging.info(f"Unable to standardize {error_string}")
                 continue
-            try:
-                new_row["num_stereoisomers"] = len(
-                    tuple(EnumerateStereoisomers(mol, options=opts))
-                )  # GetStereoisomerCount(mol)
-            except RuntimeError as err:
-                logging.info(
-                    f"Unable to create stereoisomer count for {error_string}, error = {err}"
-                )
-                new_row["num_stereoisomers"] = None
-        else:
-            # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
-            new_row["has_conformer"] = False
+            
+            if len(mol.GetPropsAsDict()) == 0:
+                logging.info(f"All molecular props unavailable {error_string}")
+                continue
 
-        # calculate solvent accessible surface area per atom
-        # try:
-        #     radii = []
-        #     for atom in mol.GetAtoms():
-        #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
-        #     rdFreeSASA.CalcSASA(mol, radii=radii)
-        # except:
-        #     logging.info("unable to create sasa")
-        new_row["has_tms"] = len(
-            mol.GetSubstructMatches(tms)
-        )  # count of trimethylsilane matches
-        new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
-        new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
-        new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
-        new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
-        new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
-        new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
-        new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
-        new_row["mol"] = Chem.rdMolInterchange.MolToJSON(mol)
-        new_row["num_atoms"] = mol.GetNumAtoms()
-        ecfp4.object2fingerprint(mol)  # expressed as a bit vector
-        new_row["ecfp4"] = ecfp4.to_numpy()
-        new_row["ecfp4_count"] = ecfp4.get_num_on_bits()
-        # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
-        # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
-        # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
-        # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
-        # number of undefined stereoisomers
-        new_row[
-            "num_undef_stereo"
-        ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
-        # get number of unspecified double bonds
-        new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+            # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
+            # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
+            new_row = {
+                "has_2d": True,
+                "inchi_key": Chem.inchi.MolToInchiKey(mol),
+                "isomeric_smiles": Chem.MolToSmiles(mol),
+                "smiles": Chem.MolToSmiles(mol, isomericSmiles=False),
+            }
 
-        # create useful set labels for training
-        new_row["set"] = np.random.choice(
-            ["dev", "train", "valid", "test"], p=set_probabilities
-        )
+            # todo: note that MolToInchiKey may generate a different value than what is in the spectrum.
+            # a replib example is 75992
+            # this may be fixed by workarounds with rdkit inchi generation created on 10/23/2019. need to check
 
-        spectrum = None
-        if source == "nist":
-            # create the mass spectrum
-            spectrum = Spectrum(product_mass_info=product_mass_info,
-                                     precursor_mass_info=precursor_mass_info)
-            spectrum.from_mol(
-                mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
+            if not skip_expensive:
+                mol, conformer_ids, return_value = threed.create_conformer(mol)
+                if return_value == -1:
+                    logging.info(f"Not able to create conformer for {error_string}")
+                    continue
+                # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
+
+                # calculation MMFF94 partial charges
+                partial_charges = []
+                try:
+                    mol_copy = copy.deepcopy(
+                        mol
+                    )  # the MMFF calculation sanitizes the molecule
+                    fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
+                    if fps is not None:
+                        for atom_num in range(0, mol_copy.GetNumAtoms()):
+                            partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
+                except ValueError:
+                    logging.info(f"unable to run MMFF for {error_string}")
+                new_row["num_conformers"] = len(conformer_ids)
+                new_row["partial_charges"] = partial_charges
+                bounding_box = threed.bounding_box(mol)
+                new_row["min_x"] = bounding_box[0, 0]
+                new_row["max_x"] = bounding_box[0, 1]
+                new_row["min_y"] = bounding_box[1, 0]
+                new_row["max_y"] = bounding_box[1, 1]
+                new_row["min_z"] = bounding_box[2, 0]
+                new_row["max_z"] = bounding_box[2, 1]
+                new_row["has_conformer"] = True
+                new_row["max_bound"] = np.max(np.abs(bounding_box))
+                if max_size != 0 and new_row["max_bound"] > max_size:
+                    logging.info(f"{error_string} is larger than the max bound")
+                    continue
+                try:
+                    new_row["num_stereoisomers"] = len(
+                        tuple(EnumerateStereoisomers(mol, options=opts))
+                    )  # GetStereoisomerCount(mol)
+                except RuntimeError as err:
+                    logging.info(
+                        f"Unable to create stereoisomer count for {error_string}, error = {err}"
+                    )
+                    new_row["num_stereoisomers"] = None
+            else:
+                # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
+                new_row["has_conformer"] = False
+
+            # calculate solvent accessible surface area per atom
+            # try:
+            #     radii = []
+            #     for atom in mol.GetAtoms():
+            #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
+            #     rdFreeSASA.CalcSASA(mol, radii=radii)
+            # except:
+            #     logging.info("unable to create sasa")
+            new_row["has_tms"] = len(
+                mol.GetSubstructMatches(tms)
+            )  # count of trimethylsilane matches
+            new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
+            new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
+            new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
+            new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
+            new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
+            new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
+            new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
+            new_row["mol"] = Chem.rdMolInterchange.MolToJSON(mol)
+            new_row["num_atoms"] = mol.GetNumAtoms()
+            ecfp4.object2fingerprint(mol)  # expressed as a bit vector
+            new_row["ecfp4"] = ecfp4.to_numpy()
+            new_row["ecfp4_count"] = ecfp4.get_num_on_bits()
+            # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
+            # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
+            # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
+            # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
+            # number of undefined stereoisomers
+            new_row[
+                "num_undef_stereo"
+            ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
+            # get number of unspecified double bonds
+            new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+
+            # create useful set labels for training
+            new_row["set"] = np.random.choice(
+                ["dev", "train", "valid", "test"], p=set_probabilities
             )
-            spectrum.id = current_id
-            spectrum.name = current_name
-            try:
-                new_row["precursor_mz"] = spectrum.precursor.mz
-                new_row["synonyms"] = json.dumps(spectrum.synonyms)
-                new_row["spectrum"] = spectrum
-                new_row["column"] = spectrum.column
-                new_row["experimental_ri"] = spectrum.experimental_ri
-                new_row["experimental_ri_error"] = spectrum.experimental_ri_error
-                new_row["experimental_ri_data"] = spectrum.experimental_ri_data
-                new_row["stdnp"] = spectrum.stdnp
-                new_row["stdnp_error"] = spectrum.stdnp_error
-                new_row["stdnp_data"] = spectrum.stdnp_data
-                new_row["stdpolar"] = spectrum.stdpolar
-                new_row["stdpolar_error"] = spectrum.stdpolar_error
-                new_row["stdpolar_data"] = spectrum.stdpolar_data
-                new_row["estimated_ri"] = spectrum.estimated_ri
-                new_row["estimated_ri_error"] = spectrum.estimated_ri_error
-                new_row["exact_mass"] = spectrum.exact_mass
-                new_row["ion_mode"] = spectrum.ion_mode
-                new_row["charge"] = spectrum.charge
-                new_row["instrument"] = spectrum.instrument
-                new_row["instrument_type"] = spectrum.instrument_type
-                new_row["instrument_model"] = spectrum.instrument_model
-                new_row["ionization"] = spectrum.ionization
-                new_row["collision_gas"] = spectrum.collision_gas
-                new_row["sample_inlet"] = spectrum.sample_inlet
-                new_row["spectrum_type"] = spectrum.spectrum_type
-                new_row["precursor_type"] = spectrum.precursor_type
-                new_row["inchi_key_orig"] = spectrum.inchi_key
-                new_row["vial_id"] = spectrum.vial_id
-                new_row["collision_energy"] = spectrum.collision_energy
-                new_row["nce"] = spectrum.nce
-                new_row["ev"] = spectrum.ev
-                new_row["insource_voltage"] = spectrum.insource_voltage
-                new_row["mz"] = spectrum.products.mz
-                new_row["intensity"] = spectrum.products.intensity
-                new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
-                new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-                fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
-                new_row["spectrum_fp"] = fingerprint.to_numpy()
-                new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-            except AttributeError:
-                logging.info('attribute error from spectrum: ' + error_string)
-                raise
-        elif source == "pubchem":
-            if mol.HasProp("PUBCHEM_XLOGP3"):
-                new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
-            if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
-                new_row["component_count"] = float(
-                    mol.GetProp("PUBCHEM_COMPONENT_COUNT")
+
+            spectrum = None
+            if source == "nist":
+                # create the mass spectrum
+                spectrum = Spectrum(product_mass_info=product_mass_info,
+                                        precursor_mass_info=precursor_mass_info)
+                spectrum.from_mol(
+                    mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
                 )
-        elif source == 'nist_ri':
-            new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
-            if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
-                ri_string = mol.GetProp("COLUMN CLASS")
-                if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
-                    new_row['column'] = 'SemiStdNP'
-                    new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['experimental_ri_error'] = 0.0
-                    new_row['experimental_ri_data'] = 1
-                elif ri_string == 'Standard non-polar':
-                    new_row['column'] = 'StdNP'
-                    new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['stdnp_error'] = 0.0
-                    new_row['stdnp_data'] = 1
-                elif ri_string == 'Standard polar':
-                    new_row['column'] = 'StdPolar'
-                    new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['stdpolar_error'] = 0.0
-                    new_row['stdpolar_data'] = 1
+                spectrum.id = current_id
+                spectrum.name = current_name
+                try:
+                    new_row["precursor_mz"] = spectrum.precursor.mz
+                    new_row["synonyms"] = json.dumps(spectrum.synonyms)
+                    new_row["spectrum"] = spectrum
+                    new_row["column"] = spectrum.column
+                    new_row["experimental_ri"] = spectrum.experimental_ri
+                    new_row["experimental_ri_error"] = spectrum.experimental_ri_error
+                    new_row["experimental_ri_data"] = spectrum.experimental_ri_data
+                    new_row["stdnp"] = spectrum.stdnp
+                    new_row["stdnp_error"] = spectrum.stdnp_error
+                    new_row["stdnp_data"] = spectrum.stdnp_data
+                    new_row["stdpolar"] = spectrum.stdpolar
+                    new_row["stdpolar_error"] = spectrum.stdpolar_error
+                    new_row["stdpolar_data"] = spectrum.stdpolar_data
+                    new_row["estimated_ri"] = spectrum.estimated_ri
+                    new_row["estimated_ri_error"] = spectrum.estimated_ri_error
+                    new_row["exact_mass"] = spectrum.exact_mass
+                    new_row["ion_mode"] = spectrum.ion_mode
+                    new_row["charge"] = spectrum.charge
+                    new_row["instrument"] = spectrum.instrument
+                    new_row["instrument_type"] = spectrum.instrument_type
+                    new_row["instrument_model"] = spectrum.instrument_model
+                    new_row["ionization"] = spectrum.ionization
+                    new_row["collision_gas"] = spectrum.collision_gas
+                    new_row["sample_inlet"] = spectrum.sample_inlet
+                    new_row["spectrum_type"] = spectrum.spectrum_type
+                    new_row["precursor_type"] = spectrum.precursor_type
+                    new_row["inchi_key_orig"] = spectrum.inchi_key
+                    new_row["vial_id"] = spectrum.vial_id
+                    new_row["collision_energy"] = spectrum.collision_energy
+                    new_row["nce"] = spectrum.nce
+                    new_row["ev"] = spectrum.ev
+                    new_row["insource_voltage"] = spectrum.insource_voltage
+                    new_row["mz"] = spectrum.products.mz
+                    new_row["intensity"] = spectrum.products.intensity
+                    new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                    new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                    fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
+                    new_row["spectrum_fp"] = fingerprint.to_numpy()
+                    new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+                except AttributeError:
+                    logging.info('attribute error from spectrum: ' + error_string)
+                    raise
+            elif source == "pubchem":
+                if mol.HasProp("PUBCHEM_XLOGP3"):
+                    new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
+                if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
+                    new_row["component_count"] = float(
+                        mol.GetProp("PUBCHEM_COMPONENT_COUNT")
+                    )
+            elif source == 'nist_ri':
+                new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
+                if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
+                    ri_string = mol.GetProp("COLUMN CLASS")
+                    if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
+                        new_row['column'] = 'SemiStdNP'
+                        new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['experimental_ri_error'] = 0.0
+                        new_row['experimental_ri_data'] = 1
+                    elif ri_string == 'Standard non-polar':
+                        new_row['column'] = 'StdNP'
+                        new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['stdnp_error'] = 0.0
+                        new_row['stdnp_data'] = 1
+                    elif ri_string == 'Standard polar':
+                        new_row['column'] = 'StdPolar'
+                        new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['stdpolar_error'] = 0.0
+                        new_row['stdpolar_data'] = 1
 
-        new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
+            new_row["id"] = current_id
+            new_row["name"] = current_name
+            if type(id_field) is int:
+                current_id += 1
 
-        add_row_to_records(records, new_row)
-        if i % 10000 == 0:
-            logging.info(f"processed record {i}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(pa.table(records, records_schema))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(records_schema)
+            add_row_to_records(records, new_row)
+            if i % 10000 == 0:
+                logging.info(f"processed record {i}")
+            # check to see if we have enough records to add to the pyarrow table
+            if len(records["id"]) % 25000 == 0:
+                tables.append(pa.table(records, records_schema))
+                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+                records = empty_records(records_schema)
 
-        if num is not None and num == i:
-            break
+            if num is not None and num == i:
+                break
 
     if records:
         tables.append(pa.table(records, records_schema))
