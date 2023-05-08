@@ -22,6 +22,7 @@ from rich.console import Console
 from rich.progress import (
     BarColumn,
     DownloadColumn,
+    MofNCompleteColumn,
     Progress,
     TaskID,
     TextColumn,
@@ -71,9 +72,7 @@ class Download:
                 for chunk in r.iter_content(chunk_size=32768): 
                     f.write(chunk)
                     self.progress.update(task_id, advance=len(chunk))
-        self.progress.console.log(f"Downloaded {path}")
-
-
+        self.progress.console.print(f"Downloaded {path}")
 
 
 class PubChemWiki:
@@ -84,6 +83,8 @@ class PubChemWiki:
             TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
             BarColumn(bar_width=None),
             "[progress.percentage]{task.percentage:>3.1f}%",
+            "•",
+            MofNCompleteColumn(),
             "•",
             TimeRemainingColumn(),
             transient=False,
@@ -109,24 +110,26 @@ class PubChemWiki:
 
 
     def get_pubchem_wiki(self):
-        annots = []        
-        with requests.Session() as s:
-            rjson = self.pubchem_wiki(s, 1)
-            annots.extend(rjson['Annotation'])
-            total_pages = rjson['TotalPages']
+        annots = []
+        with self.progress:
             task_id = self.progress.add_task(
                 "download",
                 filename=self.cfg.wikipedia.file, 
-                start=True,
-                total=total_pages,
+                start=False,
                 )
-            self.progress.update(task_id, advance=1)
-            for pageno in range(2, total_pages+1):
-                # description="Fetching Wikipedia entries:"):
-                rjson = self.pubchem_wiki(s, pageno)
+            with requests.Session() as s:
+                rjson = self.pubchem_wiki(s, 1)
                 annots.extend(rjson['Annotation'])
+                total_pages = rjson['TotalPages']
+                self.progress.update(task_id, total=total_pages)
+                self.progress.start_task(task_id)
                 self.progress.update(task_id, advance=1)
-        self.progress.console.log(f"Downloaded {self.cfg.wikipedia.file}")
+                for pageno in range(2, total_pages+1):
+                    # description="Fetching Wikipedia entries:"):
+                    rjson = self.pubchem_wiki(s, pageno)
+                    annots.extend(rjson['Annotation'])
+                    self.progress.update(task_id, advance=1)
+            self.progress.console.print(f"Downloaded {self.cfg.wikipedia.file}")
         return annots
 
     def use_cache(self, filename):
@@ -139,7 +142,7 @@ class PubChemWiki:
                 with path.open('w') as f:
                     f.write(fresh_data)
         else:
-            self.progress.console.log(f"Using cache file {filename}")
+            self.progress.console.print(f"Using cache file {filename}")
         with path.open('r') as f:
             cache_data = json.load(f)
         return cache_data
@@ -198,16 +201,16 @@ def cache_pubchem_files(cfg: DictConfig):
         if not csv_file.is_file():
             dlurls.append(dlurl)
         else:
-            global_console.log(f"Using cache file {csv_file}")
+            global_console.print(f"Using cache file {csv_file}")
         pqfile = dlpath / cfg.pubchem[key].parquet
         xformfiles.append( (csv_file,pqfile) )        
     if len(dlurls) > 0:
         Download(dlurls, dlpath)
     for xfile in xformfiles:
         if not xfile[1].is_file():
-            global_console.log(f"transforming {xfile[0].name} -> {xfile[1].name}")
+            global_console.print(f"transforming {xfile[0].name} -> {xfile[1].name}")
             table = pv.read_csv(xfile[0], parse_options=pv.ParseOptions(delimiter='\t'))
-            #global_console.log(table)
+            #global_console.print(table)
             pq.write_table(table, xfile[1])
 
 
@@ -216,6 +219,7 @@ def cache_pubchem_files(cfg: DictConfig):
 
 @hydra.main(config_path="conf", config_name="config_pubchem_links", version_base=None)
 def main(cfg: DictConfig) -> int:
+    global_console.print("Attempting to find or download data files:")
     wikidata = PubChemWiki(cfg)
     cache_pubchem_files(cfg)
 
