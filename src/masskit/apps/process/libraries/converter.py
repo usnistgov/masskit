@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import logging
 from pathlib import Path
 import hydra

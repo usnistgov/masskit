@@ -1,4 +1,7 @@
+#!/usr/bin/env python
+
 import argparse
+import rich.progress
 
 """
 reformat sdf file from NIST library to format usable by rdkit by appending missing M END lines
@@ -15,7 +18,7 @@ parser.add_argument('--input', default="")
 parser.add_argument('--output', default="")
 args = parser.parse_args()
 
-with open(args.input) as fin:
+with rich.progress.open(args.input, 'rt', description=f"{args.input} -> {args.output}") as fin:
     with open(args.output, 'w') as fout:
         previous_line = ""
         for line in fin:
