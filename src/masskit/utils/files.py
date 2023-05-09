@@ -1146,6 +1146,7 @@ def load_sdf2array(
                 )
                 spectrum.id = current_id
                 spectrum.name = current_name
+                #print(spectrum)
                 try:
                     new_row["precursor_mz"] = spectrum.precursor.mz
                     new_row["synonyms"] = json.dumps(spectrum.synonyms)

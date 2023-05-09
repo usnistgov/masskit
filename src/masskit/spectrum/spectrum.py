@@ -53,7 +53,7 @@ def nce2ev(nce, precursor_mz, charge):
     elif charge == 4:
         factor = 0.8
     elif charge >= 5:
-        factor == 0.75
+        factor = 0.75
     return factor * nce * precursor_mz/500.0
 
 
@@ -1830,38 +1830,39 @@ class Spectrum:
                     self.collision_energy = self.ev
         self.insource_voltage = self.get_int_prop(mol, "IN-SOURCE VOLTAGE")
 
+        skip_props = set([
+            "MASS SPECTRAL PEAKS",
+            "NISTNO",
+            "NAME",
+            "MW",
+            "EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA",
+            "ESTIMATED KOVATS RI",
+            "INCHIKEY",
+            "RI ESTIMATION ERROR",
+            "FORMULA",
+            "SYNONYMS",
+            "RIDATA_01",
+            "RIDATA_15",
+            "PRECURSOR M/Z",
+            "EXACT MASS",
+            "ION MODE",
+            "CHARGE",
+            "INSTRUMENT",
+            "INSTRUMENT TYPE",
+            "IONIZATION",
+            "COLLISION ENERGY",
+            "COLLISION GAS",
+            "SAMPLE INLET",
+            "SPECTRUM TYPE",
+            "PRECURSOR TYPE",
+            "NOTES",
+            "IN-SOURCE VOLTAGE",
+            "ID",
+        ])
         # populate spectrum props with mol props
         for k in mol.GetPropNames():
             # skip over props handled elsewhere
-            if k in [
-                "MASS SPECTRAL PEAKS",
-                "NISTNO",
-                "NAME",
-                "MW",
-                "EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA",
-                "ESTIMATED KOVATS RI",
-                "INCHIKEY",
-                "RI ESTIMATION ERROR",
-                "FORMULA",
-                "SYNONYMS",
-                "RIDATA_01",
-                "RIDATA_15",
-                "PRECURSOR M/Z",
-                "EXACT MASS",
-                "ION MODE",
-                "CHARGE",
-                "INSTRUMENT",
-                "INSTRUMENT TYPE",
-                "IONIZATION",
-                "COLLISION ENERGY",
-                "COLLISION GAS",
-                "SAMPLE INLET",
-                "SPECTRUM TYPE",
-                "PRECURSOR TYPE",
-                "NOTES",
-                "IN-SOURCE VOLTAGE",
-                "ID",
-            ]:
+            if k in skip_props:
                 continue
             self.props[k] = self.get_string_prop(mol, k)
 
