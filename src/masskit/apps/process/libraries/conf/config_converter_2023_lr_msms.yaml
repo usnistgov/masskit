@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ~/nist/NIST23/SDF/MSMS/lr_msms_nist.SDF
+      - ~/NIST23/SDF/MSMS/lr_msms_nist.sdf
     # input file type
     type: sdf
     # what is the source of the file? nist or pubchem
