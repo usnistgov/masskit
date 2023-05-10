@@ -894,19 +894,15 @@ def parse_glycopeptide_annot(annots, peak_index):
             )
     return parsed_annots
 
-def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None, 
-            name_field:str=None, max_size:int=0, skip_expensive:bool=True) -> Dict:
+def mol2row(mol, max_size:int=0, skip_expensive:bool=True) -> Dict:
     """
     Convert an rdkit Mol into a row
     
-    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum
-    :param id_field_type: the id field type, such as int or str
-    :param name_field: list of the possible name fields
+    :param mol: the molecule
     :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
     :param skip_expensive: skip expensive calculations for better perf
-    :return: row as dict
+    :return: row as dict, mol
     """
-    error_string = ""
     ecfp4 = ECFPFingerprint()
     # smarts for tms for substructure matching
     tms = Chem.MolFromSmarts("[#14]([CH3])([CH3])[CH3]")
@@ -914,46 +910,18 @@ def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None,
     opts = StereoEnumerationOptions(unique=True)
     # fingerprint generator that respects counts but not chirality as mass spec tends to be chirality blind
 
-    if id_field is None:
-        id_field = 'NISTNO'
-    if id_field_type is None:
-        id_field_type = 'int'
-    if name_field is None:
-        name_field = ["_NAME", "NAME"]
-
     if mol is None or mol.GetNumAtoms() < 1:
-        logging.info(f"Unable to create molecule object for {error_string}")
-        return None
-
-    # get ids for error reporting
-    if type(id_field) is not int and mol.HasProp(id_field):
-        if id_field_type == 'int':
-            current_id = int(mol.GetProp(id_field))
-        else:
-            current_id = mol.GetProp(id_field)
-
-    if current_id is not None:
-        error_string += "id=" + str(current_id)
-
-    for field in name_field:
-        if mol.HasProp(field):
-            current_name = mol.GetProp(field)
-            break
-
-    if current_name is not None:
-        error_string += " name=" + current_name
-    else:
-        logging.info(f"{error_string} does not have a NAME or _NAME property")
+        logging.info(f"Unable to use molecule object")
+        return {}, mol
 
     try:
         mol = masskit.small_molecule.utils.standardize_mol(mol)
     except ValueError as e:
-        logging.info(f"Unable to standardize {error_string}")
-        return None
+        logging.info(f"Unable to standardize")
+        return {}, mol
     
     if len(mol.GetPropsAsDict()) == 0:
-        logging.info(f"All molecular props unavailable {error_string}")
-        return None
+        logging.info(f"All molecular props unavailable")
 
     # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
     # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
@@ -971,8 +939,8 @@ def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None,
     if not skip_expensive:
         mol, conformer_ids, return_value = threed.create_conformer(mol)
         if return_value == -1:
-            logging.info(f"Not able to create conformer for {error_string}")
-            return None
+            logging.info(f"Not able to create conformer")
+            return {}, mol
         # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
 
         # calculation MMFF94 partial charges
@@ -986,7 +954,7 @@ def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None,
                 for atom_num in range(0, mol_copy.GetNumAtoms()):
                     partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
         except ValueError:
-            logging.info(f"unable to run MMFF for {error_string}")
+            logging.info(f"unable to run MMFF")
         new_row["num_conformers"] = len(conformer_ids)
         new_row["partial_charges"] = partial_charges
         bounding_box = threed.bounding_box(mol)
@@ -999,15 +967,15 @@ def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None,
         new_row["has_conformer"] = True
         new_row["max_bound"] = np.max(np.abs(bounding_box))
         if max_size != 0 and new_row["max_bound"] > max_size:
-            logging.info(f"{error_string} is larger than the max bound")
-            return None
+            logging.info(f"larger than the max bound")
+            return {}, mol
         try:
             new_row["num_stereoisomers"] = len(
                 tuple(EnumerateStereoisomers(mol, options=opts))
             )  # GetStereoisomerCount(mol)
         except RuntimeError as err:
             logging.info(
-                f"Unable to create stereoisomer count for {error_string}, error = {err}"
+                f"Unable to create stereoisomer count, error = {err}"
             )
             new_row["num_stereoisomers"] = None
     else:
@@ -1048,7 +1016,7 @@ def mol2row(mol, id_field:Union[str,int]=None, id_field_type:str=None,
     # get number of unspecified double bonds
     new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
 
-    return new_row
+    return new_row, mol
 
 
 def load_smiles2array(
@@ -1056,7 +1024,6 @@ def load_smiles2array(
     num=None,
     id_field=0,
     skip_expensive=True,
-    set_probabilities=(0.01, 0.97, 0.01, 0.01),
     suppress_rdkit_warnings=True
 ):
     tables = []
@@ -1079,8 +1046,8 @@ def load_smiles2array(
     fp = open_if_filename(fp, 'r')
     for i,smiles in enumerate(fp):
         mol = Chem.MolFromSmiles(smiles)
-        new_row = mol2row(mol)
-        if new_row is None:
+        new_row, mol = mol2row(mol, skip_expensive=skip_expensive)
+        if new_row is None or not new_row:
             continue
 
         new_row["id"] = current_id
@@ -1201,8 +1168,22 @@ def load_sdf2array(
     # there is only one stereoisomer per molecule.
     for i, mol in enumerate(Chem.ForwardSDMolSupplier(fp, sanitize=False)):
 
-        new_row = mol2row(mol, id_field, id_field_type, name_field, max_size)
-        if new_row is None:
+        if type(id_field) is not int:
+            if mol.HasProp(id_field):
+                if id_field_type == 'int':
+                    current_id = int(mol.GetProp(id_field))
+                else:
+                    current_id = mol.GetProp(id_field)
+            else:
+                current_id = i
+
+        for field in name_field:
+            if mol.HasProp(field):
+                current_name = mol.GetProp(field)
+                break
+
+        new_row, mol = mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
+        if new_row is None or not new_row:
             continue
 
         # create useful set labels for training
@@ -1287,36 +1268,36 @@ def load_sdf2array(
                     new_row['stdpolar_error'] = 0.0
                     new_row['stdpolar_data'] = 1
 
-            new_row["id"] = current_id
-            new_row["name"] = current_name
-            if type(id_field) is int:
-                current_id += 1
-            new_row["id"] = current_id
-            new_row["name"] = current_name
-            if type(id_field) is int:
-                current_id += 1
+        new_row["id"] = current_id
+        new_row["name"] = current_name
+        if type(id_field) is int:
+            current_id += 1
+        new_row["id"] = current_id
+        new_row["name"] = current_name
+        if type(id_field) is int:
+            current_id += 1
 
-            add_row_to_records(records, new_row)
-            if i % 10000 == 0:
-                logging.info(f"processed record {i}")
-            # check to see if we have enough records to add to the pyarrow table
-            if len(records["id"]) % 25000 == 0:
-                tables.append(pa.table(records, records_schema))
-                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-                records = empty_records(records_schema)
-            add_row_to_records(records, new_row)
-            if i % 10000 == 0:
-                logging.info(f"processed record {i}")
-            # check to see if we have enough records to add to the pyarrow table
-            if len(records["id"]) % 25000 == 0:
-                tables.append(pa.table(records, records_schema))
-                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-                records = empty_records(records_schema)
+        add_row_to_records(records, new_row)
+        if i % 10000 == 0:
+            logging.info(f"processed record {i}")
+        # check to see if we have enough records to add to the pyarrow table
+        if len(records["id"]) % 25000 == 0:
+            tables.append(pa.table(records, records_schema))
+            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+            records = empty_records(records_schema)
+        add_row_to_records(records, new_row)
+        if i % 10000 == 0:
+            logging.info(f"processed record {i}")
+        # check to see if we have enough records to add to the pyarrow table
+        if len(records["id"]) % 25000 == 0:
+            tables.append(pa.table(records, records_schema))
+            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+            records = empty_records(records_schema)
 
-            if num is not None and num == i:
-                break
-            if num is not None and num == i:
-                break
+        if num is not None and num == i:
+            break
+        if num is not None and num == i:
+            break
 
     if records:
         tables.append(pa.table(records, records_schema))
@@ -1509,8 +1490,10 @@ class BatchFileReader:
             self.dataset = pq.ParquetFile(filename)
         elif format =='arrow':
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
-        elif format in ['mgf', 'msp', 'sdf', 'smiles']:
+        elif format in ['mgf', 'msp', 'smiles']:
             self.dataset = open(filename, mode="r")
+        elif format == 'sdf':
+            self.dataset = open(filename, mode="rb")
         else:
             raise ValueError(f'Unknown format {self.format}')
         
@@ -1562,7 +1545,7 @@ class BatchFileReader:
                 yield batch
         elif self.format == 'smiles':
             while True:
-                batch = load_sdf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                batch = load_smiles2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
                 if len(batch) == 0:
                     break
                 if isinstance(self.id_field, int):
