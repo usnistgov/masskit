@@ -1291,6 +1291,10 @@ def load_sdf2array(
             new_row["name"] = current_name
             if type(id_field) is int:
                 current_id += 1
+            new_row["id"] = current_id
+            new_row["name"] = current_name
+            if type(id_field) is int:
+                current_id += 1
 
             add_row_to_records(records, new_row)
             if i % 10000 == 0:
@@ -1300,7 +1304,17 @@ def load_sdf2array(
                 tables.append(pa.table(records, records_schema))
                 logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
                 records = empty_records(records_schema)
+            add_row_to_records(records, new_row)
+            if i % 10000 == 0:
+                logging.info(f"processed record {i}")
+            # check to see if we have enough records to add to the pyarrow table
+            if len(records["id"]) % 25000 == 0:
+                tables.append(pa.table(records, records_schema))
+                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+                records = empty_records(records_schema)
 
+            if num is not None and num == i:
+                break
             if num is not None and num == i:
                 break
 
