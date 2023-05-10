@@ -35,6 +35,18 @@ from masskit.utils.fingerprints import ECFPFingerprint
 from masskit.utils.general import open_if_filename
 from masskit.utils.hitlist import Hitlist
 import masskit.spectrum.theoretical_spectrum as msts
+import rich.progress
+# from rich.progress import (
+#     BarColumn,
+#     DownloadColumn,
+#     MofNCompleteColumn,
+#     Progress,
+#     TaskID,
+#     TextColumn,
+#     TimeRemainingColumn,
+#     track,
+#     TransferSpeedColumn,
+# )
 
 float_match = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'  # regex used for matching floating point numbers
 
@@ -1275,22 +1287,22 @@ def load_sdf2array(
                     new_row['stdpolar_error'] = 0.0
                     new_row['stdpolar_data'] = 1
 
-        new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
+            new_row["id"] = current_id
+            new_row["name"] = current_name
+            if type(id_field) is int:
+                current_id += 1
 
-        add_row_to_records(records, new_row)
-        if i % 10000 == 0:
-            logging.info(f"processed record {i}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(pa.table(records, records_schema))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(records_schema)
+            add_row_to_records(records, new_row)
+            if i % 10000 == 0:
+                logging.info(f"processed record {i}")
+            # check to see if we have enough records to add to the pyarrow table
+            if len(records["id"]) % 25000 == 0:
+                tables.append(pa.table(records, records_schema))
+                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+                records = empty_records(records_schema)
 
-        if num is not None and num == i:
-            break
+            if num is not None and num == i:
+                break
 
     if records:
         tables.append(pa.table(records, records_schema))

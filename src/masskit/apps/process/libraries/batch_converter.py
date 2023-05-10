@@ -1,7 +1,7 @@
 import logging
 from pathlib import Path
 import hydra
-from omegaconf import DictConfig
+from omegaconf import DictConfig, ListConfig
 from masskit.utils.files import BatchFileReader, BatchFileWriter, load_mgf2array, load_msp2array, spectra_to_msp, spectra_to_mgf
 from masskit.utils.general import parse_filename
 from masskit.utils.tables import row_view
@@ -31,8 +31,8 @@ def batch_converter_app(config: DictConfig) -> None:
 
     output_file_root, output_file_extension = parse_filename(Path(config.output.file.name).expanduser())
     if config.output.file.types:
-        output_file_extension = config.output.file.types if isinstance(config.output.file.types, Iterable) else\
-            [config.output.file.types]
+        output_file_extension = config.output.file.types if isinstance(config.output.file.types, list) or \
+             isinstance(config.output.file.types, ListConfig) else [config.output.file.types]
     else:
         output_file_extension = [output_file_extension]
 
@@ -46,8 +46,8 @@ def batch_converter_app(config: DictConfig) -> None:
     for output_extension in output_file_extension:
         writers.append(BatchFileWriter(output_file_root.with_suffix(f".{output_extension}"), 
                                        format=output_extension, 
-                                       annotate=config.conversion.annotate, 
-                                       row_batch_size=config.conversion.row_batch_size))
+                                       annotate=config.conversion.get("annotate", False), 
+                                       row_batch_size=config.conversion.get("row_batch_size", 5000)))
     for input_file in input_files:
         input_file = str(Path(input_file).expanduser())
         # use the file extension to determine file type unless specified in the arguments
@@ -61,14 +61,17 @@ def batch_converter_app(config: DictConfig) -> None:
             raise ValueError("output file will overwrite input file")
 
         # use a named id field or use an integer initial value for the id
-        id = config.conversion[input_file_extension].id
-        if id['field']:
-            id_field = id['field']
+        conversion = config.conversion.get(input_file_extension, None)
+        if conversion is not None and conversion.get('id', None) is not None:
+            if conversion.id['field']:
+                id_field = conversion.id['field']
+            else:
+                id_field = conversion.id['initial_value']
         else:
-            id_field = id['initial_value']
+            id_field = None
 
         reader = BatchFileReader(input_file, format=input_file_extension,
-                                 row_batch_size=config.conversion.row_batch_size,
+                                 row_batch_size=config.conversion.get("row_batch_size", 5000),
                                  id_field=id_field,
                                  comment_fields=comment_fields)
 

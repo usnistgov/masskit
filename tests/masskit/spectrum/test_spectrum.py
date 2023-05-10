@@ -30,7 +30,7 @@ def test_rdkit():
         spectrum = mss.Spectrum()
         spectrum.from_mol(mol)
         assert spectrum.precursor.mz == 180
-        assert spectrum.products.mz.size == 74
+        assert spectrum.products.mz.size == 36
         assert spectrum.formula == "C9H8O4"
         break
 

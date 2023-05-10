@@ -1,0 +1,21 @@
+cache:
+  dir: ~/.masskit_cache/pubchem
+  clear_cache: False
+wikipedia:
+  urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
+  file: pubchem-wiki.json
+queries:
+  cid2inchi:
+    file: pubchem-inchi.json
+    group_size: 100
+    reqs_per_second: 4
+pubchem:
+  inchi:
+    url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-InChI-Key.gz
+    parquet: cid-inchi.parquet
+  patent:
+    url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-Patent.gz
+    parquet: cid-patent.parquet
+  pmid:
+    url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-PMID.gz
+    parquet: cid-pmid.parquet

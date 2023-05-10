@@ -61,3 +61,39 @@ def config_batch_converter(predicted_arrow_file, batch_converted_files):
                                  f"output.file.types=[msp,arrow,parquet,mgf]",
                                  f"conversion.row_batch_size=100"])
         return cfg
+
+@pytest.fixture(scope="session")
+def batch_converted_sdf_files(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_sdf'
+
+@pytest.fixture(scope="session")
+def test_new_sdf(data_dir):
+    return data_dir / "test.new.sdf"
+
+@pytest.fixture(scope="session")
+def config_batch_converter_sdf(test_new_sdf, batch_converted_sdf_files):
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={test_new_sdf}",
+                                 f"output.file.name={batch_converted_sdf_files}",
+                                 f"output.file.types=[parquet]",
+                                 f"conversion.row_batch_size=100"])
+        return cfg
+
+@pytest.fixture(scope="session")
+def batch_converted_smiles_files(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_smiles'
+
+@pytest.fixture(scope="session")
+def test_smiles(data_dir):
+    return data_dir / "test.smiles"
+
+@pytest.fixture(scope="session")
+def config_batch_converter_smiles(test_smiles, batch_converted_smiles_files):
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={test_smiles}",
+                                 f"output.file.name={batch_converted_smiles_files}",
+                                 f"output.file.types=[parquet]",
+                                 f"conversion.row_batch_size=100"])
+        return cfg
