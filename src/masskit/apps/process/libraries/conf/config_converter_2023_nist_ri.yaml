@@ -34,7 +34,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ~/data/nist/ei/2023/ri_2023x.parquet
+    name: ~/data/nist/ei/2023/ri_2023.parquet
     # parquet, msp, mzxml
     types: parquet
 
