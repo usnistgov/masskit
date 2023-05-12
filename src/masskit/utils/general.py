@@ -38,7 +38,15 @@ def class_for_name(module_name_list, class_name):
         raise ImportError(f"unable to find {class_name}")
     return c
 
-def open_if_compressed(filename):
+def open_if_compressed(filename, mode, newline=None):
+    """
+    open the file denoted by filename and uncompress it if it is compressed
+
+    :param filename: filename
+    :param mode: file opening mode
+    :param newline
+    :return: stream
+    """
     magic_dict = {
         b"\x1f\x8b\x08": "gzip",
         b"\x42\x5a\x68": "bzip2"
@@ -47,32 +55,36 @@ def open_if_compressed(filename):
     max_len = max(len(x) for x in magic_dict)
 
     def get_type(filename):
-        with open(filename, "rb") as f:
-            file_start = f.read(max_len)
-        for magic, filetype in magic_dict.items():
-            if file_start.startswith(magic):
-                return filetype
-        return "text"
+        if Path(filename).is_file():
+            with open(filename, "rb") as f:
+                file_start = f.read(max_len)
+            for magic, filetype in magic_dict.items():
+                if file_start.startswith(magic):
+                    return filetype
+        return "uncompressed"
 
     file_type = get_type(filename)
 
     if file_type == "gzip":
-        return gzip.open(filename, "rt")
+        return gzip.open(filename, mode, newline=newline)
     elif file_type == "bzip2":
-        return bz2.open(filename, "rt")
+        fp = bz2.open(filename, mode, newline=newline)
+        # For some reason bz2 does not provide this info automatically
+        fp.name = filename
+        return fp
     else:
-        return open(filename)
+        return open(filename, mode, newline=newline)
 
 def open_if_filename(fp, mode, newline=None):
     """
-    if the fp is a string, open the file
+    if the fp is a string, open the file, and uncompress if needed
 
     :param fp: possible filename
     :param mode: file opening mode
     :return: stream
     """
     if isinstance(fp, str) or isinstance(fp, Path) :
-        fp = open(fp, mode, newline=newline)
+        fp = open_if_compressed(fp, mode, newline=newline)
         if not fp:
             raise ValueError(f"not able to open file")
     return fp

@@ -35,18 +35,8 @@ from masskit.utils.fingerprints import ECFPFingerprint
 from masskit.utils.general import open_if_filename
 from masskit.utils.hitlist import Hitlist
 import masskit.spectrum.theoretical_spectrum as msts
-import rich.progress
-# from rich.progress import (
-#     BarColumn,
-#     DownloadColumn,
-#     MofNCompleteColumn,
-#     Progress,
-#     TaskID,
-#     TextColumn,
-#     TimeRemainingColumn,
-#     track,
-#     TransferSpeedColumn,
-# )
+import rich.progress as rprogress
+from pathlib import Path
 
 float_match = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'  # regex used for matching floating point numbers
 
@@ -67,6 +57,43 @@ def add_row_to_records(records, row):
 def empty_records(schema):
     return schema.empty_table().to_pydict()
 
+import io
+def seek_size(fp):
+    pos = fp.tell()
+    fp.seek(0, io.SEEK_END)
+    size = fp.tell()
+    fp.seek(pos) # back to where we were
+    return size
+
+def get_progress(fp):
+    """
+    Given a fp pointer, return best possible progress meter
+
+    :param fp: name of the file to read or a file object
+    """
+    if fp.seekable:
+        prog = rprogress.Progress(
+            rprogress.TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
+            rprogress.BarColumn(bar_width=None),
+            "[prog.percentage]{task.percentage:>3.1f}%",
+            "•",
+            rprogress.DownloadColumn(),
+            "•",
+            rprogress.TransferSpeedColumn(),
+            "•",
+            rprogress.TimeRemainingColumn(),
+            transient=False,
+            #console=global_console,
+        )
+        total=seek_size(fp)
+    else:
+        prog = rprogress.Progress(
+            rprogress.TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
+            rprogress.SpinnerColumn(),
+            rprogress.TimeElapsedColumn(),
+        )
+        total = 0
+    return prog, total
 
 def load_mgf2array(
     fp,
@@ -1162,142 +1189,148 @@ def load_sdf2array(
     if suppress_rdkit_warnings:
         RDLogger.DisableLog('rdApp.*')
 
-    fp = open_if_filename(fp, 'r')
+    fp = open_if_filename(fp, 'rb')
+    progress, sz = get_progress(fp)
 
-    # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
-    # there is only one stereoisomer per molecule.
-    for i, mol in enumerate(Chem.ForwardSDMolSupplier(fp, sanitize=False)):
+    with progress:
+        # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
+        # there is only one stereoisomer per molecule.
+        filename = Path(fp.name).name
+        task_id = progress.add_task("load_sdf", filename=f"Reading {filename}", total=sz)
+        for i, mol in enumerate(Chem.ForwardSDMolSupplier(fp, sanitize=False)):
 
-        if type(id_field) is not int:
-            if mol.HasProp(id_field):
-                if id_field_type == 'int':
-                    current_id = int(mol.GetProp(id_field))
+            if type(id_field) is not int:
+                if mol.HasProp(id_field):
+                    if id_field_type == 'int':
+                        current_id = int(mol.GetProp(id_field))
+                    else:
+                        current_id = mol.GetProp(id_field)
                 else:
-                    current_id = mol.GetProp(id_field)
-            else:
-                current_id = i
+                    current_id = i
 
-        for field in name_field:
-            if mol.HasProp(field):
-                current_name = mol.GetProp(field)
-                break
+            for field in name_field:
+                if mol.HasProp(field):
+                    current_name = mol.GetProp(field)
+                    break
 
-        new_row, mol = mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
-        if new_row is None or not new_row:
-            continue
+            new_row, mol = mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
+            if new_row is None or not new_row:
+                continue
 
-        # create useful set labels for training
-        new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=set_probabilities)
-        spectrum = None
-        if source == "nist":
-            # create the mass spectrum
-            spectrum = Spectrum(product_mass_info=product_mass_info,
-                                     precursor_mass_info=precursor_mass_info)
-            spectrum.from_mol(
-                mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
-            )
-            spectrum.id = current_id
-            spectrum.name = current_name
-            try:
-                new_row["precursor_mz"] = spectrum.precursor.mz
-                new_row["synonyms"] = json.dumps(spectrum.synonyms)
-                new_row["spectrum"] = spectrum
-                new_row["column"] = spectrum.column
-                new_row["experimental_ri"] = spectrum.experimental_ri
-                new_row["experimental_ri_error"] = spectrum.experimental_ri_error
-                new_row["experimental_ri_data"] = spectrum.experimental_ri_data
-                new_row["stdnp"] = spectrum.stdnp
-                new_row["stdnp_error"] = spectrum.stdnp_error
-                new_row["stdnp_data"] = spectrum.stdnp_data
-                new_row["stdpolar"] = spectrum.stdpolar
-                new_row["stdpolar_error"] = spectrum.stdpolar_error
-                new_row["stdpolar_data"] = spectrum.stdpolar_data
-                new_row["estimated_ri"] = spectrum.estimated_ri
-                new_row["estimated_ri_error"] = spectrum.estimated_ri_error
-                new_row["exact_mass"] = spectrum.exact_mass
-                new_row["ion_mode"] = spectrum.ion_mode
-                new_row["charge"] = spectrum.charge
-                new_row["instrument"] = spectrum.instrument
-                new_row["instrument_type"] = spectrum.instrument_type
-                new_row["instrument_model"] = spectrum.instrument_model
-                new_row["ionization"] = spectrum.ionization
-                new_row["collision_gas"] = spectrum.collision_gas
-                new_row["sample_inlet"] = spectrum.sample_inlet
-                new_row["spectrum_type"] = spectrum.spectrum_type
-                new_row["precursor_type"] = spectrum.precursor_type
-                new_row["inchi_key_orig"] = spectrum.inchi_key
-                new_row["vial_id"] = spectrum.vial_id
-                new_row["collision_energy"] = spectrum.collision_energy
-                new_row["nce"] = spectrum.nce
-                new_row["ev"] = spectrum.ev
-                new_row["insource_voltage"] = spectrum.insource_voltage
-                new_row["mz"] = spectrum.products.mz
-                new_row["intensity"] = spectrum.products.intensity
-                new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
-                new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-                fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
-                new_row["spectrum_fp"] = fingerprint.to_numpy()
-                new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-            except AttributeError:
-                logging.info('attribute error from spectrum: ' + spectrum.id)
-                raise
-        elif source == "pubchem":
-            if mol.HasProp("PUBCHEM_XLOGP3"):
-                new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
-            if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
-                new_row["component_count"] = float(
-                    mol.GetProp("PUBCHEM_COMPONENT_COUNT")
+            # create useful set labels for training
+            new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=set_probabilities)
+            spectrum = None
+            if source == "nist":
+                # create the mass spectrum
+                spectrum = Spectrum(product_mass_info=product_mass_info,
+                                        precursor_mass_info=precursor_mass_info)
+                spectrum.from_mol(
+                    mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
                 )
-        elif source == 'nist_ri':
-            new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
-            if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
-                ri_string = mol.GetProp("COLUMN CLASS")
-                if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
-                    new_row['column'] = 'SemiStdNP'
-                    new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['experimental_ri_error'] = 0.0
-                    new_row['experimental_ri_data'] = 1
-                elif ri_string == 'Standard non-polar':
-                    new_row['column'] = 'StdNP'
-                    new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['stdnp_error'] = 0.0
-                    new_row['stdnp_data'] = 1
-                elif ri_string == 'Standard polar':
-                    new_row['column'] = 'StdPolar'
-                    new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['stdpolar_error'] = 0.0
-                    new_row['stdpolar_data'] = 1
+                spectrum.id = current_id
+                spectrum.name = current_name
+                try:
+                    new_row["precursor_mz"] = spectrum.precursor.mz
+                    new_row["synonyms"] = json.dumps(spectrum.synonyms)
+                    new_row["spectrum"] = spectrum
+                    new_row["column"] = spectrum.column
+                    new_row["experimental_ri"] = spectrum.experimental_ri
+                    new_row["experimental_ri_error"] = spectrum.experimental_ri_error
+                    new_row["experimental_ri_data"] = spectrum.experimental_ri_data
+                    new_row["stdnp"] = spectrum.stdnp
+                    new_row["stdnp_error"] = spectrum.stdnp_error
+                    new_row["stdnp_data"] = spectrum.stdnp_data
+                    new_row["stdpolar"] = spectrum.stdpolar
+                    new_row["stdpolar_error"] = spectrum.stdpolar_error
+                    new_row["stdpolar_data"] = spectrum.stdpolar_data
+                    new_row["estimated_ri"] = spectrum.estimated_ri
+                    new_row["estimated_ri_error"] = spectrum.estimated_ri_error
+                    new_row["exact_mass"] = spectrum.exact_mass
+                    new_row["ion_mode"] = spectrum.ion_mode
+                    new_row["charge"] = spectrum.charge
+                    new_row["instrument"] = spectrum.instrument
+                    new_row["instrument_type"] = spectrum.instrument_type
+                    new_row["instrument_model"] = spectrum.instrument_model
+                    new_row["ionization"] = spectrum.ionization
+                    new_row["collision_gas"] = spectrum.collision_gas
+                    new_row["sample_inlet"] = spectrum.sample_inlet
+                    new_row["spectrum_type"] = spectrum.spectrum_type
+                    new_row["precursor_type"] = spectrum.precursor_type
+                    new_row["inchi_key_orig"] = spectrum.inchi_key
+                    new_row["vial_id"] = spectrum.vial_id
+                    new_row["collision_energy"] = spectrum.collision_energy
+                    new_row["nce"] = spectrum.nce
+                    new_row["ev"] = spectrum.ev
+                    new_row["insource_voltage"] = spectrum.insource_voltage
+                    new_row["mz"] = spectrum.products.mz
+                    new_row["intensity"] = spectrum.products.intensity
+                    new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                    new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                    fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
+                    new_row["spectrum_fp"] = fingerprint.to_numpy()
+                    new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+                except AttributeError:
+                    logging.info('attribute error from spectrum: ' + spectrum.id)
+                    raise
+            elif source == "pubchem":
+                if mol.HasProp("PUBCHEM_XLOGP3"):
+                    new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
+                if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
+                    new_row["component_count"] = float(
+                        mol.GetProp("PUBCHEM_COMPONENT_COUNT")
+                    )
+            elif source == 'nist_ri':
+                new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
+                if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
+                    ri_string = mol.GetProp("COLUMN CLASS")
+                    if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
+                        new_row['column'] = 'SemiStdNP'
+                        new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['experimental_ri_error'] = 0.0
+                        new_row['experimental_ri_data'] = 1
+                    elif ri_string == 'Standard non-polar':
+                        new_row['column'] = 'StdNP'
+                        new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['stdnp_error'] = 0.0
+                        new_row['stdnp_data'] = 1
+                    elif ri_string == 'Standard polar':
+                        new_row['column'] = 'StdPolar'
+                        new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['stdpolar_error'] = 0.0
+                        new_row['stdpolar_data'] = 1
 
-        new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
-        new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
+            new_row["id"] = current_id
+            new_row["name"] = current_name
+            if type(id_field) is int:
+                current_id += 1
+            new_row["id"] = current_id
+            new_row["name"] = current_name
+            if type(id_field) is int:
+                current_id += 1
 
-        add_row_to_records(records, new_row)
-        if i % 10000 == 0:
-            logging.info(f"processed record {i}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(pa.table(records, records_schema))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(records_schema)
-        add_row_to_records(records, new_row)
-        if i % 10000 == 0:
-            logging.info(f"processed record {i}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(pa.table(records, records_schema))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(records_schema)
+            progress.update(task_id, completed=fp.tell())
 
-        if num is not None and num == i:
-            break
-        if num is not None and num == i:
-            break
+            add_row_to_records(records, new_row)
+            if i % 10000 == 0:
+                logging.info(f"processed record {i}")
+            # check to see if we have enough records to add to the pyarrow table
+            if len(records["id"]) % 25000 == 0:
+                tables.append(pa.table(records, records_schema))
+                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+                records = empty_records(records_schema)
+            add_row_to_records(records, new_row)
+            if i % 10000 == 0:
+                logging.info(f"processed record {i}")
+            # check to see if we have enough records to add to the pyarrow table
+            if len(records["id"]) % 25000 == 0:
+                tables.append(pa.table(records, records_schema))
+                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
+                records = empty_records(records_schema)
+
+            if num is not None and num == i:
+                break
+            if num is not None and num == i:
+                break
 
     if records:
         tables.append(pa.table(records, records_schema))
