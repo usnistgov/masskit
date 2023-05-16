@@ -76,7 +76,7 @@ IF ERRORLEVEL 1 (
 )
 
 SET BASE_PACKAGES=^
-arrow-cpp=11.*^
+arrow-cpp=12.*^
  conda-build^
  cmake^
  cython^
@@ -88,7 +88,7 @@ arrow-cpp=11.*^
  numba^
  numpy^
  pandas^
- pyarrow=11.*^
+ pyarrow=12.*^
  pybind11^
  pynndescent^
  pytest^

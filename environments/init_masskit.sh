@@ -89,7 +89,7 @@ fi
 # gxx is not available on windows
 
 BASE_PACKAGES="
-  arrow-cpp=11.* \
+  arrow-cpp=12.* \
   conda-build \
   cmake \
   cython \
