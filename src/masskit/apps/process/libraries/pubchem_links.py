@@ -188,11 +188,25 @@ def get_pubchem_inchi(CIDs, cfg):
     print()
     return annots
 
+def get_csv_type(t):
+    if t == 'int8':
+        return pa.int8()
+    if t == 'int64':
+        return pa.int64()
+    
+    return pa.string()
+
+def get_convert_options(headers):
+    col_types = {}
+    for field in headers:
+        col_types[field['name']] = get_csv_type(field['type'])
+    return pv.ConvertOptions(column_types=col_types)
+
 def cache_pubchem_files(cfg: DictConfig):
     dlpath = Path(cfg.cache.dir).expanduser()
     dlpath.mkdir(parents=True, exist_ok=True)
     dlurls = []
-    xformfiles = []
+    transform_files = []
 
     for key in cfg.pubchem.keys():
         dlurl = cfg.pubchem[key].url
@@ -203,13 +217,19 @@ def cache_pubchem_files(cfg: DictConfig):
         else:
             global_console.print(f"Using cache file {csv_file}")
         pqfile = dlpath / cfg.pubchem[key].parquet
-        xformfiles.append( (csv_file,pqfile) )        
+        transform_files.append( (csv_file,pqfile,key) )        
     if len(dlurls) > 0:
         Download(dlurls, dlpath)
-    for xfile in xformfiles:
+    for xfile in transform_files:
         if not xfile[1].is_file():
             global_console.print(f"transforming {xfile[0].name} -> {xfile[1].name}")
-            table = pv.read_csv(xfile[0], parse_options=pv.ParseOptions(delimiter='\t'))
+            convert_opts = get_convert_options(cfg.pubchem[xfile[2]].headers)
+            read_opts = pv.ReadOptions(column_names=list(convert_opts.column_types.keys()))
+            table = pv.read_csv(xfile[0], 
+                                parse_options=pv.ParseOptions(delimiter='\t'),
+                                convert_options=convert_opts,
+                                read_options=read_opts
+                                )
             #global_console.print(table)
             pq.write_table(table, xfile[1])
 
