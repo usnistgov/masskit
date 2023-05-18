@@ -102,7 +102,7 @@ BASE_PACKAGES="
   numba \
   numpy \
   pandas \
-  pyarrow=11.* \
+  pyarrow=12.* \
   pybind11 \
   pynndescent \
   pytest \
