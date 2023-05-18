@@ -17,6 +17,10 @@ pubchem:
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-InChI-Key.gz
     parquet: cid-inchi.parquet
     headers:
+      - cid
+      - inchi
+      - inchi-key
+    types:
       - name: cid
         type: int64
       - name: inchi
@@ -32,6 +36,9 @@ pubchem:
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-Patent.gz
     parquet: cid-patent.parquet
     headers:
+      - cid
+      - patent-id
+    types:
       - name: cid
         type: int64
       - name: patent-id
@@ -48,6 +55,10 @@ pubchem:
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-PMID.gz
     parquet: cid-pmid.parquet
     headers:
+      - cid
+      - pmid
+      - pmtype
+    types:
       - name: cid
         type: int64
       - name: pmid

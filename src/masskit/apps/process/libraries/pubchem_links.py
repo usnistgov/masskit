@@ -196,9 +196,9 @@ def get_csv_type(t):
     
     return pa.string()
 
-def get_convert_options(headers):
+def get_convert_options(col_types):
     col_types = {}
-    for field in headers:
+    for field in col_types:
         col_types[field['name']] = get_csv_type(field['type'])
     return pv.ConvertOptions(column_types=col_types)
 
@@ -223,8 +223,9 @@ def cache_pubchem_files(cfg: DictConfig):
     for xfile in transform_files:
         if not xfile[1].is_file():
             global_console.print(f"transforming {xfile[0].name} -> {xfile[1].name}")
-            convert_opts = get_convert_options(cfg.pubchem[xfile[2]].headers)
-            read_opts = pv.ReadOptions(column_names=list(convert_opts.column_types.keys()))
+            convert_opts = get_convert_options(cfg.pubchem[xfile[2]].types)
+            read_opts = pv.ReadOptions(column_names=cfg.pubchem[xfile[2]].headers)
+            print(read_opts.column_names)
             table = pv.read_csv(xfile[0], 
                                 parse_options=pv.ParseOptions(delimiter='\t'),
                                 convert_options=convert_opts,
