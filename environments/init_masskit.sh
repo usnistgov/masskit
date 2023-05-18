@@ -107,7 +107,7 @@ BASE_PACKAGES="
   pynndescent \
   pytest \
   python=3 \
-  rdkit=2021.09.4 \
+  rdkit \
   rich \
   ruff \
   scikit-build-core \
@@ -142,9 +142,9 @@ if ! conda activate $ENVNAME; then
     # conda activate $SETUP_ENVNAME
     echo "Creating conda environment"
     conda create -y -n $ENVNAME
-    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
+    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c nodefaults -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
     conda activate $ENVNAME
-    
+
     # # Check for bayesian_torch
     # (python -c "import bayesian_torch" 2> /dev/null) && has_lib=1 || has_lib=0
 
