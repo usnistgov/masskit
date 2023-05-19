@@ -19,13 +19,13 @@ pubchem:
     headers:
       - cid
       - inchi
-      - inchi-key
+      - inchi_key
     types:
       - name: cid
         type: int64
       - name: inchi
         type: string
-      - name: inchi-key
+      - name: inchi_key
         type: string
   patent:
     description: "This is a listing of all patent documents linked to CIDs. 
@@ -37,11 +37,11 @@ pubchem:
     parquet: cid-patent.parquet
     headers:
       - cid
-      - patent-id
+      - patent_id
     types:
       - name: cid
         type: int64
-      - name: patent-id
+      - name: patent_id
         type: string
   pmid:
     description: 'This is a listing of all PubMed IDs (PMIDs) linked to CIDs. It 
