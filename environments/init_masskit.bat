@@ -85,6 +85,7 @@ arrow-cpp=12.*^
  jsonpickle^
  jupyter^
  matplotlib^
+ matplotlib-venn^
  numba^
  numpy^
  pandas^
@@ -130,7 +131,7 @@ call conda activate %ENVNAME%
 IF ERRORLEVEL 1 (
     ECHO Creating conda environment
     conda create -y -n %ENVNAME%
-    mamba install -y -n %ENVNAME% %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
+    mamba install -y -n %ENVNAME% -c nodefaults %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
     call conda activate %ENVNAME%
 )
 

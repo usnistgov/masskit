@@ -99,6 +99,7 @@ BASE_PACKAGES="
   jsonpickle \
   jupyter \
   matplotlib \
+  matplotlib-venn \
   numba \
   numpy \
   pandas \
@@ -142,7 +143,7 @@ if ! conda activate $ENVNAME; then
     # conda activate $SETUP_ENVNAME
     echo "Creating conda environment"
     conda create -y -n $ENVNAME
-    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c nodefaults -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
+    mamba install -y -n $ENVNAME -c nodefaults ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
     conda activate $ENVNAME
 
     # # Check for bayesian_torch
