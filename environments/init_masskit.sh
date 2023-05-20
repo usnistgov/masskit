@@ -53,7 +53,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 for arg in "$@"; do shift; done  # Don't pass args to activate
-local_conda="${CONDA_PREFIX:-$HOME/miniconda3}"
+if [ -d "$HOME/mambaforge" ]; then
+    local_dir=$HOME/mambaforge
+elif [ -d "$HOME/miniconda3" ]; then
+    local_dir=$HOME/miniconda3
+else
+    local_dir=$HOME/Anaconda3
+fi
+local_conda="${CONDA_PREFIX:-$local_dir}"
 source $local_conda/bin/activate
 
 if [[ $CONDA_SHLVL != 1 ]]
@@ -93,7 +100,6 @@ BASE_PACKAGES="
   conda-build \
   cmake \
   cython \
-  gxx>12 \
   hydra-core \
   imageio \
   jsonpickle \
