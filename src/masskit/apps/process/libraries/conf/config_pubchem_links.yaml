@@ -1,15 +1,19 @@
 cache:
   dir: ~/.masskit_cache/pubchem
   clear_cache: False
-wikipedia:
-  urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
-  file: pubchem-wiki.json
 queries:
+  wikipedia:
+    user_agent: Wiki Query Agent (douglas.slotta@nist.gov)
+    reqs_per_second: 100
+    parquet: cid-wikipedia.parquet
   cid2inchi:
     file: pubchem-inchi.json
     group_size: 100
     reqs_per_second: 4
 pubchem:
+  wikipedia:
+    urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
+    file: pubchem-wiki.json
   inchi:
     description: 'This is a listing of all CIDs with their full InChI strings and
     InChI keys. It is a gzipped text file with CID, tab, InChI, tab,
