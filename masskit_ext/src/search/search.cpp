@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <memory>
+#include <math.h>
 #include <cstdint>
 
 #include "search.hpp"
@@ -86,7 +87,7 @@ arrow::Status TanimotoFunction(cp::KernelContext* ctx,
     // Get the output array so we may place our results there.
     //arrow::ArraySpan* out_arr = out->array_span();
     //auto out_values = out_arr->GetValues<float>(1);
-    auto out_values = out->array_span()->GetValues<float>(1);
+    auto out_values = out->array_span_mutable()->GetValues<float>(1);
 
     // Iterate over our subset of rows.
     for (int64_t i = 0; i < list.length; ++i) {
@@ -373,7 +374,7 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
     auto mask = std::static_pointer_cast<arrow::BooleanArray>(batch[6].array.ToArray());
 
     // Output array for results
-    auto out_values = out->array_span()->GetValues<float>(1);
+    auto out_values = out->array_span_mutable()->GetValues<float>(1);
 
     for (int64_t i = 0; i < batch.length; i++) {
         if (mask->Value(i)) {

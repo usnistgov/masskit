@@ -77,6 +77,10 @@
         "typeinfo": "cpp",
         "valarray": "cpp",
         "variant": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "charconv": "cpp",
+        "slist": "cpp",
+        "format": "cpp",
+        "span": "cpp"
     }
 }

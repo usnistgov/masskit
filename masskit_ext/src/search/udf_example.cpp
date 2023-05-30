@@ -64,7 +64,7 @@ arrow::Status SampleFunction(cp::KernelContext* ctx,
   auto z_scalar_int = static_cast<const arrow::Int64Scalar*>(z_scalar);
   int64_t z = z_scalar_int->value;
 
-  int64_t* out_values = out->array_span()->GetValues<int64_t>(1);
+  int64_t* out_values = out->array_span_mutable()->GetValues<int64_t>(1);
   for (int64_t i = 0; i < batch.length; ++i) {
     //*out_values++ = *x++ + *y++ + *z++;
     *out_values++ = (*x++ + *y++) * z;

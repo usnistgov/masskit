@@ -4,11 +4,19 @@
 #include <arrow/filesystem/filesystem.h>
 #include <iostream>
 #include <chrono>
+#include <vector>
 
 #include "search.hpp"
 
 namespace ds = arrow::dataset;
 namespace fs = arrow::fs;
+
+const int64_t TEST_SIZE = 30000;
+const int64_t TOPN_HITS = 20;
+
+// Global variables as a last minute hack, don't tell anyone that you saw this!
+int64_t first_matches = 0;
+int64_t topn_matches = 0;
 
 class Timer
 {
@@ -28,8 +36,7 @@ public:
         
         if(m_bRunning) {
             endTime = std::chrono::system_clock::now();
-        }
-        else {
+        } else {
             endTime = m_EndTime;
         }
         
@@ -71,6 +78,7 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_data(std::string filename) {
                                                                            format,
                                                                            ds::FileSystemFactoryOptions()));
     ARROW_ASSIGN_OR_RAISE(auto dataset, factory->Finish());
+
     // Read specified columns with a row filter
     ARROW_ASSIGN_OR_RAISE(auto scan_builder, dataset->NewScan());
     ARROW_RETURN_NOT_OK(scan_builder->Project({ 
@@ -79,15 +87,18 @@ arrow::Result<std::shared_ptr<arrow::Table>> read_data(std::string filename) {
         "product_massinfo",
         "mz",
         "intensity",
-        "spectrum_fp",
-        "spectrum_fp_count"
+        //"spectrum_fp",
+        //"spectrum_fp_count",
+        "peptide",
+        "mod_names",
+        "mod_positions"
         }));
     ARROW_ASSIGN_OR_RAISE(auto scanner, scan_builder->Finish());
     return scanner->ToTable();
     //return scanner->Head(50);
 }
 
-arrow::Status initialize(const std::string FILENAME, std::shared_ptr<arrow::Table> &table) {
+arrow::Status initialize() {
     // Adding compute functions to the central registry is a runtime
     // operation, even arrow does this for itself. At some point we'll
     // have a single function that calls all of the sub-registry
@@ -95,25 +106,81 @@ arrow::Status initialize(const std::string FILENAME, std::shared_ptr<arrow::Tabl
     // available to all.
     auto registry = cp::GetFunctionRegistry();
     ARROW_RETURN_NOT_OK(RegisterSearchFunctions(registry));
-  
-    // Load the columns we need from the given parquet file.
-    //const std::string FILENAME = "/home/slottad/nist/data/hr_msms_nist.parquet";
-    auto result = read_data(FILENAME);
-    //std::shared_ptr<arrow::Table> table;
-    ARROW_ASSIGN_OR_RAISE(table, result);
-    std::cout << "Loaded " << table->num_rows() << " rows in " << table->num_columns() << " columns." << std::endl;
-
     return arrow::Status::OK();
 }
 
-arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
+arrow::Status load_db(const std::string FILENAME, std::shared_ptr<arrow::Table> &table) {
+    // Load the columns we need from the given parquet file.
+    auto result = read_data(FILENAME);
+    ARROW_ASSIGN_OR_RAISE(table, result);
+    std::cout << "Loaded " << table->num_rows() << " rows in " << table->num_columns() << " columns." << std::endl;
+
+     return arrow::Status::OK();
+}
+
+arrow::Status load_db(const std::vector<std::string> filenames, std::shared_ptr<arrow::Table> &table) {
+    std::vector<std::shared_ptr<arrow::Table>> tables;
+    for (auto file : filenames) {
+        std::cout << file << std::endl;
+        std::shared_ptr<arrow::Table> subtable;
+        ARROW_RETURN_NOT_OK(load_db(file, subtable));
+        tables.push_back(subtable);
+    }
+    ARROW_ASSIGN_OR_RAISE(table, arrow::ConcatenateTables(tables));
+    std::cout << "Complete library loaded " << table->num_rows() << " rows in " << table->num_columns() << " columns." << std::endl;
+    return arrow::Status::OK();
+}
+
+arrow::Status check_cosine_score(int64_t query_row, 
+                               std::shared_ptr<arrow::Table> query_table, 
+                               std::shared_ptr<arrow::Table> library_table,
+                               arrow::Datum results) {
+
+    //ARROW_ASSIGN_OR_RAISE(auto query_peptide, query_table->GetColumnByName("peptide")->GetScalar(0));
+    auto query_peptide = query_table->GetColumnByName("peptide")->GetScalar(0).ValueOrDie()->ToString();
+
+    ARROW_ASSIGN_OR_RAISE(auto selectk_results, cp::SelectKUnstable(results, cp::SelectKOptions::TopKDefault(TOPN_HITS)));
+    // std::cout << "Select K Result:" << std::endl << selectk_results->ToString() << std::endl;
+
+    ARROW_ASSIGN_OR_RAISE(auto cosine_scores, cp::Take(results,selectk_results));
+
+    ARROW_ASSIGN_OR_RAISE(auto matches_datum, cp::Take(arrow::Datum(library_table->GetColumnByName("peptide")), selectk_results));
+    //std::shared_ptr<arrow::Array> matches = std::move(matches_datum).make_array();
+
+    // ARROW_ASSIGN_OR_RAISE(auto all_contains, cp::CallFunction("equal", {matches, query_peptide}));
+    // ARROW_ASSIGN_OR_RAISE(auto contains, cp::Any(all_contains));
+    // //std::cout << "Contains:" << std::endl << contains.scalar_as<arrow::BooleanType>() << std::endl;
+    // //contains.scalar_as<arrow::BooleanType>()
+    // ARROW_ASSIGN_OR_RAISE(auto contains_bool, contains.scalar());
+    // if (contains.scalar() {
+    for (int64_t i=0; i < matches_datum.length(); i++) {
+        auto match_peptide = matches_datum.chunked_array()->GetScalar(i).ValueOrDie()->ToString();
+        auto cosine_score = cosine_scores.chunked_array()->GetScalar(i).ValueOrDie()->ToString();
+        if (query_peptide == match_peptide) {
+            //std::cout << i << "\tScore: " << cosine_score << "\tQuery: " << query_peptide << "\tMatch: " << match_peptide << std::endl;
+            if (i == 0) ++first_matches;
+            ++topn_matches;
+            break;
+        }
+    }
+    return arrow::Status::OK();
+}
+
+arrow::Status run_cosine_score(int64_t query_row, 
+                               std::shared_ptr<arrow::Table> query_table, 
+                               std::shared_ptr<arrow::Table> library_table) {
+
+    // Extract the query elements
+    ARROW_ASSIGN_OR_RAISE(auto query_precursor_mz, query_table->GetColumnByName("precursor_mz")->GetScalar(query_row));
+    ARROW_ASSIGN_OR_RAISE(auto query_mz, query_table->GetColumnByName("mz")->GetScalar(0));
+    ARROW_ASSIGN_OR_RAISE(auto query_intensity, query_table->GetColumnByName("intensity")->GetScalar(0));
+    ARROW_ASSIGN_OR_RAISE(auto query_massinfo, query_table->GetColumnByName("product_massinfo")->GetScalar(0));
 
     // Create a mask, essentially a column of boolean values to denote which rows will be scored
     // and which will be skipped. Right now, it is based on the precursor fitting within a given 
     // window. However, more complex criteria may be used in the future.
     double ppm = 20; // Should be a parameter
-    auto precursor_mz = table->GetColumnByName("precursor_mz");
-    ARROW_ASSIGN_OR_RAISE(auto query_precursor_mz, precursor_mz->GetScalar(0));
+    auto precursor_mz = library_table->GetColumnByName("precursor_mz");
     double qPrecursorMZ = (std::static_pointer_cast<arrow::DoubleScalar>(query_precursor_mz))->value;
     double tol = qPrecursorMZ * ppm / 1000000.0;
     arrow::Datum maxMZ = arrow::DoubleScalar(qPrecursorMZ + tol);
@@ -122,16 +189,10 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
     ARROW_ASSIGN_OR_RAISE(auto maxDatum, arrow::compute::CallFunction("less_equal",{precursor_mz, maxMZ}));
     ARROW_ASSIGN_OR_RAISE(auto precursorMask, arrow::compute::And(minDatum, maxDatum));
 
-    // The fingerprints to be searched
-    auto mz = table->GetColumnByName("mz");
-    auto intensity = table->GetColumnByName("intensity");
-    auto massinfo = table->GetColumnByName("product_massinfo");
-
-    // The query fingerprint conveniently location in the first position
-    // of our array to be searched. I wonder if it will match anything?
-    ARROW_ASSIGN_OR_RAISE(auto query_mz, mz->GetScalar(0));
-    ARROW_ASSIGN_OR_RAISE(auto query_intensity, intensity->GetScalar(0));
-    ARROW_ASSIGN_OR_RAISE(auto query_massinfo, massinfo->GetScalar(0));
+    // The library to be searched
+    auto mz = library_table->GetColumnByName("mz");
+    auto intensity = library_table->GetColumnByName("intensity");
+    auto massinfo = library_table->GetColumnByName("product_massinfo");
     
     CosineScoreOptions cso(0,0.5,999,true,TieBreaker::MZ);
 
@@ -147,10 +208,10 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
             arrow::Datum(massinfo),
             precursorMask
         },
-        table->num_rows() );
+        library_table->num_rows() );
 
     // To simplify debugging
-    ARROW_RETURN_NOT_OK(arrow::SetCpuThreadPoolCapacity(1));
+    // ARROW_RETURN_NOT_OK(arrow::SetCpuThreadPoolCapacity(1));
 
     // Use the convenience function we apply the cosine score UDF to the
     // previously batched data
@@ -158,7 +219,11 @@ arrow::Status run_cosine_score(std::shared_ptr<arrow::Table> table) {
 
     // The type of array returned should match the input arrays
     auto cosine_score_results_array = cosine_score_results.chunked_array();
-    std::cout << "Cosine Score Result:" << std::endl << cosine_score_results_array->ToString() << std::endl;
+    //std::cout << "Cosine Score Result:" << std::endl << cosine_score_results_array->ToString() << std::endl;
+
+    ARROW_RETURN_NOT_OK(check_cosine_score(query_row, query_table, library_table, cosine_score_results));
+    // ARROW_ASSIGN_OR_RAISE(auto selectk_results, cp::SelectKUnstable(cosine_score_results, cp::SelectKOptions::TopKDefault(5)));
+    // std::cout << "Select K Result:" << std::endl << selectk_results->ToString() << std::endl;
 
     // cp::ArraySortOptions sort_options(cp::SortOrder::Descending);
     // ARROW_ASSIGN_OR_RAISE(auto sort_results, cp::CallFunction("array_sort_indices", {cosine_score_results}, &sort_options));
@@ -225,38 +290,72 @@ arrow::Status run_tanimoto(std::shared_ptr<arrow::Table> table) {
 
 
 int main(int argc, char** argv) {
-    if (argc < 2) {
-        std::cerr << argv[0] << ": missing parquet input file!\n";
-        std::cerr << "\tusage: " << argv[0] << " <input_file> ...\n";
+    // if (argc < 2) {
+    //     std::cerr << argv[0] << ": missing parquet input file!\n";
+    //     std::cerr << "\tusage: " << argv[0] << " <input_file> ...\n";
+    //     return EXIT_FAILURE;
+    // }
+    // std::string filename(argv[1]);
+    std::string query_file("/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test.parquet");
+
+    std::vector<std::string> library_files{
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_0.parquet",
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_1.parquet",
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_2.parquet",
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_3.parquet",
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_4.parquet",
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
+    };
+    // std::vector<std::string> library_files{
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
+    // };
+
+    auto status = initialize();
+    if (!status.ok()) {
+        std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
-    std::string filename(argv[1]);
+
     Timer timer;
-
     timer.start();
-    std::shared_ptr<arrow::Table> table;
-    auto status = initialize(filename, table);
+    std::shared_ptr<arrow::Table> query_table;
+    status = load_db(query_file, query_table);
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
     timer.stop();
-    std::cout << "Time to load data: " << timer.elapsedSeconds() << " seconds.\n";
+    std::cout << "Time to load query data: " << timer.elapsedSeconds() << " seconds.\n";
 
     timer.start();
-    status = run_cosine_score(table);
+    std::shared_ptr<arrow::Table> search_table;
+    status = load_db(library_files, search_table);
     if (!status.ok()) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
     timer.stop();
-    std::cout << "Time to calculate cosine score: " << timer.elapsedSeconds() << " seconds.\n";
-    std::cout << "Rate of cosine score: \n";
-    double tps = table->num_rows()/timer.elapsedSeconds();
-    std::cout << "\t" << tps << " spectra matches/second.\n";
-    std::cout << "\t" << tps / 1000.0 << " spectra matches/millisecond.\n";
-    std::cout << "\t" << tps / 1000000.0 << " spectra matches/microsecond.\n";
-    std::cout << "\t" << tps / 1000000000.0 << " spectra matches/nanosecond.\n";
+    std::cout << "Time to load library data: " << timer.elapsedSeconds() << " seconds.\n";
+
+    for (int64_t i=0; i<TEST_SIZE; i++) {
+        timer.start();
+        status = run_cosine_score(i, query_table, search_table);
+        if (!status.ok()) {
+            std::cerr << "Error occurred : " << status.message() << std::endl;
+            return EXIT_FAILURE;
+        }
+        timer.stop();
+        std::cout << "Query: " << i << "\t search time: " << timer.elapsedSeconds() << " seconds. Rate: ";
+        double tps = query_table->num_rows()/timer.elapsedSeconds();
+        //std::cout << "\t" << tps << " spectra matches/second.\n";
+        // std::cout << "\t" << tps / 1000.0 << " spectra matches/millisecond.\n";
+        std::cout << "\t" << tps / 1000000.0 << " spectra matches/microsecond.\n";
+        // std::cout << "\t" << tps / 1000000000.0 << " spectra matches/nanosecond.\n";
+    }
+
+    std::cout << "\n";
+    std::cout << "First place matches: \t" << first_matches << "\n";
+    std::cout << "Top N matches: \t" << topn_matches << "\n";
 
     // timer.start();
     // status = run_tanimoto(table);
