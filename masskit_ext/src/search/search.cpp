@@ -7,6 +7,7 @@
 #include <cstdint>
 
 #include "search.hpp"
+#include "IntervalTree.h"
 
 #ifdef _MSC_VER
   #include <intrin.h>
@@ -181,6 +182,9 @@ bool overlap(tInterval &a, tInterval &b) {
     return (std::max(a.first, b.first) <= std::min(a.second, b.second));
 };
 
+typedef IntervalTree<double, size_t> peakIntervalTree;
+typedef peakIntervalTree::interval peakInterval;
+
 void compute_weight(const double *mz,
                     const double *intensity,
                     int32_t length,
@@ -200,39 +204,15 @@ struct CSpectrum {
     const double *m_mz;
     const double *m_intensity;
     int64_t m_length;
-    std::vector<tInterval> m_intervals; 
+    peakIntervalTree m_intervals;
+    //std::vector<tInterval> m_intervals; 
     double m_tolerance;
     Tolerance_Type m_toltype;
-
-    // CSpectrum(std::shared_ptr<arrow::DoubleArray> mzArr,
-    //           std::shared_ptr<arrow::DoubleArray> intensityArr,
-    //           double m_tolerance, Tolerance_Type type) 
-    //           : m_tolerance(m_tolerance), m_toltype(type) {
-    //     const double *mzbuf = mzArr->raw_values();
-    //     const double *intbuf = intensityArr->raw_values();
-    //     // Strip out ions with zero intensities
-    //     for (auto i = 0; i < mzArr->length(); i++) {
-    //         if ( intbuf[i] > 0) {
-    //             m_mz.push_back(mzbuf[i]);
-    //             m_intensity.push_back(intbuf[i]);
-    //         }
-    //     }
-    //     this->create_intervals();
-    // }
 
     CSpectrum(const double *mzArr, const double *intensityArr, int64_t length,
               double m_tolerance, Tolerance_Type type) 
               : m_mz(mzArr), m_intensity(intensityArr), m_length(length), 
-                m_tolerance(m_tolerance), m_toltype(type) {
-        // Strip out ions with zero intensities
-        // for (auto i = 0; i < length; i++) {
-        //     if ( intensityArr[i] > 0) {
-        //         m_mz.push_back(mzArr[i]);
-        //         m_intensity.push_back(intensityArr[i]);
-        //     }
-        // }
-        this->create_intervals();
-    }
+                m_tolerance(m_tolerance), m_toltype(type) {}
 
     float cosine_score(CSpectrum &other) {
         std::vector<tMatch> intersections;
@@ -275,28 +255,11 @@ struct CSpectrum {
     }
 
     void intersect(CSpectrum &other, std::vector<tMatch> &intersections) {
-
-        int32_t curIdx = 0;
-        int32_t othMinIdx = 0;
-        int32_t othCurIdx = 0;
-        intersections.clear();
-
-        while (curIdx < m_intervals.size()) {
-            othCurIdx = othMinIdx;
-            while ((curIdx < m_intervals.size()) &&
-                   (othCurIdx < other.m_intervals.size()) &&
-                   (m_intervals[curIdx].first <= other.m_intervals[othCurIdx].second)) {
-                if (overlap(m_intervals[curIdx], other.m_intervals[othCurIdx])) {
-                    intersections.push_back(std::make_pair(curIdx, othCurIdx));
-                }
-                ++othCurIdx;
-            }
-            ++curIdx;
-            if (curIdx < m_intervals.size()) {
-                while ((othMinIdx < other.m_intervals.size()) &&
-                       (m_intervals[curIdx].first > other.m_intervals[othMinIdx].second)) {
-                    ++othMinIdx;
-                }
+        for (int32_t i=0; i<other.m_length; i++) {
+            tInterval ss = other.get_start_stop(i);
+            auto overlaps = m_intervals.findOverlapping(ss.first, ss.second);
+            for (auto over : overlaps) {
+                intersections.push_back(std::make_pair(i, over.value));
             }
         }
     }
@@ -313,13 +276,18 @@ struct CSpectrum {
         return 0;
     }
 
-    void create_intervals() {
-        m_intervals.clear();
-        // for (auto mz : m_mz) {
+    void create_interval_tree() {
+        peakIntervalTree::interval_vector ivector;
         for (int32_t i=0; i<m_length; i++) {
             double hTol = this->half_tolerance(m_mz[i]);
-            m_intervals.push_back(std::make_pair(m_mz[i] - hTol, m_mz[i] + hTol));            
+            ivector.push_back(peakInterval(m_mz[i] - hTol, m_mz[i] + hTol, i));      
         }
+        m_intervals = peakIntervalTree(std::move(ivector));
+    }
+
+    tInterval get_start_stop(int32_t i) {
+        double hTol = this->half_tolerance(m_mz[i]);
+        return std::make_pair(m_mz[i] - hTol, m_mz[i] + hTol);
     }
 
 };
@@ -351,6 +319,7 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
 
     CSpectrum query(query_mz->raw_values(), query_intensity->raw_values(),
                     query_mz->length(), query_tol->value, PPM);
+    query.create_interval_tree();
 
     // Reference Data
     // This data is passed in as subsets of the large columns, e.g. 5,000 items

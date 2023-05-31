@@ -11,8 +11,8 @@
 namespace ds = arrow::dataset;
 namespace fs = arrow::fs;
 
-const int64_t TEST_SIZE = 30000;
-const int64_t TOPN_HITS = 20;
+const int64_t TEST_SIZE = 1000;
+const int64_t TOPN_HITS = 5;
 
 // Global variables as a last minute hack, don't tell anyone that you saw this!
 int64_t first_matches = 0;
@@ -143,6 +143,7 @@ arrow::Status check_cosine_score(int64_t query_row,
     // std::cout << "Select K Result:" << std::endl << selectk_results->ToString() << std::endl;
 
     ARROW_ASSIGN_OR_RAISE(auto cosine_scores, cp::Take(results,selectk_results));
+    // std::cout << "Top N cosine scores:" << std::endl << cosine_scores.chunked_array()->ToString() << std::endl;
 
     ARROW_ASSIGN_OR_RAISE(auto matches_datum, cp::Take(arrow::Datum(library_table->GetColumnByName("peptide")), selectk_results));
     //std::shared_ptr<arrow::Array> matches = std::move(matches_datum).make_array();
@@ -296,7 +297,7 @@ int main(int argc, char** argv) {
     //     return EXIT_FAILURE;
     // }
     // std::string filename(argv[1]);
-    std::string query_file("/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test.parquet");
+    std::string query_file("/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet");
 
     std::vector<std::string> library_files{
         "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_0.parquet",
@@ -308,6 +309,9 @@ int main(int argc, char** argv) {
     };
     // std::vector<std::string> library_files{
     //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
+    // };
+    // std::vector<std::string> library_files{
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet"
     // };
 
     auto status = initialize();
@@ -324,6 +328,8 @@ int main(int argc, char** argv) {
         std::cerr << "Error occurred : " << status.message() << std::endl;
         return EXIT_FAILURE;
     }
+
+
     timer.stop();
     std::cout << "Time to load query data: " << timer.elapsedSeconds() << " seconds.\n";
 
