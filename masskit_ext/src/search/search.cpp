@@ -7,7 +7,7 @@
 #include <cstdint>
 
 #include "search.hpp"
-#include "IntervalTree.h"
+#include "IITree.h"
 
 #ifdef _MSC_VER
   #include <intrin.h>
@@ -182,8 +182,7 @@ bool overlap(tInterval &a, tInterval &b) {
     return (std::max(a.first, b.first) <= std::min(a.second, b.second));
 };
 
-typedef IntervalTree<double, size_t> peakIntervalTree;
-typedef peakIntervalTree::interval peakInterval;
+typedef IITree<double, size_t> peakIntervalTree;
 
 void compute_weight(const double *mz,
                     const double *intensity,
@@ -257,9 +256,10 @@ struct CSpectrum {
     void intersect(CSpectrum &other, std::vector<tMatch> &intersections) {
         for (int32_t i=0; i<other.m_length; i++) {
             tInterval ss = other.get_start_stop(i);
-            auto overlaps = m_intervals.findOverlapping(ss.first, ss.second);
+            std::vector<size_t> overlaps;
+            m_intervals.overlap(ss.first, ss.second, overlaps);
             for (auto over : overlaps) {
-                intersections.push_back(std::make_pair(i, over.value));
+                intersections.push_back(std::make_pair(i, m_intervals.data(over)));
             }
         }
     }
@@ -277,12 +277,11 @@ struct CSpectrum {
     }
 
     void create_interval_tree() {
-        peakIntervalTree::interval_vector ivector;
         for (int32_t i=0; i<m_length; i++) {
             double hTol = this->half_tolerance(m_mz[i]);
-            ivector.push_back(peakInterval(m_mz[i] - hTol, m_mz[i] + hTol, i));      
+            m_intervals.add(m_mz[i] - hTol, m_mz[i] + hTol, i);
         }
-        m_intervals = peakIntervalTree(std::move(ivector));
+        m_intervals.index();
     }
 
     tInterval get_start_stop(int32_t i) {

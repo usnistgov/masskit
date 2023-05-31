@@ -11,7 +11,7 @@
 namespace ds = arrow::dataset;
 namespace fs = arrow::fs;
 
-const int64_t TEST_SIZE = 1000;
+const int64_t TEST_SIZE = 5;
 const int64_t TOPN_HITS = 5;
 
 // Global variables as a last minute hack, don't tell anyone that you saw this!
@@ -132,18 +132,18 @@ arrow::Status load_db(const std::vector<std::string> filenames, std::shared_ptr<
 }
 
 arrow::Status check_cosine_score(int64_t query_row, 
-                               std::shared_ptr<arrow::Table> query_table, 
-                               std::shared_ptr<arrow::Table> library_table,
+                               std::shared_ptr<arrow::Table> const& query_table, 
+                               std::shared_ptr<arrow::Table> const& library_table,
                                arrow::Datum results) {
 
     //ARROW_ASSIGN_OR_RAISE(auto query_peptide, query_table->GetColumnByName("peptide")->GetScalar(0));
-    auto query_peptide = query_table->GetColumnByName("peptide")->GetScalar(0).ValueOrDie()->ToString();
+    auto query_peptide = query_table->GetColumnByName("peptide")->GetScalar(query_row).ValueOrDie()->ToString();
 
     ARROW_ASSIGN_OR_RAISE(auto selectk_results, cp::SelectKUnstable(results, cp::SelectKOptions::TopKDefault(TOPN_HITS)));
-    // std::cout << "Select K Result:" << std::endl << selectk_results->ToString() << std::endl;
+    std::cout << "Select K Result:" << std::endl << selectk_results->ToString() << std::endl;
 
     ARROW_ASSIGN_OR_RAISE(auto cosine_scores, cp::Take(results,selectk_results));
-    // std::cout << "Top N cosine scores:" << std::endl << cosine_scores.chunked_array()->ToString() << std::endl;
+    std::cout << "Top N cosine scores:" << std::endl << cosine_scores.chunked_array()->ToString() << std::endl;
 
     ARROW_ASSIGN_OR_RAISE(auto matches_datum, cp::Take(arrow::Datum(library_table->GetColumnByName("peptide")), selectk_results));
     //std::shared_ptr<arrow::Array> matches = std::move(matches_datum).make_array();
@@ -154,12 +154,15 @@ arrow::Status check_cosine_score(int64_t query_row,
     // //contains.scalar_as<arrow::BooleanType>()
     // ARROW_ASSIGN_OR_RAISE(auto contains_bool, contains.scalar());
     // if (contains.scalar() {
-    for (int64_t i=0; i < matches_datum.length(); i++) {
+    for (int64_t i=0; i < matches_datum.chunked_array()->length(); i++) {
         auto match_peptide = matches_datum.chunked_array()->GetScalar(i).ValueOrDie()->ToString();
         auto cosine_score = cosine_scores.chunked_array()->GetScalar(i).ValueOrDie()->ToString();
+        std::cout << query_peptide << "\t" << match_peptide << "\n";
         if (query_peptide == match_peptide) {
             //std::cout << i << "\tScore: " << cosine_score << "\tQuery: " << query_peptide << "\tMatch: " << match_peptide << std::endl;
-            if (i == 0) ++first_matches;
+            if (i == 0) {
+                ++first_matches;
+            }
             ++topn_matches;
             break;
         }
@@ -168,14 +171,14 @@ arrow::Status check_cosine_score(int64_t query_row,
 }
 
 arrow::Status run_cosine_score(int64_t query_row, 
-                               std::shared_ptr<arrow::Table> query_table, 
-                               std::shared_ptr<arrow::Table> library_table) {
+                               std::shared_ptr<arrow::Table> const& query_table, 
+                               std::shared_ptr<arrow::Table> const& library_table) {
 
     // Extract the query elements
     ARROW_ASSIGN_OR_RAISE(auto query_precursor_mz, query_table->GetColumnByName("precursor_mz")->GetScalar(query_row));
-    ARROW_ASSIGN_OR_RAISE(auto query_mz, query_table->GetColumnByName("mz")->GetScalar(0));
-    ARROW_ASSIGN_OR_RAISE(auto query_intensity, query_table->GetColumnByName("intensity")->GetScalar(0));
-    ARROW_ASSIGN_OR_RAISE(auto query_massinfo, query_table->GetColumnByName("product_massinfo")->GetScalar(0));
+    ARROW_ASSIGN_OR_RAISE(auto query_mz, query_table->GetColumnByName("mz")->GetScalar(query_row));
+    ARROW_ASSIGN_OR_RAISE(auto query_intensity, query_table->GetColumnByName("intensity")->GetScalar(query_row));
+    ARROW_ASSIGN_OR_RAISE(auto query_massinfo, query_table->GetColumnByName("product_massinfo")->GetScalar(query_row));
 
     // Create a mask, essentially a column of boolean values to denote which rows will be scored
     // and which will be skipped. Right now, it is based on the precursor fitting within a given 
@@ -299,20 +302,20 @@ int main(int argc, char** argv) {
     // std::string filename(argv[1]);
     std::string query_file("/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet");
 
-    std::vector<std::string> library_files{
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_0.parquet",
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_1.parquet",
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_2.parquet",
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_3.parquet",
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_4.parquet",
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
-    };
     // std::vector<std::string> library_files{
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_0.parquet",
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_1.parquet",
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_2.parquet",
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_3.parquet",
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_4.parquet",
     //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
     // };
     // std::vector<std::string> library_files{
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet"
+    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
     // };
+    std::vector<std::string> library_files{
+        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet"
+    };
 
     auto status = initialize();
     if (!status.ok()) {
@@ -343,7 +346,7 @@ int main(int argc, char** argv) {
     timer.stop();
     std::cout << "Time to load library data: " << timer.elapsedSeconds() << " seconds.\n";
 
-    for (int64_t i=0; i<TEST_SIZE; i++) {
+    for (int64_t i=0; i<TEST_SIZE; ++i) {
         timer.start();
         status = run_cosine_score(i, query_table, search_table);
         if (!status.ok()) {
