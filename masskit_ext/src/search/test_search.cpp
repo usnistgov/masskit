@@ -11,7 +11,7 @@
 namespace ds = arrow::dataset;
 namespace fs = arrow::fs;
 
-const int64_t TEST_SIZE = 5;
+const int64_t TEST_SIZE = 10000;
 const int64_t TOPN_HITS = 5;
 
 // Global variables as a last minute hack, don't tell anyone that you saw this!
@@ -118,7 +118,7 @@ arrow::Status load_db(const std::string FILENAME, std::shared_ptr<arrow::Table> 
      return arrow::Status::OK();
 }
 
-arrow::Status load_db(const std::vector<std::string> filenames, std::shared_ptr<arrow::Table> &table) {
+arrow::Status load_db(std::vector<std::string> const& filenames, std::shared_ptr<arrow::Table> &table) {
     std::vector<std::shared_ptr<arrow::Table>> tables;
     for (auto file : filenames) {
         std::cout << file << std::endl;
@@ -132,8 +132,8 @@ arrow::Status load_db(const std::vector<std::string> filenames, std::shared_ptr<
 }
 
 arrow::Status check_cosine_score(int64_t query_row, 
-                               std::shared_ptr<arrow::Table> query_table, 
-                               std::shared_ptr<arrow::Table> library_table,
+                               std::shared_ptr<arrow::Table> const& query_table, 
+                               std::shared_ptr<arrow::Table> const& library_table,
                                arrow::Datum results) {
 
     //ARROW_ASSIGN_OR_RAISE(auto query_peptide, query_table->GetColumnByName("peptide")->GetScalar(0));
@@ -154,12 +154,15 @@ arrow::Status check_cosine_score(int64_t query_row,
     // //contains.scalar_as<arrow::BooleanType>()
     // ARROW_ASSIGN_OR_RAISE(auto contains_bool, contains.scalar());
     // if (contains.scalar() {
-    for (int64_t i=0; i < matches_datum.length(); i++) {
+    for (int64_t i=0; i < matches_datum.chunked_array()->length(); i++) {
         auto match_peptide = matches_datum.chunked_array()->GetScalar(i).ValueOrDie()->ToString();
         auto cosine_score = cosine_scores.chunked_array()->GetScalar(i).ValueOrDie()->ToString();
+        // std::cout << query_peptide << "\t" << match_peptide << "\n";
         if (query_peptide == match_peptide) {
             //std::cout << i << "\tScore: " << cosine_score << "\tQuery: " << query_peptide << "\tMatch: " << match_peptide << std::endl;
-            if (i == 0) ++first_matches;
+            if (i == 0) {
+                ++first_matches;
+            }
             ++topn_matches;
             break;
         }
@@ -168,8 +171,8 @@ arrow::Status check_cosine_score(int64_t query_row,
 }
 
 arrow::Status run_cosine_score(int64_t query_row, 
-                               std::shared_ptr<arrow::Table> query_table, 
-                               std::shared_ptr<arrow::Table> library_table) {
+                               std::shared_ptr<arrow::Table> const& query_table, 
+                               std::shared_ptr<arrow::Table> const& library_table) {
 
     // Extract the query elements
     ARROW_ASSIGN_OR_RAISE(auto query_precursor_mz, query_table->GetColumnByName("precursor_mz")->GetScalar(query_row));
@@ -297,22 +300,22 @@ int main(int argc, char** argv) {
     //     return EXIT_FAILURE;
     // }
     // std::string filename(argv[1]);
-    std::string query_file("/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet");
+    std::string query_file("/home/djs10/asms2023/test_filtered.parquet");
 
-    // std::vector<std::string> library_files{
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_0.parquet",
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_1.parquet",
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_2.parquet",
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_3.parquet",
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_4.parquet",
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
-    // };
-    // std::vector<std::string> library_files{
-    //     "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/library/predicted_cho_uniprot_tryptic_2_5.parquet"
-    // };
     std::vector<std::string> library_files{
-        "/home/djs10/gitlab/masskit/masskit_ext/build/release/src/search/test_filtered.parquet"
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_0.parquet",
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_1.parquet",
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_2.parquet",
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_3.parquet",
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_4.parquet",
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_5.parquet"
     };
+    // std::vector<std::string> library_files{
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_5.parquet"
+    // };
+    // std::vector<std::string> library_files{
+    //     "/home/djs10/asms2023/test_filtered.parquet"
+    // };
 
     auto status = initialize();
     if (!status.ok()) {
@@ -343,7 +346,17 @@ int main(int argc, char** argv) {
     timer.stop();
     std::cout << "Time to load library data: " << timer.elapsedSeconds() << " seconds.\n";
 
-    for (int64_t i=0; i<TEST_SIZE; i++) {
+    int64_t num_tests;
+    if (TEST_SIZE > query_table->num_rows()) {
+        num_tests = query_table->num_rows();
+    } else {
+        num_tests = TEST_SIZE;
+    }
+
+    double tps;
+    Timer timer2;
+    timer2.start();
+    for (int64_t i=0; i<num_tests; ++i) {
         timer.start();
         status = run_cosine_score(i, query_table, search_table);
         if (!status.ok()) {
@@ -351,14 +364,21 @@ int main(int argc, char** argv) {
             return EXIT_FAILURE;
         }
         timer.stop();
-        std::cout << "Query: " << i << "\t search time: " << timer.elapsedSeconds() << " seconds. Rate: ";
-        double tps = query_table->num_rows()/timer.elapsedSeconds();
-        //std::cout << "\t" << tps << " spectra matches/second.\n";
-        // std::cout << "\t" << tps / 1000.0 << " spectra matches/millisecond.\n";
-        std::cout << "\t" << tps / 1000000.0 << " spectra matches/microsecond.\n";
-        // std::cout << "\t" << tps / 1000000000.0 << " spectra matches/nanosecond.\n";
+        std::cout << "Query: " << i << "\t search time: " << timer.elapsedSeconds() << " seconds.\tRate: ";
+        tps = search_table->num_rows()/timer.elapsedSeconds();
+        // std::cout << tps << " spectra matches/second.\n";
+        // std::cout << tps / 1000.0 << " spectra matches/millisecond.\n";
+        std::cout << tps / 1000000.0 << " spectra matches/microsecond.\n";
+        // std::cout << tps / 1000000000.0 << " spectra matches/nanosecond.\n";
     }
+    timer2.stop();
 
+    std::cout << "\n";
+    std::cout << "Num queries: " << num_tests << "\n";
+    std::cout << "Library Spectra: " << search_table->num_rows() << "\n";
+    std::cout << "Total search time: " << timer2.elapsedSeconds() << "\tRate: " ;
+    tps = (num_tests * search_table->num_rows())/timer.elapsedSeconds();
+    std::cout << tps / 1000000.0 << " spectra matches/microsecond.\n";
     std::cout << "\n";
     std::cout << "First place matches: \t" << first_matches << "\n";
     std::cout << "Top N matches: \t" << topn_matches << "\n";
