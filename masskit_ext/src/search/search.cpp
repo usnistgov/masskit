@@ -217,7 +217,8 @@ struct CSpectrum {
         std::vector<tMatch> intersections;
         this->intersect(other, intersections);
 
-        //if ((m_length > 2) && (other.m_length > 2) && (intersections.size() < 2))
+        if (intersections.size() < 1)
+            return -2.0;
         if ((std::min(m_length, other.m_length) > 2) && (intersections.size() < 2))
             return -42.0;
 

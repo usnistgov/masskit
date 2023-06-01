@@ -294,6 +294,10 @@ arrow::Status run_tanimoto(std::shared_ptr<arrow::Table> table) {
 
 
 int main(int argc, char** argv) {
+    // std::cout << "CPU Thread Pool Capacity: " << arrow::GetCpuThreadPoolCapacity() << "\n"; 
+    // std::cout << "IO Thread Pool Capacity:  " << arrow::io::GetIOThreadPoolCapacity() << "\n"; 
+    // return EXIT_SUCCESS;
+
     // if (argc < 2) {
     //     std::cerr << argv[0] << ": missing parquet input file!\n";
     //     std::cerr << "\tusage: " << argv[0] << " <input_file> ...\n";
@@ -376,9 +380,9 @@ int main(int argc, char** argv) {
     std::cout << "\n";
     std::cout << "Num queries: " << num_tests << "\n";
     std::cout << "Library Spectra: " << search_table->num_rows() << "\n";
-    std::cout << "Total search time: " << timer2.elapsedSeconds() << "\tRate: " ;
-    tps = (num_tests * search_table->num_rows())/timer.elapsedSeconds();
-    std::cout << tps / 1000000.0 << " spectra matches/microsecond.\n";
+    std::cout << "Total search time: " << timer2.elapsedSeconds() << "\n";
+    tps = (num_tests * search_table->num_rows())/timer2.elapsedSeconds();
+    std::cout << "Rate: " << tps / 1000000.0 << " spectra matches/microsecond.\n";
     std::cout << "\n";
     std::cout << "First place matches: \t" << first_matches << "\n";
     std::cout << "Top N matches: \t" << topn_matches << "\n";
