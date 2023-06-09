@@ -175,7 +175,7 @@ const cp::FunctionDoc cosine_score_doc{
 
 enum Tolerance_Type { NONE, PPM, DALTONS};
 typedef std::pair<double, double> tInterval;
-typedef std::pair<int32_t, int32_t> tMatch;
+typedef std::pair<int32_t, uint64_t> tMatch;
 bool overlap(tInterval &a, tInterval &b) {
     // overlap if max(L1, L2) <= min(R1, R2)}
     // Non-overlapping if max(L1, L2) > min(R1, R2)}
