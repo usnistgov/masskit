@@ -316,7 +316,7 @@ class ECFPFingerprint(Fingerprint):
     def __init__(self, dimension=4096, radius=2, *args, **kwargs):
         super().__init__(dimension=dimension, *args, **kwargs)
         self.ecfp = rdFingerprintGenerator.GetMorganGenerator(fpSize=dimension, radius=radius,
-                                                              useCountSimulation=True, includeChirality=False)
+                                                              countSimulation=True, includeChirality=False)
 
     def to_bitvec(self):
         """
