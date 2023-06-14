@@ -216,6 +216,9 @@ arrow::Status run_cosine_score(int64_t query_row,
 
     // To simplify debugging
     // ARROW_RETURN_NOT_OK(arrow::SetCpuThreadPoolCapacity(1));
+    // auto cpus_result = arrow::GetCpuThreadPoolCapacity();
+    // std::cout << "Arrow CPU count: " << cpus_result << "\n";
+    // return arrow::Status::OK();
 
     // Use the convenience function we apply the cosine score UDF to the
     // previously batched data
@@ -306,17 +309,20 @@ int main(int argc, char** argv) {
     // std::string filename(argv[1]);
     std::string query_file("/home/djs10/asms2023/test_filtered.parquet");
 
-    std::vector<std::string> library_files{
-        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_0.parquet",
-        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_1.parquet",
-        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_2.parquet",
-        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_3.parquet",
-        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_4.parquet",
-        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_5.parquet"
-    };
+    // std::vector<std::string> library_files{
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_0.parquet",
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_1.parquet",
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_2.parquet",
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_3.parquet",
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_4.parquet",
+    //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_5.parquet"
+    // };
     // std::vector<std::string> library_files{
     //     "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2_5.parquet"
     // };
+    std::vector<std::string> library_files{
+        "/home/djs10/asms2023/library/predicted_cho_uniprot_tryptic_2.parquet"
+    };
     // std::vector<std::string> library_files{
     //     "/home/djs10/asms2023/test_filtered.parquet"
     // };
