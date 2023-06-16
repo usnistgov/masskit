@@ -97,3 +97,16 @@ def config_batch_converter_smiles(test_smiles, batch_converted_smiles_files):
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100"])
         return cfg
+
+@pytest.fixture(scope="session")
+def batch_converted_smiles_path_file(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_smiles_path_file'
+
+@pytest.fixture(scope="session")
+def config_shortest_path_smiles(batch_converted_smiles_files, batch_converted_smiles_path_file):
+    with initialize(version_base=None, config_path="../apps/process/mols/conf"):
+        cfg = compose(config_name="config_path",
+                      overrides=[f"input.file.name={batch_converted_smiles_files}.parquet",
+                                 f"output.file.name={batch_converted_smiles_path_file}.parquet",
+                                 ])
+        return cfg

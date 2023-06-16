@@ -118,78 +118,6 @@ Micristin
 Pharmacin
 Pirseal
 Premaspin
-S-211
-Solfrin
-Solprin acid
-Spira-Dine
-St. Joseph
-Acetilsalicilico
-Acido acetilsalicilico
-Acimetten
-Acido O-acetil-benzoico
-Asatard
-Aspalon
-Bialpirinia
-Caprin
-Contrheuma retard
-Delgesic
-Entrophen
-Kyselina 2-acetoxybenzoova
-Kyselina acetylsalicylova
-Solpyron
-Bayer
-Bufferin
-Easprin
-St. Joseph Aspirin for Adults
-2-Acetylsalicyclic acid
-Ascoden-30
-Coricidin
-Nu-seals
-Nu-seals aspirin
-Persistin
-Supac
-Tasprin
-Triaminicin
-Salicylic acid, acetyl-
-o-(Acetyloxy)benzoic acid
-Zorprin
-Magnecyl
-Miniasal
-Colsprin
-Acesan
-Acetard
-Ascolong
-Aspropharm
-Salycylacetylsalicylic acid
-Kapsazal
-A.S.A. and Codeine Compound (Salt/Mix)
-Anacin (Salt/Mix)
-Anacin Maximum Strength (Salt/Mix)
-Arthritis Pain Formula Maximum Strength (Salt/Mix)
-Ascriptin (Salt/Mix)
-Axotal (Salt/Mix)
-Dasin (Salt/Mix)
-Empirin with Codeine (Salt/Mix)
-Equagesic (Salt/Mix)
-Fiorinal (Salt/Mix)
-Micrainin (Salt/Mix)
-Norgesic (Salt/Mix)
-P-A-C Analgesic Tablets (Salt/Mix)
-Percodan (Salt/Mix)
-Percodan Demi (Salt/Mix)
-Phensal (Salt/Mix)
-Pravigard PAC (Salt/Mix)
-Robaxisal (Salt/Mix)
-SK-65 Compound (Salt/Mix)
-Soma Compound (Salt/Mix)
-Synalgos (Salt/Mix)
-Synalgos-DC (Salt/Mix)
-Vanquish (Salt/Mix)
-component of Zactirin (Salt/Mix)
-component of Ansemco 2 (Salt/Mix)
-component of Ascodeen-30 (Salt/Mix)
-component of Darvon with A.S.A (Salt/Mix)
-component of Midol (Salt/Mix)
 
 >  <RELATED CASNO>
 11126-35-5; 26914-13-6; 98201-60-6; 2349-94-2
@@ -214,9 +142,6 @@ C9H8O4
 
 >  <ID>
 111198
-
->  <CONTRIBUTOR>
-Virginia Division of Forensic Science
 
 >  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
 StdNP=1000/3/4
@@ -344,7 +269,6 @@ Pregnane-3,20-dione, (5.alpha.)-
 3,20-Dioxo-5.alpha.-pregnane
 5.alpha.-Pregnan-3,20-dione
 Allopregnan-3,20-dione
-NSC 18319
 
 >  <INCHIKEY>
 XMRPGKVKISIQBV-BJMCWZGWSA-N
@@ -366,9 +290,6 @@ C21H32O2
 
 >  <ID>
 10546
-
->  <CONTRIBUTOR>
-D.HENNEBERG, MAX-PLANCK INSTITUTE, MULHEIM, WEST GERMANY
 
 >  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
 StdNP=2111/0/1

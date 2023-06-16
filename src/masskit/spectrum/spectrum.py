@@ -2517,3 +2517,7 @@ class AccumulatorSpectrum(Spectrum, Accumulator):
 
 
 populate_properties(AccumulatorSpectrum, fields=spectrum_accumulator_fields)
+
+class HiResSpectrum(Spectrum):
+    def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, starts=None, stops=None, copy_arrays=False):
+        super().__init__(precursor_mass_info, product_mass_info, name, id, ev, nce, charge, ion_class, mz, intensity, row, precursor_mz, precursor_intensity, stddev, annotations, starts, stops, copy_arrays)
