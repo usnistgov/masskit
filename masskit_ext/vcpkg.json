@@ -1,12 +1,12 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
   "name": "masskit-ext",
-  "version-string": "0.1.0",
+  "version-string": "1.1.0",
   "dependencies": [
     {
       "name": "arrow",
       "default-features": false,
-      "features": [ "csv", "filesystem", "json", "parquet", "dataset" ]
+      "features": [ "csv", "filesystem", "json", "parquet", "dataset", "acero" ]
     },
     "pybind11"
   ]

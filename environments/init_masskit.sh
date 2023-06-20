@@ -53,7 +53,14 @@ while [[ $# -gt 0 ]]; do
 done
 
 for arg in "$@"; do shift; done  # Don't pass args to activate
-local_conda="${CONDA_PREFIX:-$HOME/miniconda3}"
+if [ -d "$HOME/mambaforge" ]; then
+    local_dir=$HOME/mambaforge
+elif [ -d "$HOME/miniconda3" ]; then
+    local_dir=$HOME/miniconda3
+else
+    local_dir=$HOME/Anaconda3
+fi
+local_conda="${CONDA_PREFIX:-$local_dir}"
 source $local_conda/bin/activate
 
 if [[ $CONDA_SHLVL != 1 ]]
@@ -89,25 +96,25 @@ fi
 # gxx is not available on windows
 
 BASE_PACKAGES="
-  arrow-cpp=11.* \
+  arrow-cpp=12.* \
   conda-build \
   cmake \
   cython \
-  gxx>12 \
   hydra-core \
   imageio \
   jsonpickle \
   jupyter \
   matplotlib \
+  matplotlib-venn \
   numba \
   numpy \
   pandas \
-  pyarrow=11.* \
+  pyarrow=12.* \
   pybind11 \
   pynndescent \
   pytest \
   python=3 \
-  rdkit=2021.09.4 \
+  rdkit \
   rich \
   ruff \
   scikit-build-core \
@@ -142,9 +149,9 @@ if ! conda activate $ENVNAME; then
     # conda activate $SETUP_ENVNAME
     echo "Creating conda environment"
     conda create -y -n $ENVNAME
-    mamba install -y -n $ENVNAME ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
+    mamba install -y -n $ENVNAME -c nodefaults ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
     conda activate $ENVNAME
-    
+
     # # Check for bayesian_torch
     # (python -c "import bayesian_torch" 2> /dev/null) && has_lib=1 || has_lib=0
 

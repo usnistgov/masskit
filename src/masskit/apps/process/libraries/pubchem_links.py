@@ -5,7 +5,9 @@ import time
 import math
 
 from collections import namedtuple
+from datetime import datetime
 from pathlib import Path
+from urllib.parse import urlparse
 from typing import Iterable
 
 import requests
@@ -90,7 +92,15 @@ class PubChemWiki:
             transient=False,
             console=global_console,
             )
-        self.parse_json()
+        self.parse_pubchem_json()
+        self.counts_schema = pa.schema([
+            pa.field("cid", pa.int64()),
+            pa.field("pageviews", pa.int64()),
+            pa.field("months", pa.int64()),
+            pa.field("references", pa.int64()),
+            pa.field("average_pageviews", pa.float32())
+        ])
+        self.fetch_counts()
 
     def pubchem_wiki(self, session, page):
         parameters = {
@@ -101,7 +111,7 @@ class PubChemWiki:
             'response_type': 'save',
             'response_basename': 'PubChemAnnotations_Wikipedia'
         }
-        r = session.get(self.cfg.wikipedia.urlbase, timeout=5, params=parameters)
+        r = session.get(self.cfg.pubchem.wikipedia.urlbase, timeout=5, params=parameters)
         #print(r.url)
         #print(r.headers)
         r.raise_for_status()
@@ -114,7 +124,7 @@ class PubChemWiki:
         with self.progress:
             task_id = self.progress.add_task(
                 "download",
-                filename=self.cfg.wikipedia.file, 
+                filename=self.cfg.pubchem.wikipedia.file, 
                 start=False,
                 )
             with requests.Session() as s:
@@ -129,10 +139,10 @@ class PubChemWiki:
                     rjson = self.pubchem_wiki(s, pageno)
                     annots.extend(rjson['Annotation'])
                     self.progress.update(task_id, advance=1)
-            self.progress.console.print(f"Downloaded {self.cfg.wikipedia.file}")
+            self.progress.console.print(f"Downloaded {self.cfg.pubchem.wikipedia.file}")
         return annots
 
-    def use_cache(self, filename):
+    def use_pubchem_cache(self, filename):
         path = Path(filename).expanduser()
         if (not path.is_file()):
             Path(path.parent).mkdir(parents=True, exist_ok=True)
@@ -147,11 +157,11 @@ class PubChemWiki:
             cache_data = json.load(f)
         return cache_data
 
-    def parse_json(self):
+    def parse_pubchem_json(self):
         self.path = Path(self.cfg.cache.dir).expanduser()
-        #cache_file = f"{self.cfg.cache.dir}/{self.cfg.wikipedia.file}"
-        cache_file = self.path / self.cfg.wikipedia.file
-        wikidata = self.use_cache(cache_file)
+        #cache_file = f"{self.cfg.cache.dir}/{self.cfg.pubchem.wikipedia.file}"
+        cache_file = self.path / self.cfg.pubchem.wikipedia.file
+        wikidata = self.use_pubchem_cache(cache_file)
 
         self.cid2url = dict()
         for entry in wikidata:
@@ -167,6 +177,68 @@ class PubChemWiki:
                     else:
                         self.cid2url[cid] = set({url})
         CIDs = set(self.cid2url.keys())
+    
+    def parse_counts(self, wikijson):
+        items = wikijson['items']
+        total = 0
+        months = 0
+        for item in items:
+            total += int(item['views'])
+            months += 1
+        return (total, months)
+
+    def fetch_counts(self):
+        parquet_file = Path(self.cfg.cache.dir).expanduser() / self.cfg.queries.wikipedia.parquet
+        if parquet_file.is_file():
+            self.progress.console.print(f"Using cache file {parquet_file}")
+            return
+        # Even though today might not be a full month, they only return results up to the previous full month.
+        today = datetime.today().strftime('%Y%m%d')
+        records = self.counts_schema.empty_table().to_pydict()
+        with self.progress:
+            task_id = self.progress.add_task(
+                "download",
+                filename="Wikipedia Page Views", 
+                start=False,
+                )
+            with requests.session() as session:
+                session.headers.update({'User-Agent': self.cfg.queries.wikipedia.user_agent})
+                self.progress.update(task_id, total=len(self.cid2url))
+                self.progress.start_task(task_id)
+                for k,v in self.cid2url.items():
+                    total = 0
+                    months = 0
+                    references = 0
+                    for url in v:
+                        parts = urlparse(url)
+                        # Can't use the following beacuse of pages like:
+                        #    https://en.wikipedia.org/wiki/Tegafur/gimeracil/oteracil
+                        # chemical = Path(parts.path).name
+                        chemical = parts.path.replace("/wiki/", "", 1).replace("/","%2F")
+                        # Some links which look like the following don't work:
+                        #    https://en.wikipedia.org/w/index.php?title=Diammonium_dioxido(dioxo)molybdenum&action=edit&redlink=1
+                        if "index.php" in chemical:
+                            continue
+                        req_url = f'https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/{parts.hostname}/all-access/user/{chemical}/monthly/20150701/{today}'
+                        r = session.get(req_url, timeout=10)
+                        r.raise_for_status()
+                        counts = self.parse_counts(r.json())
+                        total += counts[0]
+                        months += counts[1]
+                        references += 1
+                        time.sleep(1/self.cfg.queries.wikipedia.reqs_per_second)
+                    self.progress.update(task_id, advance=1)
+                    records["cid"].append(k)
+                    records["pageviews"].append(total)
+                    records["months"].append(months)
+                    records["references"].append(references)
+                    if months == 0:
+                        records["average_pageviews"].append(0)
+                    else:
+                        records["average_pageviews"].append(total/months)
+
+        table = pa.table(records, self.counts_schema)
+        pq.write_table(table, parquet_file)
 
 # Obsolete function to get the InChI data for a set of CIDs
 # Now we are downloading the complete list from a file they publish.
@@ -184,17 +256,32 @@ def get_pubchem_inchi(CIDs, cfg):
             r.raise_for_status()
             rjson = r.json()['PropertyTable']
             annots.extend(rjson['Properties'])
-            time.sleep(1/cfg.queries.cid2inchi.group_size.reqs_per_second)
+            time.sleep(1/cfg.queries.cid2inchi.reqs_per_second)
     print()
     return annots
+
+def get_csv_type(t):
+    if t == 'int8':
+        return pa.int8()
+    if t == 'int64':
+        return pa.int64()
+    
+    return pa.string()
+
+def get_convert_options(col_types):
+    col_types = {}
+    for field in col_types:
+        col_types[field['name']] = get_csv_type(field['type'])
+    return pv.ConvertOptions(column_types=col_types)
 
 def cache_pubchem_files(cfg: DictConfig):
     dlpath = Path(cfg.cache.dir).expanduser()
     dlpath.mkdir(parents=True, exist_ok=True)
     dlurls = []
-    xformfiles = []
+    transform_files = []
 
     for key in cfg.pubchem.keys():
+        if key == "wikipedia": continue
         dlurl = cfg.pubchem[key].url
         filename = dlurl.split('/')[-1]
         csv_file = dlpath / filename
@@ -203,13 +290,20 @@ def cache_pubchem_files(cfg: DictConfig):
         else:
             global_console.print(f"Using cache file {csv_file}")
         pqfile = dlpath / cfg.pubchem[key].parquet
-        xformfiles.append( (csv_file,pqfile) )        
+        transform_files.append( (csv_file,pqfile,key) )        
     if len(dlurls) > 0:
         Download(dlurls, dlpath)
-    for xfile in xformfiles:
+    for xfile in transform_files:
         if not xfile[1].is_file():
             global_console.print(f"transforming {xfile[0].name} -> {xfile[1].name}")
-            table = pv.read_csv(xfile[0], parse_options=pv.ParseOptions(delimiter='\t'))
+            convert_opts = get_convert_options(cfg.pubchem[xfile[2]].types)
+            read_opts = pv.ReadOptions(column_names=cfg.pubchem[xfile[2]].headers)
+            print(read_opts.column_names)
+            table = pv.read_csv(xfile[0], 
+                                parse_options=pv.ParseOptions(delimiter='\t'),
+                                convert_options=convert_opts,
+                                read_options=read_opts
+                                )
             #global_console.print(table)
             pq.write_table(table, xfile[1])
 

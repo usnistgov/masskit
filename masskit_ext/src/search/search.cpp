@@ -3,9 +3,11 @@
 
 #include <iostream>
 #include <memory>
+#include <math.h>
 #include <cstdint>
 
 #include "search.hpp"
+#include "IITree.h"
 
 #ifdef _MSC_VER
   #include <intrin.h>
@@ -86,7 +88,7 @@ arrow::Status TanimotoFunction(cp::KernelContext* ctx,
     // Get the output array so we may place our results there.
     //arrow::ArraySpan* out_arr = out->array_span();
     //auto out_values = out_arr->GetValues<float>(1);
-    auto out_values = out->array_span()->GetValues<float>(1);
+    auto out_values = out->array_span_mutable()->GetValues<float>(1);
 
     // Iterate over our subset of rows.
     for (int64_t i = 0; i < list.length; ++i) {
@@ -173,12 +175,14 @@ const cp::FunctionDoc cosine_score_doc{
 
 enum Tolerance_Type { NONE, PPM, DALTONS};
 typedef std::pair<double, double> tInterval;
-typedef std::pair<int32_t, int32_t> tMatch;
+typedef std::pair<int32_t, uint64_t> tMatch;
 bool overlap(tInterval &a, tInterval &b) {
     // overlap if max(L1, L2) <= min(R1, R2)}
     // Non-overlapping if max(L1, L2) > min(R1, R2)}
     return (std::max(a.first, b.first) <= std::min(a.second, b.second));
 };
+
+typedef IITree<double, size_t> peakIntervalTree;
 
 void compute_weight(const double *mz,
                     const double *intensity,
@@ -199,45 +203,22 @@ struct CSpectrum {
     const double *m_mz;
     const double *m_intensity;
     int64_t m_length;
-    std::vector<tInterval> m_intervals; 
+    peakIntervalTree m_intervals;
+    //std::vector<tInterval> m_intervals; 
     double m_tolerance;
     Tolerance_Type m_toltype;
-
-    // CSpectrum(std::shared_ptr<arrow::DoubleArray> mzArr,
-    //           std::shared_ptr<arrow::DoubleArray> intensityArr,
-    //           double m_tolerance, Tolerance_Type type) 
-    //           : m_tolerance(m_tolerance), m_toltype(type) {
-    //     const double *mzbuf = mzArr->raw_values();
-    //     const double *intbuf = intensityArr->raw_values();
-    //     // Strip out ions with zero intensities
-    //     for (auto i = 0; i < mzArr->length(); i++) {
-    //         if ( intbuf[i] > 0) {
-    //             m_mz.push_back(mzbuf[i]);
-    //             m_intensity.push_back(intbuf[i]);
-    //         }
-    //     }
-    //     this->create_intervals();
-    // }
 
     CSpectrum(const double *mzArr, const double *intensityArr, int64_t length,
               double m_tolerance, Tolerance_Type type) 
               : m_mz(mzArr), m_intensity(intensityArr), m_length(length), 
-                m_tolerance(m_tolerance), m_toltype(type) {
-        // Strip out ions with zero intensities
-        // for (auto i = 0; i < length; i++) {
-        //     if ( intensityArr[i] > 0) {
-        //         m_mz.push_back(mzArr[i]);
-        //         m_intensity.push_back(intensityArr[i]);
-        //     }
-        // }
-        this->create_intervals();
-    }
+                m_tolerance(m_tolerance), m_toltype(type) {}
 
     float cosine_score(CSpectrum &other) {
         std::vector<tMatch> intersections;
         this->intersect(other, intersections);
 
-        //if ((m_length > 2) && (other.m_length > 2) && (intersections.size() < 2))
+        if (intersections.size() < 1)
+            return -2.0;
         if ((std::min(m_length, other.m_length) > 2) && (intersections.size() < 2))
             return -42.0;
 
@@ -274,28 +255,12 @@ struct CSpectrum {
     }
 
     void intersect(CSpectrum &other, std::vector<tMatch> &intersections) {
-
-        int32_t curIdx = 0;
-        int32_t othMinIdx = 0;
-        int32_t othCurIdx = 0;
-        intersections.clear();
-
-        while (curIdx < m_intervals.size()) {
-            othCurIdx = othMinIdx;
-            while ((curIdx < m_intervals.size()) &&
-                   (othCurIdx < other.m_intervals.size()) &&
-                   (m_intervals[curIdx].first <= other.m_intervals[othCurIdx].second)) {
-                if (overlap(m_intervals[curIdx], other.m_intervals[othCurIdx])) {
-                    intersections.push_back(std::make_pair(curIdx, othCurIdx));
-                }
-                ++othCurIdx;
-            }
-            ++curIdx;
-            if (curIdx < m_intervals.size()) {
-                while ((othMinIdx < other.m_intervals.size()) &&
-                       (m_intervals[curIdx].first > other.m_intervals[othMinIdx].second)) {
-                    ++othMinIdx;
-                }
+        for (int32_t i=0; i<other.m_length; i++) {
+            tInterval ss = other.get_start_stop(i);
+            std::vector<size_t> overlaps;
+            m_intervals.overlap(ss.first, ss.second, overlaps);
+            for (auto over : overlaps) {
+                intersections.push_back(std::make_pair(i, m_intervals.data(over)));
             }
         }
     }
@@ -312,13 +277,17 @@ struct CSpectrum {
         return 0;
     }
 
-    void create_intervals() {
-        m_intervals.clear();
-        // for (auto mz : m_mz) {
+    void create_interval_tree() {
         for (int32_t i=0; i<m_length; i++) {
             double hTol = this->half_tolerance(m_mz[i]);
-            m_intervals.push_back(std::make_pair(m_mz[i] - hTol, m_mz[i] + hTol));            
+            m_intervals.add(m_mz[i] - hTol, m_mz[i] + hTol, i);
         }
+        m_intervals.index();
+    }
+
+    tInterval get_start_stop(int32_t i) {
+        double hTol = this->half_tolerance(m_mz[i]);
+        return std::make_pair(m_mz[i] - hTol, m_mz[i] + hTol);
     }
 
 };
@@ -350,6 +319,7 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
 
     CSpectrum query(query_mz->raw_values(), query_intensity->raw_values(),
                     query_mz->length(), query_tol->value, PPM);
+    query.create_interval_tree();
 
     // Reference Data
     // This data is passed in as subsets of the large columns, e.g. 5,000 items
@@ -373,7 +343,7 @@ arrow::Status CosineScore(cp::KernelContext* ctx,
     auto mask = std::static_pointer_cast<arrow::BooleanArray>(batch[6].array.ToArray());
 
     // Output array for results
-    auto out_values = out->array_span()->GetValues<float>(1);
+    auto out_values = out->array_span_mutable()->GetValues<float>(1);
 
     for (int64_t i = 0; i < batch.length; i++) {
         if (mask->Value(i)) {

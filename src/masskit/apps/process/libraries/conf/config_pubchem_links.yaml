@@ -1,21 +1,71 @@
 cache:
   dir: ~/.masskit_cache/pubchem
   clear_cache: False
-wikipedia:
-  urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
-  file: pubchem-wiki.json
 queries:
+  wikipedia:
+    user_agent: Wiki Query Agent (douglas.slotta@nist.gov)
+    reqs_per_second: 100
+    parquet: cid-wikipedia.parquet
   cid2inchi:
     file: pubchem-inchi.json
     group_size: 100
     reqs_per_second: 4
 pubchem:
+  wikipedia:
+    urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
+    file: pubchem-wiki.json
   inchi:
+    description: 'This is a listing of all CIDs with their full InChI strings and
+    InChI keys. It is a gzipped text file with CID, tab, InChI, tab,
+    InChI Key on each line.'
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-InChI-Key.gz
     parquet: cid-inchi.parquet
+    headers:
+      - cid
+      - inchi
+      - inchi_key
+    types:
+      - name: cid
+        type: int64
+      - name: inchi
+        type: string
+      - name: inchi_key
+        type: string
   patent:
+    description: "This is a listing of all patent documents linked to CIDs. 
+    These are in Google's 'publication number' format, following PubChem's
+		matching of depositor-supplied patent identifiers to publication
+		numbers. It is a gzipped text file with CID, tab, and publication
+		number on each line."
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-Patent.gz
     parquet: cid-patent.parquet
+    headers:
+      - cid
+      - patent_id
+    types:
+      - name: cid
+        type: int64
+      - name: patent_id
+        type: string
   pmid:
+    description: 'This is a listing of all PubMed IDs (PMIDs) linked to CIDs. It 
+    is a gzipped text file with CID, tab, PMID, tab, and type on 
+    each line. The types are:-
+        
+        1   PMIDs provided by PubChem Substance depositors
+        2   PMIDs from the MeSH heading(s) linked to the given CID
+        3   PMIDs provided by PubMed publishers
+        4   PMIDs associated through BioAssays'
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-PMID.gz
     parquet: cid-pmid.parquet
+    headers:
+      - cid
+      - pmid
+      - pmtype
+    types:
+      - name: cid
+        type: int64
+      - name: pmid
+        type: int64
+      - name: pmtype
+        type: int8

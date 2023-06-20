@@ -76,7 +76,7 @@ IF ERRORLEVEL 1 (
 )
 
 SET BASE_PACKAGES=^
-arrow-cpp=11.*^
+arrow-cpp=12.*^
  conda-build^
  cmake^
  cython^
@@ -85,10 +85,11 @@ arrow-cpp=11.*^
  jsonpickle^
  jupyter^
  matplotlib^
+ matplotlib-venn^
  numba^
  numpy^
  pandas^
- pyarrow=11.*^
+ pyarrow=12.*^
  pybind11^
  pynndescent^
  pytest^
@@ -130,7 +131,7 @@ call conda activate %ENVNAME%
 IF ERRORLEVEL 1 (
     ECHO Creating conda environment
     conda create -y -n %ENVNAME%
-    mamba install -y -n %ENVNAME% %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
+    mamba install -y -n %ENVNAME% -c nodefaults %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
     call conda activate %ENVNAME%
 )
 

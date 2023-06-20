@@ -9,7 +9,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from masskit.data_specs.schemas import peptide_schema
 from masskit.peptide.spectrum_generator import generate_mods
-from masskit.utils.general import open_if_compressed
+from masskit.utils.general import open_if_filename
 from masskit.utils.files import empty_records, add_row_to_records
 from masskit.peptide.encoding import calc_precursor_mz, parse_modification_encoding
 
@@ -22,7 +22,7 @@ def fasta(filename):
     :param filename: name of fasta file
     :return: 
     """
-    f = open_if_compressed(filename)
+    f = open_if_filename(filename, 'rt')
 
     # ditch the boolean (x[0]) and just keep the header or sequence since
     # we know they alternate.

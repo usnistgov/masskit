@@ -60,6 +60,12 @@ class parquet_info:
             #renderables = [Panel(f"{idx}: {field.name}", expand=True) for field, idx in zip(schema,range(len(schema)))]
             renderables = [f"{idx:#2}: [b]{field.name}[/b]" for field, idx in zip(schema,range(len(schema)))]
         console = Console()
+        mdrenderables = [f'Total Rows: {metadata.num_rows}', 
+                         f'Row Groups: {metadata.num_row_groups}', 
+                         f'Row Group Size: {metadata.row_group(0).num_rows}']
+
+        console.print(Columns(mdrenderables, equal=True, expand=True))
+        console.print()
         console.print(Columns(renderables))
 
 class parquet_data:
