@@ -16,10 +16,12 @@ def test_arrow_types(SRM1950_lumos_structarray):
     spectrum_array = array.to_numpy()
     assert spectrum_array[0].name == 'N-Acetyl-L-alanine'
     
-def test_table2structarry(SRM1950_lumos_table):
+def test_table2structarray(SRM1950_lumos_table):
     structarray = table2structarray(SRM1950_lumos_table, mda.SpectrumArrowType())
     table = table_add_structarray(SRM1950_lumos_table, structarray)
     assert table['spectrum'][0].as_py().name == 'N-Acetyl-L-alanine'
+    df = table.to_pandas()
+    assert df['spectrum'].iloc[0].name == 'N-Acetyl-L-alanine'
 
 # pd.Series(array, dtype=pd.ArrowDtype(mda.MolSpectrumArrowType()))
 # mapit = lambda x: mda.MolSpectrumArrowType() if x ==  mda.MolSpectrumArrowType else x
