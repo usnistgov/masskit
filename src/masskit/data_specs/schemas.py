@@ -117,9 +117,9 @@ def compose_fields(*field_lists):
 massinfo_struct_fields = \
     [
         ("tolerance", pa.float64()),
-        ("tolerance_type", pa.dictionary(pa.int8(), pa.string())),
+        ("tolerance_type", pa.dictionary(pa.int32(), pa.string())),
         # ("tolerance_type", pa.string()),
-        ("mass_type", pa.dictionary(pa.int8(), pa.string())),
+        ("mass_type", pa.dictionary(pa.int32(), pa.string())),
         # ("mass_type", pa.string()),
         # ("tolerance_type", pa.string()),
         # ("mass_type", pa.string()),
@@ -144,10 +144,10 @@ ion_annot_fields = \
         ("ion_subtype", pa.dictionary(pa.int32(), pa.string())),  # subtype of ion_type
         ("position", pa.uint16()),  # position of bond break in polymer
         ("end_position", pa.uint16()),   # optional end position of bond break in polymer (eg internal ion)
-        ("aa_before", pa.dictionary(pa.int8(), pa.string())),  # amino acid before cleavage point
-        ("aa_after", pa.dictionary(pa.int8(), pa.string())),  # amino acid after cleavage point
-        ("ptm_before", pa.dictionary(pa.int16(), pa.string())),  # ptm before cleavage point
-        ("ptm_after", pa.dictionary(pa.int16(), pa.string())),  # ptm after cleavage point
+        ("aa_before", pa.dictionary(pa.int32(), pa.string())),  # amino acid before cleavage point
+        ("aa_after", pa.dictionary(pa.int32(), pa.string())),  # amino acid after cleavage point
+        ("ptm_before", pa.dictionary(pa.int32(), pa.string())),  # ptm before cleavage point
+        ("ptm_after", pa.dictionary(pa.int32(), pa.string())),  # ptm after cleavage point
     ]
 
 ion_annot = pa.struct(ion_annot_fields)
@@ -209,8 +209,8 @@ base_annotation_fields = [
     pa.field("spectrum_fp", pa.large_list(pa.uint8())),
     pa.field("spectrum_fp_count", pa.int32()),
     pa.field("hybrid_fp", pa.large_list(pa.float32())),
-    pa.field("set", pa.dictionary(pa.int8(), pa.string())),
-    pa.field("composition", pa.dictionary(pa.int8(), pa.string())),  # bestof, consensus
+    pa.field("set", pa.dictionary(pa.int32(), pa.string())),
+    pa.field("composition", pa.dictionary(pa.int32(), pa.string())),  # bestof, consensus
 ]
 
 # base experimental metadata
@@ -230,7 +230,7 @@ mod_names_field = pa.field("mod_names", pa.large_list(pa.int16()))  # should be 
 peptide_definition_fields = [
     pa.field("peptide", pa.string()),
     pa.field("peptide_len", pa.int32()),
-    pa.field("peptide_type", pa.dictionary(pa.int8(), pa.string())),  # tryptic, semitryptic
+    pa.field("peptide_type", pa.dictionary(pa.int32(), pa.string())),  # tryptic, semitryptic
     # note that mod_names should be a list of dictionary arrays but it's not clear how to initialize
     # this properly with arrays of mod_names, such as in library import.  So for now, just using a list of int16
     # which matches the modifications dictionary in encoding.py
@@ -312,9 +312,14 @@ spectrum_accumulator_fields = [
 
 # schema for standard spectral file formats which do not include a molecular connectivity graph
 peptide_schema = pa.schema(compose_fields(base_fields, peptide_property_fields))
+peptide_struct = pa.struct(compose_fields(base_fields, peptide_property_fields))
 
 # schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
 molecules_schema = pa.schema(compose_fields(base_fields, molecule_property_fields))
+molecules_struct = pa.struct(compose_fields(base_fields, molecule_property_fields))
+
+# generic spectrum expressed as a struct
+spectrum_struct = pa.struct(compose_fields(base_fields, property_fields))
 
 # Useful lists of fields
 # minimal set of spectrum fields
@@ -342,7 +347,7 @@ spectrum_join = pa.struct(spectrum_join_fields)
 join_types = ["exp2predicted", "exp2theo", "predicted2theo"]
 
 join_fields = [
-    ("join_type", pa.dictionary(pa.int8(), pa.string())),
+    ("join_type", pa.dictionary(pa.int32(), pa.string())),
     ("join", spectrum_join),
 ]
 

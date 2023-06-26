@@ -15,7 +15,7 @@ def library_df():
 def test_df_to_msp(library_df, tmpdir):
     msp_file = (tmpdir / 'test_spectral_library.msp')
     library_df.lib.to_msp(msp_file.open("w+"), annotate=True)
-    assert msp_file.read().startswith("Name: AAAACALTPGPLADLAAR/2_1(4,C,Carbamidomethyl)")
+    assert msp_file.read().startswith("Name: AAAACALTPGPLADLAAR/2_1(4,C,CAM)")
 
 def test_df_to_mgf(library_df, tmpdir):
     msp_file = (tmpdir / 'test_spectral_library.mgf')
