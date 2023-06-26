@@ -475,6 +475,38 @@ def populate_properties(class_in, fields=property_fields):
         setattr(class_in, field.name, property(create_getter(field.name),create_setter(field.name)))
 
 
+def table2structarray(table: pa.Table, structarray_type=None) -> pa.StructArray:
+    """
+    convert a spectrum table into a spectrum struct array
+
+    :param table: spectrum table
+    :param structarray_type: the type of the array returned, e.g. SpectrumArrowType()
+    :return: StructArray
+    """
+    # theoretically could be done via recordbatches to save memory if recordbatches are zero copy
+    table = table.combine_chunks()
+    arrays = [table.column(i).chunk(0) for i in range(table.num_columns)]
+    output = pa.StructArray.from_arrays(arrays, names=table.column_names)
+    if structarray_type is not None:
+        output = pa.ExtensionArray.from_storage(structarray_type, output)
+    return output
+
+
+def table_add_structarray(table, structarray, column_name=None):  
+    """
+    add a struct array to a table
+
+    :param table: table to be added to
+    :param structarray: structarray to add to table
+    :param column_name: name of column to add
+    :return: new table with appended column
+    """
+    if column_name is None:
+        column_name = 'spectrum'
+    table = table.append_column(column_name, structarray)
+    return table
+
+
 if __name__ == "__main__":
     f1 = molecule_definition_fields
     f1.append(pa.field("junk", pa.int16()))

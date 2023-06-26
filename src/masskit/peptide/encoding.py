@@ -415,10 +415,10 @@ def calc_named_ions(arrays, analysis=None, named_ion=None, precursor_mass=None, 
         arrays['position_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.uint16()))
         arrays['end_position_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.uint16()))
         if analysis is not None:
-            analysis['aa_before_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int8()))
-            analysis['aa_after_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int8()))
-            analysis['ptm_before_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int16()))
-            analysis['ptm_after_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int16()))
+            analysis['aa_before_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int32()))
+            analysis['aa_after_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int32()))
+            analysis['ptm_before_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int32()))
+            analysis['ptm_after_array'].append(pa.array(np.zeros_like(offsets), mask=np.ones_like(offsets, dtype=np.bool_), type=pa.int32()))
 
     
 def mod_mass_pos(mod_positions, mod_names, i):

@@ -92,7 +92,7 @@ class MassInfo:
             self.neutral_loss = arrow_struct_accessor.neutral_loss()
             self.neutral_loss_charge = arrow_struct_accessor.neutral_loss_charge()
             self.evenly_spaced = arrow_struct_accessor.evenly_spaced()
-        if arrow_struct_scalar:
+        elif arrow_struct_scalar:
             self.tolerance = arrow_struct_scalar['tolerance'].as_py()
             self.tolerance_type = arrow_struct_scalar['tolerance_type'].as_py()
             self.mass_type = arrow_struct_scalar['mass_type'].as_py()

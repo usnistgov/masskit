@@ -1,8 +1,8 @@
+import numpy as np
 import pyarrow as pa
 import pandas as pd
 from masskit.data_specs.schemas import molecules_struct, peptide_struct
 from masskit.spectrum.spectrum import Spectrum
-from masskit.data_specs.arrow_types import MolSpectrumArrowType
 
 class SpectrumArrowScalarType(pa.ExtensionScalar):
     """
@@ -16,15 +16,14 @@ class SpectrumArrowScalarType(pa.ExtensionScalar):
             return Spectrum(struct=self.value)
 
     
-class MolSpectrumArrowType(pa.PyExtensionType):
+class SpectrumArrowType(pa.PyExtensionType):
     """
-    arrow type extension class for small molecule spectra
+    arrow type extension class for spectra
+    parameterized by storage_type, which can be molecules_struct or peptide_struct
     """
 
-    storage_type = molecules_struct
-
-    def __init__(self):
-        pa.PyExtensionType.__init__(self, self.storage_type)
+    def __init__(self, storage_type=molecules_struct):
+        pa.PyExtensionType.__init__(self, storage_type)
 
     def __reduce__(self):
         """
@@ -35,68 +34,46 @@ class MolSpectrumArrowType(pa.PyExtensionType):
         :return: a callable object and a tuple of arguments
         """
         #todo: should save size as metadata
-        return MolSpectrumArrowType, ()
+        return SpectrumArrowType, (self.storage_type,)
 
     def __arrow_ext_scalar_class__(self):
         return SpectrumArrowScalarType
     
-    # def __arrow_ext_class__(self):
-
-    #     return SpectrumArrowArray
+    def __arrow_ext_class__(self):
+        return SpectrumArrowArray
 
     def to_pandas_dtype(self):
         """
         returns pandas extension dtype
         """
-        return MolSpectrumArrowType()
+        return SpectrumArrowType(storage_type=self.storage_type)
 
 
-class PeptideSpectrumArrowType(pa.PyExtensionType):
+class SpectrumArrowArray(pa.ExtensionArray):
     """
-    arrow type extension class for peptide spectra
+    Extension array for SpectrumArrowType.
+    Used for subclassing Array of SpectrumArrowType methods
     """
-
-    storage_type = peptide_struct
-
-    def __init__(self):
-        pa.PyExtensionType.__init__(self, self.storage_type)
-
-    def __reduce__(self):
+    def to_pylist(self):
         """
-        used by pickle to understand how to serialize this class
-        See https://docs.python.org/3/library/pickle.html#object.__reduce__
-        https://stackoverflow.com/questions/19855156/whats-the-exact-usage-of-reduce-in-pickler
-
-        :return: a callable object and a tuple of arguments
+        Convert to list of Spectrum objects
         """
-        #todo: should save size as metadata
-        return PeptideSpectrumArrowType, ()
+        array = pa.ExtensionArray.from_storage(self.type, self.storage)
+        output = []
+        for i in range(len(array)):
+            output.append(array[i].as_py())
+        return output
 
-    def __arrow_ext_scalar_class__(self):
-        return SpectrumArrowScalarType
-    
-    # def __arrow_ext_class__(self):
-
-    #     return SpectrumArrowArray
-
-    def to_pandas_dtype(self):
-            return pd.PeriodDtype(freq=self.freq)
-
-
-# class SpectrumArrowArray(pa.ExtensionArray):
-#     """
-#     See Arrow docs for customizing extension arrays:
-#     https://arrow.apache.org/docs/python/extending_types.html#custom-extension-array-class
-#     """
-#     def to_pylist(self):
-#         """
-#         Convert to list of Spectrum
-#         """
-
-#     def to_numpy(self):
-#         """
-#         Convert to numpy array of Spectrum
-#         """
+    def to_numpy(self):
+        """
+        Convert to numpy array of Spectrum objects
+        """
+        array = pa.ExtensionArray.from_storage(self.type, self.storage)
+        output = np.empty((len(array),), dtype=object)
+        for i in range(len(array)):
+            output[i] = array[i].as_py()
+        return output
+        
 
 
 #     OFFSET_DTYPE = np.int32
