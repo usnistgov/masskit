@@ -107,6 +107,21 @@ def compose_fields(*field_lists):
     return ret_fields
 
 
+def subtract_fields(field_list, fields2bsubtracted):
+    """
+    delete fields from a field list
+
+    :param field_list: field list to be edited
+    :param fields2bsubtracted: list of fields to be deleted
+    :return: edited field list
+    """
+    ret_fields = []
+    for field in field_list:
+        if field not in fields2bsubtracted:
+            ret_fields.append(field)
+    return ret_fields
+
+
 # :param tolerance: mass tolerance.  If 0.5 daltons, this is unit mass
 # :param tolerance_type: type of tolerance: "ppm", "daltons"
 # :param mass_type: "monoisotopic" or "average"
@@ -316,7 +331,8 @@ peptide_struct = pa.struct(compose_fields(base_fields, peptide_property_fields))
 
 # schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
 molecules_schema = pa.schema(compose_fields(base_fields, molecule_property_fields))
-molecules_struct = pa.struct(compose_fields(base_fields, molecule_property_fields))
+# struct doesn't contain the mol or path data as those are separate columns
+molecules_struct = pa.struct(subtract_fields(compose_fields(base_fields, molecule_property_fields), molecule_definition_fields))
 
 # generic spectrum expressed as a struct
 spectrum_struct = pa.struct(compose_fields(base_fields, property_fields))
@@ -475,18 +491,30 @@ def populate_properties(class_in, fields=property_fields):
         setattr(class_in, field.name, property(create_getter(field.name),create_setter(field.name)))
 
 
-def table2structarray(table: pa.Table, structarray_type=None) -> pa.StructArray:
+def table2structarray(table: pa.Table, structarray_type:pa.ExtensionType=None) -> pa.StructArray:
     """
-    convert a spectrum table into a spectrum struct array
+    convert a spectrum table into a struct array.
+    if an ExtensionType is passed in, will create a struct array of that type
 
     :param table: spectrum table
     :param structarray_type: the type of the array returned, e.g. SpectrumArrowType()
     :return: StructArray
     """
-    # theoretically could be done via recordbatches to save memory if recordbatches are zero copy
+    
     table = table.combine_chunks()
-    arrays = [table.column(i).chunk(0) for i in range(table.num_columns)]
-    output = pa.StructArray.from_arrays(arrays, names=table.column_names)
+    if structarray_type is None:
+        arrays = [table.column(i).chunk(0) for i in range(table.num_columns)]
+        column_names = table.column_names
+    else:
+        arrays = []
+        column_names = []
+        for column_name in table.column_names:
+            i = structarray_type.storage_type.get_field_index(column_name)
+            if i != -1:
+                column_names.append(column_name)
+                arrays.append(table[column_name].chunk(0))
+
+    output = pa.StructArray.from_arrays(arrays, names=column_names)
     if structarray_type is not None:
         output = pa.ExtensionArray.from_storage(structarray_type, output)
     return output

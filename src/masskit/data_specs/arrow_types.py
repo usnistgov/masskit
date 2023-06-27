@@ -7,56 +7,12 @@ from pandas.core.arrays import ExtensionArray
 from pandas.core.dtypes.base import ExtensionDtype
 from pandas.api.extensions import register_extension_dtype, take
 import numbers
+from rdkit import Chem
 
-class SpectrumArrowScalarType(pa.ExtensionScalar):
+
+class MasskitArrowArray(pa.ExtensionArray):
     """
-    arrow scalar extension class for spectra
-    """
-
-    def as_py(self):
-        if self.value is None:
-            return None
-        else:
-            return Spectrum(struct=self.value)
-
-    
-class SpectrumArrowType(pa.PyExtensionType):
-    """
-    arrow type extension class for spectra
-    parameterized by storage_type, which can be molecules_struct or peptide_struct
-    """
-
-    def __init__(self, storage_type=molecules_struct):
-        pa.PyExtensionType.__init__(self, storage_type)
-
-    def __reduce__(self):
-        """
-        used by pickle to understand how to serialize this class
-        See https://docs.python.org/3/library/pickle.html#object.__reduce__
-        https://stackoverflow.com/questions/19855156/whats-the-exact-usage-of-reduce-in-pickler
-
-        :return: a callable object and a tuple of arguments
-        """
-        #todo: should save size as metadata
-        return SpectrumArrowType, (self.storage_type,)
-
-    def __arrow_ext_scalar_class__(self):
-        return SpectrumArrowScalarType
-    
-    def __arrow_ext_class__(self):
-        return SpectrumArrowArray
-
-    def to_pandas_dtype(self):
-        """
-        returns pandas extension dtype
-        """
-        return SpectrumPandasDtype()
-
-
-class SpectrumArrowArray(pa.ExtensionArray):
-    """
-    Extension array for SpectrumArrowType.
-    Used for subclassing Array of SpectrumArrowType methods
+    Extension array for arrow arrays.
     """
     def to_pylist(self):
         """
@@ -79,37 +35,12 @@ class SpectrumArrowArray(pa.ExtensionArray):
         return output
         
 
-@register_extension_dtype
-class SpectrumPandasDtype(ExtensionDtype):
-    type = Spectrum
-    name = "Spectrum"
-    na_value = np.nan
+class MasskitPandasArray(ExtensionArray):
+    """
+    Base class for pandas extension arrays that contain a numpy array of objects
+    """
 
-    @classmethod
-    def construct_array_type(cls):
-        """
-        Return the array type associated with this dtype.
-        Returns
-        -------
-        type
-        """
-        return SpectrumPandasArray
-
-    def __from_arrow__(self, arr):
-        """
-        input can be table, struct array, or chunked struct array
-        """
-        print("in __from_arrow__")
-        output = []
-        for chunk in arr.iterchunks():
-            output.append(chunk.to_numpy())
-        numpy_arr = np.concatenate(output)
-        return SpectrumPandasArray(numpy_arr)
-
-
-class SpectrumPandasArray(ExtensionArray):
-
-    dtype = SpectrumPandasDtype()
+    dtype = None
 
     def __init__(self, values):
         if not isinstance(values, np.ndarray):
@@ -154,12 +85,182 @@ class SpectrumPandasArray(ExtensionArray):
     def take(self, indexes):
         indexes = np.asarray(indexes)
         output = np.take(self.data, indexes)
-        return SpectrumPandasArray(output)
+        return type(self)(output)
 
     def copy(self):
-        return SpectrumPandasArray(self.data[:])
+        return type(self)(self.data[:])
 
     @classmethod
     def _concat_same_type(cls, to_concat):
         data = np.concatenate([x.data for x in to_concat])
         return cls(data)
+
+
+class MasskitPandasDtype(ExtensionDtype):
+    type = None
+    name = None
+    na_value = None
+
+    @classmethod
+    def construct_array_type(cls):
+        """
+        Return the array type associated with this dtype.
+        Returns
+        -------
+        type
+        """
+        return None
+
+    def __from_arrow__(self, arr):
+        """
+        input can be table, struct array, or chunked struct array
+        """
+        output = []
+        for chunk in arr.iterchunks():
+            output.append(chunk.to_numpy())
+        numpy_arr = np.concatenate(output)
+        return self.construct_array_type()(numpy_arr)
+
+
+class SpectrumArrowScalarType(pa.ExtensionScalar):
+    """
+    arrow scalar extension class for spectra
+    """
+
+    def as_py(self):
+        if self.value is None:
+            return None
+        else:
+            return Spectrum(struct=self.value)
+
+    
+class SpectrumArrowType(pa.PyExtensionType):
+    """
+    arrow type extension class for spectra
+    parameterized by storage_type, which can be molecules_struct or peptide_struct
+    """
+
+    def __init__(self, storage_type=molecules_struct):
+        pa.PyExtensionType.__init__(self, storage_type)
+
+    def __reduce__(self):
+        """
+        used by pickle to understand how to serialize this class
+        :return: a callable object and a tuple of arguments
+        """
+        #todo: should save size as metadata
+        return SpectrumArrowType, (self.storage_type,)
+
+    def __arrow_ext_scalar_class__(self):
+        return SpectrumArrowScalarType
+    
+    def __arrow_ext_class__(self):
+        return SpectrumArrowArray
+
+    def to_pandas_dtype(self):
+        """
+        returns pandas extension dtype
+        """
+        return SpectrumPandasDtype()
+
+
+class SpectrumArrowArray(MasskitArrowArray):
+    """
+    arrow array that holds spectra
+    """
+
+
+@register_extension_dtype
+class SpectrumPandasDtype(MasskitPandasDtype):
+    type = Spectrum
+    name = "Spectrum"
+    na_value = np.nan
+
+    @classmethod
+    def construct_array_type(cls):
+        """
+        Return the array type associated with this dtype.
+        Returns
+        -------
+        type
+        """
+        return SpectrumPandasArray
+
+
+class SpectrumPandasArray(MasskitPandasArray):
+    dtype = SpectrumPandasDtype()
+    
+    def __init__(self, values):
+        super().__init__(values)
+
+
+class MolArrowScalarType(pa.ExtensionScalar):
+    """
+    arrow scalar extension class for spectra
+    """
+
+    def as_py(self):
+        if self.value is None:
+            return None
+        else:
+            mol = Chem.rdMolInterchange.JSONToMols(self.value.as_py())[0]
+            return mol
+
+    
+class MolArrowType(pa.PyExtensionType):
+    """
+    arrow type extension class for Mols
+    """
+
+    def __init__(self):
+        pa.PyExtensionType.__init__(self, pa.string())
+
+    def __reduce__(self):
+        """
+        used by pickle to understand how to serialize this class
+        :return: a callable object and a tuple of arguments
+        """
+        #todo: should save size as metadata
+        return MolArrowType, (self.storage_type,)
+
+    def __arrow_ext_scalar_class__(self):
+        return MolArrowScalarType
+    
+    def __arrow_ext_class__(self):
+        return MolArrowArray
+
+    def to_pandas_dtype(self):
+        """
+        returns pandas extension dtype
+        """
+        return MolPandasDtype()
+
+
+class MolArrowArray(MasskitArrowArray):
+    """
+    Extension array for MolArrowType
+    """
+        
+
+@register_extension_dtype
+class MolPandasDtype(MasskitPandasDtype):
+    type = Chem.rdchem.Mol
+    name = "Mol"
+    na_value = np.nan
+
+    @classmethod
+    def construct_array_type(cls):
+        """
+        Return the array type associated with this dtype.
+        Returns
+        -------
+        type
+        """
+        return MolPandasArray
+
+
+class MolPandasArray(MasskitPandasArray):
+    dtype = MolPandasDtype()
+    
+    def __init__(self, values):
+        super().__init__(values)
