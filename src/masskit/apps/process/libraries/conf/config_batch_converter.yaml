@@ -6,6 +6,8 @@ input:
     type:
     # what is the source of the file? nist or pubchem
     source:
+    # spectrum type: "mol" or "peptide"
+    spectrum_type: mol
   # number of records to generate
   num:
 

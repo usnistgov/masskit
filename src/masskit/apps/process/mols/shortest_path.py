@@ -3,11 +3,11 @@ import jsonpickle
 import logging
 import hydra
 from omegaconf import DictConfig
-from masskit.utils.general import parse_filename
 from masskit.utils.tablemap import ArrowLibraryMap
 import pyarrow as pa
 import pyarrow.parquet as pq
 from rdkit import Chem
+from masskit.data_specs.arrow_types import PathArrowType
 
 """
 takes a parquet file with rdkit mols in it and adds shortest path information
@@ -110,7 +110,8 @@ def path_generator_app(config: DictConfig) -> None:
         table = table.remove_column(table.column_names.index("shortest_paths"))
     except ValueError:
         pass
-    table = table.add_column(table.num_columns,"shortest_paths", pa.array(shortest_paths))
+    new_array = pa.ExtensionArray.from_storage(PathArrowType(), pa.array(shortest_paths))
+    table = table.add_column(table.num_columns,"shortest_paths", new_array)
     # output the files
     output_file = Path(config.output.file.name).expanduser()
     pq.write_table(table, output_file)

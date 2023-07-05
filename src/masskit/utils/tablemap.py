@@ -1,11 +1,10 @@
 import csv
 import numpy as np
 from abc import ABC, abstractmethod
-from masskit.spectrum.spectrum import Spectrum
-from masskit.data_specs.schemas import min_spectrum_fields, property_fields
+from masskit.data_specs.schemas import min_spectrum_field_names, property_schema
 import masskit.utils.files as msuf
 from masskit.utils.general import open_if_filename
-from masskit.utils.tables import row_view, arrow_to_pandas
+from masskit.utils.tables import row_view
 import jsonpickle
 from rdkit import Chem
 
@@ -20,17 +19,11 @@ class TableMap(ABC):
     """
     collections.abc.Sequence wrapper for a library.  Allows use of different stores, e.g. arrow or pandas
     """
-    def __init__(self, column_name=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
-        :param column_name: the column name for the spectrum. "spectrum" is default
         """
         super().__init__(*args, **kwargs)
-        if column_name is None:
-            self.column_name = "spectrum"
-        else:
-            self.column_name = column_name
-        # fields to report
-        self.field_list = property_fields
+
 
     def __getitem__(self, key):
         """
@@ -92,50 +85,20 @@ class TableMap(ABC):
         """
         raise NotImplementedError
     
-    def to_msp(self, file, annotate=False, ion_types=None):
+    def to_msp(self, file, annotate=False, ion_types=None, spectrum_column=None):
         """
         write out spectra in msp format
 
         :param file: file or filename to write to
         :param annotate: annotate the spectra
         :param ion_types: ion types for annotation
+        :param spectrum_column: column name for spectrum
         """
-        spectra = [self[i][self.column_name] for i in range(len(self))]
+        if spectrum_column is None:
+            spectrum_column = 'spectrum'
+        spectra = [self[i][spectrum_column] for i in range(len(self))]
         msuf.spectra_to_msp(file, spectra, annotate=annotate, ion_types=ion_types)
 
-"""
-code to convert encoded or multicolumn data structures into python objects.
-
-It would be useful to (a) include the names of these fields in the TableMap field_names,
-(b) have converters to str format for output to csv files, (c) possibly have this work from tables.py
-"""
-
-def make_spectrum(row):
-    return Spectrum(row=row)
-
-def make_mol(row):
-    attribute = row.get('mol')
-    if attribute is not None:
-        value = attribute()
-        if value is not None:
-            return Chem.rdMolInterchange.JSONToMols(value)[0]
-    else:
-        return None
-
-def make_shortest_paths(row):
-    attribute = row.get('shortest_paths')
-    if attribute is not None:
-        value = attribute()
-        if value is not None:
-            return jsonpickle.decode(value, keys=True)
-    else:
-        return None
-
-converter_list = {
-    'spectrum': make_spectrum,
-    'mol': make_mol,
-    'shortest_paths': make_shortest_paths,
-}
 
 class ArrowLibraryMap(TableMap):
     """
@@ -143,14 +106,12 @@ class ArrowLibraryMap(TableMap):
 
     """
 
-    def __init__(self, table_in, column_name=None, num=0, conversions=None, *args, **kwargs):
+    def __init__(self, table_in, num=0, *args, **kwargs):
         """
         :param table_in: parquet table
-        :param column_name: name of the spectrum column
         :param num: number of rows to use
-        :param conversions: conversions when converting to pandas dataframe. None=['spectrum']
         """
-        super().__init__(column_name=column_name, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.table = table_in
         if num:
             self.table = self.table.slice(0, num)
@@ -159,10 +120,6 @@ class ArrowLibraryMap(TableMap):
         self.ids = self.table['id'].combine_chunks().to_numpy()
         self.sort_indices = np.argsort(self.ids)
         self.sorted_ids = self.ids[self.sort_indices]
-        if conversions == None:
-            self.conversions = ['spectrum']
-        else:
-            self.conversions = conversions
 
     def __len__(self):
         return self.length
@@ -180,19 +137,10 @@ class ArrowLibraryMap(TableMap):
         self.row.idx = idx
         return_val = {}
         # put interesting fields in the dictionary
-        for field in self.field_list:
-            if field.name in converter_list:
-                converted_val = converter_list[field.name](self.row)
-                if converted_val is not None:
-                    return_val[field.name] = converted_val
-            else:
-                attribute = self.row.get(field.name)
-                if attribute is not None:
-                    return_val[field.name] = attribute()
-
-        # create the spectrum
-        if self.column_name is not None:
-            return_val[self.column_name] = Spectrum(row=self.row)
+        for field in self.table.column_names:
+            attribute = self.row.get(field)
+            if attribute is not None:
+                return_val[field] = attribute()
         return return_val
 
     def getitem_by_id(self, key):
@@ -212,7 +160,7 @@ class ArrowLibraryMap(TableMap):
         return self.table
     
     def to_pandas(self):
-        return arrow_to_pandas(self.table, conversions=self.conversions, field_list=self.field_list)
+        return self.table.to_pandas()
 
     def to_parquet(self, file):
         """
@@ -222,23 +170,29 @@ class ArrowLibraryMap(TableMap):
         """
         msuf.write_parquet(file, self.table)
         
-    def to_mzxml(self, file, use_id_as_scan=True):
+    def to_mzxml(self, file, use_id_as_scan=True, spectrum_column=None):
         """
         save spectra to mzxml format file
 
         :param file: filename or stream
         :param use_id_as_scan: use spectrum.id instead of spectrum.scan
+        :param spectrum_column: column name for spectrum
         """
-        spectra = [self[i][self.column_name] for i in range(len(self))]
+        if spectrum_column is None:
+            spectrum_column = 'spectrum'
+        spectra = [self[i][spectrum_column] for i in range(len(self))]
         msuf.spectra_to_mzxml(file, spectra, use_id_as_scan=use_id_as_scan)
             
-    def to_mgf(self, file):
+    def to_mgf(self, file, spectrum_column=None):
         """
         save spectra to mgf file
 
         :param file: filename or file pointer
+        :param spectrum_column: column name for spectrum
         """
-        spectra = [self[i][self.column_name] for i in range(len(self))]
+        if spectrum_column is None:
+            spectrum_column = 'spectrum'
+        spectra = [self[i][spectrum_column] for i in range(len(self))]
         msuf.spectra_to_mgf(file, spectra)
 
     def to_csv(self, file, columns=None):
@@ -250,7 +204,7 @@ class ArrowLibraryMap(TableMap):
         :param columns: list of columns to write out to csv file.  If none, all columns
         """
         if columns is None:
-            columns = self.field_list
+            columns = property_schema.names
 
         fp = open_if_filename(file, 'w', newline='')
         csv_writer = csv.DictWriter(fp, fieldnames=columns, extrasaction='ignore')
@@ -273,8 +227,6 @@ class ArrowLibraryMap(TableMap):
         :param combine_chunks: dechunkify the arrow table to allow zero copy
         :param filters: parquet predicate as a list of tuples
         """
-        if columns is not None:
-            columns = list(set(columns + min_spectrum_fields))
         input_table = msuf.read_parquet(file, columns=columns, num=num, filters=filters)
         if len(input_table) == 0:
             raise IOError(f'Parquet file {file} read in with zero rows when using filters {filters}')
@@ -283,7 +235,8 @@ class ArrowLibraryMap(TableMap):
         return ArrowLibraryMap(input_table)
 
     @staticmethod
-    def from_msp(file, num=None, id_field=0, comment_fields=None, min_intensity=0.0, max_mz=2000):
+    def from_msp(file, num=None, id_field=0, comment_fields=None, min_intensity=0.0, max_mz=2000,
+                 spectrum_type=None):
         """
         read in an msp file and create an ArrowLibraryMap
 
@@ -293,13 +246,20 @@ class ArrowLibraryMap(TableMap):
         :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
         :param min_intensity: the minimum intensity to set the fingerprint bit
         :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
+        :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        return ArrowLibraryMap(msuf.load_msp2array(file, num=num, id_field=id_field, comment_fields=comment_fields,
-                                              min_intensity=min_intensity, max_mz=max_mz))
+        return ArrowLibraryMap(msuf.load_msp2array(file,
+                                                   num=num,
+                                                   id_field=id_field,
+                                                   comment_fields=comment_fields,
+                                                   min_intensity=min_intensity, 
+                                                   max_mz=max_mz, 
+                                                   spectrum_type=spectrum_type))
 
     @staticmethod
-    def from_mgf(file, num=None, title_fields=None, min_intensity=0.0, max_mz=2000):
+    def from_mgf(file, num=None, title_fields=None, min_intensity=0.0, max_mz=2000,
+                 spectrum_type=None):
         """
         read in an mgf file and create an ArrowLibraryMap
 
@@ -308,10 +268,14 @@ class ArrowLibraryMap(TableMap):
         :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE
         :param min_intensity: the minimum intensity to set the fingerprint bit
         :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
+        :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        return ArrowLibraryMap(msuf.load_mgf2array(file, num=num, title_fields=title_fields,
-                                                   min_intensity=min_intensity, max_mz=max_mz))
+        return ArrowLibraryMap(msuf.load_mgf2array(file, num=num, 
+                                                   title_fields=title_fields,
+                                                   min_intensity=min_intensity, 
+                                                   max_mz=max_mz,
+                                                   spectrum_type=spectrum_type))
 
 
     @staticmethod
@@ -324,6 +288,7 @@ class ArrowLibraryMap(TableMap):
                  min_intensity=0.0,
                  max_mz=2000,
                  set_probabilities=(0.01, 0.97, 0.01, 0.01),
+                 spectrum_type=None
         ):
         """
         read in an sdf file and create an ArrowLibraryMap
@@ -338,11 +303,19 @@ class ArrowLibraryMap(TableMap):
         :param min_intensity: the minimum intensity to set the fingerprint bit
         :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :param set_probabilities: how to divide into dev, train, valid, test
+        :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        return ArrowLibraryMap(msuf.load_sdf2array(file, num=num, skip_expensive=skip_expensive, max_size=max_size,
-                                              source=source, id_field=id_field, min_intensity=min_intensity,
-                                              max_mz=max_mz, set_probabilities=set_probabilities))
+        return ArrowLibraryMap(msuf.load_sdf2array(file, 
+                                                   num=num, 
+                                                   skip_expensive=skip_expensive, 
+                                                   max_size=max_size,
+                                                   source=source, 
+                                                   id_field=id_field, 
+                                                   min_intensity=min_intensity,
+                                                   max_mz=max_mz, 
+                                                   set_probabilities=set_probabilities,
+                                                   spectrum_type=spectrum_type))
 
 
 class PandasLibraryMap(TableMap):
@@ -351,12 +324,11 @@ class PandasLibraryMap(TableMap):
 
     """
 
-    def __init__(self, df, column_name=None, *args, **kwargs):
+    def __init__(self, df, *args, **kwargs):
         """
         :param df: pandas dataframe
-        :param column_name: name of the spectrum column
         """
-        super().__init__(column_name=column_name, *args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.df = df
         self.ids = self.df.index.values
         self.length = len(self.ids)
@@ -393,13 +365,18 @@ class ListLibraryMap(TableMap):
 
     """
 
-    def __init__(self, list_in,  *args, **kwargs):
+    def __init__(self, list_in, spectrum_column=None, *args, **kwargs):
         """
         :param list_in: list of spectra
+        :param spectrum_column: column name for spectrum
         """
         super().__init__(*args, **kwargs)
         self.list_in = list_in
         self.length = len(self.list_in)
+        if spectrum_column is None:
+            self.spectrum_column = 'spectrum'
+        else:
+            self.spectrum_column = spectrum_column
 
     def __len__(self):
         return self.length
@@ -408,7 +385,7 @@ class ListLibraryMap(TableMap):
         spectrum = self.list_in[idx]
         return_val = {}
         # put interesting fields in the dictionary
-        for field in self.field_list:
+        for field in property_schema.names:
             try:
                 attribute = getattr(spectrum, field.name)
                 if attribute is not None:
@@ -416,7 +393,7 @@ class ListLibraryMap(TableMap):
             except AttributeError:
                 pass
 
-        return_val[self.column_name] = spectrum
+        return_val[self.spectrum_column] = spectrum
         return return_val
 
     def get_ids(self):

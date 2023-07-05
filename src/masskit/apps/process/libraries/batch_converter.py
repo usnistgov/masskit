@@ -73,7 +73,8 @@ def batch_converter_app(config: DictConfig) -> None:
         reader = BatchFileReader(input_file, format=input_file_extension,
                                  row_batch_size=config.conversion.get("row_batch_size", 5000),
                                  id_field=id_field,
-                                 comment_fields=comment_fields)
+                                 comment_fields=comment_fields,
+                                 spectrum_type=config.input.file.get('spectrum_type', 'mol'))
 
         for writer in writers:
             num_rows = 0

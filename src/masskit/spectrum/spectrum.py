@@ -4,7 +4,7 @@ import numpy as np
 from masskit.accumulator import Accumulator
 import masskit.utils.textalloc as ta
 from masskit.constants import EPSILON
-from masskit.data_specs.schemas import populate_properties, property_fields, spectrum_accumulator_fields
+import masskit.data_specs.schemas as mds
 from masskit.peptide.encoding import h2o_mass
 from masskit.spectrum.ipython import is_notebook
 import re
@@ -1443,7 +1443,7 @@ class Spectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in property_fields:
+        for field in mds.property_fields:
             attribute = row.get(field.name)
             if attribute is not None:
                 setattr(self, field.name, attribute())
@@ -1486,10 +1486,18 @@ class Spectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in property_fields:
+        for field in mds.property_fields:
             attribute = struct.get(field.name)
             if attribute is not None:
-                setattr(self, field.name, attribute.as_py())
+                if pa.types.is_list(field.type) or pa.types.is_large_list(field.type):
+                    if attribute.values is not None:
+                        # zero copy only is False to handle string lists
+                        setattr(self, field.name, attribute.values.to_numpy(zero_copy_only=False))
+                elif pa.types.is_struct(field.type):
+                    if attribute.values is not None:
+                        setattr(self, field.name, attribute.values)
+                else:
+                    setattr(self, field.name, attribute.as_py())
         
         self.charge = struct['charge'].as_py() if struct.get('charge') is not None else None
 
@@ -1500,7 +1508,6 @@ class Spectrum:
             return None
         
         stddev = struct2numpy(struct, 'stddev')
-        annotations = struct2numpy(struct, 'annotations')
         precursor_intensity = struct['precursor_intensity'].as_py() if struct.get('precursor_intensity') is not None else None
 
         self.precursor = self.precursor_class(
@@ -1517,7 +1524,7 @@ class Spectrum:
             struct2numpy(struct, 'intensity'),
             stddev=stddev,
             mass_info=MassInfo(arrow_struct_scalar=struct['product_massinfo']),
-            annotations=annotations,
+            annotations=struct.get("annotations", None),
             copy_arrays=copy_arrays,
             starts=starts,
             stops=stops
@@ -2495,7 +2502,7 @@ class Spectrum:
 
 
 # Add properties from the schema to Spectrum
-populate_properties(Spectrum)
+mds.populate_properties(Spectrum)
 
 class AccumulatorSpectrum(Spectrum, Accumulator):
     """
@@ -2577,7 +2584,7 @@ class AccumulatorSpectrum(Spectrum, Accumulator):
         self.__class__ = Spectrum
 
 
-populate_properties(AccumulatorSpectrum, fields=spectrum_accumulator_fields)
+mds.populate_properties(AccumulatorSpectrum, fields=mds.spectrum_accumulator_fields)
 
 class HiResSpectrum(Spectrum):
     def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, starts=None, stops=None, copy_arrays=False):

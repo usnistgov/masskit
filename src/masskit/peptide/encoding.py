@@ -2,7 +2,7 @@ from collections import OrderedDict
 import string
 
 import numpy as np
-from masskit.data_specs.schemas import ion_annot_fields
+import masskit.data_specs.schemas as mds
 import pyarrow as pa
 import pandas as pd
 
@@ -583,7 +583,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     arrays['ion_subtype_array'] = pa.DictionaryArray.from_arrays(
         indices=arrays['ion_subtype_array'],
         dictionary=named_ions.dictionary)
-    fields = ion_annot_fields[0:6]
+    fields = mds.ion_annot_fields[0:6]
     arrays_out = list(arrays.values())[0:6] 
     if analysis is not None:
         analysis['aa_before_array'] = pa.DictionaryArray.from_arrays(
@@ -598,7 +598,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
         analysis['ptm_after_array'] = pa.DictionaryArray.from_arrays(
             indices=pa.concat_arrays(analysis['ptm_after_array']),
             dictionary=mod_masses.dictionary)
-        fields += ion_annot_fields[6:]
+        fields += mds.ion_annot_fields[6:]
         arrays_out += list(analysis.values())
 
     annotations = pa.StructArray.from_arrays(arrays=arrays_out, fields=fields)

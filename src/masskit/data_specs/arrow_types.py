@@ -1,11 +1,10 @@
+import jsonpickle
 import numpy as np
 import pyarrow as pa
-import pandas as pd
-from masskit.data_specs.schemas import molecules_struct, peptide_struct
-from masskit.spectrum.spectrum import Spectrum
+import masskit.spectrum.spectrum as mss
 from pandas.core.arrays import ExtensionArray
 from pandas.core.dtypes.base import ExtensionDtype
-from pandas.api.extensions import register_extension_dtype, take
+from pandas.api.extensions import register_extension_dtype
 import numbers
 from rdkit import Chem
 
@@ -131,7 +130,7 @@ class SpectrumArrowScalarType(pa.ExtensionScalar):
         if self.value is None:
             return None
         else:
-            return Spectrum(struct=self.value)
+            return mss.Spectrum(struct=self.value)
 
     
 class SpectrumArrowType(pa.PyExtensionType):
@@ -140,13 +139,14 @@ class SpectrumArrowType(pa.PyExtensionType):
     parameterized by storage_type, which can be molecules_struct or peptide_struct
     """
 
-    def __init__(self, storage_type=molecules_struct):
+    def __init__(self, storage_type=None):
         pa.PyExtensionType.__init__(self, storage_type)
 
     def __reduce__(self):
         """
         used by pickle to understand how to serialize this class
         :return: a callable object and a tuple of arguments
+        to the object
         """
         #todo: should save size as metadata
         return SpectrumArrowType, (self.storage_type,)
@@ -172,7 +172,7 @@ class SpectrumArrowArray(MasskitArrowArray):
 
 @register_extension_dtype
 class SpectrumPandasDtype(MasskitPandasDtype):
-    type = Spectrum
+    type = mss.Spectrum
     name = "Spectrum"
     na_value = np.nan
 
@@ -219,9 +219,9 @@ class MolArrowType(pa.PyExtensionType):
         """
         used by pickle to understand how to serialize this class
         :return: a callable object and a tuple of arguments
+        to the object
         """
-        #todo: should save size as metadata
-        return MolArrowType, (self.storage_type,)
+        return MolArrowType, ()
 
     def __arrow_ext_scalar_class__(self):
         return MolArrowScalarType
@@ -261,6 +261,90 @@ class MolPandasDtype(MasskitPandasDtype):
 
 class MolPandasArray(MasskitPandasArray):
     dtype = MolPandasDtype()
+    
+    def __init__(self, values):
+        super().__init__(values)
+
+
+class JSONArrowScalarType(pa.ExtensionScalar):
+    """
+    arrow scalar extension class for jsonpickled objects
+    """
+
+    def as_py(self):
+        if self.value is None:
+            return None
+        else:
+            obj = jsonpickle.decode(self.value.as_py(), keys=True)
+            return obj
+
+    
+class JSONArrowType(pa.PyExtensionType):
+    """
+    arrow type extension class for jsonpickled objects
+    """
+
+    def __init__(self):
+        pa.PyExtensionType.__init__(self, pa.string())
+
+    def __reduce__(self):
+        """
+        used by pickle to understand how to serialize this class
+        :return: a callable object and a tuple of arguments
+        to the object
+        """
+        return type(self), ()
+
+    def __arrow_ext_scalar_class__(self):
+        return JSONArrowScalarType
+    
+    def __arrow_ext_class__(self):
+        return JSONArrowArray
+
+    def to_pandas_dtype(self):
+        """
+        returns pandas extension dtype
+        """
+        raise NotImplementedError
+
+
+
+class JSONArrowArray(MasskitArrowArray):
+    """
+    Extension array for JSONArrowType
+    """
+        
+
+class PathArrowType(JSONArrowType):
+    def __init__(self):
+        super().__init__()
+
+    def to_pandas_dtype(self):
+        """
+        returns pandas extension dtype
+        """
+        return PathPandasDtype()
+
+
+@register_extension_dtype
+class PathPandasDtype(MasskitPandasDtype):
+    type = object
+    name = "shortest_path"
+    na_value = np.nan
+
+    @classmethod
+    def construct_array_type(cls):
+        """
+        Return the array type associated with this dtype.
+        Returns
+        -------
+        type
+        """
+        return PathPandasArray
+
+
+class PathPandasArray(MasskitPandasArray):
+    dtype = PathPandasDtype()
     
     def __init__(self, values):
         super().__init__(values)

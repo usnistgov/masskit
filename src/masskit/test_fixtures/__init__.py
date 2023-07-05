@@ -5,6 +5,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 from pathlib import Path
 from masskit.apps.process.libraries.batch_converter import batch_converter_app
+import masskit
 
 """
 pytest fixtures
@@ -24,7 +25,7 @@ def data_dir():
     """
     # test_dir, _ = os.path.splitext(__file__)
     #return Path(__file__).parents[1] / Path("../../tests/data")
-    return Path("data")
+    return Path(masskit.__file__).parent.parent.parent / "tests/data"
 
 @pytest.fixture(scope="session")
 def SRM1950_lumos_short_sdf(data_dir):
@@ -36,7 +37,8 @@ def SRM1950_lumos_short_parquet(SRM1950_lumos_short_sdf, tmpdir_factory):
     with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
         cfg = compose(config_name="config_batch_converter",
                       overrides=[f"input.file.names={SRM1950_lumos_short_sdf}",
-                                 f"output.file.name={out}"])
+                                 f"output.file.name={out}",
+                                 f"input.file.spectrum_type=mol"])
         batch_converter_app(cfg)
         return out
     assert False
@@ -51,7 +53,8 @@ def cho_uniq_short_parquet(cho_uniq_short_msp, tmpdir_factory):
     with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
         cfg = compose(config_name="config_batch_converter",
                       overrides=[f"input.file.names={cho_uniq_short_msp}",
-                                 f"output.file.name={out}"])
+                                 f"output.file.name={out}",
+                                 f"input.file.spectrum_type=peptide"])
         batch_converter_app(cfg)
         return out
     assert False
@@ -108,22 +111,8 @@ def create_peptide_parquet_file(config_fasta2peptides):
     return config_fasta2peptides.output.file
 
 @pytest.fixture(scope="session")
-def predicted_arrow_file(data_dir):
+def f(data_dir):
     return data_dir / "test.arrow"
-
-@pytest.fixture(scope="session")
-def batch_converted_files(tmpdir_factory):
-    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted'
-
-@pytest.fixture(scope="session")
-def config_batch_converter(predicted_arrow_file, batch_converted_files):
-    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
-        cfg = compose(config_name="config_batch_converter",
-                      overrides=[f"input.file.names={predicted_arrow_file}",
-                                 f"output.file.name={batch_converted_files}",
-                                 f"output.file.types=[msp,arrow,parquet,mgf]",
-                                 f"conversion.row_batch_size=100"])
-        return cfg
 
 @pytest.fixture(scope="session")
 def batch_converted_sdf_files(tmpdir_factory):
@@ -140,7 +129,8 @@ def config_batch_converter_sdf(test_new_sdf, batch_converted_sdf_files):
                       overrides=[f"input.file.names={test_new_sdf}",
                                  f"output.file.name={batch_converted_sdf_files}",
                                  f"output.file.types=[parquet]",
-                                 f"conversion.row_batch_size=100"])
+                                 f"conversion.row_batch_size=100",
+                                 f"input.file.spectrum_type=mol"])
         return cfg
 
 @pytest.fixture(scope="session")
@@ -158,7 +148,8 @@ def config_batch_converter_smiles(test_smiles, batch_converted_smiles_files):
                       overrides=[f"input.file.names={test_smiles}",
                                  f"output.file.name={batch_converted_smiles_files}",
                                  f"output.file.types=[parquet]",
-                                 f"conversion.row_batch_size=100"])
+                                 f"conversion.row_batch_size=100",
+                                 f"input.file.spectrum_type=mol"])
         return cfg
 
 @pytest.fixture(scope="session")

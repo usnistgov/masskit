@@ -30,7 +30,9 @@ def hi_res3():
 
 class Helpers:
     @staticmethod
-    def do_queries(index, table_in, num_queries=None, queries=None, hitlist_size=120):
+    def do_queries(index, table_in, num_queries=None, queries=None, hitlist_size=120, column_name=None):
+        if column_name is None:
+            column_name = 'spectrum'
         if queries is None:
             if num_queries is not None:
                 queries = random.sample(range(len(table_in)), num_queries)
@@ -42,7 +44,7 @@ class Helpers:
 
         objects = []
         for i in queries:
-            objects.append(table_in[i][table_in.column_name])
+            objects.append(table_in[i][column_name])
 
         hitlist = index.search(objects, id_list=table_in.get_ids(), hitlist_size=hitlist_size, epsilon=0.1)
 

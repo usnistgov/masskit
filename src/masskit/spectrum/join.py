@@ -154,8 +154,8 @@ class PairwiseJoin(Join):
         assert(len(self.exp_lib_map) == len(self.theo_lib_map))
 
         for i in range(len(self.exp_lib_map)):
-            result = self.join_2_spectra(self.exp_lib_map[i][self.exp_lib_map.column_name],
-                                         self.theo_lib_map[i][self.theo_lib_map.column_name], tiebreaker=tiebreaker)
+            result = self.join_2_spectra(self.exp_lib_map[i][self.exp_lib_map.spectrum_column],
+                                         self.theo_lib_map[i][self.theo_lib_map.spectrum_column], tiebreaker=tiebreaker)
             update_join_lists(result, self.exp_lib_map.get_ids()[i], self.theo_lib_map.get_ids()[i])
 
         self.results = pa.Table.from_arrays([Join.list2uint64(experimental_list_id),
@@ -218,9 +218,9 @@ class ThreewayJoin(Join):
         assert(len(self.exp_lib_map) == len(self.theo_lib_map) == len(self.pred_lib_map))
 
         for i in range(len(self.exp_lib_map)):
-            experimental_spectrum = self.exp_lib_map[i][self.exp_lib_map.column_name].norm(max_intensity_in=1.0)
-            predicted_spectrum = self.pred_lib_map[i][self.pred_lib_map.column_name].norm(max_intensity_in=1.0)
-            theoretical_spectrum = self.theo_lib_map[i][self.theo_lib_map.column_name].norm(max_intensity_in=1.0)
+            experimental_spectrum = self.exp_lib_map[i][self.exp_lib_map.spectrum_column].norm(max_intensity_in=1.0)
+            predicted_spectrum = self.pred_lib_map[i][self.pred_lib_map.spectrum_column].norm(max_intensity_in=1.0)
+            theoretical_spectrum = self.theo_lib_map[i][self.theo_lib_map.spectrum_column].norm(max_intensity_in=1.0)
 
             result = self.join_3_spectra(experimental_spectrum,
                                          predicted_spectrum,

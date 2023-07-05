@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import math
-from masskit.data_specs.schemas import populate_properties, accumulator_property_fields
 import pyarrow as pa
 
 class Accumulator(ABC):

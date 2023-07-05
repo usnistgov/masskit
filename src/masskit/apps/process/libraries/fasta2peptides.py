@@ -7,10 +7,10 @@ from itertools import groupby, combinations
 from collections import namedtuple
 import pyarrow as pa
 import pyarrow.parquet as pq
-from masskit.data_specs.schemas import peptide_schema
+from masskit.data_specs.file_schemas import flat_peptide_schema
 from masskit.peptide.spectrum_generator import generate_mods
 from masskit.utils.general import open_if_filename
-from masskit.utils.files import empty_records, add_row_to_records
+from masskit.utils.files import empty_records, add_row_to_records, records2table
 from masskit.peptide.encoding import calc_precursor_mz, parse_modification_encoding
 
 PepTuple = namedtuple('PepTuple', ['nterm', 'pep', 'cterm'])
@@ -234,7 +234,7 @@ class pepgen:
         self.digest = cfg.protein.cleavage.digest
         self.limit_rhk = cfg.peptide.use_basic_limit
         # initialize data structs
-        self.records = empty_records(peptide_schema)
+        self.records = empty_records(flat_peptide_schema)
         self.tables = []
         self.table = []
 
@@ -244,11 +244,19 @@ class pepgen:
 
         :param row: the new row
         """
+        # self.records['annotations']=None
+        # self.records['intensity']=None
+        # self.records['stddev']=None
+        # self.records['product_massinfo']=None
+        # self.records['mz']=None
+        # self.records['precursor_intensity']=None
+        # self.records['precursor_massinfo']=None
+        # self.records['starts']=None
+        # self.records['stops']=None
         add_row_to_records(self.records, row)
         if len(self.records["id"]) % 25000 == 0:
-            table = pa.table(self.records, peptide_schema)
-            self.tables.append(table)
-            self.records = empty_records(peptide_schema)
+            self.tables.append(records2table(self.records, 'peptide'))
+            self.records = empty_records(flat_peptide_schema)
 
     def finalize_table(self):
         """
@@ -256,8 +264,7 @@ class pepgen:
 
         :return: a pyarrow table
         """
-        table = pa.table(self.records, peptide_schema)
-        self.tables.append(table)
+        self.tables.append(records2table(self.records, 'peptide'))
         table = pa.concat_tables(self.tables)
         return table
 

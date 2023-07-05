@@ -90,20 +90,17 @@ def compose_fields(*field_lists):
     :param field_lists: variable number of field lists
     :return: combined noin-redundant field list
     """
-    unique_names = set()
-    unique_fields = set()
+    unique_fields = {}
     ret_fields = []
     for field_list in field_lists:
         for field in field_list:
-            if field.name not in unique_names:
-                if field not in unique_fields:
-                    ret_fields.append(field)
-            elif field not in unique_fields:
-                # The name has already been seen, but with a different type signature
-                # This should never happen and is an error in the schema specifications
-                raise TypeError
-            unique_names.add(field.name)
-            unique_fields.add(field)
+            if field.name not in unique_fields:
+                ret_fields.append(field)
+                unique_fields[field.name] = field
+            else:
+                if field != unique_fields[field.name]:
+                    # duplicate name but different type
+                    raise TypeError
     return ret_fields
 
 
@@ -217,28 +214,32 @@ base_spectrum_small_fields = [
 base_spectrum_fields = base_spectrum_large_fields + base_spectrum_small_fields
 
 # annotations on spectra, shared by all types of experiments
-base_annotation_fields = [
+
+base_annotation_small_fields = [
     pa.field("exact_mass", pa.float64()),
     pa.field("exact_mw", pa.float64()),
-    pa.field("annotations", pa.large_list(ion_annot)),
-    pa.field("spectrum_fp", pa.large_list(pa.uint8())),
-    pa.field("spectrum_fp_count", pa.int32()),
-    pa.field("hybrid_fp", pa.large_list(pa.float32())),
     pa.field("set", pa.dictionary(pa.int32(), pa.string())),
     pa.field("composition", pa.dictionary(pa.int32(), pa.string())),  # bestof, consensus
+    pa.field("spectrum_fp", pa.large_list(pa.uint8()), metadata={b"fp_size": (2000).to_bytes(8, byteorder='big')}),
+    pa.field("spectrum_fp_count", pa.int32()),
+    pa.field("hybrid_fp", pa.large_list(pa.float32())),
 ]
+
+base_annotation_large_fields = [
+    pa.field("annotations", pa.large_list(ion_annot)),
+]
+
+base_annotation_fields = base_annotation_small_fields + base_annotation_large_fields
 
 # base experimental metadata
 base_metadata_fields = base_experimental_fields
 
-# fields treated as properties
-base_property_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields, base_annotation_fields)
+# fields treated as properties (no large fields)
+base_property_fields = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields, base_annotation_small_fields)
 
-base_fields = compose_fields(base_property_fields, base_spectrum_large_fields)
+# all basic spectrum fields, flattened
+base_fields = compose_fields(base_property_fields, base_annotation_large_fields, base_spectrum_large_fields)
 base_schema = pa.schema(base_fields)
-
-# base fields minus the big fields used for spectra
-base_fields_small = compose_fields(min_fields, base_metadata_fields, base_spectrum_small_fields, base_annotation_fields)
 
 # fields used in peptide experiments that define the experimental molecule
 mod_names_field = pa.field("mod_names", pa.large_list(pa.int16()))  # should be pa.large_list(pa.dictionary(pa.int16(), pa.string()))
@@ -254,17 +255,11 @@ peptide_definition_fields = [
 ]
 
 # peptide experimental metadata
-protein_id_field = pa.field("protein_id", pa.large_list(pa.string()))
-peptide_metadata_fields = compose_fields(peptide_definition_fields, [protein_id_field])
+protein_id_field = [pa.field("protein_id", pa.large_list(pa.string()))]
+peptide_metadata_fields = compose_fields(peptide_definition_fields, protein_id_field)
 
 # all property fields that are specific for describing peptides
 peptide_property_fields = peptide_metadata_fields
-
-# fields used in small molecule experiments that define the experimental molecule
-molecule_definition_fields = [
-    pa.field("mol", pa.string()),  # rdkit molecule expressed as MolInterchange JSON
-    pa.field("shortest_paths", pa.string()),  # shortest paths between atoms in molecule
-]
 
 # experimental metadata fields used in small molecule experiments, measured or recorded
 molecule_experimental_fields = [
@@ -284,7 +279,7 @@ molecule_experimental_fields = [
 # annotation fields used in small molecule experiments that are calculated from structure
 molecule_annotation_fields = [
     pa.field("aromatic_rings", pa.int64()),
-    pa.field("ecfp4", pa.large_list(pa.uint8())),
+    pa.field("ecfp4", pa.large_list(pa.uint8()), metadata={b"fp_size": (4096).to_bytes(8, byteorder='big')}),
     pa.field("ecfp4_count", pa.int32()),
     pa.field("estimated_ri", pa.float64()),
     pa.field("estimated_ri_error", pa.float64()),
@@ -306,13 +301,14 @@ molecule_annotation_fields = [
 ]
 
 # small molecule experimental metadata
-molecule_metadata_fields = compose_fields(molecule_definition_fields, molecule_experimental_fields)
+molecule_metadata_fields = molecule_experimental_fields
 
 # all property fields that describe small molecules and associated spectra.  used in file schemas
 molecule_property_fields = compose_fields(molecule_metadata_fields, molecule_annotation_fields)
 
 # all property fields. Use to populate properties in spectra, Accumulators, and columns in arrow tables.
 property_fields = compose_fields(base_property_fields, peptide_property_fields, molecule_property_fields)
+property_schema = pa.schema(property_fields)
 
 accumulator_fields = [
     pa.field('predicted_mean', pa.float64()),
@@ -325,23 +321,20 @@ spectrum_accumulator_fields = [
     pa.field('cosine_score', pa.float64()),
 ]
 
-# schema for standard spectral file formats which do not include a molecular connectivity graph
-peptide_schema = pa.schema(compose_fields(base_fields, peptide_property_fields))
+# struct for peptide spectra
 peptide_struct = pa.struct(compose_fields(base_fields, peptide_property_fields))
 
-# schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
-molecules_schema = pa.schema(compose_fields(base_fields, molecule_property_fields))
+# struct for small molecule spectrum
 # struct doesn't contain the mol or path data as those are separate columns
-molecules_struct = pa.struct(subtract_fields(compose_fields(base_fields, molecule_property_fields), molecule_definition_fields))
+molecules_struct = pa.struct(compose_fields(base_fields, molecule_property_fields))
 
 # generic spectrum expressed as a struct
 spectrum_struct = pa.struct(compose_fields(base_fields, property_fields))
 
 # Useful lists of fields
 # minimal set of spectrum fields
-min_spectrum_fields = ["id", "name", "precursor_mz", "precursor_massinfo",
+min_spectrum_field_names = ["id", "name", "precursor_mz", "precursor_massinfo",
                        "precursor_intensity", "mz", "product_massinfo", "intensity"]
-
 
 peak_join_fields = [
     ("ion1", pa.uint16()),
@@ -501,18 +494,22 @@ def table2structarray(table: pa.Table, structarray_type:pa.ExtensionType=None) -
     :return: StructArray
     """
     
+    # combine chunks as StructArray.from_arrays() only takes Arrays, not ChunkedArray
     table = table.combine_chunks()
+    # TODO: this should be modified to work on ChunkedArrays to created ChunkedArray of Struct
+    # to improve performance, or Structs should be created in the first place
     if structarray_type is None:
         arrays = [table.column(i).chunk(0) for i in range(table.num_columns)]
         column_names = table.column_names
     else:
         arrays = []
         column_names = []
-        for column_name in table.column_names:
-            i = structarray_type.storage_type.get_field_index(column_name)
-            if i != -1:
-                column_names.append(column_name)
-                arrays.append(table[column_name].chunk(0))
+        field_names = [field.name for field in structarray_type.storage_type]
+        # extract columns in order of type to avoid TypeError
+        for field_name in field_names:
+            if field_name in table.column_names:
+                column_names.append(field_name)
+                arrays.append(table.column(field_name).chunk(0))
 
     output = pa.StructArray.from_arrays(arrays, names=column_names)
     if structarray_type is not None:

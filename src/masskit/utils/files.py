@@ -17,13 +17,17 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 import json
+from omegaconf import ListConfig
 from masskit.constants import SET_NAMES, EPSILON
-from masskit.data_specs.schemas import peptide_schema, molecules_schema, set_field_int_metadata, \
-    mod_names_field, hitlist_schema
+from masskit.data_specs.schemas import set_field_int_metadata, \
+    mod_names_field, hitlist_schema, table2structarray, table_add_structarray, molecules_struct, \
+    peptide_struct
+from masskit.data_specs.file_schemas import nested_peptide_spectrum_schema, \
+    nested_molecule_spectrum_schema, flat_peptide_schema, flat_molecule_schema
+from masskit.data_specs.arrow_types import SpectrumArrowType
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
 from masskit.spectrum.spectrum import Spectrum
-from masskit.utils.tables import row_view
 try:
     from rdkit import Chem
     from rdkit.Chem import AllChem
@@ -37,6 +41,7 @@ from masskit.utils.hitlist import Hitlist
 import masskit.spectrum.theoretical_spectrum as msts
 import rich.progress as rprogress
 from pathlib import Path
+
 
 float_match = r'[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?'  # regex used for matching floating point numbers
 
@@ -104,6 +109,8 @@ def load_mgf2array(
     title_fields=None,
     min_intensity=0.0,
     max_mz=2000,
+    spectrum_type=None,
+
 ):
     """
     Read stream in MGF format and return as Pandas data frame.
@@ -116,6 +123,7 @@ def load_mgf2array(
     :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE regex match group 1 is the value
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
+    :param spectrum_type: the type of spectrum file
     :return: one dataframe
     """
     # Scan:3\w  scan
@@ -123,8 +131,10 @@ def load_mgf2array(
     # \wHCD=10.00%\w  collision_energy
     # sample is from filename  _Urine3667_
     # ionization, energy, date, sample, run#, from filename
-
-    records = empty_records(peptide_schema)
+    if spectrum_type is None:
+        spectrum_type = 'peptide'
+    records_schema = spectrum_types[spectrum_type]['flat_schema']
+    records = empty_records(records_schema)
     tables = []
 
     fp = open_if_filename(fp, 'r')
@@ -217,15 +227,13 @@ def load_mgf2array(
             logging.info(f"read record {len(records['id'])}, spectrum_id={spectrum_id}")
         # check to see if we have enough records to add to the pyarrow table
         if len(records["id"]) % 25000 == 0:
-            table = pa.table(records, peptide_schema)
-            tables.append(table)
+            tables.append(records2table(records, spectrum_type))
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(peptide_schema)
+            records = empty_records(records_schema)
         if num is not None and len(records['id']) >= num:
             break
 
-    table = pa.table(records, peptide_schema)
-    tables.append(table)
+    tables.append(records2table(records, spectrum_type))
     logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
     return table
@@ -252,6 +260,8 @@ def read_parquet(fp, columns=None, num=None, filters=None):
     :return: PyArrow table
     """
     fp = open_if_filename(fp, 'rb')
+    if type(columns) == ListConfig:
+        columns = list(columns)
     table = pq.read_table(fp, columns=columns, filters=filters)
     if num is None:
         return table
@@ -259,7 +269,12 @@ def read_parquet(fp, columns=None, num=None, filters=None):
         return table.slice(0, num)
 
 
-def spectra_to_array(spectra, min_intensity=0, max_mz=2000, write_starts_stops=False):
+def spectra_to_array(spectra,
+                     min_intensity=0,
+                     max_mz=2000,
+                     write_starts_stops=False,
+                     spectrum_type=None
+                     ):
     """
     convert an array-like of spectra to an arrow_table
 
@@ -267,9 +282,13 @@ def spectra_to_array(spectra, min_intensity=0, max_mz=2000, write_starts_stops=F
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :param write_starts_stops: put the starts and stops arrays into the arrow Table
+    :param spectrum_type: the type of spectrum file
     :return: arrow table of spectra
     """
-    records = empty_records(peptide_schema)
+    if spectrum_type is None:
+        spectrum_type = 'peptide'
+    records_schema = spectrum_types[spectrum_type]['flat_schema']
+    records = empty_records(records_schema)
 
     for s in spectra:
         row = {}
@@ -307,7 +326,7 @@ def spectra_to_array(spectra, min_intensity=0, max_mz=2000, write_starts_stops=F
         row['mod_names'] = s.mod_names
         row['mod_positions'] = s.mod_positions
         add_row_to_records(records, row)
-    table = pa.table(records, peptide_schema)
+    table = pa.table(records, records_schema)
     return table
 
 
@@ -565,12 +584,11 @@ def load_msp2array(
     fp,
     num=None,
     id_field=0,
-    set_probabilities=(0.01, 0.97, 0.01, 0.01),
     title_fields=None,
     comment_fields=None,
     min_intensity=20,
     max_mz=2000,
-    parse_glyco_annotations=False,
+    spectrum_type=None
 ):
     """
     Read stream or filename in MSP format and return as pyarrow Table.
@@ -578,18 +596,20 @@ def load_msp2array(
     :param fp: stream or filename
     :param num: the maximum number of records to generate (None=all)
     :param id_field: the spectrum id to begin with
-    :param set_probabilities: how to divide into dev, train, valid, test
     :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE. regex match group 1 is the value
     :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
-    :param parse_glyco_annotations: parse glycopeptide annotations
+    :param spectrum_type: type of spectrum file
     :return: arrow table
     """
 
     fp = open_if_filename(fp, 'r')
     tables = []
-    records = empty_records(peptide_schema)
+    if spectrum_type is None:
+        spectrum_type = 'mol'
+    record_type = spectrum_types[spectrum_type]['flat_schema']
+    records = empty_records(record_type)
 
     spectrum_id = id_field  # a made up integer spectrum id
     # move forward to first begin ions
@@ -750,18 +770,31 @@ def load_msp2array(
             logging.info(f"read record {len(records['id'])}, spectrum_id={spectrum_id}")
         # check to see if we have enough records to add to the pyarrow table
         if len(records["id"]) % 25000 == 0:
-            table = pa.table(records, peptide_schema)
-            tables.append(table)
+            tables.append(records2table(records, spectrum_type))
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(peptide_schema)
+            records = empty_records(record_type)
         if num is not None and len(records['id']) >= num:
             break
 
-    table = pa.table(records, peptide_schema)
-    tables.append(table)
+    tables.append(records2table(records, spectrum_type))
     logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
     return table
+
+
+def records2table(records, spectrum_type):
+    """
+    convert a flat table with spectral records into a table with a nested spectrum
+
+    :param records: records to be added to a table
+    :param spectrum_type: which type of spectrum
+    """
+    table = pa.table(records, spectrum_types[spectrum_type]['flat_schema'])
+    structarray = table2structarray(table, SpectrumArrowType(storage_type=spectrum_types[spectrum_type]['storage_type']))
+    table = table.select([x for x in table.column_names if x in spectrum_types[spectrum_type]['nested_schema'].names])
+    table = table_add_structarray(table, structarray)
+    return table
+
 
 def parse_energy(row, value):
     """
@@ -1051,13 +1084,27 @@ def load_smiles2array(
     num=None,
     id_field=0,
     skip_expensive=True,
-    suppress_rdkit_warnings=True
+    suppress_rdkit_warnings=True,
+    spectrum_type=None
 ):
+    """
+    Read file of SMILES and return pyarrow table.
+
+    :param fp: name of the file to read or a file object
+    :param num: the maximum number of records to generate (None=all)
+    :param skip_expensive: skip expensive calculations for better perf
+    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use
+    the value as the starting value for the id and increment for each spectrum
+    :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
+    :param spectrum_type: the type of spectrum file
+    :return: arrow table with records
+    """
+    if spectrum_type is None:
+        spectrum_type = 'mol'
     tables = []
+    records_schema = spectrum_types[spectrum_type]['flat_schema']
     # create arrow schema and batch table
-    records_schema = molecules_schema
     ecfp4_size = 4096  # size of ecfp4 fingerprint
-    records_schema = set_field_int_metadata(records_schema, "ecfp4", "fp_size", ecfp4_size)
     records = empty_records(records_schema)
 
     # generate id using id_field as start
@@ -1085,7 +1132,7 @@ def load_smiles2array(
             logging.info(f"processed record {i}")
         # check to see if we have enough records to add to the pyarrow table
         if len(records["id"]) % 25000 == 0:
-            tables.append(pa.table(records, records_schema))
+            tables.append(records2table(records, spectrum_type))
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
             records = empty_records(records_schema)
 
@@ -1093,7 +1140,7 @@ def load_smiles2array(
             break
 
     if records:
-        tables.append(pa.table(records, records_schema))
+        tables.append(records2table(records, spectrum_type))
     logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
 
@@ -1110,11 +1157,11 @@ def load_sdf2array(
     id_field_type=None,
     min_intensity=0,
     max_mz=2000,
-    fp_tolerance=0.1,
     precursor_mass_info=None,
     product_mass_info=None,
     set_probabilities=(0.01, 0.97, 0.01, 0.01),
-    suppress_rdkit_warnings=True
+    suppress_rdkit_warnings=True,
+    spectrum_type=None
 ):
     """
     Read file in SDF format and return as Lists of Dicts.
@@ -1131,9 +1178,9 @@ def load_sdf2array(
     :param id_field_type: the id field type, such as int or str
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
-    :param fp_tolerance: mass tolerance in Daltons used to create interval fingerprint
     :param set_probabilities: how to divide into dev, train, valid, test
     :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
+    :param spectrum_type: the type of spectrum file
     :return: arrow table with records
 
     various issues:
@@ -1178,11 +1225,11 @@ def load_sdf2array(
     # list of batch tables
     tables = []
     # create arrow schema and batch table
-    records_schema = molecules_schema
+    if spectrum_type is None:
+        spectrum_type = 'mol'
+    records_schema = spectrum_types[spectrum_type]['flat_schema']
     ecfp4_size = 4096  # size of ecfp4 fingerprint
-    spectrum_fp_size = int(max_mz)  # size of spectrum fingerprint
-    records_schema = set_field_int_metadata(records_schema, "ecfp4", "fp_size", ecfp4_size)
-    records_schema = set_field_int_metadata(records_schema, "spectrum_fp", "fp_size", spectrum_fp_size)
+    spectrum_fp_size = 2000  # size of spectrum fingerprint
     records = empty_records(records_schema)
 
     # Turn off RDKit error messages
@@ -1315,7 +1362,8 @@ def load_sdf2array(
                 logging.info(f"processed record {i}")
             # check to see if we have enough records to add to the pyarrow table
             if len(records["id"]) % 25000 == 0:
-                tables.append(pa.table(records, records_schema))
+                # TODO: generalize struct
+                tables.append(records2table(records, spectrum_type))
                 logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
                 records = empty_records(records_schema)
 
@@ -1323,7 +1371,7 @@ def load_sdf2array(
                 break
 
     if records:
-        tables.append(pa.table(records, records_schema))
+        tables.append(records2table(records, spectrum_type))
     logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
 
@@ -1488,11 +1536,23 @@ def load_mzTab(fp, dedup=True, decoy_func=None):
     return mztr.get_hitlist()
 
 
+# describe types of file formats and associated data structures
+spectrum_types = {
+    "peptide": {"storage_type": peptide_struct,
+                "flat_schema": flat_peptide_schema,
+                "nested_schema": nested_peptide_spectrum_schema},
+    "mol": {"storage_type": molecules_struct,
+            "flat_schema": flat_molecule_schema,
+            "nested_schema": nested_molecule_spectrum_schema},
+}
+
+
 class BatchFileReader:
     def __init__(self, filename: Union[str, os.PathLike],
                  format:str=None, row_batch_size:int=5000,
                  id_field: Union[str, int]=0,
-                 comment_fields:str=None,
+                 comment_fields:str=None, spectrum_type:str=None,
+                 column_name:str=None
                  ) -> None:
         """
         read files in batches of pyarrow Tables
@@ -1502,6 +1562,8 @@ class BatchFileReader:
         :param row_batch_size: size of batches to read (except parquet files, which use existing batches)
         :param id_field: the integer start value or string name of the id fields
         :param comment_fields: used for parsing msp file Comment lines
+        :param spectrum_type: the type file (see spectrum_types: 'mol', 'peptide',...)
+        :param column_name: name of the struct column
         """
         super().__init__()
         self.format = format
@@ -1509,14 +1571,31 @@ class BatchFileReader:
         self.id_field = id_field
         self.filename = str(filename)
         self.comment_fields = comment_fields
+        self.spectrum_type = spectrum_type
+        if column_name is None:
+            self.column_name = 'spectrum'
+        else:
+            self.column_name = column_name
         if format == 'parquet':
             self.dataset = pq.ParquetFile(filename)
-        elif format =='arrow':
+            if spectrum_type is None:
+                self.spectrum_type = "peptide"
+        elif format == 'arrow':
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
-        elif format in ['mgf', 'msp', 'smiles']:
+            if spectrum_type is None:
+                self.spectrum_type = "peptide"           
+        elif format == 'mgf':
             self.dataset = open(filename, mode="r")
+            if spectrum_type is None:
+                self.spectrum_type = "peptide"           
+        elif format in ['msp', 'smiles']:
+            self.dataset = open(filename, mode="r")
+            if spectrum_type is None:
+                self.spectrum_type = "mol"           
         elif format == 'sdf':
             self.dataset = open(filename, mode="rb")
+            if spectrum_type is None:
+                self.spectrum_type = "mol"           
         else:
             raise ValueError(f'Unknown format {self.format}')
         
@@ -1534,17 +1613,18 @@ class BatchFileReader:
             # not clear if this goes through the entire memmap -- need to test
             start = 0
             while True:
-                table = self.dataset.slice(start, self.row_batch_size)
-                if len(table) == 0:
+                batch = self.dataset.slice(start, self.row_batch_size)
+                if len(batch) == 0:
                     break
                 start += self.row_batch_size
-                yield table
+                yield batch
         elif self.format == 'msp':
             while True:
                 batch = load_msp2array(self.dataset, 
                                        num=self.row_batch_size, 
                                        id_field=self.id_field,
-                                       comment_fields=self.comment_fields)
+                                       comment_fields=self.comment_fields,
+                                       spectrum_type=self.spectrum_type)
                 if len(batch) == 0:
                     break
                 if isinstance(self.id_field, int):
@@ -1552,7 +1632,10 @@ class BatchFileReader:
                 yield batch
         elif self.format == 'mgf':
             while True:
-                batch = load_mgf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                batch = load_mgf2array(self.dataset, 
+                                       num=self.row_batch_size, 
+                                       id_field=self.id_field,
+                                       spectrum_type=self.spectrum_type)
                 if len(batch) == 0:
                     break
                 if isinstance(self.id_field, int):
@@ -1560,7 +1643,10 @@ class BatchFileReader:
                 yield batch
         elif self.format == 'sdf':
             while True:
-                batch = load_sdf2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                batch = load_sdf2array(self.dataset, 
+                                       num=self.row_batch_size, 
+                                       id_field=self.id_field,
+                                       spectrum_type=self.spectrum_type)
                 if len(batch) == 0:
                     break
                 if isinstance(self.id_field, int):
@@ -1568,7 +1654,10 @@ class BatchFileReader:
                 yield batch
         elif self.format == 'smiles':
             while True:
-                batch = load_smiles2array(self.dataset, num=self.row_batch_size, id_field=self.id_field)
+                batch = load_smiles2array(self.dataset, 
+                                          num=self.row_batch_size, 
+                                          id_field=self.id_field,
+                                          spectrum_type=self.spectrum_type)
                 if len(batch) == 0:
                     break
                 if isinstance(self.id_field, int):
@@ -1582,7 +1671,8 @@ class BatchFileWriter:
     def __init__(self, filename: Union[str, os.PathLike], 
                  format:str=None, annotate:bool=False, 
                  row_batch_size:int=5000,
-                 num_workers:int=7) -> None:
+                 num_workers:int=7,
+                 column_name:str=None) -> None:
         """
         write batches of pyarrow Tables to files
 
@@ -1591,6 +1681,7 @@ class BatchFileWriter:
         :param annotate: whether to annotate the output file
         :param row_batch_size: size of batches to write 
         :param num_workers: number of threads for processing
+        :param column_name: name of the struct column
 =        """
         super().__init__()
         self.format = format
@@ -1598,26 +1689,17 @@ class BatchFileWriter:
         self.filename = str(filename)
         self.annotate = annotate
         self.num_workers = num_workers
+        if column_name is None:
+            self.column_name = 'spectrum'
+        else:
+            self.column_name = column_name
         if format in ['parquet','arrow']:
             self.dataset = None  # set this up in writer as it needs the schema 
         elif format in ['mgf', 'msp']:
             self.dataset = open(self.filename, mode="w")
         else:
             raise ValueError(f'Unknown format {self.format}')
-        
-    def table2spectra(self, table:pa.Table) -> List:
-        """
-        convert a table to a list of spectra
-        
-        :param table: pyarrow table to convert
-        """
-        row = row_view(table)
-        spectra = []
-        for idx in range(len(table)):
-            row.idx = idx
-            spectra.append(Spectrum(row=row))
-        return spectra
-        
+            
     def write_table(self, table:pa.Table) -> None:
         """
         write a table out
@@ -1633,14 +1715,14 @@ class BatchFileWriter:
                 self.dataset = pa.RecordBatchFileWriter(pa.OSFile(self.filename, 'wb'), table.schema)
             self.dataset.write_table(table)
         elif self.format == 'msp':
-            spectra = self.table2spectra(table)
+            spectra = table[self.column_name].to_pylist()
             with Pool(self.num_workers) as p:
                 spectra = p.map(partial(spectrum2msp, annotate=self.annotate), spectra)
             for spectrum in spectra:
                 self.dataset.write(spectrum)
             self.dataset.flush()
         elif self.format == 'mgf':
-            spectra = self.table2spectra(table)
+            spectra = table[self.column_name].to_pylist()
             with Pool(self.num_workers) as p:
                 spectra = p.map(spectrum2mgf, spectra)
             for spectrum in spectra:

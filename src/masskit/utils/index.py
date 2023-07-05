@@ -1,4 +1,3 @@
-import csv
 import logging
 import timeit
 import numpy as np
@@ -6,17 +5,13 @@ import pandas as pd
 from abc import ABC, abstractmethod
 from scipy import sparse
 from masskit.spectrum.spectrum import Spectrum
-from masskit.data_specs.schemas import min_spectrum_fields, property_fields
-import masskit.utils.files as msuf
 from masskit.utils.general import open_if_filename
 #from masskit.utils.search import tanimoto_search
-from masskit.utils.tables import row_view, arrow_to_pandas
+from masskit.utils.tables import row_view
 import pynndescent
 import pickle
-import jsonpickle
 from masskit.utils.fingerprints import SpectrumFloatFingerprint, SpectrumTanimotoFingerPrint
 from masskit.utils.hitlist import Hitlist
-from rdkit import Chem
 
 # try:
 #     from numba import jit, prange
@@ -66,11 +61,12 @@ class Index(ABC):
             self.index_name = "default"
 
     @abstractmethod
-    def create(self, table_map):
+    def create(self, table_map, column_name=None):
         """
         create index from a TableMap
 
         :param table_map: the library to index
+        :param column_name: name of the column containing the objects to index.  None='spectrum'
         """
         raise NotImplementedError
 
@@ -249,14 +245,16 @@ class DescentIndex(Index):
     def __init__(self, index_name=None, dimension=2000, fingerprint_factory=SpectrumFloatFingerprint):
         super().__init__(index_name=index_name, dimension=dimension, fingerprint_factory=fingerprint_factory)
 
-    def create(self, table_map, metric=None):
+    def create(self, table_map, metric=None, column_name=None):
+        if column_name is None:
+            column_name = 'spectrum'
         if metric is None:
             metric = "cosine"
         feature_array = np.zeros((len(table_map), self.dimension), dtype=np.float32)
         factory = self.fingerprint_factory(dimension=self.dimension)
 
         for i in range(len(table_map)):
-            feature_array[i] = factory.object2fingerprint(table_map[i][table_map.column_name])
+            feature_array[i] = factory.object2fingerprint(table_map[i][column_name])
 
         feature_array = sparse.csr_matrix(feature_array)
 
@@ -405,9 +403,11 @@ class BruteForceIndex(Index):
         super().__init__(index_name=index_name, dimension=dimension, fingerprint_factory=fingerprint_factory)
         self.index = []
 
-    def create(self, table_map):
+    def create(self, table_map, column_name=None):
+        if column_name is None:
+            column_name = 'spectrum'
         for i in range(len(table_map)):
-            self.index.append(table_map[i][table_map.column_name])
+            self.index.append(table_map[i][column_name])
 
     def optimize(self):
         pass
@@ -552,12 +552,14 @@ class TanimotoIndex(Index):
         super().__init__(index_name=index_name, dimension=dimension, fingerprint_factory=fingerprint_factory)
         self.index_count = None
 
-    def create(self, table_map):
+    def create(self, table_map, column_name=None):
+        if column_name is None:
+            column_name = 'spectrum'
         fingerprint = self.fingerprint_factory(dimension=self.dimension)
         self.index = np.zeros((len(table_map), fingerprint.size()), dtype=np.uint8)
         self.index_count = np.zeros((len(table_map),), dtype=np.int32)
         for i in range(len(table_map)):
-            fingerprint.object2fingerprint(table_map[i][table_map.column_name])
+            fingerprint.object2fingerprint(table_map[i][column_name])
             self.index[i] = fingerprint.to_numpy()
             self.index_count[i] = fingerprint.to_bitvec().GetNumOnBits()
             

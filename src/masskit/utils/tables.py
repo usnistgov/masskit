@@ -1,11 +1,7 @@
 import numpy as np
 import pyarrow as pa
-import pandas as pd
-import masskit.data_specs.schemas as ms_schemas
-import string
 import string
 from types import MethodType
-from masskit.spectrum.spectrum import Spectrum
 
 ALPHABET = np.array(list(string.ascii_letters))
 
@@ -160,50 +156,7 @@ def row_view_raw(table, idx=0):
 
     return inst
 
-def convert_spectra(table):
-    # Create dataframe of spectrums
-    rv = row_view(table)
-    spectrums = []
-    for i in range(table.num_rows):
-        rv.idx = i
-        spectrums.append(Spectrum(row=rv))
-    spectrum_df = pd.DataFrame({
-        "id": table['id'].to_pandas(),
-        "spectrum": spectrums})
-    return spectrum_df
 
-def arrow_to_pandas(table, conversions=None, field_list=None):
-    """
-    converts a pyarrow table to a pandas dataframe with spectrum objects
-
-    :param table: The pyarrow table to be converted
-    :param conversions: list of pandas object types to convert to
-    :param field_list: list of pyarrow fields to convert
-    """
-    # Create a table for each object requested
-    merge_tables = []
-    if conversions is not None:
-        for convertor in conversions:
-            if convertor == "spectrum":
-                merge_tables.append(convert_spectra(table))
-
-    # dataframe of the remaining subset of columns
-    if field_list is None:
-        field_list = list(map(lambda x: x.name,
-                                ms_schemas.property_fields))
-        # TODO: remove columns for converted objects
-    else:
-        field_list = list(map(lambda x: x.name,
-                                field_list))
-    common_names = set(table.schema.names) & set(field_list)
-    table_df = table.select(common_names).to_pandas()
-
-    # merge all dataframes
-    for mt in merge_tables:
-        table_df = pd.merge(mt, table_df, how='inner', on='id', validate='one_to_one')
-
-    return table_df
-    
 if __name__ == "__main__":
 
     table = create_dataset(cols=[int, float, list])
