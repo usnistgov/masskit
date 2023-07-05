@@ -8,7 +8,7 @@ build-backend = "scikit_build_core.build"
 
 [project]
 name = "masskit_ext"
-version = "1.0.1"
+version = "1.1.0"
 authors = [
     { name = "Douglas Slotta", email = "douglas.slotta@nist.gov" },
     { name = "Lewis Geer", email = "lewis.geer@nist.gov" },
