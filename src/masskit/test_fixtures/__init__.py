@@ -25,7 +25,7 @@ def data_dir():
     """
     # test_dir, _ = os.path.splitext(__file__)
     #return Path(__file__).parents[1] / Path("../../tests/data")
-    return Path(masskit.__file__).parent.parent.parent / "tests/data"
+    return Path("data")
 
 @pytest.fixture(scope="session")
 def SRM1950_lumos_short_sdf(data_dir):
