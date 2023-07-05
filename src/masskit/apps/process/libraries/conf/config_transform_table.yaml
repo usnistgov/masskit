@@ -1,0 +1,25 @@
+# fasta filename
+input:
+  files:
+    - /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic_2_0.arrow
+    - /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic_2_1.arrow
+    - /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic_2_2.arrow
+    - /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic_2_3.arrow
+    - /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic_2_4.arrow
+    - /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic_2_5.arrow
+output:
+  arrow_file: /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic.arrow
+  parquet_file: /data/aiomics/massspec_cache/uniprot/cho/predicted_cho_uniprot_tryptic.parquet
+  batch_size: 65536
+temp:
+  dir: /data/aiomics/massspec_cache/uniprot/cho
+sort:
+  - field: precursor_mz
+    order: ascending
+operations:
+  - compress_start_stop
+casts:
+    - field: intensity
+      type: "large_list<item: float>"
+    - field: mz
+      type: "large_list<item: float>"
