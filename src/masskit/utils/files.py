@@ -595,7 +595,7 @@ def load_msp2array(
     # move forward to first begin ions
     line = fp.readline()
     # skip to first full entry
-    while not line.lower().startswith("Name: ".lower()):
+    while line and not line.lower().startswith("Name: ".lower()):
         line = fp.readline()
 
     while line:
@@ -1318,17 +1318,7 @@ def load_sdf2array(
                 tables.append(pa.table(records, records_schema))
                 logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
                 records = empty_records(records_schema)
-            add_row_to_records(records, new_row)
-            if i % 10000 == 0:
-                logging.info(f"processed record {i}")
-            # check to see if we have enough records to add to the pyarrow table
-            if len(records["id"]) % 25000 == 0:
-                tables.append(pa.table(records, records_schema))
-                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-                records = empty_records(records_schema)
 
-            if num is not None and num == i:
-                break
             if num is not None and num == i:
                 break
 

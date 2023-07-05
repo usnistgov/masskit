@@ -1,8 +1,10 @@
 import pytest
 from hydra import compose, initialize
 from masskit.apps.process.libraries import fasta2peptides
-import os
+import pyarrow as pa
+import pyarrow.parquet as pq
 from pathlib import Path
+from masskit.apps.process.libraries.batch_converter import batch_converter_app
 
 """
 pytest fixtures
@@ -14,6 +16,7 @@ in the conftest.py file at the root of the package unit tests
 
 """
 
+
 @pytest.fixture(scope="session")
 def data_dir():
     """
@@ -22,6 +25,66 @@ def data_dir():
     # test_dir, _ = os.path.splitext(__file__)
     #return Path(__file__).parents[1] / Path("../../tests/data")
     return Path("data")
+
+@pytest.fixture(scope="session")
+def SRM1950_lumos_short_sdf(data_dir):
+    return data_dir / "SRM1950_lumos_short.sdf"
+
+@pytest.fixture(scope="session")
+def SRM1950_lumos_short_parquet(SRM1950_lumos_short_sdf, tmpdir_factory):
+    out = tmpdir_factory.mktemp('batch_converter') / 'SRM1950_lumos_short.parquet'
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={SRM1950_lumos_short_sdf}",
+                                 f"output.file.name={out}"])
+        batch_converter_app(cfg)
+        return out
+    assert False
+
+@pytest.fixture(scope="session")
+def cho_uniq_short_msp(data_dir):
+    return data_dir / "cho_uniq_short.msp"
+
+@pytest.fixture(scope="session")
+def cho_uniq_short_parquet(cho_uniq_short_msp, tmpdir_factory):
+    out = tmpdir_factory.mktemp('batch_converter') / 'cho_uniq_short.parquet'
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={cho_uniq_short_msp}",
+                                 f"output.file.name={out}"])
+        batch_converter_app(cfg)
+        return out
+    assert False
+
+@pytest.fixture(scope="session")
+def cho_uniq_short_table(cho_uniq_short_parquet):
+    table = pq.read_table(cho_uniq_short_parquet)
+    return table
+
+@pytest.fixture(scope="session")
+def SRM1950_lumos_table(SRM1950_lumos_short_parquet):
+    table = pq.read_table(SRM1950_lumos_short_parquet)
+    return table
+
+@pytest.fixture(scope="session")
+def cho_uniq_short_recordbatch(cho_uniq_short_table):
+    return cho_uniq_short_table.to_batches()
+
+@pytest.fixture(scope="session")
+def SRM1950_lumos_recordbatch(SRM1950_lumos_table):
+    return SRM1950_lumos_table.to_batches()
+
+@pytest.fixture(scope="session")
+def cho_uniq_short_structarray(cho_uniq_short_recordbatch):
+    return pa.StructArray.from_arrays(
+        cho_uniq_short_recordbatch[0].columns, 
+        names=cho_uniq_short_recordbatch[0].schema.names)
+
+@pytest.fixture(scope="session")
+def SRM1950_lumos_structarray(SRM1950_lumos_recordbatch):
+    return pa.StructArray.from_arrays(
+        SRM1950_lumos_recordbatch[0].columns, 
+        names=SRM1950_lumos_recordbatch[0].schema.names)
 
 @pytest.fixture(scope="session")
 def human_uniprot_trunc_parquet(tmpdir_factory):
@@ -96,4 +159,17 @@ def config_batch_converter_smiles(test_smiles, batch_converted_smiles_files):
                                  f"output.file.name={batch_converted_smiles_files}",
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100"])
+        return cfg
+
+@pytest.fixture(scope="session")
+def batch_converted_smiles_path_file(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_smiles_path_file'
+
+@pytest.fixture(scope="session")
+def config_shortest_path_smiles(batch_converted_smiles_files, batch_converted_smiles_path_file):
+    with initialize(version_base=None, config_path="../apps/process/mols/conf"):
+        cfg = compose(config_name="config_path",
+                      overrides=[f"input.file.name={batch_converted_smiles_files}.parquet",
+                                 f"output.file.name={batch_converted_smiles_path_file}.parquet",
+                                 ])
         return cfg

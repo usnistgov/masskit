@@ -107,6 +107,21 @@ def compose_fields(*field_lists):
     return ret_fields
 
 
+def subtract_fields(field_list, fields2bsubtracted):
+    """
+    delete fields from a field list
+
+    :param field_list: field list to be edited
+    :param fields2bsubtracted: list of fields to be deleted
+    :return: edited field list
+    """
+    ret_fields = []
+    for field in field_list:
+        if field not in fields2bsubtracted:
+            ret_fields.append(field)
+    return ret_fields
+
+
 # :param tolerance: mass tolerance.  If 0.5 daltons, this is unit mass
 # :param tolerance_type: type of tolerance: "ppm", "daltons"
 # :param mass_type: "monoisotopic" or "average"
@@ -117,9 +132,9 @@ def compose_fields(*field_lists):
 massinfo_struct_fields = \
     [
         ("tolerance", pa.float64()),
-        ("tolerance_type", pa.dictionary(pa.int8(), pa.string())),
+        ("tolerance_type", pa.dictionary(pa.int32(), pa.string())),
         # ("tolerance_type", pa.string()),
-        ("mass_type", pa.dictionary(pa.int8(), pa.string())),
+        ("mass_type", pa.dictionary(pa.int32(), pa.string())),
         # ("mass_type", pa.string()),
         # ("tolerance_type", pa.string()),
         # ("mass_type", pa.string()),
@@ -144,10 +159,10 @@ ion_annot_fields = \
         ("ion_subtype", pa.dictionary(pa.int32(), pa.string())),  # subtype of ion_type
         ("position", pa.uint16()),  # position of bond break in polymer
         ("end_position", pa.uint16()),   # optional end position of bond break in polymer (eg internal ion)
-        ("aa_before", pa.dictionary(pa.int8(), pa.string())),  # amino acid before cleavage point
-        ("aa_after", pa.dictionary(pa.int8(), pa.string())),  # amino acid after cleavage point
-        ("ptm_before", pa.dictionary(pa.int16(), pa.string())),  # ptm before cleavage point
-        ("ptm_after", pa.dictionary(pa.int16(), pa.string())),  # ptm after cleavage point
+        ("aa_before", pa.dictionary(pa.int32(), pa.string())),  # amino acid before cleavage point
+        ("aa_after", pa.dictionary(pa.int32(), pa.string())),  # amino acid after cleavage point
+        ("ptm_before", pa.dictionary(pa.int32(), pa.string())),  # ptm before cleavage point
+        ("ptm_after", pa.dictionary(pa.int32(), pa.string())),  # ptm after cleavage point
     ]
 
 ion_annot = pa.struct(ion_annot_fields)
@@ -209,8 +224,8 @@ base_annotation_fields = [
     pa.field("spectrum_fp", pa.large_list(pa.uint8())),
     pa.field("spectrum_fp_count", pa.int32()),
     pa.field("hybrid_fp", pa.large_list(pa.float32())),
-    pa.field("set", pa.dictionary(pa.int8(), pa.string())),
-    pa.field("composition", pa.dictionary(pa.int8(), pa.string())),  # bestof, consensus
+    pa.field("set", pa.dictionary(pa.int32(), pa.string())),
+    pa.field("composition", pa.dictionary(pa.int32(), pa.string())),  # bestof, consensus
 ]
 
 # base experimental metadata
@@ -230,7 +245,7 @@ mod_names_field = pa.field("mod_names", pa.large_list(pa.int16()))  # should be 
 peptide_definition_fields = [
     pa.field("peptide", pa.string()),
     pa.field("peptide_len", pa.int32()),
-    pa.field("peptide_type", pa.dictionary(pa.int8(), pa.string())),  # tryptic, semitryptic
+    pa.field("peptide_type", pa.dictionary(pa.int32(), pa.string())),  # tryptic, semitryptic
     # note that mod_names should be a list of dictionary arrays but it's not clear how to initialize
     # this properly with arrays of mod_names, such as in library import.  So for now, just using a list of int16
     # which matches the modifications dictionary in encoding.py
@@ -312,9 +327,15 @@ spectrum_accumulator_fields = [
 
 # schema for standard spectral file formats which do not include a molecular connectivity graph
 peptide_schema = pa.schema(compose_fields(base_fields, peptide_property_fields))
+peptide_struct = pa.struct(compose_fields(base_fields, peptide_property_fields))
 
 # schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
 molecules_schema = pa.schema(compose_fields(base_fields, molecule_property_fields))
+# struct doesn't contain the mol or path data as those are separate columns
+molecules_struct = pa.struct(subtract_fields(compose_fields(base_fields, molecule_property_fields), molecule_definition_fields))
+
+# generic spectrum expressed as a struct
+spectrum_struct = pa.struct(compose_fields(base_fields, property_fields))
 
 # Useful lists of fields
 # minimal set of spectrum fields
@@ -342,7 +363,7 @@ spectrum_join = pa.struct(spectrum_join_fields)
 join_types = ["exp2predicted", "exp2theo", "predicted2theo"]
 
 join_fields = [
-    ("join_type", pa.dictionary(pa.int8(), pa.string())),
+    ("join_type", pa.dictionary(pa.int32(), pa.string())),
     ("join", spectrum_join),
 ]
 
@@ -468,6 +489,50 @@ def populate_properties(class_in, fields=property_fields):
     """
     for field in fields:
         setattr(class_in, field.name, property(create_getter(field.name),create_setter(field.name)))
+
+
+def table2structarray(table: pa.Table, structarray_type:pa.ExtensionType=None) -> pa.StructArray:
+    """
+    convert a spectrum table into a struct array.
+    if an ExtensionType is passed in, will create a struct array of that type
+
+    :param table: spectrum table
+    :param structarray_type: the type of the array returned, e.g. SpectrumArrowType()
+    :return: StructArray
+    """
+    
+    table = table.combine_chunks()
+    if structarray_type is None:
+        arrays = [table.column(i).chunk(0) for i in range(table.num_columns)]
+        column_names = table.column_names
+    else:
+        arrays = []
+        column_names = []
+        for column_name in table.column_names:
+            i = structarray_type.storage_type.get_field_index(column_name)
+            if i != -1:
+                column_names.append(column_name)
+                arrays.append(table[column_name].chunk(0))
+
+    output = pa.StructArray.from_arrays(arrays, names=column_names)
+    if structarray_type is not None:
+        output = pa.ExtensionArray.from_storage(structarray_type, output)
+    return output
+
+
+def table_add_structarray(table, structarray, column_name=None):  
+    """
+    add a struct array to a table
+
+    :param table: table to be added to
+    :param structarray: structarray to add to table
+    :param column_name: name of column to add
+    :return: new table with appended column
+    """
+    if column_name is None:
+        column_name = 'spectrum'
+    table = table.append_column(column_name, structarray)
+    return table
 
 
 if __name__ == "__main__":

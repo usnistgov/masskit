@@ -70,7 +70,8 @@ class MassInfo:
             neutral_loss: str = None,
             neutral_loss_charge: int = None,
             evenly_spaced = False,
-            arrow_struct = None,
+            arrow_struct_accessor = None,
+            arrow_struct_scalar = None,
     ):
         """
         initialize
@@ -81,15 +82,23 @@ class MassInfo:
         :param neutral_loss: # neutral loss chemical formula
         :param neutral_loss_charge: sign of neutral loss
         :param evenly_spaced: spectra m/z values are evenly spaced
-        :param arrow_struct: the same as above, but taken from an arrow row_view() object
+        :param arrow_struct_accessor: the same as above, but taken from an arrow row_view() object
+        :param arrow_struct_scalar: the same as above, but taken from an arrow StructScalar
         """
-        if arrow_struct:
-            self.tolerance = arrow_struct.tolerance()
-            self.tolerance_type = arrow_struct.tolerance_type()
-            self.mass_type = arrow_struct.mass_type()
-            self.neutral_loss = arrow_struct.neutral_loss()
-            self.neutral_loss_charge = arrow_struct.neutral_loss_charge()
-            self.evenly_spaced = arrow_struct.evenly_spaced()
+        if arrow_struct_accessor:
+            self.tolerance = arrow_struct_accessor.tolerance()
+            self.tolerance_type = arrow_struct_accessor.tolerance_type()
+            self.mass_type = arrow_struct_accessor.mass_type()
+            self.neutral_loss = arrow_struct_accessor.neutral_loss()
+            self.neutral_loss_charge = arrow_struct_accessor.neutral_loss_charge()
+            self.evenly_spaced = arrow_struct_accessor.evenly_spaced()
+        elif arrow_struct_scalar:
+            self.tolerance = arrow_struct_scalar['tolerance'].as_py()
+            self.tolerance_type = arrow_struct_scalar['tolerance_type'].as_py()
+            self.mass_type = arrow_struct_scalar['mass_type'].as_py()
+            self.neutral_loss = arrow_struct_scalar['neutral_loss'].as_py()
+            self.neutral_loss_charge = arrow_struct_scalar['neutral_loss_charge'].as_py()
+            self.evenly_spaced = arrow_struct_scalar['evenly_spaced'].as_py()
         else:
             self.tolerance = tolerance
             self.tolerance_type = tolerance_type
@@ -1281,7 +1290,7 @@ class Spectrum:
 
     def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, 
                  ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None,
-                 row=None, precursor_mz=None, precursor_intensity=None, stddev=None,
+                 row=None, struct=None, precursor_mz=None, precursor_intensity=None, stddev=None,
                  annotations=None, starts=None, stops=None, copy_arrays=False):
         """
         construct a spectrum.  Can initialize with arrays (mz, intensity) or arrow row object
@@ -1290,6 +1299,7 @@ class Spectrum:
         :param intensity: intensity array
         :param stddev: standard deviation of intensity
         :param row: dict containing parameters and precursor info or arrow row object
+        :param struct: arrow struct containing parameters and precursor info
         :param precursor_mz: precursor_mz value, used preferentially to row
         :param precursor_intensity: precursor intensity, optional
         :param annotations: annotations on the ions
@@ -1340,6 +1350,8 @@ class Spectrum:
                 )
         elif row is not None:
             self.from_arrow(row, copy_arrays=copy_arrays)
+        elif struct is not None:
+            self.from_struct(struct, copy_arrays=copy_arrays)
         
 
     # def __getstate__(self):
@@ -1445,7 +1457,7 @@ class Spectrum:
         self.precursor = self.precursor_class(
             mz=row.precursor_mz(),
             intensity=precursor_intensity,
-            mass_info=MassInfo(arrow_struct=row.precursor_massinfo),
+            mass_info=MassInfo(arrow_struct_accessor=row.precursor_massinfo),
         )
 
         starts = row.starts() if row.get('starts') is not None else None
@@ -1455,7 +1467,7 @@ class Spectrum:
             row.mz(),
             row.intensity(),
             stddev=stddev,
-            mass_info=MassInfo(arrow_struct=row.product_massinfo),
+            mass_info=MassInfo(arrow_struct_accessor=row.product_massinfo),
             annotations=annotations,
             copy_arrays=copy_arrays,
             starts=starts,
@@ -1463,6 +1475,55 @@ class Spectrum:
         )
         return self
 
+    def from_struct(self,
+                   struct,
+                   copy_arrays=False):
+        """
+        Update or initialize from an arrow struct object
+
+        :param row: row object from which to extract the spectrum information
+        :param copy_arrays: if the inputs are numpy arrays, make copies
+        """
+
+        # loop through the experimental fields and if there is data, save it to the spectrum
+        for field in property_fields:
+            attribute = struct.get(field.name)
+            if attribute is not None:
+                setattr(self, field.name, attribute.as_py())
+        
+        self.charge = struct['charge'].as_py() if struct.get('charge') is not None else None
+
+        def struct2numpy(struct, attribute):
+            if struct.get(attribute) is not None:
+                if struct[attribute].values is not None:
+                    return struct[attribute].values.to_numpy()
+            return None
+        
+        stddev = struct2numpy(struct, 'stddev')
+        annotations = struct2numpy(struct, 'annotations')
+        precursor_intensity = struct['precursor_intensity'].as_py() if struct.get('precursor_intensity') is not None else None
+
+        self.precursor = self.precursor_class(
+            mz=struct.get('precursor_mz'),
+            intensity=precursor_intensity,
+            mass_info=MassInfo(arrow_struct_scalar=struct['precursor_massinfo']),
+        )
+
+        starts = struct2numpy(struct, 'starts')
+        stops = struct2numpy(struct, 'stops')
+        
+        self.products = self.product_class(
+            struct2numpy(struct, 'mz'),
+            struct2numpy(struct, 'intensity'),
+            stddev=stddev,
+            mass_info=MassInfo(arrow_struct_scalar=struct['product_massinfo']),
+            annotations=annotations,
+            copy_arrays=copy_arrays,
+            starts=starts,
+            stops=stops
+        )
+        return self
+    
     def from_arrays(
             self,
             mz,
@@ -2517,3 +2578,7 @@ class AccumulatorSpectrum(Spectrum, Accumulator):
 
 
 populate_properties(AccumulatorSpectrum, fields=spectrum_accumulator_fields)
+
+class HiResSpectrum(Spectrum):
+    def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, starts=None, stops=None, copy_arrays=False):
+        super().__init__(precursor_mass_info, product_mass_info, name, id, ev, nce, charge, ion_class, mz, intensity, row, precursor_mz, precursor_intensity, stddev, annotations, starts, stops, copy_arrays)

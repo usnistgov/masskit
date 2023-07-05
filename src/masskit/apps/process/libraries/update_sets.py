@@ -46,7 +46,7 @@ def update_sets_app(config: DictConfig) -> None:
         else:
             new_set.append(update_table['set'][i].as_py())
 
-    set_array = pa.array(new_set, type=pa.dictionary(pa.int8(), pa.string()))
+    set_array = pa.array(new_set, type=pa.dictionary(pa.int32(), pa.string()))
     print(f"Updated rows: {update_table.num_rows}")
 
     print("Reading full dataset")

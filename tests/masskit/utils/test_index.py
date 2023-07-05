@@ -4,21 +4,11 @@ import pytest
 from pytest import approx
 import numpy as np
 import masskit.spectrum.spectrum as mss
-import pyarrow.parquet as pq
 from masskit.utils.index import *
 from masskit.utils.tablemap import ArrowLibraryMap
 import random
 import logging
 
-@pytest.fixture
-def table():
-    table = pq.read_table('data/cho_uniq_short.parquet')
-    return table
-
-@pytest.fixture
-def table_small_mol():
-    table = pq.read_table('data/SRM1950_lumos.parquet')
-    return table
 
 @pytest.fixture
 def hi_res3():
@@ -66,28 +56,28 @@ class Helpers:
 def helpers():
     return Helpers
 
-def test_to_msp(table, tmpdir):
-    lib = ArrowLibraryMap(table, num=3)
+def test_to_msp(cho_uniq_short_table, tmpdir):
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=3)
     msp_file = (tmpdir / 'test.msp')
     lib.to_msp(msp_file.open("w+"))
-    assert msp_file.read().startswith("Name: AAAACALTPGPLADLAAR/2_1(4,C,Carbamidomethyl)")
+    assert msp_file.read().startswith("Name: AAAACALTPGPLADLAAR/2_1(4,C,CAM)")
 
-def test_to_mgf(table, tmpdir):
-    lib = ArrowLibraryMap(table, num=3)
+def test_to_mgf(cho_uniq_short_table, tmpdir):
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=3)
     msp_file = (tmpdir / 'test.mgf')
     lib.to_mgf(msp_file.open("w+"))
 
-def test_nnd_index(table, tmpdir):
+def test_nnd_index(cho_uniq_short_table, tmpdir):
     index = DescentIndex(tmpdir / 'tandem_newfp', dimension=2000)
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     index.create(lib)
     logging.info('saving index')
     index.save()
 
-def test_nnd_query(table, helpers, tmpdir):
+def test_nnd_query(cho_uniq_short_table, helpers, tmpdir):
     index = DescentIndex(tmpdir / '../test_nnd_indexcurrent/tandem_newfp')
     index.load()
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     helpers.do_queries(index, lib, num_queries=3)
 
 def test_recall():
@@ -102,33 +92,33 @@ def test_recall():
                                                 0.700]}, index=mux2)
     comparison = CompareRecallDCG()(Hitlist(compare_df), Hitlist(truth_df))
 
-def test_tanimoto_index(table, tmpdir):
+def test_tanimoto_index(cho_uniq_short_table, tmpdir):
     index = TanimotoIndex(tmpdir / 'spectrum_fp_10000')
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     index.create(lib)
     index.save()
 
 @pytest.mark.skip(reason="tanimoto search currently unimplemented")
-def test_tanimoto_query(table, helpers, tmpdir):
+def test_tanimoto_query(cho_uniq_short_table, helpers, tmpdir):
     index = TanimotoIndex(tmpdir / '../test_tanimoto_indexcurrent/spectrum_fp_10000')
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     index.load()
     helpers.do_queries(index, lib, num_queries=3, hitlist_size=100)
 
 @pytest.mark.skip(reason="tanimoto search currently unimplemented")
-def test_tanimoto_from_fingerprint(table_small_mol, tmpdir):
+def test_tanimoto_from_fingerprint(SRM1950_lumos_table, tmpdir):
     index = TanimotoIndex(tmpdir / '../test_tanimoto_indexcurrent/tanimoto_from_column',
                           fingerprint_factory=ECFPFingerprint)
-    lib = ArrowLibraryMap(table_small_mol, num=10)
+    lib = ArrowLibraryMap(SRM1950_lumos_table, num=10)
     index.create_from_fingerprint(lib)
     hitlist = index.search(lib[0]['ecfp4'], id_list=lib.get_ids(),
                            id_list_query=lib.get_ids(), hitlist_size=10, epsilon=0.01)
     assert hitlist.hitlist.index[0][0] == hitlist.hitlist.index[0][1]
     assert hitlist.hitlist.iloc[0]['tanimoto'] == 1.0
 
-def test_nnd_from_fingerprint(table_small_mol):
+def test_nnd_from_fingerprint(SRM1950_lumos_table):
     index = DescentIndex(fingerprint_factory=ECFPFingerprint)
-    lib = ArrowLibraryMap(table_small_mol)
+    lib = ArrowLibraryMap(SRM1950_lumos_table)
     index.create_from_fingerprint(lib)
     hitlist = index.search(lib[0]['ecfp4'], id_list=lib.get_ids(),
                            id_list_query=lib.get_ids(), hitlist_size=30, epsilon=0.1)
@@ -151,38 +141,38 @@ def test_a_fingerprint(hi_res3):
     fp.object2fingerprint(hi_res3)
 
 @pytest.mark.skip(reason="tanimoto search currently unimplemented")
-def test_compare_tani_fast_search(table, helpers, tmpdir):
+def test_compare_tani_fast_search(cho_uniq_short_table, helpers, tmpdir):
     tani = TanimotoIndex(tmpdir / '../test_tanimoto_indexcurrent/spectrum_fp_10000')
     tani.load()    
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     tani_hitlist = helpers.do_queries(tani, lib, num_queries=10, hitlist_size=300)
     descent = DescentIndex(tmpdir / '../test_nnd_indexcurrent/tandem_newfp')
     descent.load()
     descent_hitlist = helpers.do_queries(descent, lib, queries=tani_hitlist.get_query_ids(), hitlist_size=300)
     comparison = CompareRecallDCG()(descent_hitlist, tani_hitlist)
 
-def test_brute_force_index(table, tmpdir):
+def test_brute_force_index(cho_uniq_short_table, tmpdir):
     index = BruteForceIndex(tmpdir / "brute_force")
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     index.create(lib)
     index.save()
     
-def test_brute_force_query(table, helpers, tmpdir):
+def test_brute_force_query(cho_uniq_short_table, helpers, tmpdir):
     index = BruteForceIndex(tmpdir / '../test_brute_force_indexcurrent/brute_force')
     index.load()
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     hitlist = helpers.do_queries(index, lib, num_queries=10)
 
-def test_compare_brute_fast_search(table, helpers, tmpdir):
+def test_compare_brute_fast_search(cho_uniq_short_table, helpers, tmpdir):
     brute = BruteForceIndex(tmpdir / '../test_brute_force_indexcurrent/brute_force').load()
-    lib = ArrowLibraryMap(table, num=100)
+    lib = ArrowLibraryMap(cho_uniq_short_table, num=100)
     brute_hitlist = helpers.do_queries(brute, lib, num_queries=2)
     descent = DescentIndex(tmpdir / '../test_nnd_indexcurrent/tandem_newfp').load()
     descent_hitlist = helpers.do_queries(descent, lib, queries=brute_hitlist.get_query_ids(), hitlist_size=300)
     comparison = CompareRecallDCG()(descent_hitlist, brute_hitlist)
 
-def test_table(table):
-    item = ArrowLibraryMap(table)[0]
+def test_table(cho_uniq_short_table):
+    item = ArrowLibraryMap(cho_uniq_short_table)[0]
 
 # @pytest.fixture
 # def table_ei():
