@@ -17,14 +17,11 @@ in the conftest.py file at the root of the package unit tests
 
 """
 
-
 @pytest.fixture(scope="session")
 def data_dir():
     """
     the directory containing the test data files
     """
-    # test_dir, _ = os.path.splitext(__file__)
-    #return Path(__file__).parents[1] / Path("../../tests/data")
     return Path("data")
 
 @pytest.fixture(scope="session")
@@ -109,10 +106,6 @@ def config_fasta2peptides(human_uniprot_trunc_parquet, human_uniprot_trunc_fasta
 def create_peptide_parquet_file(config_fasta2peptides):
     fasta2peptides.main(config_fasta2peptides)
     return config_fasta2peptides.output.file
-
-@pytest.fixture(scope="session")
-def f(data_dir):
-    return data_dir / "test.arrow"
 
 @pytest.fixture(scope="session")
 def batch_converted_sdf_files(tmpdir_factory):

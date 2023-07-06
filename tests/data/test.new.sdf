@@ -1,6 +1,6 @@
 ASPIRIN
  -MSLIB32-03140511252D 1   1.0         0.0    250572
-CAS rn = 50782, Lib ID = 111198
+CAS rn = 50782, Lib ID = 44
  13 13  0  0  0  0  0  0  0  0  0
    -8.0000   10.0000    0.0000 C   0  0  0     0  0  0  0  0  0
    -8.0000  -10.0000    0.0000 C   0  0  0     0  0  0  0  0  0
@@ -138,13 +138,13 @@ C9H8O4
 50782
 
 >  <NISTNO>
-250572
+44
 
 >  <ID>
-111198
+44
 
 >  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
-StdNP=1000/3/4
+SemiStdNP=1000/3/4 StdNP=1000/3/4 StdPolar=1000/3/4
 
 >  <NUM PEAKS>
 74
@@ -199,7 +199,7 @@ splash10-00dl-6900000000-74f8a29aa18d0c3afe98
 $$$$
 5.ALPHA.-DIHYDROPROGESTERONE
  -MSLIB32-03140511252D 1   1.0         0.0     62034
-CAS rn = 566654, Lib ID = 10546
+CAS rn = 566654, Lib ID = 55
  27 30  0  0  0  0  0  0  0  0  0
   -54.0000  -26.0000    0.0000 C   0  0  0     0  0  0  0  0  0
   -54.0000   -4.0000    0.0000 C   0  0  0     0  0  0  0  0  0
@@ -286,13 +286,13 @@ C21H32O2
 566654
 
 >  <NISTNO>
-62034
+55
 
 >  <ID>
-10546
+55
 
 >  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
-StdNP=2111/0/1
+SemiStdNP=2111/0/1 StdNP=2111/0/1 StdPolar=2111/0/1
 
 >  <NUM PEAKS>
 250
@@ -468,7 +468,7 @@ splash10-00l6-9541000000-79abc6d9936ed5938a83
 $$$$
 ACETIC ACID
  -MSLIB32-03140511252D 1   1.0         0.0    227635
-CAS rn = 64197, Lib ID = 7393
+CAS rn = 64197, Lib ID = 66
   4  3  0  0  0  0  0  0  0  0  0
     0.0000   20.0000    0.0000 C   0  0  0     0  0  0  0  0  0
   -17.0000   30.0000    0.0000 C   0  0  0     0  0  0  0  0  0
@@ -524,16 +524,16 @@ C2H4O2
 64197
 
 >  <NISTNO>
-227635
+66
 
 >  <ID>
-7393
+739663
 
 >  <CONTRIBUTOR>
 Japan AIST/NIMC Database- Spectrum MS-NW- 80
 
 >  <EXPERIMENTAL RI MEDIAN/DEVIATION/#DATA>
-SemiStdNP=345/10/91 StdNP=789/21/24 StdPolar=1000/13/380
+SemiStdNP=345/10/91 StdNP=345/10/91 StdPolar=345/10/91
 
 >  <NUM PEAKS>
 30
