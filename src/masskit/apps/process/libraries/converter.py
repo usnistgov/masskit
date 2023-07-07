@@ -73,7 +73,6 @@ def converter_app(config: DictConfig) -> None:
                 source=config.input.file.source,
                 id_field=id_field,
                 min_intensity=config.conversion.spectra.min_intensity,
-                max_mz=config.conversion.spectra.max_mz,
                 set_probabilities=config.conversion.set.probabilities,
             )
         elif input_file_extension == "msp":
@@ -83,14 +82,12 @@ def converter_app(config: DictConfig) -> None:
                 id_field=id_field,
                 comment_fields=comment_fields,
                 min_intensity=config.conversion.spectra.min_intensity,
-                max_mz=config.conversion.spectra.max_mz,
             )
         elif input_file_extension == "mgf":
             table = ArrowLibraryMap.from_mgf(
                 input_file,
                 num=config.input.num,
                 min_intensity=config.conversion.spectra.min_intensity,
-                max_mz=config.conversion.spectra.max_mz,
             )
         elif input_file_extension == "parquet":
             table = ArrowLibraryMap.from_parquet(

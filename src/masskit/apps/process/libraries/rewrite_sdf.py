@@ -2,27 +2,42 @@
 
 import argparse
 import rich.progress
+import re
 
 """
-reformat sdf file from NIST library to format usable by rdkit by appending missing M END lines
+reformat old fashioned sdf files into those usable by rdkit by appending missing M END lines
+also turn any latin-1 characters into the unicode expected by rdkit
 
-to create sdf files from nist libraries, use commands like
-
-wine lib2nist64.exe /log9 hr_msms_nist2020_v47.log /OutSDF /ToV2000 z:\\home\\lyg\\data\\nist\\2020\\v47\\hr_msms_nist2020_v42 =hr_msms_nist2020_v47.orig.sdf
-# get rid of non unicode characters in chemical names.
-iconv -f utf-8 -t utf-8 -c ~/nist/hr_msms_nist2020_v47.orig.sdf | uniq > ~/nist/hr_msms_nist2020_v42.sdf
 """
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--input', default="")
 parser.add_argument('--output', default="")
+parser.add_argument('--encoding', default="latin-1")
 args = parser.parse_args()
 
-with rich.progress.open(args.input, 'rt', description=f"{args.input} -> {args.output}") as fin:
+# match connectivity block line
+connectivity_block = re.compile(r'^\s{0,2}\d{1,3}\s{0,2}\d{1,3}\s{1,2}\d+\s{1,2}(\d{1,3}|\s)\s{1,2}(\d{1,3}|\s)\s{1,2}(\d{1,3}|\s)\s{0,2}(\d{1,3}|\s)?\s*$')
+                     
+with rich.progress.open(args.input, 'rt', encoding=args.encoding, 
+                        description=f"{args.input} -> {args.output}") as fin:
     with open(args.output, 'w') as fout:
         previous_line = ""
+        first_line = True
+        in_m_block = False
+        no_m_end = True
         for line in fin:
-            if line.strip() == '>  <NAME>' and previous_line.strip() != 'M  END':
-                fout.write('M  END\n')
+            if not first_line:
+                if connectivity_block.match(previous_line) and \
+                not connectivity_block.match(line):
+                    in_m_block = True
+                    no_m_end = True
+                if in_m_block and line.strip() == 'M  END':
+                    no_m_end = False
+                if in_m_block and (line.startswith("> ") or line.startswith('$$$$')):
+                    in_m_block = False
+                    if no_m_end:
+                        fout.write('M  END\n')
+            first_line = False
             fout.write(line)
             previous_line = line

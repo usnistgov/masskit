@@ -180,6 +180,7 @@ base_experimental_fields = [
     pa.field("ion_mode", pa.string()),
     pa.field("ionization", pa.string()),
     pa.field("name", pa.string()),
+    pa.field("casno", pa.string()),
     pa.field("synonyms", pa.string()),
     pa.field("scan", pa.string()),
     pa.field("collision_energy", pa.float64(), metadata={'description': 'collision energy, either ev or calculated from nce'}),

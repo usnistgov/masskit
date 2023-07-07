@@ -24,7 +24,7 @@ from masskit.data_specs.schemas import set_field_int_metadata, \
     peptide_struct
 from masskit.data_specs.file_schemas import nested_peptide_spectrum_schema, \
     nested_molecule_spectrum_schema, flat_peptide_schema, flat_molecule_schema
-from masskit.data_specs.arrow_types import SpectrumArrowType
+from masskit.data_specs.arrow_types import MolArrowType, SpectrumArrowType
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
 from masskit.spectrum.spectrum import Spectrum
@@ -108,7 +108,6 @@ def load_mgf2array(
     row_entries=None,
     title_fields=None,
     min_intensity=0.0,
-    max_mz=2000,
     spectrum_type=None,
 
 ):
@@ -122,7 +121,6 @@ def load_mgf2array(
     :param row_entries: dict containing additional row columns
     :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE regex match group 1 is the value
     :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :param spectrum_type: the type of spectrum file
     :return: one dataframe
     """
@@ -136,8 +134,6 @@ def load_mgf2array(
     records_schema = spectrum_types[spectrum_type]['flat_schema']
     records = empty_records(records_schema)
     tables = []
-
-    fp = open_if_filename(fp, 'r')
 
     spectrum_id = id_field  # a made up integer spectrum id
     # move forward to first begin ions
@@ -215,12 +211,15 @@ def load_mgf2array(
             spectrum.mod_positions = row.get('mod_positions', None)
             row['product_massinfo'] = spectrum.product_mass_info.__dict__
             row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=max_mz)
+            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
             row["spectrum_fp"] = fingerprint.to_numpy()
             row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
             row['precursor_mz'] = spectrum.precursor.mz
 
             add_row_to_records(records, row)
+
+        if num is not None and len(records['id']) >= num:
+            break
 
         # check to see if we have enough records to log
         if len(records["id"]) % 5000 == 0:
@@ -230,11 +229,9 @@ def load_mgf2array(
             tables.append(records2table(records, spectrum_type))
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
             records = empty_records(records_schema)
-        if num is not None and len(records['id']) >= num:
-            break
 
     tables.append(records2table(records, spectrum_type))
-    logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
+    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
     return table
 
@@ -271,7 +268,6 @@ def read_parquet(fp, columns=None, num=None, filters=None):
 
 def spectra_to_array(spectra,
                      min_intensity=0,
-                     max_mz=2000,
                      write_starts_stops=False,
                      spectrum_type=None
                      ):
@@ -280,7 +276,6 @@ def spectra_to_array(spectra,
 
     :param spectra: iteratable containing the spectrums
     :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :param write_starts_stops: put the starts and stops arrays into the arrow Table
     :param spectrum_type: the type of spectrum file
     :return: arrow table of spectra
@@ -317,7 +312,7 @@ def spectra_to_array(spectra,
         else:
             row['precursor_massinfo'] = s.product_mass_info.__dict__
         row['precursor_mz'] = s.precursor.mz
-        fingerprint = s.filter(min_intensity=min_intensity).create_fingerprint(max_mz=int(max_mz))
+        fingerprint = s.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
         row['spectrum_fp'] = fingerprint.to_numpy()
         row['spectrum_fp_count'] = fingerprint.get_num_on_bits()
         row['peptide'] = s.peptide
@@ -374,7 +369,7 @@ def spectra_to_mgf(fp, spectra, charge_list=None):
         if spectra[i].id is not None:
             print(f"SCANS={spectra[i].id}", file=fp)
         if spectra[i].precursor is not None:
-            print(f"PEPMASS={spectra[i].precursor.mz} 1.0", file=fp)
+            print(f"PEPMASS={spectra[i].precursor.mz} 999.0", file=fp)
         if spectra[i].retention_time is not None:
             print(f"RTINSECONDS={spectra[i].retention_time}", file=fp)
 #        else:
@@ -587,7 +582,6 @@ def load_msp2array(
     title_fields=None,
     comment_fields=None,
     min_intensity=20,
-    max_mz=2000,
     spectrum_type=None
 ):
     """
@@ -599,12 +593,10 @@ def load_msp2array(
     :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE. regex match group 1 is the value
     :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
     :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :param spectrum_type: type of spectrum file
     :return: arrow table
     """
 
-    fp = open_if_filename(fp, 'r')
     tables = []
     if spectrum_type is None:
         spectrum_type = 'mol'
@@ -622,7 +614,6 @@ def load_msp2array(
         row = {}
         mz = []
         intensity = []
-        annotations = []  # peak annotations
         row["id"] = spectrum_id
         spectrum_id += 1  # increment id
 
@@ -757,12 +748,15 @@ def load_msp2array(
             spectrum.mod_positions = row.get('mod_positions', None)
             row['product_massinfo'] = spectrum.product_mass_info.__dict__
             row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=max_mz)
+            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
             row["spectrum_fp"] = fingerprint.to_numpy()
             row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
             add_row_to_records(records, row)
         else:
             pass
+
+        if num is not None and len(records['id']) >= num:
+            break
 
         # check to see if we have enough records to log
         if len(records["id"]) % 5000 == 0:
@@ -773,11 +767,9 @@ def load_msp2array(
             tables.append(records2table(records, spectrum_type))
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
             records = empty_records(record_type)
-        if num is not None and len(records['id']) >= num:
-            break
 
     tables.append(records2table(records, spectrum_type))
-    logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
+    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
     return table
 
@@ -1078,6 +1070,81 @@ def mol2row(mol, max_size:int=0, skip_expensive:bool=True) -> Dict:
 
     return new_row, mol
 
+def load_csv2array(
+    fp,
+    id_field=None,
+    suppress_rdkit_warnings=True,
+    no_column_headers=False,
+    mol_column_name=None,
+    smiles_column_name=None,
+):
+    """
+    read in csv file with SMILES in one column and convert to an arrow table
+    SMILES are standardized and converted into an rdkit Mol object
+
+    :param fp: name of the file to read or a file object
+    :param block_size: the size of text blocks read in. default is 1MB
+    :param id_field: integer value that is the start of the id values. If none, no id field is created
+    :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
+    :param no_column_headers: the csv has no headers.  In that case, the columns are labeled f0, f1, ...
+    :param mol_column_name: name of the rdkit Mol column in the output table
+    :param smiles_column_name: the name of the SMILES column. default is "SMILES" or "f0" if no headers
+    :param delimiter: csv file delimiter. "," is the default
+    :return: arrow table
+    """
+    # Turn off RDKit error messages
+    if suppress_rdkit_warnings:
+        RDLogger.DisableLog('rdApp.*')
+
+    tables = []
+
+    if smiles_column_name is None:
+        if no_column_headers:
+            smiles_column_name = "f0"
+        else:
+            smiles_column_name = "SMILES"
+    if mol_column_name is None:
+        mol_column_name = 'mol'
+
+    if type(id_field) is int:
+        id_value = id_field
+    else:
+        id_value = None
+
+    for next_chunk in fp:
+        if next_chunk is None:
+            break
+        table = pa.Table.from_batches([next_chunk])
+        column_names = table.column_names
+
+        # edit possibly overlapping column names
+        column_names = [f'{mol_column_name}_original' if mol_column_name == x else x for x in column_names]
+        if id_value is not None:
+            column_names = ['id_original' if 'id' in x else x for x in column_names]
+        table = table.rename_columns(column_names)
+
+        ids = []
+        mols = []
+
+        for i in range(len(table)):
+            try:
+                mol = Chem.MolFromSmiles(table[smiles_column_name][i].as_py())
+                mol = masskit.small_molecule.utils.standardize_mol(mol)
+            except ValueError as e:
+                logging.info(f"Unable to standardize {table[smiles_column_name][i].as_py()}")
+                continue
+            mols.append(Chem.rdMolInterchange.MolToJSON(mol))
+            if id_value is not None:
+                ids.append(id_value)
+                id_value += 1
+        table = table.append_column(pa.field(mol_column_name, MolArrowType()), mols)
+        if id_value is not None:
+            table = table.append_column('id', ids)
+        tables.append(table)
+
+    table = pa.concat_tables(tables)
+    return table
+
 
 def load_smiles2array(
     fp,
@@ -1104,7 +1171,6 @@ def load_smiles2array(
     tables = []
     records_schema = spectrum_types[spectrum_type]['flat_schema']
     # create arrow schema and batch table
-    ecfp4_size = 4096  # size of ecfp4 fingerprint
     records = empty_records(records_schema)
 
     # generate id using id_field as start
@@ -1118,7 +1184,7 @@ def load_smiles2array(
         RDLogger.DisableLog('rdApp.*')
 
     fp = open_if_filename(fp, 'r')
-    for i,smiles in enumerate(fp):
+    for smiles in fp:
         mol = Chem.MolFromSmiles(smiles)
         new_row, mol = mol2row(mol, skip_expensive=skip_expensive)
         if new_row is None or not new_row:
@@ -1128,20 +1194,20 @@ def load_smiles2array(
         current_id += 1
 
         add_row_to_records(records, new_row)
-        if i % 10000 == 0:
-            logging.info(f"processed record {i}")
+        if num is not None and len(records['id']) >= num:
+            break
+
+        if len(records['id']) % 10000 == 0:
+            logging.info(f"processed record {len(records['id'])}")
         # check to see if we have enough records to add to the pyarrow table
         if len(records["id"]) % 25000 == 0:
             tables.append(records2table(records, spectrum_type))
             logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
             records = empty_records(records_schema)
 
-        if num is not None and num == i:
-            break
-
     if records:
         tables.append(records2table(records, spectrum_type))
-    logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
+    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
 
     return table
@@ -1156,7 +1222,6 @@ def load_sdf2array(
     id_field=None,
     id_field_type=None,
     min_intensity=0,
-    max_mz=2000,
     precursor_mass_info=None,
     product_mass_info=None,
     set_probabilities=(0.01, 0.97, 0.01, 0.01),
@@ -1166,7 +1231,7 @@ def load_sdf2array(
     """
     Read file in SDF format and return as Lists of Dicts.
 
-    :param fp: name of the file to read or a file object
+    :param fp: ForwardSDMolSupplier iterator
     :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
     :param num: the maximum number of records to generate (None=all)
     :param source: where did the sdf come from?  pubchem, nist, ?
@@ -1177,7 +1242,6 @@ def load_sdf2array(
     the value as the starting value for the id and increment for each spectrum
     :param id_field_type: the id field type, such as int or str
     :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
     :param set_probabilities: how to divide into dev, train, valid, test
     :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
     :param spectrum_type: the type of spectrum file
@@ -1185,9 +1249,7 @@ def load_sdf2array(
 
     various issues:
     - argon has no structure
-    - hydrogen causes CanonicalizeMol to fail
-    - some molecules fail parsing
-    - some have empty spectra
+    - if there is an UnicodeDecodeError, consider running "iconv -f latin1 -t utf-8 < old.sdf > new.sdf
     """
     if source == None:
         source = 'nist'
@@ -1221,158 +1283,151 @@ def load_sdf2array(
         current_id = id_field
         id_field_type = 'int'
 
-
     # list of batch tables
     tables = []
     # create arrow schema and batch table
     if spectrum_type is None:
         spectrum_type = 'mol'
     records_schema = spectrum_types[spectrum_type]['flat_schema']
-    ecfp4_size = 4096  # size of ecfp4 fingerprint
-    spectrum_fp_size = 2000  # size of spectrum fingerprint
     records = empty_records(records_schema)
 
     # Turn off RDKit error messages
     if suppress_rdkit_warnings:
         RDLogger.DisableLog('rdApp.*')
 
-    fp = open_if_filename(fp, 'rb')
-    progress, sz = get_progress(fp)
+    # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
+    # there is only one stereoisomer per molecule.
+    while True:
+        try:
+            mol = next(fp)
+        except StopIteration:
+            break
+        if mol is None:
+            logging.info(f'unable to read mol after mol with name {current_name} and id {current_id}')
+            continue
 
-    with progress:
-        # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
-        # there is only one stereoisomer per molecule.
-        filename = Path(fp.name).name
-        task_id = progress.add_task("load_sdf", filename=f"Reading {filename}", total=sz)
-        for i, mol in enumerate(Chem.ForwardSDMolSupplier(fp, sanitize=False)):
-
-            if type(id_field) is not int:
-                if mol.HasProp(id_field):
-                    if id_field_type == 'int':
-                        current_id = int(mol.GetProp(id_field))
-                    else:
-                        current_id = mol.GetProp(id_field)
+        if type(id_field) is not int:
+            if mol.HasProp(id_field):
+                if id_field_type == 'int':
+                    current_id = int(mol.GetProp(id_field))
                 else:
-                    current_id = i
+                    current_id = mol.GetProp(id_field)
 
-            for field in name_field:
-                if mol.HasProp(field):
-                    current_name = mol.GetProp(field)
-                    break
-
-            new_row, mol = mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
-            if new_row is None or not new_row:
-                continue
-
-            # create useful set labels for training
-            new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=set_probabilities)
-            spectrum = None
-            if source == "nist":
-                # create the mass spectrum
-                spectrum = Spectrum(product_mass_info=product_mass_info,
-                                        precursor_mass_info=precursor_mass_info)
-                spectrum.from_mol(
-                    mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
-                )
-                spectrum.id = current_id
-                spectrum.name = current_name
-                try:
-                    new_row["precursor_mz"] = spectrum.precursor.mz
-                    new_row["synonyms"] = json.dumps(spectrum.synonyms)
-                    new_row["spectrum"] = spectrum
-                    new_row["column"] = spectrum.column
-                    new_row["experimental_ri"] = spectrum.experimental_ri
-                    new_row["experimental_ri_error"] = spectrum.experimental_ri_error
-                    new_row["experimental_ri_data"] = spectrum.experimental_ri_data
-                    new_row["stdnp"] = spectrum.stdnp
-                    new_row["stdnp_error"] = spectrum.stdnp_error
-                    new_row["stdnp_data"] = spectrum.stdnp_data
-                    new_row["stdpolar"] = spectrum.stdpolar
-                    new_row["stdpolar_error"] = spectrum.stdpolar_error
-                    new_row["stdpolar_data"] = spectrum.stdpolar_data
-                    new_row["estimated_ri"] = spectrum.estimated_ri
-                    new_row["estimated_ri_error"] = spectrum.estimated_ri_error
-                    new_row["exact_mass"] = spectrum.exact_mass
-                    new_row["ion_mode"] = spectrum.ion_mode
-                    new_row["charge"] = spectrum.charge
-                    new_row["instrument"] = spectrum.instrument
-                    new_row["instrument_type"] = spectrum.instrument_type
-                    new_row["instrument_model"] = spectrum.instrument_model
-                    new_row["ionization"] = spectrum.ionization
-                    new_row["collision_gas"] = spectrum.collision_gas
-                    new_row["sample_inlet"] = spectrum.sample_inlet
-                    new_row["spectrum_type"] = spectrum.spectrum_type
-                    new_row["precursor_type"] = spectrum.precursor_type
-                    new_row["inchi_key_orig"] = spectrum.inchi_key
-                    new_row["vial_id"] = spectrum.vial_id
-                    new_row["collision_energy"] = spectrum.collision_energy
-                    new_row["nce"] = spectrum.nce
-                    new_row["ev"] = spectrum.ev
-                    new_row["insource_voltage"] = spectrum.insource_voltage
-                    new_row["mz"] = spectrum.products.mz
-                    new_row["intensity"] = spectrum.products.intensity
-                    new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
-                    new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-                    fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=spectrum_fp_size)
-                    new_row["spectrum_fp"] = fingerprint.to_numpy()
-                    new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-                except AttributeError:
-                    logging.info('attribute error from spectrum: ' + spectrum.id)
-                    raise
-            elif source == "pubchem":
-                if mol.HasProp("PUBCHEM_XLOGP3"):
-                    new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
-                if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
-                    new_row["component_count"] = float(
-                        mol.GetProp("PUBCHEM_COMPONENT_COUNT")
-                    )
-            elif source == 'nist_ri':
-                new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
-                if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
-                    ri_string = mol.GetProp("COLUMN CLASS")
-                    if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
-                        new_row['column'] = 'SemiStdNP'
-                        new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
-                        new_row['experimental_ri_error'] = 0.0
-                        new_row['experimental_ri_data'] = 1
-                    elif ri_string == 'Standard non-polar':
-                        new_row['column'] = 'StdNP'
-                        new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
-                        new_row['stdnp_error'] = 0.0
-                        new_row['stdnp_data'] = 1
-                    elif ri_string == 'Standard polar':
-                        new_row['column'] = 'StdPolar'
-                        new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
-                        new_row['stdpolar_error'] = 0.0
-                        new_row['stdpolar_data'] = 1
-
-            new_row["id"] = current_id
-            new_row["name"] = current_name
-            if type(id_field) is int:
-                current_id += 1
-            new_row["id"] = current_id
-            new_row["name"] = current_name
-            if type(id_field) is int:
-                current_id += 1
-
-            progress.update(task_id, completed=fp.tell())
-
-            add_row_to_records(records, new_row)
-            if i % 10000 == 0:
-                logging.info(f"processed record {i}")
-            # check to see if we have enough records to add to the pyarrow table
-            if len(records["id"]) % 25000 == 0:
-                # TODO: generalize struct
-                tables.append(records2table(records, spectrum_type))
-                logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-                records = empty_records(records_schema)
-
-            if num is not None and num == i:
+        for field in name_field:
+            if mol.HasProp(field):
+                current_name = mol.GetProp(field)
                 break
+
+        new_row, mol = mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
+        if new_row is None or not new_row:
+            logging.info(f'unable to standardize mol with name {current_name} and id {current_id}')
+            continue
+
+        # create useful set labels for training
+        new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=set_probabilities)
+        spectrum = None
+        if source == "nist":
+            # create the mass spectrum
+            spectrum = Spectrum(product_mass_info=product_mass_info,
+                                    precursor_mass_info=precursor_mass_info)
+            spectrum.from_mol(
+                mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
+            )
+            spectrum.id = current_id
+            spectrum.name = current_name
+            try:
+                new_row["precursor_mz"] = spectrum.precursor.mz
+                new_row["casno"] = spectrum.casno
+                new_row["synonyms"] = json.dumps(spectrum.synonyms)
+                new_row["spectrum"] = spectrum
+                new_row["column"] = spectrum.column
+                new_row["experimental_ri"] = spectrum.experimental_ri
+                new_row["experimental_ri_error"] = spectrum.experimental_ri_error
+                new_row["experimental_ri_data"] = spectrum.experimental_ri_data
+                new_row["stdnp"] = spectrum.stdnp
+                new_row["stdnp_error"] = spectrum.stdnp_error
+                new_row["stdnp_data"] = spectrum.stdnp_data
+                new_row["stdpolar"] = spectrum.stdpolar
+                new_row["stdpolar_error"] = spectrum.stdpolar_error
+                new_row["stdpolar_data"] = spectrum.stdpolar_data
+                new_row["estimated_ri"] = spectrum.estimated_ri
+                new_row["estimated_ri_error"] = spectrum.estimated_ri_error
+                new_row["exact_mass"] = spectrum.exact_mass
+                new_row["ion_mode"] = spectrum.ion_mode
+                new_row["charge"] = spectrum.charge
+                new_row["instrument"] = spectrum.instrument
+                new_row["instrument_type"] = spectrum.instrument_type
+                new_row["instrument_model"] = spectrum.instrument_model
+                new_row["ionization"] = spectrum.ionization
+                new_row["collision_gas"] = spectrum.collision_gas
+                new_row["sample_inlet"] = spectrum.sample_inlet
+                new_row["spectrum_type"] = spectrum.spectrum_type
+                new_row["precursor_type"] = spectrum.precursor_type
+                new_row["inchi_key_orig"] = spectrum.inchi_key
+                new_row["vial_id"] = spectrum.vial_id
+                new_row["collision_energy"] = spectrum.collision_energy
+                new_row["nce"] = spectrum.nce
+                new_row["ev"] = spectrum.ev
+                new_row["insource_voltage"] = spectrum.insource_voltage
+                new_row["mz"] = spectrum.products.mz
+                new_row["intensity"] = spectrum.products.intensity
+                new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
+                new_row["spectrum_fp"] = fingerprint.to_numpy()
+                new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+            except AttributeError:
+                logging.info('attribute error from spectrum: ' + spectrum.id)
+                raise
+        elif source == "pubchem":
+            if mol.HasProp("PUBCHEM_XLOGP3"):
+                new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
+            if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
+                new_row["component_count"] = float(
+                    mol.GetProp("PUBCHEM_COMPONENT_COUNT")
+                )
+        elif source == 'nist_ri':
+            new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
+            if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
+                ri_string = mol.GetProp("COLUMN CLASS")
+                if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
+                    new_row['column'] = 'SemiStdNP'
+                    new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
+                    new_row['experimental_ri_error'] = 0.0
+                    new_row['experimental_ri_data'] = 1
+                elif ri_string == 'Standard non-polar':
+                    new_row['column'] = 'StdNP'
+                    new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
+                    new_row['stdnp_error'] = 0.0
+                    new_row['stdnp_data'] = 1
+                elif ri_string == 'Standard polar':
+                    new_row['column'] = 'StdPolar'
+                    new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
+                    new_row['stdpolar_error'] = 0.0
+                    new_row['stdpolar_data'] = 1
+
+        new_row["id"] = current_id
+        new_row["name"] = current_name
+        if type(id_field) is int:
+            current_id += 1
+        new_row["id"] = current_id
+        new_row["name"] = current_name
+        if type(id_field) is int:
+            current_id += 1
+
+        add_row_to_records(records, new_row)
+        if num is not None and len(records['id']) >= num:
+            break
+
+        # check to see if we have enough records to add to the pyarrow table
+        if len(records["id"]) % 25000 == 0:
+            # TODO: generalize struct
+            tables.append(records2table(records, spectrum_type))
+            records = empty_records(records_schema)
 
     if records:
         tables.append(records2table(records, spectrum_type))
-    logging.info(f"created final chunk {len(tables)} with {len(records['id'])} records")
+    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
     table = pa.concat_tables(tables)
 
     return table
@@ -1552,18 +1607,26 @@ class BatchFileReader:
                  format:str=None, row_batch_size:int=5000,
                  id_field: Union[str, int]=0,
                  comment_fields:str=None, spectrum_type:str=None,
-                 column_name:str=None
+                 column_name:str=None,
+                 no_column_headers=False,
+                 mol_column_name=None,
+                 smiles_column_name=None,
+                 delimiter=None,
                  ) -> None:
         """
         read files in batches of pyarrow Tables
 
         :param filename: input file
-        :param format: format of the input file: mgf, msp, sdf, smiles
+        :param format: format of the input file: mgf, msp, sdf, smiles, csv
         :param row_batch_size: size of batches to read (except parquet files, which use existing batches)
         :param id_field: the integer start value or string name of the id fields
         :param comment_fields: used for parsing msp file Comment lines
         :param spectrum_type: the type file (see spectrum_types: 'mol', 'peptide',...)
         :param column_name: name of the struct column
+        :param no_column_headers: if csv, the csv has no headers.  In that case, the columns are labeled f0, f1, ...
+        :param mol_column_name: if csv, name of the rdkit Mol column in the output table
+        :param smiles_column_name: if csv, the name of the SMILES column. default is "SMILES" or "f0" if no headers
+        :param delimiter: if csv, the column delimiter. "," is the default
         """
         super().__init__()
         self.format = format
@@ -1585,15 +1648,26 @@ class BatchFileReader:
             if spectrum_type is None:
                 self.spectrum_type = "peptide"           
         elif format == 'mgf':
-            self.dataset = open(filename, mode="r")
+            self.dataset = open_if_filename(filename, mode="r")
             if spectrum_type is None:
                 self.spectrum_type = "peptide"           
         elif format in ['msp', 'smiles']:
-            self.dataset = open(filename, mode="r")
+            self.dataset = open_if_filename(filename, mode="r")
             if spectrum_type is None:
-                self.spectrum_type = "mol"           
+                self.spectrum_type = "mol"
+        elif format == 'csv':
+            read_options = pa.csv.ReadOptions(autogenerate_column_names=no_column_headers,
+                                              block_size=row_batch_size)
+            parse_options = pa.csv.ParseOptions(delimiter=delimiter)
+            self.dataset =  pa.csv.open_csv(filename, read_options=read_options, parse_options=parse_options)
+            if spectrum_type is None:
+                self.spectrum_type = "mol"
+            self.no_column_headers = no_column_headers
+            self.mol_column_name = mol_column_name
+            self.smiles_column_name = smiles_column_name
         elif format == 'sdf':
-            self.dataset = open(filename, mode="rb")
+            self.dataset = open_if_filename(filename, mode="rb")
+            self.dataset = Chem.ForwardSDMolSupplier(self.dataset, sanitize=False)
             if spectrum_type is None:
                 self.spectrum_type = "mol"           
         else:
@@ -1603,9 +1677,12 @@ class BatchFileReader:
         """
         read batch generator, returns a Table
         """
+        batch_num = 0
         if self.format == 'parquet':
             for batch in self.dataset.iter_batches():
                 table = pa.Table.from_batches(batch)  # schema is inferred from batch
+                logging.info(f'processing batch {batch_num} with size {len(table)}')
+                batch_num += 1
                 yield table 
         elif self.format == 'arrow':
             # the entire table is memmapped as self.dataset
@@ -1617,6 +1694,8 @@ class BatchFileReader:
                 if len(batch) == 0:
                     break
                 start += self.row_batch_size
+                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                batch_num += 1
                 yield batch
         elif self.format == 'msp':
             while True:
@@ -1629,6 +1708,8 @@ class BatchFileReader:
                     break
                 if isinstance(self.id_field, int):
                     self.id_field += len(batch)
+                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                batch_num += 1
                 yield batch
         elif self.format == 'mgf':
             while True:
@@ -1640,6 +1721,8 @@ class BatchFileReader:
                     break
                 if isinstance(self.id_field, int):
                     self.id_field += len(batch)
+                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                batch_num += 1
                 yield batch
         elif self.format == 'sdf':
             while True:
@@ -1651,6 +1734,8 @@ class BatchFileReader:
                     break
                 if isinstance(self.id_field, int):
                     self.id_field += len(batch)
+                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                batch_num += 1
                 yield batch
         elif self.format == 'smiles':
             while True:
@@ -1662,6 +1747,23 @@ class BatchFileReader:
                     break
                 if isinstance(self.id_field, int):
                     self.id_field += len(batch)
+                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                batch_num += 1
+                yield batch
+        elif self.format == 'csv':
+            while True:
+                batch = load_csv2array(self.dataset, 
+                                       num=self.row_batch_size, 
+                                       id_field=self.id_field,
+                                       no_column_headers=self.no_column_headers,
+                                       mol_column_name=self.mol_column_name,
+                                       smiles_column_name=self.smiles_column_name)
+                if len(batch) == 0:
+                    break
+                if isinstance(self.id_field, int):
+                    self.id_field += len(batch)
+                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                batch_num += 1
                 yield batch
         else:
             raise ValueError(f'Unknown format {self.format}')

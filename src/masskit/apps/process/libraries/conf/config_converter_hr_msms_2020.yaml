@@ -2,7 +2,7 @@ input:
   file:
     # list of input file names
     names:
-      - ~/data/nist/tandem/2020/sdf/hr_msms_nist.SDF
+      - ~/data/nist/tandem/2020/sdf/ESI_2020_fixed.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem

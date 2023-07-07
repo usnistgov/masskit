@@ -218,4 +218,4 @@ def test_theoretical_spectrum():
     np.testing.assert_array_almost_equal(spectrum.products.mz, [45.531115,  46.032793,  72.04439 ,  72.546068,  81.049672,
                                                                 81.55135 ,  90.054955,  91.05831 , 143.081504, 144.084859,
                                                                 161.092069, 162.095424])
-    np.testing.assert_array_almost_equal(spectrum.products.intensity, [0.5] * 12)
+    np.testing.assert_array_almost_equal(spectrum.products.intensity, [999.0] * 12)

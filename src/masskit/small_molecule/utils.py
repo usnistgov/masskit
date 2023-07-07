@@ -291,11 +291,11 @@ def standardize_mol(mol):
     # disconnector = rdMolStandardize.MetalDisconnector()
     normalizer = rdMolStandardize.Normalizer()
     reionizer = rdMolStandardize.Reionizer()
-    mol_in = copy.deepcopy(mol)  # copy as AdjustAromaticNs return None on failure
-    mol_props = mol.GetPropsAsDict()
+    # mol_in = copy.deepcopy(mol)  # copy as AdjustAromaticNs return None on failure
+    mol_props = copy.deepcopy(mol.GetPropsAsDict())
     # mol = AdjustAromaticNs(mol_in)  # allows for explicit H's
-    if mol is None:
-        mol = mol_in
+    # if mol is None:
+    #     mol = mol_in
     try:
         # molvs standarizer
         # s = Standardizer()

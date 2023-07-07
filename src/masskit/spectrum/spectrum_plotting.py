@@ -63,7 +63,7 @@ class AnimateSpectrumPlot:
 
 
 
-def normalize_intensity(intensity, normalize=1.0):
+def normalize_intensity(intensity, normalize=999.0):
     """
     norm the spectrum to the max peak
 

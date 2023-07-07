@@ -88,5 +88,5 @@ class TheoreticalPeptideSpectrum(TheoreticalSpectrum):
                          analysis_annotations=analysis_annotations, num_isotopes=num_isotopes, precursor_charge=self.charge)
         self.from_arrays(mz, intensity, product_mass_info=sp.MassInfo(0.0, "ppm", "monoisotopic"),
                          copy_arrays=False, annotations=annotations,
-                         precursor_mz=protonate_mass(precursor_mass, self.charge), precursor_intensity=1.0,
+                         precursor_mz=protonate_mass(precursor_mass, self.charge), precursor_intensity=999.0,
                          precursor_mass_info=sp.MassInfo(0.0, "ppm", "monoisotopic"))

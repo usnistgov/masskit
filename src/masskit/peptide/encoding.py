@@ -319,7 +319,7 @@ def calc_ion_series(ion_type, num_isotopes, cumulative_masses, arrays, peptide, 
         mz += num_carbon_13 * delta_c_13
 
         arrays['ion_mz'].append(protonate_mass(mz, charge_in))
-        arrays['ion_intensity'].append(np.full_like(mz, 0.5))
+        arrays['ion_intensity'].append(np.full_like(mz, 999.0))
         arrays['ion_type_array'].append(np.full_like(mz, ion_type_id))
         arrays['charge_array'].append(np.full_like(mz, charge_in))
         arrays['isotope_array'].append(np.full_like(mz, num_carbon_13))
@@ -407,7 +407,7 @@ def calc_named_ions(arrays, analysis=None, named_ion=None, precursor_mass=None, 
             offsets = protonate_mass(precursor_mass + offsets, precursor_charge)
 
         arrays['ion_mz'].append(offsets)
-        arrays['ion_intensity'].append(np.full_like(offsets, 0.5))
+        arrays['ion_intensity'].append(np.full_like(offsets, 999.0))
         arrays['ion_type_array'].append(np.full_like(offsets, ion_types.df.loc[named_ion]['id']))
         arrays['charge_array'].append(np.full_like(offsets, charge_in))
         arrays['isotope_array'].append(np.full_like(offsets, num_carbon_13))

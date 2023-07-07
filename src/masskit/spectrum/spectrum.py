@@ -827,7 +827,7 @@ class Ions(ABC):
             channel,
             bin_size=1.0,
             precursor=0,
-            intensity_norm=1000.0,
+            intensity_norm=1.0,
             insert_mz=False,
             mz_norm=2000.0,
             rand_intensity=0.0,
@@ -959,7 +959,6 @@ class Ions(ABC):
             0,
             bin_size=tolerance * 2,
             precursor=0,
-            intensity_norm=1.0,
             insert_mz=False,
             down_shift=tolerance,
             channel_first=True,
@@ -1815,6 +1814,7 @@ class Spectrum:
                 mass_info=self.precursor_mass_info,
             )
         self.name = self.get_string_prop(mol, "NAME")
+        self.casno = self.get_string_prop(mol, "CASNO")
         self.synonyms = self.get_string_prop(mol, "SYNONYMS")
         if self.synonyms is not None:
             self.synonyms = self.synonyms.splitlines()
@@ -2528,7 +2528,7 @@ class AccumulatorSpectrum(Spectrum, Accumulator):
         self.count = np.zeros_like(mz)
         self.from_arrays(mz, np.zeros_like(mz), stddev=np.zeros_like(mz),
                          product_mass_info=MassInfo(tolerance, "daltons", "monoisotopic", evenly_spaced=True), 
-                         precursor_mz=precursor_mz, precursor_intensity=1.0,
+                         precursor_mz=precursor_mz, precursor_intensity=999.0,
                          precursor_mass_info=MassInfo(0.0, "ppm", "monoisotopic"))
         self.count_spectra = count_spectra
         self.take_max = take_max

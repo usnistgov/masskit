@@ -235,8 +235,7 @@ class ArrowLibraryMap(TableMap):
         return ArrowLibraryMap(input_table)
 
     @staticmethod
-    def from_msp(file, num=None, id_field=0, comment_fields=None, min_intensity=0.0, max_mz=2000,
-                 spectrum_type=None):
+    def from_msp(file, num=None, id_field=0, comment_fields=None, min_intensity=0.0, spectrum_type=None):
         """
         read in an msp file and create an ArrowLibraryMap
 
@@ -245,21 +244,19 @@ class ArrowLibraryMap(TableMap):
         :param id_field: start value of the id field
         :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
         :param min_intensity: the minimum intensity to set the fingerprint bit
-        :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        return ArrowLibraryMap(msuf.load_msp2array(file,
+        fp = open_if_filename(file, 'r')
+        return ArrowLibraryMap(msuf.load_msp2array(fp,
                                                    num=num,
                                                    id_field=id_field,
                                                    comment_fields=comment_fields,
                                                    min_intensity=min_intensity, 
-                                                   max_mz=max_mz, 
                                                    spectrum_type=spectrum_type))
 
     @staticmethod
-    def from_mgf(file, num=None, title_fields=None, min_intensity=0.0, max_mz=2000,
-                 spectrum_type=None):
+    def from_mgf(file, num=None, title_fields=None, min_intensity=0.0, spectrum_type=None):
         """
         read in an mgf file and create an ArrowLibraryMap
 
@@ -267,14 +264,13 @@ class ArrowLibraryMap(TableMap):
         :param num: number of rows.  None means all
         :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE
         :param min_intensity: the minimum intensity to set the fingerprint bit
-        :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        return ArrowLibraryMap(msuf.load_mgf2array(file, num=num, 
+        fp = open_if_filename(file, 'r')
+        return ArrowLibraryMap(msuf.load_mgf2array(fp, num=num, 
                                                    title_fields=title_fields,
                                                    min_intensity=min_intensity, 
-                                                   max_mz=max_mz,
                                                    spectrum_type=spectrum_type))
 
 
@@ -286,7 +282,6 @@ class ArrowLibraryMap(TableMap):
                  source=None,
                  id_field=None,
                  min_intensity=0.0,
-                 max_mz=2000,
                  set_probabilities=(0.01, 0.97, 0.01, 0.01),
                  spectrum_type=None
         ):
@@ -301,7 +296,6 @@ class ArrowLibraryMap(TableMap):
         :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if an integer,
           use the integer as the starting value for an assigned id
         :param min_intensity: the minimum intensity to set the fingerprint bit
-        :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :param set_probabilities: how to divide into dev, train, valid, test
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
@@ -313,7 +307,6 @@ class ArrowLibraryMap(TableMap):
                                                    source=source, 
                                                    id_field=id_field, 
                                                    min_intensity=min_intensity,
-                                                   max_mz=max_mz, 
                                                    set_probabilities=set_probabilities,
                                                    spectrum_type=spectrum_type))
 

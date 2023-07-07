@@ -218,9 +218,9 @@ class ThreewayJoin(Join):
         assert(len(self.exp_lib_map) == len(self.theo_lib_map) == len(self.pred_lib_map))
 
         for i in range(len(self.exp_lib_map)):
-            experimental_spectrum = self.exp_lib_map[i][self.exp_lib_map.spectrum_column].norm(max_intensity_in=1.0)
-            predicted_spectrum = self.pred_lib_map[i][self.pred_lib_map.spectrum_column].norm(max_intensity_in=1.0)
-            theoretical_spectrum = self.theo_lib_map[i][self.theo_lib_map.spectrum_column].norm(max_intensity_in=1.0)
+            experimental_spectrum = self.exp_lib_map[i][self.exp_lib_map.spectrum_column].norm()
+            predicted_spectrum = self.pred_lib_map[i][self.pred_lib_map.spectrum_column].norm()
+            theoretical_spectrum = self.theo_lib_map[i][self.theo_lib_map.spectrum_column].norm()
 
             result = self.join_3_spectra(experimental_spectrum,
                                          predicted_spectrum,

@@ -2,11 +2,8 @@ import logging
 from pathlib import Path
 import hydra
 from omegaconf import DictConfig, ListConfig
-from masskit.utils.files import BatchFileReader, BatchFileWriter, load_mgf2array, load_msp2array, spectra_to_msp, spectra_to_mgf
+from masskit.utils.files import BatchFileReader, BatchFileWriter
 from masskit.utils.general import parse_filename
-from masskit.utils.tables import row_view
-from pyarrow import Table
-from collections.abc import Iterable
 
 """
 streaming file converter with multiprocessing
@@ -74,7 +71,12 @@ def batch_converter_app(config: DictConfig) -> None:
                                  row_batch_size=config.conversion.get("row_batch_size", 5000),
                                  id_field=id_field,
                                  comment_fields=comment_fields,
-                                 spectrum_type=config.input.file.get('spectrum_type', 'mol'))
+                                 spectrum_type=config.input.file.get('spectrum_type', 'mol'),
+                                 no_column_headers=config.conversion.get("no_column_headers", False),
+                                 mol_column_name=config.conversion.get("mol_column_name", None),
+                                 smiles_column_name=config.conversion.get("smiles_column_name", None),
+                                 delimiter=config.conversion.get("delimiter", None),
+                                 )
 
         for writer in writers:
             num_rows = 0

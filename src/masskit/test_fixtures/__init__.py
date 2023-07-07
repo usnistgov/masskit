@@ -149,6 +149,8 @@ def config_batch_converter_smiles(test_smiles, batch_converted_smiles_files):
 def batch_converted_smiles_path_file(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_smiles_path_file'
 
+# configurations are kept here so that the config_path can resolve correctly
+
 @pytest.fixture(scope="session")
 def config_shortest_path_smiles(batch_converted_smiles_files, batch_converted_smiles_path_file):
     with initialize(version_base=None, config_path="../apps/process/mols/conf"):
@@ -157,3 +159,4 @@ def config_shortest_path_smiles(batch_converted_smiles_files, batch_converted_sm
                                  f"output.file.name={batch_converted_smiles_path_file}.parquet",
                                  ])
         return cfg
+    
