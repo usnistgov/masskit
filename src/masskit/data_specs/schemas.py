@@ -223,7 +223,6 @@ base_annotation_small_fields = [
     pa.field("composition", pa.dictionary(pa.int32(), pa.string())),  # bestof, consensus
     pa.field("spectrum_fp", pa.large_list(pa.uint8()), metadata={b"fp_size": (2000).to_bytes(8, byteorder='big')}),
     pa.field("spectrum_fp_count", pa.int32()),
-    pa.field("hybrid_fp", pa.large_list(pa.float32())),
 ]
 
 base_annotation_large_fields = [
@@ -531,16 +530,3 @@ def table_add_structarray(table, structarray, column_name=None):
         column_name = 'spectrum'
     table = table.append_column(column_name, structarray)
     return table
-
-
-if __name__ == "__main__":
-    f1 = molecule_definition_fields
-    f1.append(pa.field("junk", pa.int16()))
-    f2 = molecule_experimental_fields
-    f1.append(pa.field("junk", pa.uint16()))
-
-    print(compose_fields(molecule_definition_fields,molecule_experimental_fields)) # This should not throw an exception
-    print()
-    print(molecule_metadata_fields)
-    print("\n----\n")
-    print(compose_fields(f1,f2)) # This should throw an exception

@@ -21,13 +21,9 @@ flat_peptide_schema = pa.schema(compose_fields(base_fields, peptide_property_fie
 # flattened schema for files that include spectral data and molecular connectivity graphs, e.g. sdf/mol files.
 flat_molecule_schema = pa.schema(compose_fields(base_fields, molecule_property_fields, molecule_definition_fields))
 
-# fields used for querying on spectral libraries, useful for 
-# promoting useful peptide_struct and molecules_struct fields to the top level table
-# spectrum_query_fields = molecule_definition_fields + \
-#                         property_fields + \
-#                         base_annotation_query_fields + \
-#                         base_spectrum_small_fields + \
-#                         base_experimental_fields + \
-#                         min_fields
+# nested schemas
 nested_peptide_spectrum_schema = pa.schema(base_property_fields + peptide_property_fields + peptide_spectrum_field)
 nested_molecule_spectrum_schema = pa.schema(base_property_fields + molecule_property_fields + molecule_definition_fields + molecule_spectrum_field)
+
+# fields useful for dropping from csv output
+csv_drop_fields = ['mol', 'shortest_paths', 'spectrum', 'predicted_spectrum', 'theoretical_spectrum', 'spectrum_fp', 'spectrum_fp_count', 'ecfp4', 'ecfp4_count']
