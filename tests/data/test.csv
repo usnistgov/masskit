@@ -1,0 +1,4 @@
+id,SMILES,test_data
+id1,CC(=O)OC1=CC=CC=C1C(=O)O,test1
+id2,CC(=O)[C@H]1CC[C@@H]2[C@@]1(CC[C@H]3[C@H]2CC[C@@H]4[C@@]3(CCC(=O)C4)C)C,test2
+id3,CC(=O)O,test3

@@ -146,6 +146,25 @@ def config_batch_converter_smiles(test_smiles, batch_converted_smiles_files):
         return cfg
 
 @pytest.fixture(scope="session")
+def batch_converted_csv_files(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_csv'
+
+@pytest.fixture(scope="session")
+def test_csv(data_dir):
+    return data_dir / "test.csv"
+
+@pytest.fixture(scope="session")
+def config_batch_converter_csv(test_csv, batch_converted_csv_files):
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={test_csv}",
+                                 f"output.file.name={batch_converted_csv_files}",
+                                 f"output.file.types=[parquet]",
+                                 f"conversion.row_batch_size=100",
+                                 f"input.file.spectrum_type=mol"])
+        return cfg
+    
+@pytest.fixture(scope="session")
 def batch_converted_smiles_path_file(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_smiles_path_file'
 
@@ -159,4 +178,3 @@ def config_shortest_path_smiles(batch_converted_smiles_files, batch_converted_sm
                                  f"output.file.name={batch_converted_smiles_path_file}.parquet",
                                  ])
         return cfg
-    

@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
+from pyarrow import csv as pacsv
 import json
 from omegaconf import ListConfig
 from masskit.constants import SET_NAMES, EPSILON
@@ -1083,13 +1084,11 @@ def load_csv2array(
     SMILES are standardized and converted into an rdkit Mol object
 
     :param fp: name of the file to read or a file object
-    :param block_size: the size of text blocks read in. default is 1MB
     :param id_field: integer value that is the start of the id values. If none, no id field is created
     :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
     :param no_column_headers: the csv has no headers.  In that case, the columns are labeled f0, f1, ...
     :param mol_column_name: name of the rdkit Mol column in the output table
     :param smiles_column_name: the name of the SMILES column. default is "SMILES" or "f0" if no headers
-    :param delimiter: csv file delimiter. "," is the default
     :return: arrow table
     """
     # Turn off RDKit error messages
@@ -1106,7 +1105,7 @@ def load_csv2array(
     if mol_column_name is None:
         mol_column_name = 'mol'
 
-    if type(id_field) is int:
+    if type(id_field) is int or id_field is None:
         id_value = id_field
     else:
         id_value = None
@@ -1137,12 +1136,15 @@ def load_csv2array(
             if id_value is not None:
                 ids.append(id_value)
                 id_value += 1
-        table = table.append_column(pa.field(mol_column_name, MolArrowType()), mols)
+        table = table.append_column('mol', pa.array(mols, type=MolArrowType()))
         if id_value is not None:
-            table = table.append_column('id', ids)
+            table = table.append_column('id', pa.array(ids, type=pa.uint64()))
         tables.append(table)
 
-    table = pa.concat_tables(tables)
+    if len(tables) == 0:
+        table = pa.table([])
+    else:
+        table = pa.concat_tables(tables)
     return table
 
 
@@ -1656,10 +1658,10 @@ class BatchFileReader:
             if spectrum_type is None:
                 self.spectrum_type = "mol"
         elif format == 'csv':
-            read_options = pa.csv.ReadOptions(autogenerate_column_names=no_column_headers,
+            read_options = pacsv.ReadOptions(autogenerate_column_names=no_column_headers,
                                               block_size=row_batch_size)
-            parse_options = pa.csv.ParseOptions(delimiter=delimiter)
-            self.dataset =  pa.csv.open_csv(filename, read_options=read_options, parse_options=parse_options)
+            parse_options = pacsv.ParseOptions(delimiter=delimiter)
+            self.dataset =  pacsv.open_csv(filename, read_options=read_options, parse_options=parse_options)
             if spectrum_type is None:
                 self.spectrum_type = "mol"
             self.no_column_headers = no_column_headers
@@ -1672,6 +1674,8 @@ class BatchFileReader:
                 self.spectrum_type = "mol"           
         else:
             raise ValueError(f'Unknown format {self.format}')
+        if self.id_field is None:
+            self.id_field = 0
         
     def iter_tables(self) -> pa.Table:
         """
@@ -1753,7 +1757,6 @@ class BatchFileReader:
         elif self.format == 'csv':
             while True:
                 batch = load_csv2array(self.dataset, 
-                                       num=self.row_batch_size, 
                                        id_field=self.id_field,
                                        no_column_headers=self.no_column_headers,
                                        mol_column_name=self.mol_column_name,

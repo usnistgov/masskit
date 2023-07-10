@@ -1,0 +1,20 @@
+input:
+  file:
+    # input file name
+    name:
+    # input file type
+    encoding: latin-1
+output:
+  file:
+    # output file or output file prefix
+    name:
+
+hydra:
+  run:
+    # working directory
+    dir: hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+  output_subdir: hydra
+  sweep:
+    dir: hydra_sweep
+  job:
+    chdir: False
