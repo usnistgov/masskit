@@ -85,6 +85,7 @@ def batch_converter_app(config: DictConfig) -> None:
                     break
                 writer.write_table(table)
                 num_rows += len(table)
+            writer.close()
 
 
 if __name__ == "__main__":

@@ -1835,11 +1835,14 @@ class BatchFileWriter:
             self.dataset.flush()
         else:
             raise ValueError(f'Unknown format {self.format}')
-            
-    def __del__(self):
-        # for some reason, need to explictly close RecordBatchFileWriter
+
+    def close(self):
         if self.dataset is not None:
             self.dataset.close()
+
+    def __del__(self):
+        # explictly close RecordBatchFileWriter which can be threaded
+        self.close()
 
 
 def spectrum2msp(spectrum, annotate=False):
