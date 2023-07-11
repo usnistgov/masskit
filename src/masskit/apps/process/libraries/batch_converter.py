@@ -6,9 +6,7 @@ from masskit.utils.files import BatchFileReader, BatchFileWriter
 from masskit.utils.general import parse_filename
 
 """
-streaming file converter with multiprocessing
-takes a variety of inputs, including parquet and arrow formatted files and converts them 
-in batches to msp, mgf, arrow, and parquet formatted files.
+
 
 batch_converter.py --config config_converter
 batch_converter.py input.file.names=TestUniqSynPho202249.msp output.file.name=TestUniqSynPho202249.mzxml

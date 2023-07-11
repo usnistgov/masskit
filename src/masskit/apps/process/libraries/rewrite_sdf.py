@@ -3,19 +3,14 @@ import rich.progress
 import re
 
 """
-reformat old fashioned sdf files into those usable by rdkit by appending missing M END lines
-also turn any latin-1 characters into the unicode expected by rdkit
+reformat pre v2000 sdf files into those usable by rdkit by appending missing M END lines.
+Turns any latin-1 characters into the unicode expected by rdkit
+
 
 """
 
 @hydra.main(config_path="conf", config_name="config_rewrite_sdf", version_base=None)
-def main(config):
-
-# parser = argparse.ArgumentParser()
-# parser.add_argument('--input', default="")
-# parser.add_argument('--output', default="")
-# parser.add_argument('--encoding', default="latin-1")
-# args = parser.parse_args()
+def rewrite_sdf_app(config):
 
     # match connectivity block line
     connectivity_block = re.compile(r'^\s{0,2}\d{1,3}\s{0,2}\d{1,3}\s{1,2}\d+\s{1,2}(\d{1,3}|\s)\s{1,2}(\d{1,3}|\s)\s{1,2}(\d{1,3}|\s)\s{0,2}(\d{1,3}|\s)?\s*$')
@@ -44,4 +39,4 @@ def main(config):
                 previous_line = line
 
 if __name__ == "__main__":
-    main()
+    rewrite_sdf_app()

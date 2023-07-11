@@ -1,3 +1,6 @@
+defaults:
+  - override hydra/help: rewrite_sdf_help
+
 input:
   file:
     # input file name

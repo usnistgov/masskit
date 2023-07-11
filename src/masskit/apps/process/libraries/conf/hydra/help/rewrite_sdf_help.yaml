@@ -1,0 +1,35 @@
+app_name: rewrite_sdf
+
+template: |-
+  ${hydra.help.app_name}: Reformat pre v2000 version sdf files into those 
+  usable by rdkit by appending missing M END lines. Turns any latin-1 
+  characters into the unicode expected by the rdkit SDF parser.
+
+  Example:
+  `${hydra.help.app_name} input.file.name=my_sdf.sdf output.file.name=output.sdf`
+
+  Applications can be configured two ways: by groups of configurations and
+  overriding individual configuration values. 
+  
+  To override individual configuration values, use 
+  the name=value syntax on the command line, where name is the dot notation 
+  that reflects the indentation of the configuration in the default 
+  configuration. For example, a setting of:
+
+  input:
+    file:
+      name: my_file.txt
+  
+  would be set on the command line as `input.file.name=my_file.txt` The 
+  default configuration for ${hydra.help.app_name} is:
+ 
+  $CONFIG
+  Values can be specified in various ways.  A value of `null` means an empty
+  value. Strings with spaces can be specified by enclosing them in quotes. 
+  Lists can be specified using the notation `[1,2,3]`. `true` and `false` are 
+  boolean values.
+
+  The configuration groups can be found in separate yaml files for some
+  applications. If available, compose your configuration from these groups:
+
+  $APP_CONFIG_GROUPS

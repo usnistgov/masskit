@@ -1,3 +1,6 @@
+defaults:
+  - override hydra/help: batch_converter_help
+
 input:
   file:
     # list of input file names
