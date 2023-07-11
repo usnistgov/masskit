@@ -1,3 +1,6 @@
+defaults:
+  - override hydra/help: fasta2peptides_help
+  
 # fasta filename
 input:
   file:

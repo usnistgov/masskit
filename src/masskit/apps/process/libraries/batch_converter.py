@@ -5,13 +5,6 @@ from omegaconf import DictConfig, ListConfig
 from masskit.utils.files import BatchFileReader, BatchFileWriter
 from masskit.utils.general import parse_filename
 
-"""
-
-
-batch_converter.py --config config_converter
-batch_converter.py input.file.names=TestUniqSynPho202249.msp output.file.name=TestUniqSynPho202249.mzxml
-"""
-
 
 @hydra.main(config_path="conf", config_name="config_batch_converter", version_base=None)
 def batch_converter_app(config: DictConfig) -> None:

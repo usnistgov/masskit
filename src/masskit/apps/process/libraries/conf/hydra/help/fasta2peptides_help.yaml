@@ -1,12 +1,12 @@
-app_name: rewrite_sdf
+app_name: fasta2peptides
 
 template: |-
-  ${hydra.help.app_name}: Reformat pre v2000 version sdf files into those 
-  usable by rdkit by appending missing M END lines. Turns any latin-1 
-  characters into the unicode expected by the rdkit SDF parser.
+  ${hydra.help.app_name}: Converts protein fasta files into parquet
+  files containing digested peptides decorated with modifications.
 
-  Example:
-  `${hydra.help.app_name} input.file.name=my_sdf.sdf output.file.name=output.sdf`
+  Examples:
+  `${hydra.help.app_name} input.file=uniprot.fasta 
+    output.file=uniprot_peptides.parquet`
 
   Applications can be configured two ways: by groups of configurations and
   overriding individual configuration values. 
