@@ -37,6 +37,7 @@ template: |-
   boolean values.
 
   The configuration groups can be found in separate yaml files for some
-  applications. If available, compose your configuration from these groups:
+  applications. yaml is a simple indented text format for configuration
+  settings. If available, compose your configuration from these groups:
 
   $APP_CONFIG_GROUPS

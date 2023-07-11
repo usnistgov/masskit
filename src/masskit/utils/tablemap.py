@@ -3,6 +3,7 @@ import numpy as np
 from abc import ABC, abstractmethod
 from masskit.data_specs.schemas import min_spectrum_field_names, property_schema
 import masskit.utils.files as msuf
+import masskit.utils.spectrum_writers as msus
 from masskit.utils.general import open_if_filename
 from masskit.utils.tables import row_view
 import jsonpickle
@@ -85,19 +86,19 @@ class TableMap(ABC):
         """
         raise NotImplementedError
     
-    def to_msp(self, file, annotate=False, ion_types=None, spectrum_column=None):
+    def to_msp(self, file, annotate_peptide=False, ion_types=None, spectrum_column=None):
         """
         write out spectra in msp format
 
         :param file: file or filename to write to
-        :param annotate: annotate the spectra
+        :param annotate_peptide: annotate the spectra as a peptide
         :param ion_types: ion types for annotation
         :param spectrum_column: column name for spectrum
         """
         if spectrum_column is None:
             spectrum_column = 'spectrum'
         spectra = [self[i][spectrum_column] for i in range(len(self))]
-        msuf.spectra_to_msp(file, spectra, annotate=annotate, ion_types=ion_types)
+        msus.spectra_to_msp(file, spectra, annotate_peptide=annotate_peptide, ion_types=ion_types)
 
 
 class ArrowLibraryMap(TableMap):
@@ -181,7 +182,7 @@ class ArrowLibraryMap(TableMap):
         if spectrum_column is None:
             spectrum_column = 'spectrum'
         spectra = [self[i][spectrum_column] for i in range(len(self))]
-        msuf.spectra_to_mzxml(file, spectra, use_id_as_scan=use_id_as_scan)
+        msus.spectra_to_mzxml(file, spectra, use_id_as_scan=use_id_as_scan)
             
     def to_mgf(self, file, spectrum_column=None):
         """
@@ -193,7 +194,7 @@ class ArrowLibraryMap(TableMap):
         if spectrum_column is None:
             spectrum_column = 'spectrum'
         spectra = [self[i][spectrum_column] for i in range(len(self))]
-        msuf.spectra_to_mgf(file, spectra)
+        msus.spectra_to_mgf(file, spectra)
 
     def to_csv(self, file, columns=None):
         """

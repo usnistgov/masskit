@@ -1,9 +1,4 @@
-from masskit.utils.files import (
-    spectra_to_msp,
-    spectra_to_mgf,
-)
 import pandas as pd
-from masskit.constants import EPSILON
 try:
     from IPython import display
 except ImportError:
@@ -32,26 +27,6 @@ class LibraryAccessor:
         # verify this is a DataFrame
         if not isinstance(pandas_obj, pd.DataFrame):
             raise AttributeError("Must be a pandas DataFrame")
-
-    def to_msp(self, fp, spectrum_column='spectrum', annotate=False, ion_types=None):
-        """
-        write to an msp file
-
-        :param fp: stream or filename
-        :param spectrum_column: name of the column containing the spectrum
-        :param annotate: annotate the spectrum
-        :param ion_types: ion types to annotate
-        """
-        spectra_to_msp(fp, self._obj[spectrum_column], annotate=annotate, ion_types=ion_types)
-        
-    def to_mgf(self, fp, spectrum_column='spectrum'):
-        """
-        write to an mgf file
-
-        :param fp: stream or filename
-        :param spectrum_column: name of the column containing the spectrum
-        """
-        spectra_to_mgf(fp, self._obj[spectrum_column])
    
     def display(self):
         if display is not None:

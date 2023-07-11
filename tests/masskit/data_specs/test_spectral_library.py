@@ -14,9 +14,9 @@ def library_df(cho_uniq_short_parquet):
 
 def test_df_to_msp(library_df, tmpdir):
     msp_file = (tmpdir / 'test_spectral_library.msp')
-    library_df.lib.to_msp(msp_file.open("w+"), annotate=True)
+    library_df['spectrum'].array.to_msp(msp_file.open("w+"), annotate_peptide=True)
     assert msp_file.read().startswith("Name: AAAACALTPGPLADLAAR/2_1(4,C,CAM)")# Name: AAAACALTPGPLADLAAR/2_1(4,C,Carbamidomethyl)
 
 def test_df_to_mgf(library_df, tmpdir):
     msp_file = (tmpdir / 'test_spectral_library.mgf')
-    library_df.lib.to_mgf(msp_file.open("w+"))
+    library_df['spectrum'].array.to_mgf(msp_file.open("w+"))

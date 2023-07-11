@@ -205,6 +205,7 @@ class Ions(ABC):
                 if stddev is not None:
                     self.stddev = self.stddev[sorted_indexes]
                 if annotations is not None:
+                    # TODO: the relationship of annotations is one to many, so this needs to be fixed.
                     self.annotations = self.annotations.take(pa.array(sorted_indexes))
 
             # peak rank by intensity
@@ -466,6 +467,7 @@ class Ions(ABC):
         return_ions.mz = return_ions.mz[mask]
         return_ions.intensity = return_ions.intensity[mask]
         if return_ions.annotations is not None:
+            # TODO: the relationship of annotations is one to many, so this needs to be fixed. 
             return_ions.annotations = return_ions.annotations.filter(pa.array(mask))
         if return_ions.stddev is not None:
             return_ions.stddev = return_ions.stddev[mask]
@@ -597,6 +599,7 @@ class Ions(ABC):
             return_ions.mz = return_ions.mz[indices]
             return_ions.intensity = return_ions.intensity[indices]
             if return_ions.annotations is not None:
+                # TODO: the relationship of annotations is one to many, so this needs to be fixed.
                 return_ions.annotations = return_ions.annotations.take(pa.array(indices))
             if return_ions.stddev is not None:
                 return_ions.stddev = return_ions.stddev[indices]
@@ -604,6 +607,7 @@ class Ions(ABC):
             return_ions.mz = np.delete(return_ions.mz, indices)
             return_ions.intensity = np.delete(return_ions.intensity, indices)
             if return_ions.annotations is not None:
+                # TODO: the relationship of annotations is one to many, so this needs to be fixed. 
                 mask = np.ones(len(return_ions.annotations), np.bool)
                 mask[indices] = False
                 return_ions.annotations = return_ions.annotations.filter(pa.array(mask))
@@ -631,6 +635,7 @@ class Ions(ABC):
         return_ions.mz = return_ions.mz[mask]
         return_ions.intensity = return_ions.intensity[mask]
         if return_ions.annotations is not None:
+            # TODO: the relationship of annotations is one to many, so this needs to be fixed.
             return_ions.annotations = return_ions.filter(pa.array(mask))
         if return_ions.stddev is not None:
             return_ions.stddev = return_ions.stddev[mask]
@@ -670,6 +675,7 @@ class Ions(ABC):
         else:
             return_ions.stddev = None
         if return_ions.annotations is not None or merge_ions.annotations is not None:
+            # TODO: the relationship of annotations is one to many, so this needs to be fixed. 
             return_ions.annotations = pa.concat_arrays([return_ions.annotations, merge_ions.annotations])
             return_ions.annotations = return_ions.annotations.take(pa.array(sorted_indexes))
         else:
@@ -734,6 +740,8 @@ class Ions(ABC):
                 indices.append(index2[pos[0][0]])
             else:
                 indices.append(None)
+        # TODO: the relationship of annotations is one to many, so this needs to be fixed.  Also,
+        # sometimes the annotations is a LargeListScalar, and sometimes an Array.  why?
         self.annotations = ion2.annotations.take(indices)
 
     def clear_and_intersect(self, ion2, index1, index2, tiebreaker=None):
@@ -1517,13 +1525,18 @@ class Spectrum:
 
         starts = struct2numpy(struct, 'starts')
         stops = struct2numpy(struct, 'stops')
+
+        annotations = struct.get("annotations", None)
+        if annotations is not None:
+            # unwrap the struct array
+            annotations = annotations.values
         
         self.products = self.product_class(
             struct2numpy(struct, 'mz'),
             struct2numpy(struct, 'intensity'),
             stddev=stddev,
             mass_info=MassInfo(arrow_struct_scalar=struct['product_massinfo']),
-            annotations=struct.get("annotations", None),
+            annotations=annotations,
             copy_arrays=copy_arrays,
             starts=starts,
             stops=stops
@@ -1674,13 +1687,18 @@ class Spectrum:
                 prop = None
         return prop
 
-    def to_msp(self):
+    def to_msp(self, annotate_peptide=False, ion_types=None):
         """
         convert a spectrum to an msp file entry, encoded as a string
 
+        :param annotate_peptide: annotate as a peptide
+        :param ion_types: ion types for annotation
         :return: string containing spectrum in msp format
         """
         #todo: check to see if annotation should be turned on
+        if annotate_peptide:
+            from masskit.spectrum.theoretical_spectrum import annotate_peptide_spectrum
+            annotate_peptide_spectrum(self, ion_types=ion_types)
 
         ret_value = ""
         if hasattr(self, "name") and self.name is not None:

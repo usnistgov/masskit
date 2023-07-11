@@ -8,6 +8,8 @@ from pandas.api.extensions import register_extension_dtype
 import numbers
 from rdkit import Chem
 
+from masskit.utils.spectrum_writers import spectra_to_mgf, spectra_to_msp, spectra_to_mzxml
+
 
 class MasskitArrowArray(pa.ExtensionArray):
     """
@@ -81,8 +83,10 @@ class MasskitPandasArray(ExtensionArray):
         # this is not correct -- have to ask Spectrum objects for their size
         return self.data.nbytes
 
-    def take(self, indexes):
+    def take(self, indexes, fill_value=None, allow_fill=False):
         indexes = np.asarray(indexes)
+        if allow_fill and np.any(indexes < 0):
+            raise ValueError('in MasskitPandasArray unable to use negative indices to place fill values')
         output = np.take(self.data, indexes)
         return type(self)(output)
 
@@ -93,6 +97,33 @@ class MasskitPandasArray(ExtensionArray):
     def _concat_same_type(cls, to_concat):
         data = np.concatenate([x.data for x in to_concat])
         return cls(data)
+    
+    def to_msp(self, fp, annotate_peptide=False, ion_types=None):
+        """
+        write to an msp file
+
+        :param fp: stream or filename
+        :param annotate_peptide: annotate the spectrum as a peptide
+        :param ion_types: ion types to annotate
+        """
+        spectra_to_msp(fp, self.data, annotate_peptide=annotate_peptide, ion_types=ion_types)
+        
+    def to_mgf(self, fp):
+        """
+        write to an mgf file
+
+        :param fp: stream or filename
+        """
+        spectra_to_mgf(fp, self.data)
+
+    def to_mzxml(self, fp):
+        """
+        write to an mgf file
+
+        :param fp: stream or filename
+        """
+        spectra_to_mzxml(fp, self.data)
+
 
 
 class MasskitPandasDtype(ExtensionDtype):
