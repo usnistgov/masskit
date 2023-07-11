@@ -1837,6 +1837,9 @@ class BatchFileWriter:
             raise ValueError(f'Unknown format {self.format}')
 
     def close(self):
+        """
+        Close the writer. Essential to avoid race conditions with threaded writers.
+        """
         if self.dataset is not None:
             self.dataset.close()
 
