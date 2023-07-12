@@ -27,3 +27,5 @@ nested_molecule_spectrum_schema = pa.schema(base_property_fields + molecule_prop
 
 # fields useful for dropping from csv output
 csv_drop_fields = ['mol', 'shortest_paths', 'spectrum', 'predicted_spectrum', 'theoretical_spectrum', 'spectrum_fp', 'spectrum_fp_count', 'ecfp4', 'ecfp4_count']
+# fields useful for dropping out for display
+display_drop_fields = ['mol', 'shortest_paths', 'spectrum_fp', 'spectrum_fp_count', 'ecfp4', 'ecfp4_count']

@@ -4,6 +4,12 @@ try:
 except ImportError:
     display = None
 
+def display_masskit_df(df):
+    if display is not None:
+        return display.display(display.HTML(df.to_html(escape=False, index=False, float_format="%.2f")))
+    else:
+        return df
+
 @pd.api.extensions.register_dataframe_accessor("lib")
 class LibraryAccessor:
     """

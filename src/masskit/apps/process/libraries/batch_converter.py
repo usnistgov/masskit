@@ -63,10 +63,10 @@ def batch_converter_app(config: DictConfig) -> None:
                                  id_field=id_field,
                                  comment_fields=comment_fields,
                                  spectrum_type=config.input.file.get('spectrum_type', 'mol'),
-                                 no_column_headers=config.conversion.get("no_column_headers", False),
-                                 mol_column_name=config.conversion.get("mol_column_name", None),
-                                 smiles_column_name=config.conversion.get("smiles_column_name", None),
-                                 delimiter=config.conversion.get("delimiter", None),
+                                 no_column_headers=config.conversion.csv.get("no_column_headers", False),
+                                 mol_column_name=config.conversion.csv.get("mol_column_name", None),
+                                 smiles_column_name=config.conversion.csv.get("smiles_column_name", None),
+                                 delimiter=config.conversion.csv.get("delimiter", None),
                                  )
 
         for writer in writers:

@@ -42,6 +42,17 @@ conversion:
     id:
       field:
       initial_value: 0
+  csv:
+    id:
+      field:
+      initial_value: 0
+    # csv has no column headers in first line
+    no_column_headers: False
+    # name of the column that will contain rdkit Mol
+    mol_column_name: mol
+    # name of the column containing SMILES
+    smiles_column_name: SMILES 
+    delimiter: ","
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
     probabilities: [0.0, 1.0, 0.0, 0.0]

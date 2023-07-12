@@ -249,13 +249,16 @@ def read_parquet(fp, columns=None, num=None, filters=None):
     reads a PyArrow table from a parquet file.
 
     :param fp: stream or filename
-    :param columns: list of columns to read, None=all
+    :param columns: list of columns to remy_sdf.parquetad, None=all
     :param filters: parquet predicate as a list of tuples
     :return: PyArrow table
     """
     fp = open_if_filename(fp, 'rb')
     if type(columns) == ListConfig:
         columns = list(columns)
+    metadata = pq.read_metadata(fp)
+    # if columns is not None:
+    #     columns = [x for x in metadata.schema.names if x in columns]
     table = pq.read_table(fp, columns=columns, filters=filters)
     if num is None:
         return table

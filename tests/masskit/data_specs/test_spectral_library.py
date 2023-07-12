@@ -1,11 +1,6 @@
-from matplotlib.pyplot import annotate
 import pytest
 from pytest import approx
-import numpy as np
-import masskit.spectrum.spectrum as mss
-import pyarrow.parquet as pq
 from masskit.utils.tablemap import ArrowLibraryMap
-from masskit.data_specs.spectral_library import LibraryAccessor
 
 @pytest.fixture
 def library_df(cho_uniq_short_parquet):
