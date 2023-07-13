@@ -935,8 +935,7 @@ def load_smiles2array(
     :param fp: name of the file to read or a file object
     :param num: the maximum number of records to generate (None=all)
     :param skip_expensive: skip expensive calculations for better perf
-    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use
-    the value as the starting value for the id and increment for each spectrum
+    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum
     :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
     :param spectrum_type: the type of spectrum file
     :return: arrow table with records
@@ -1013,18 +1012,13 @@ def load_sdf2array(
     :param precursor_mass_info: mass information for precursor. if None, will use default.
     :param product_mass_info: mass information for product. if None, will use default.
     :param skip_expensive: skip expensive calculations for better perf
-    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use
-    the value as the starting value for the id and increment for each spectrum
+    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum
     :param id_field_type: the id field type, such as int or str
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param set_probabilities: how to divide into dev, train, valid, test
     :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
     :param spectrum_type: the type of spectrum file
     :return: arrow table with records
-
-    various issues:
-    - argon has no structure
-    - if there is an UnicodeDecodeError, consider running "iconv -f latin1 -t utf-8 < old.sdf > new.sdf
     """
     if source == None:
         source = 'nist'
