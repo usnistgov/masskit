@@ -1,0 +1,18 @@
+masskit.apps.process.libraries.conf.hydra package
+=================================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.apps.process.libraries.conf.hydra.help
+
+Module contents
+---------------
+
+.. automodule:: masskit.apps.process.libraries.conf.hydra
+   :members:
+   :undoc-members:
+   :show-inheritance:

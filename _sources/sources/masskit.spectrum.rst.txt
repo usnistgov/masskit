@@ -20,18 +20,18 @@ masskit.spectrum.join module
    :undoc-members:
    :show-inheritance:
 
-masskit.spectrum.plotting module
---------------------------------
-
-.. automodule:: masskit.spectrum.plotting
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 masskit.spectrum.spectrum module
 --------------------------------
 
 .. automodule:: masskit.spectrum.spectrum
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.spectrum.spectrum\_plotting module
+------------------------------------------
+
+.. automodule:: masskit.spectrum.spectrum_plotting
    :members:
    :undoc-members:
    :show-inheritance:

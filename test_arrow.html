@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Speed Tests for Poster &#8212; masskit 1.0.0-44-gffab90d documentation</title>
+    <title>Speed Tests for Poster &#8212; masskit 1.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -58,7 +58,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Speed Tests for Poster</a></li> 
       </ul>
     </div>  
@@ -1536,8 +1536,8 @@ Wall time: 9.1 s
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/home/djs10/gitlab/msdc_services/libraries&#39;</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">masskit.data_specs.schemas</span> <span class="kn">import</span> <span class="n">peptide_schema</span>
-<span class="n">peptide_schema</span><span class="o">.</span><span class="n">empty_table</span><span class="p">()</span><span class="o">.</span><span class="n">to_pydict</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">masskit.data_specs.file_schemas</span> <span class="kn">import</span> <span class="n">flat_peptide_schema</span>
+<span class="n">flat_peptide_schema</span><span class="o">.</span><span class="n">empty_table</span><span class="p">()</span><span class="o">.</span><span class="n">to_pydict</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -1576,7 +1576,7 @@ Wall time: 9.1 s
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">sys</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;/home/djs10/gitlab/msdc_services/libraries&#39;</span><span class="p">)</span>
-<span class="kn">from</span> <span class="nn">masskit.data_specs.schemas</span> <span class="kn">import</span> <span class="n">molecules_schema</span>
+<span class="kn">from</span> <span class="nn">masskit.data_specs.file_schemas</span> <span class="kn">import</span> <span class="n">molecules_schema</span>
 <span class="n">molecules_schema</span><span class="o">.</span><span class="n">empty_table</span><span class="p">()</span><span class="o">.</span><span class="n">to_pydict</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -4049,9 +4049,9 @@ Index([&#39;set&#39;, &#39;name&#39;, &#39;spectrum&#39;, &#39;spectrum_fp&#39;,
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-[(&#39;__class__&#39;, masskit.spectrum.spectrum.HiResSpectrum),
+[(&#39;__class__&#39;, masskit.spectrum.spectrum.Spectrum),
  (&#39;__delattr__&#39;,
-  &lt;method-wrapper &#39;__delattr__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__delattr__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__dict__&#39;,
   {&#39;precursor_class&#39;: masskit.spectrum.spectrum.HiResIons,
    &#39;precursor_mass_info&#39;: &lt;masskit.spectrum.spectrum.MassInfo at 0x7fcb61ccf8b0&gt;,
@@ -4071,40 +4071,40 @@ Index([&#39;set&#39;, &#39;name&#39;, &#39;spectrum&#39;, &#39;spectrum_fp&#39;,
     &#39;num_mods&#39;: 1,
     &#39;precursor_mz&#39;: 855.4538,
     &#39;nce&#39;: 35.0}}),
- (&#39;__dir__&#39;, &lt;function HiResSpectrum.__dir__()&gt;),
+ (&#39;__dir__&#39;, &lt;function Spectrum.__dir__()&gt;),
  (&#39;__doc__&#39;, &#39;\n    class for a high resolution spectrum\n    &#39;),
  (&#39;__eq__&#39;,
-  &lt;method-wrapper &#39;__eq__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
- (&#39;__format__&#39;, &lt;function HiResSpectrum.__format__(format_spec, /)&gt;),
+  &lt;method-wrapper &#39;__eq__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
+ (&#39;__format__&#39;, &lt;function Spectrum.__format__(format_spec, /)&gt;),
  (&#39;__ge__&#39;,
-  &lt;method-wrapper &#39;__ge__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__ge__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__getattribute__&#39;,
-  &lt;method-wrapper &#39;__getattribute__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__getattribute__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__gt__&#39;,
-  &lt;method-wrapper &#39;__gt__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__gt__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__hash__&#39;,
-  &lt;method-wrapper &#39;__hash__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__hash__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__init__&#39;,
-  &lt;bound method HiResSpectrum.__init__ of &lt;spectrum 1; 855.4538Da precursor; 204 ions&gt;&gt;),
- (&#39;__init_subclass__&#39;, &lt;function HiResSpectrum.__init_subclass__&gt;),
+  &lt;bound method Spectrum.__init__ of &lt;spectrum 1; 855.4538Da precursor; 204 ions&gt;&gt;),
+ (&#39;__init_subclass__&#39;, &lt;function Spectrum.__init_subclass__&gt;),
  (&#39;__le__&#39;,
-  &lt;method-wrapper &#39;__le__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__le__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__lt__&#39;,
-  &lt;method-wrapper &#39;__lt__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__lt__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__module__&#39;, &#39;masskit.spectrum.spectrum&#39;),
  (&#39;__ne__&#39;,
-  &lt;method-wrapper &#39;__ne__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
+  &lt;method-wrapper &#39;__ne__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
  (&#39;__new__&#39;, &lt;function object.__new__(*args, **kwargs)&gt;),
- (&#39;__reduce__&#39;, &lt;function HiResSpectrum.__reduce__()&gt;),
- (&#39;__reduce_ex__&#39;, &lt;function HiResSpectrum.__reduce_ex__(protocol, /)&gt;),
+ (&#39;__reduce__&#39;, &lt;function Spectrum.__reduce__()&gt;),
+ (&#39;__reduce_ex__&#39;, &lt;function Spectrum.__reduce_ex__(protocol, /)&gt;),
  (&#39;__repr__&#39;,
   &lt;bound method BaseSpectrum.__repr__ of &lt;spectrum 1; 855.4538Da precursor; 204 ions&gt;&gt;),
  (&#39;__setattr__&#39;,
-  &lt;method-wrapper &#39;__setattr__&#39; of HiResSpectrum object at 0x7fcb61e7bd30&gt;),
- (&#39;__sizeof__&#39;, &lt;function HiResSpectrum.__sizeof__()&gt;),
+  &lt;method-wrapper &#39;__setattr__&#39; of Spectrum object at 0x7fcb61e7bd30&gt;),
+ (&#39;__sizeof__&#39;, &lt;function Spectrum.__sizeof__()&gt;),
  (&#39;__str__&#39;,
   &lt;bound method BaseSpectrum.__str__ of &lt;spectrum 1; 855.4538Da precursor; 204 ions&gt;&gt;),
- (&#39;__subclasshook__&#39;, &lt;function HiResSpectrum.__subclasshook__&gt;),
+ (&#39;__subclasshook__&#39;, &lt;function Spectrum.__subclasshook__&gt;),
  (&#39;__weakref__&#39;, None),
  (&#39;_filtered&#39;, None),
  (&#39;_props&#39;,
@@ -4137,7 +4137,7 @@ Index([&#39;set&#39;, &#39;name&#39;, &#39;spectrum&#39;, &#39;spectrum_fp&#39;,
  (&#39;estimated_ri_error&#39;, None),
  (&#39;ev&#39;, None),
  (&#39;evenly_space&#39;,
-  &lt;bound method HiResSpectrum.evenly_space of &lt;spectrum 1; 855.4538Da precursor; 204 ions&gt;&gt;),
+  &lt;bound method Spectrum.evenly_space of &lt;spectrum 1; 855.4538Da precursor; 204 ions&gt;&gt;),
  (&#39;exact_mass&#39;, None),
  (&#39;experimental_ri&#39;, None),
  (&#39;experimental_ri_data&#39;, None),
@@ -5176,7 +5176,7 @@ memory usage: 1.7+ MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_single_peptide</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">to_msp</span><span class="p">(</span><span class="s2">&quot;single_peptide.msp&quot;</span><span class="p">)</span>
+<span></span><span class="n">df_single_peptide</span><span class="p">[</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">to_msp</span><span class="p">(</span><span class="s2">&quot;single_peptide.msp&quot;</span><span class="p">)</span>
 <span class="n">df_2</span> <span class="o">=</span> <span class="n">LibraryAccessor</span><span class="o">.</span><span class="n">read_msp</span><span class="p">(</span><span class="s2">&quot;single_peptide.msp&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -5188,7 +5188,7 @@ memory usage: 1.7+ MB
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">df_single_peptide</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">lib</span><span class="o">.</span><span class="n">to_msp</span><span class="p">(</span><span class="s2">&quot;single_spectrum.msp&quot;</span><span class="p">)</span>
+<span></span><span class="n">df_single_peptide</span><span class="o">.</span><span class="n">iloc</span><span class="p">[[</span><span class="mi">0</span><span class="p">]][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">array</span><span class="o">.</span><span class="n">to_msp</span><span class="p">(</span><span class="s2">&quot;single_spectrum.msp&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -5339,7 +5339,7 @@ memory usage: 1.7+ MB
         <li class="right" >
           <a href="py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Speed Tests for Poster</a></li> 
       </ul>
     </div>

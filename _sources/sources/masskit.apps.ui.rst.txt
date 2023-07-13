@@ -1,13 +1,16 @@
 masskit.apps.ui package
 =======================
 
-Subpackages
------------
+Submodules
+----------
 
-.. toctree::
-   :maxdepth: 4
+masskit.apps.ui.pqview module
+-----------------------------
 
-   masskit.apps.ui.pqview
+.. automodule:: masskit.apps.ui.pqview
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
 Module contents
 ---------------

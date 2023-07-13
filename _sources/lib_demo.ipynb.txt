@@ -10,7 +10,7 @@
     "%matplotlib inline\n",
     "import matplotlib\n",
     "import matplotlib.pyplot as plt\n",
-    "from masskit.utils.index import ArrowLibraryMap"
+    "from masskit.utils.tablemap import ArrowLibraryMap"
    ]
   },
   {

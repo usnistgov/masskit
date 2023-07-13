@@ -76,6 +76,22 @@ masskit.utils.setup module
    :undoc-members:
    :show-inheritance:
 
+masskit.utils.spectrum\_writers module
+--------------------------------------
+
+.. automodule:: masskit.utils.spectrum_writers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.utils.tablemap module
+-----------------------------
+
+.. automodule:: masskit.utils.tablemap
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 masskit.utils.tables module
 ---------------------------
 

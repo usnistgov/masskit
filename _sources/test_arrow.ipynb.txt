@@ -46,6 +46,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "9743fd3e",
    "metadata": {},
@@ -54,6 +55,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "f407b558",
    "metadata": {},
@@ -1541,6 +1543,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "87ac1f29",
    "metadata": {},
@@ -1613,6 +1616,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "1bd52937",
    "metadata": {},
@@ -1661,8 +1665,8 @@
    "source": [
     "import sys\n",
     "sys.path.append('/home/djs10/gitlab/msdc_services/libraries')\n",
-    "from masskit.data_specs.schemas import peptide_schema\n",
-    "peptide_schema.empty_table().to_pydict()"
+    "from masskit.data_specs.file_schemas import flat_peptide_schema\n",
+    "flat_peptide_schema.empty_table().to_pydict()"
    ]
   },
   {
@@ -1741,7 +1745,7 @@
    "source": [
     "import sys\n",
     "sys.path.append('/home/djs10/gitlab/msdc_services/libraries')\n",
-    "from masskit.data_specs.schemas import molecules_schema\n",
+    "from masskit.data_specs.file_schemas import molecules_schema\n",
     "molecules_schema.empty_table().to_pydict()"
    ]
   },
@@ -4265,6 +4269,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "57594a02",
    "metadata": {},
@@ -4514,6 +4519,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "78bc504d",
    "metadata": {},
@@ -4704,6 +4710,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "dc551769",
    "metadata": {},
@@ -4736,6 +4743,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "2fbda86c",
    "metadata": {},
@@ -4755,6 +4763,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "13f8d53f",
    "metadata": {},
@@ -4771,9 +4780,9 @@
     {
      "data": {
       "text/plain": [
-       "[('__class__', masskit.spectrum.spectrum.HiResSpectrum),\n",
+       "[('__class__', masskit.spectrum.spectrum.Spectrum),\n",
        " ('__delattr__',\n",
-       "  <method-wrapper '__delattr__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__delattr__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__dict__',\n",
        "  {'precursor_class': masskit.spectrum.spectrum.HiResIons,\n",
        "   'precursor_mass_info': <masskit.spectrum.spectrum.MassInfo at 0x7fcb61ccf8b0>,\n",
@@ -4793,40 +4802,40 @@
        "    'num_mods': 1,\n",
        "    'precursor_mz': 855.4538,\n",
        "    'nce': 35.0}}),\n",
-       " ('__dir__', <function HiResSpectrum.__dir__()>),\n",
+       " ('__dir__', <function Spectrum.__dir__()>),\n",
        " ('__doc__', '\\n    class for a high resolution spectrum\\n    '),\n",
        " ('__eq__',\n",
-       "  <method-wrapper '__eq__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
-       " ('__format__', <function HiResSpectrum.__format__(format_spec, /)>),\n",
+       "  <method-wrapper '__eq__' of Spectrum object at 0x7fcb61e7bd30>),\n",
+       " ('__format__', <function Spectrum.__format__(format_spec, /)>),\n",
        " ('__ge__',\n",
-       "  <method-wrapper '__ge__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__ge__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__getattribute__',\n",
-       "  <method-wrapper '__getattribute__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__getattribute__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__gt__',\n",
-       "  <method-wrapper '__gt__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__gt__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__hash__',\n",
-       "  <method-wrapper '__hash__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__hash__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__init__',\n",
-       "  <bound method HiResSpectrum.__init__ of <spectrum 1; 855.4538Da precursor; 204 ions>>),\n",
-       " ('__init_subclass__', <function HiResSpectrum.__init_subclass__>),\n",
+       "  <bound method Spectrum.__init__ of <spectrum 1; 855.4538Da precursor; 204 ions>>),\n",
+       " ('__init_subclass__', <function Spectrum.__init_subclass__>),\n",
        " ('__le__',\n",
-       "  <method-wrapper '__le__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__le__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__lt__',\n",
-       "  <method-wrapper '__lt__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__lt__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__module__', 'masskit.spectrum.spectrum'),\n",
        " ('__ne__',\n",
-       "  <method-wrapper '__ne__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
+       "  <method-wrapper '__ne__' of Spectrum object at 0x7fcb61e7bd30>),\n",
        " ('__new__', <function object.__new__(*args, **kwargs)>),\n",
-       " ('__reduce__', <function HiResSpectrum.__reduce__()>),\n",
-       " ('__reduce_ex__', <function HiResSpectrum.__reduce_ex__(protocol, /)>),\n",
+       " ('__reduce__', <function Spectrum.__reduce__()>),\n",
+       " ('__reduce_ex__', <function Spectrum.__reduce_ex__(protocol, /)>),\n",
        " ('__repr__',\n",
        "  <bound method BaseSpectrum.__repr__ of <spectrum 1; 855.4538Da precursor; 204 ions>>),\n",
        " ('__setattr__',\n",
-       "  <method-wrapper '__setattr__' of HiResSpectrum object at 0x7fcb61e7bd30>),\n",
-       " ('__sizeof__', <function HiResSpectrum.__sizeof__()>),\n",
+       "  <method-wrapper '__setattr__' of Spectrum object at 0x7fcb61e7bd30>),\n",
+       " ('__sizeof__', <function Spectrum.__sizeof__()>),\n",
        " ('__str__',\n",
        "  <bound method BaseSpectrum.__str__ of <spectrum 1; 855.4538Da precursor; 204 ions>>),\n",
-       " ('__subclasshook__', <function HiResSpectrum.__subclasshook__>),\n",
+       " ('__subclasshook__', <function Spectrum.__subclasshook__>),\n",
        " ('__weakref__', None),\n",
        " ('_filtered', None),\n",
        " ('_props',\n",
@@ -4859,7 +4868,7 @@
        " ('estimated_ri_error', None),\n",
        " ('ev', None),\n",
        " ('evenly_space',\n",
-       "  <bound method HiResSpectrum.evenly_space of <spectrum 1; 855.4538Da precursor; 204 ions>>),\n",
+       "  <bound method Spectrum.evenly_space of <spectrum 1; 855.4538Da precursor; 204 ions>>),\n",
        " ('exact_mass', None),\n",
        " ('experimental_ri', None),\n",
        " ('experimental_ri_data', None),\n",
@@ -5781,6 +5790,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "3d79792a",
    "metadata": {},
@@ -5808,6 +5818,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "031bc181",
    "metadata": {},
@@ -5835,6 +5846,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "694e9de5",
    "metadata": {},
@@ -5917,6 +5929,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "4e47783e",
    "metadata": {},
@@ -5935,6 +5948,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "2e03e840",
    "metadata": {},
@@ -5955,6 +5969,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "8743f10b",
    "metadata": {},
@@ -5975,6 +5990,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "f96fe454",
    "metadata": {},
@@ -5994,6 +6010,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "26211fad",
    "metadata": {},
@@ -6012,6 +6029,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "7eea3a26",
    "metadata": {},
@@ -6032,6 +6050,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "a0036117",
    "metadata": {},
@@ -6050,6 +6069,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "f1d882f1",
    "metadata": {},
@@ -6068,6 +6088,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "9f95c951",
    "metadata": {},
@@ -6087,6 +6108,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "4d27ef8b",
    "metadata": {},
@@ -6105,6 +6127,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "c212780d",
    "metadata": {},
@@ -6116,6 +6139,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "a0351f43",
    "metadata": {},
@@ -6130,11 +6154,12 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "df_single_peptide.lib.to_msp(\"single_peptide.msp\")\n",
+    "df_single_peptide['spectrum'].array.to_msp(\"single_peptide.msp\")\n",
     "df_2 = LibraryAccessor.read_msp(\"single_peptide.msp\")"
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "0db4b8ea",
    "metadata": {},
@@ -6149,10 +6174,11 @@
    "metadata": {},
    "outputs": [],
    "source": [
-    "df_single_peptide.iloc[[0]].lib.to_msp(\"single_spectrum.msp\")"
+    "df_single_peptide.iloc[[0]]['spectrum'].array.to_msp(\"single_spectrum.msp\")"
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "eb4196f2",
    "metadata": {},
@@ -6173,6 +6199,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "0bb6d955",
    "metadata": {},
@@ -6191,6 +6218,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "96dd8255",
    "metadata": {},
@@ -6211,6 +6239,7 @@
    ]
   },
   {
+   "attachments": {},
    "cell_type": "markdown",
    "id": "f73eae5d",
    "metadata": {},

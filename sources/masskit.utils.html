@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>masskit.utils package &#8212; masskit 1.0.0-44-gffab90d documentation</title>
+    <title>masskit.utils package &#8212; masskit 1.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -56,7 +56,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils package</a></li> 
       </ul>
     </div>  
@@ -677,13 +677,24 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.general.open_if_compressed">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">open_if_compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.open_if_compressed" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">open_if_compressed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.open_if_compressed" title="Permalink to this definition">¶</a></dt>
+<dd><p>open the file denoted by filename and uncompress it if it is compressed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – filename</p></li>
+<li><p><strong>mode</strong> – file opening mode</p></li>
+</ul>
+</dd>
+</dl>
+<p>:param newline
+:return: stream</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.general.open_if_filename">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">open_if_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">newline</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.open_if_filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>if the fp is a string, open the file</p>
+<dd><p>if the fp is a string, open the file, and uncompress if needed</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -977,8 +988,98 @@ truth_score</p></li>
 <section id="masskit-utils-setup-module">
 <h2>masskit.utils.setup module<a class="headerlink" href="#masskit-utils-setup-module" title="Permalink to this heading">¶</a></h2>
 </section>
-<section id="masskit-utils-tables-module">
-<h2>masskit.utils.tables module<a class="headerlink" href="#masskit-utils-tables-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.utils.spectrum_writers">
+<span id="masskit-utils-spectrum-writers-module"></span><h2>masskit.utils.spectrum_writers module<a class="headerlink" href="#module-masskit.utils.spectrum_writers" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.spectrum_writers.spectra_to_mgf">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.spectrum_writers.</span></span><span class="sig-name descname"><span class="pre">spectra_to_mgf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge_list</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.spectrum_writers.spectra_to_mgf" title="Permalink to this definition">¶</a></dt>
+<dd><p>write out an array-like of spectra in mgf format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> – stream or filename to write out to.  will append</p></li>
+<li><p><strong>spectra</strong> – name of the column containing the spectrum</p></li>
+<li><p><strong>charge_list</strong> – list of charges for Mascot to search, otherwise use the CHARGE field</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.spectrum_writers.spectra_to_msp">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.spectrum_writers.</span></span><span class="sig-name descname"><span class="pre">spectra_to_msp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_peptide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.spectrum_writers.spectra_to_msp" title="Permalink to this definition">¶</a></dt>
+<dd><p>write out an array-like of spectra  in msp format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> – stream or filename to write out to.  will append</p></li>
+<li><p><strong>spectra</strong> – map containing the spectrum</p></li>
+<li><p><strong>annotate_peptide</strong> – annotate the spectra as peptide</p></li>
+<li><p><strong>ion_types</strong> – ion types for annotation</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.spectrum_writers.spectra_to_mzxml">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.spectrum_writers.</span></span><span class="sig-name descname"><span class="pre">spectra_to_mzxml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mzxml_attributes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compress</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_id_as_scan</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.spectrum_writers.spectra_to_mzxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>write out an array-like of spectra in mzxml format</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> – stream or filename to write out to.  will not append</p></li>
+<li><p><strong>min_intensity</strong> – the minimum intensity value</p></li>
+<li><p><strong>spectra</strong> – name of the column containing the spectrum</p></li>
+<li><p><strong>mzxml_attributes</strong> – dict containing mzXML attributes</p></li>
+<li><p><strong>use_id_as_scan</strong> – use spectrum.id instead of spectrum.scan</p></li>
+<li><p><strong>compress</strong> – should the data be compressed?</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="masskit-utils-tablemap-module">
+<h2>masskit.utils.tablemap module<a class="headerlink" href="#masskit-utils-tablemap-module" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-masskit.utils.tables">
+<span id="masskit-utils-tables-module"></span><h2>masskit.utils.tables module<a class="headerlink" href="#module-masskit.utils.tables" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.create_dataset">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">create_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">rows=5,</span> <span class="pre">cols=[&lt;class</span> <span class="pre">'int'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'float'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'str'&gt;,</span> <span class="pre">&lt;class</span> <span class="pre">'list'&gt;],</span> <span class="pre">names=array(['a',</span> <span class="pre">'b',</span> <span class="pre">'c',</span> <span class="pre">'d',</span> <span class="pre">'e',</span> <span class="pre">'f',</span> <span class="pre">'g',</span> <span class="pre">'h',</span> <span class="pre">'i',</span> <span class="pre">'j',</span> <span class="pre">'k',</span> <span class="pre">'l',</span> <span class="pre">'m',</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">'n',</span> <span class="pre">'o',</span> <span class="pre">'p',</span> <span class="pre">'q',</span> <span class="pre">'r',</span> <span class="pre">'s',</span> <span class="pre">'t',</span> <span class="pre">'u',</span> <span class="pre">'v',</span> <span class="pre">'w',</span> <span class="pre">'x',</span> <span class="pre">'y',</span> <span class="pre">'z',</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">'A',</span> <span class="pre">'B',</span> <span class="pre">'C',</span> <span class="pre">'D',</span> <span class="pre">'E',</span> <span class="pre">'F',</span> <span class="pre">'G',</span> <span class="pre">'H',</span> <span class="pre">'I',</span> <span class="pre">'J',</span> <span class="pre">'K',</span> <span class="pre">'L',</span> <span class="pre">'M',</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">'N',</span> <span class="pre">'O',</span> <span class="pre">'P',</span> <span class="pre">'Q',</span> <span class="pre">'R',</span> <span class="pre">'S',</span> <span class="pre">'T',</span> <span class="pre">'U',</span> <span class="pre">'V',</span> <span class="pre">'W',</span> <span class="pre">'X',</span> <span class="pre">'Y',</span> <span class="pre">'Z'],</span>&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">dtype='&lt;U1')</span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.create_dataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.random_string">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.random_string" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.row_view">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">row_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.row_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.row_view_raw">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">row_view_raw</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idx</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.row_view_raw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.struct_to_table">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">struct_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.struct_to_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.struct_view">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">struct_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.struct_view" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.table_to_struct">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">table_to_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.table_to_struct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-masskit.utils">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.utils" title="Permalink to this heading">¶</a></h2>
@@ -1006,7 +1107,9 @@ truth_score</p></li>
 <li><a class="reference internal" href="#masskit-utils-index-module">masskit.utils.index module</a></li>
 <li><a class="reference internal" href="#masskit-utils-search-module">masskit.utils.search module</a></li>
 <li><a class="reference internal" href="#masskit-utils-setup-module">masskit.utils.setup module</a></li>
-<li><a class="reference internal" href="#masskit-utils-tables-module">masskit.utils.tables module</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.spectrum_writers">masskit.utils.spectrum_writers module</a></li>
+<li><a class="reference internal" href="#masskit-utils-tablemap-module">masskit.utils.tablemap module</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.tables">masskit.utils.tables module</a></li>
 <li><a class="reference internal" href="#module-masskit.utils">Module contents</a></li>
 </ul>
 </li>
@@ -1043,7 +1146,7 @@ truth_score</p></li>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils package</a></li> 
       </ul>
     </div>

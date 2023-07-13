@@ -4,6 +4,22 @@ masskit.data\_specs package
 Submodules
 ----------
 
+masskit.data\_specs.arrow\_types module
+---------------------------------------
+
+.. automodule:: masskit.data_specs.arrow_types
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.data\_specs.file\_schemas module
+----------------------------------------
+
+.. automodule:: masskit.data_specs.file_schemas
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 masskit.data\_specs.schemas module
 ----------------------------------
 

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>masskit.small_molecule package &#8212; masskit 1.0.0-44-gffab90d documentation</title>
+    <title>masskit.small_molecule package &#8212; masskit 1.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -56,7 +56,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.small_molecule package</a></li> 
       </ul>
     </div>  
@@ -70,41 +70,6 @@ $(document).ready(function(){
 <h1>masskit.small_molecule package<a class="headerlink" href="#masskit-small-molecule-package" title="Permalink to this heading">¶</a></h1>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
-</section>
-<section id="module-masskit.small_molecule.network">
-<span id="masskit-small-molecule-network-module"></span><h2>masskit.small_molecule.network module<a class="headerlink" href="#module-masskit.small_molecule.network" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.small_molecule.network.call_airi_service">
-<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.network.</span></span><span class="sig-name descname"><span class="pre">call_airi_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">smile_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">server</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10.208.85.87'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">port</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'80'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.network.call_airi_service" title="Permalink to this definition">¶</a></dt>
-<dd><p>call the airi service</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>smile_in</strong> – the smiles string used to compute the ri value</p></li>
-<li><p><strong>server</strong> – the http server containing the airi service</p></li>
-<li><p><strong>port</strong> – the port on the server</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>the json response from the server</p>
-</dd>
-</dl>
-</dd></dl>
-
-</section>
-<section id="module-masskit.small_molecule.plotting">
-<span id="masskit-small-molecule-plotting-module"></span><h2>masskit.small_molecule.plotting module<a class="headerlink" href="#module-masskit.small_molecule.plotting" title="Permalink to this heading">¶</a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.small_molecule.plotting.file_download_button">
-<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.plotting.</span></span><span class="sig-name descname"><span class="pre">file_download_button</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'download.txt'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">button_text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Download</span> <span class="pre">File'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">css_class</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'p-Widget</span> <span class="pre">jupyter-widgets</span> <span class="pre">jupyter-button</span> <span class="pre">widget-button</span> <span class="pre">mod-warning'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.plotting.file_download_button" title="Permalink to this definition">¶</a></dt>
-<dd><p>create an html file download button for use in jupyter notebook using HTML(file_download())
-:param filename: name of file to download
-:param data: string containing data to download
-:param button_text: the text on the button
-:param css_class: styling of the button
-:return: string containing button html</p>
-</dd></dl>
-
 </section>
 <section id="module-masskit.small_molecule.react">
 <span id="masskit-small-molecule-react-module"></span><h2>masskit.small_molecule.react module<a class="headerlink" href="#module-masskit.small_molecule.react" title="Permalink to this heading">¶</a></h2>
@@ -315,8 +280,6 @@ with dative bonds. The replacement is only done if the atom has “too many” b
     <ul>
 <li><a class="reference internal" href="#">masskit.small_molecule package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-masskit.small_molecule.network">masskit.small_molecule.network module</a></li>
-<li><a class="reference internal" href="#module-masskit.small_molecule.plotting">masskit.small_molecule.plotting module</a></li>
 <li><a class="reference internal" href="#module-masskit.small_molecule.react">masskit.small_molecule.react module</a></li>
 <li><a class="reference internal" href="#module-masskit.small_molecule.threed">masskit.small_molecule.threed module</a></li>
 <li><a class="reference internal" href="#module-masskit.small_molecule.utils">masskit.small_molecule.utils module</a></li>
@@ -356,7 +319,7 @@ with dative bonds. The replacement is only done if the atom has “too many” b
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.small_molecule package</a></li> 
       </ul>
     </div>

@@ -1,6 +1,14 @@
 masskit.apps.process.libraries.conf package
 ===========================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.apps.process.libraries.conf.hydra
+
 Module contents
 ---------------
 

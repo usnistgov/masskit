@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Recipes &#8212; masskit 1.0.0-44-gffab90d documentation</title>
+    <title>Recipes &#8212; masskit 1.1.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -60,7 +60,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="demo_peptide.html" title="Tables of spectra"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
       </ul>
     </div>  
@@ -78,8 +78,7 @@ $(document).ready(function(){
 <h3>Protein sequences to peptide library<a class="headerlink" href="#protein-sequences-to-peptide-library" title="Permalink to this heading">¶</a></h3>
 <p>To generate a library of peptides, which is typically the first step in generating a peptide
 spectral library, use the program <code class="docutils literal notranslate"><span class="pre">fasta2peptides</span></code>. This program takes protein sequences
-in fasta format and generates a peptide library in parquet format. The default configuration for this program is
-contained in the <code class="docutils literal notranslate"><span class="pre">masskit/src/masskit/apps/process/libraries/conf/config_fasta2peptides.yaml</span></code> file.</p>
+in fasta format and generates a peptide library in parquet format. The default configuration for this program can be see by running <code class="docutils literal notranslate"><span class="pre">fasta2peptides</span> <span class="pre">-h</span></code>.</p>
 <ul class="simple">
 <li><p>to change the name of the input file, specify <code class="docutils literal notranslate"><span class="pre">input.file=myfilename.fasta</span></code> on the
 command line.</p></li>
@@ -100,6 +99,49 @@ the peptide generated.</p></li>
 </li>
 </ul>
 <p>An example command line: <code class="docutils literal notranslate"><span class="pre">fasta2peptides</span> <span class="pre">input.file=uniprot.fasta</span> <span class="pre">output.file=uniprot_peptides.parquet</span></code></p>
+</section>
+</section>
+<section id="library-import">
+<h2>Library import<a class="headerlink" href="#library-import" title="Permalink to this heading">¶</a></h2>
+<p>Masskit computational pipelines operate on standardized parquet and arrow files.
+These open source columnar data stores allow for high performance from vectorization
+and parallelization and, by checking and correcting
+data at import and placing it in well specified fields, modularizes and
+simplifies computational tasks by avoiding data errors that can arise in
+computational pipelines that depend on ill-specified file formats. The
+command line program <code class="docutils literal notranslate"><span class="pre">batch_converter</span></code> is used to load different file formats
+into standardized parquet and arrow files and to convert these standardized
+files into common file formats. For performance, <code class="docutils literal notranslate"><span class="pre">batch_converter</span></code> is
+parallelized and operates on batches so that it can handle any size of
+file without exhausting memory.</p>
+<section id="sdf-molfiles-to-small-molecule-libraries">
+<h3>SDF Molfiles to small molecule libraries<a class="headerlink" href="#sdf-molfiles-to-small-molecule-libraries" title="Permalink to this heading">¶</a></h3>
+<p>To convert an SDF file (also known as a Molfile) into parquet format, use a
+command line of the format <code class="docutils literal notranslate"><span class="pre">batch_converter</span> <span class="pre">input.file.names=my_sdf.sdf</span> <span class="pre">output.file.name=my_sdf</span> <span class="pre">output.file.types=[parquet]</span></code>.</p>
+</section>
+<section id="csv-file-to-small-molecule-libraries">
+<h3>CSV file to small molecule libraries<a class="headerlink" href="#csv-file-to-small-molecule-libraries" title="Permalink to this heading">¶</a></h3>
+<p>To convert an CSV file that includes SMILES molecular specifications into
+parquet format, use a command line of the format <code class="docutils literal notranslate"><span class="pre">batch_converter</span> <span class="pre">input.file.names=my_csv.csv</span> <span class="pre">output.file.name=my_csv</span> <span class="pre">output.file.types=[parquet]</span></code>. Options for csv parsing:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">conversion.csv.no_column_headers</span></code>, set this to true if the csv file does not have column headers. In this case, the columns will be named <code class="docutils literal notranslate"><span class="pre">f0</span></code>, <code class="docutils literal notranslate"><span class="pre">f1</span></code>, …</p></li>
+<li><p>the default SMILES column name is <code class="docutils literal notranslate"><span class="pre">SMILES</span></code> if there is a header and <code class="docutils literal notranslate"><span class="pre">f0</span></code> if not. To change the column name, set <code class="docutils literal notranslate"><span class="pre">conversion.csv.smiles_column_name</span></code></p></li>
+<li><p>use <code class="docutils literal notranslate"><span class="pre">conversion.csv.delimiter</span></code>, set to the column delimiter.  Tab delimited is <code class="docutils literal notranslate"><span class="pre">conversion.csv.delimiter=&quot;\t&quot;</span></code></p></li>
+<li><p>the default rdkit Mol column name is “mol”. To change this, use <code class="docutils literal notranslate"><span class="pre">conversion.csv.mol_column_name</span></code></p></li>
+</ul>
+<p>Examples:
+To read in a headerless tab delimited file with the SMILES in the second column, <code class="docutils literal notranslate"><span class="pre">batch_converter</span> <span class="pre">input.file.names=my_csv.csv</span> <span class="pre">output.file.name=my_csv</span> <span class="pre">output.file.types=[parquet]</span> <span class="pre">conversion.csv.no_column_headers=true</span> <span class="pre">conversion.csv.smiles_column_name=f1</span> <span class="pre">conversion.csv.delimiter=&quot;\t&quot;</span></code></p>
+<section id="sdf-files-with-incorrect-encoding-or-pre-v2000-format">
+<h4>SDF files with incorrect encoding or pre-v2000 format<a class="headerlink" href="#sdf-files-with-incorrect-encoding-or-pre-v2000-format" title="Permalink to this heading">¶</a></h4>
+<p>Some SDF files include characters encoded using non-ASCII encodings,
+such as Latin-1 (ISO-8859-1) while rdkit and python support ASCII and
+UTF-8 (unicode).  Other SDF files are written in a pre version v2000
+format that does not include ‘M  END’ section separators.  To address
+these issues, use the command line program
+<code class="docutils literal notranslate"><span class="pre">rewrite_sdf</span> <span class="pre">input.file.name=my_input.sdf</span> <span class="pre">output.file.name=my_output.sdf</span></code>.
+If the encoding is not latin-1, set the <code class="docutils literal notranslate"><span class="pre">input.file.encoding</span></code> option
+to the encoding used.</p>
+</section>
 </section>
 </section>
 <section id="modification-specification">
@@ -143,6 +185,14 @@ using a command line like bash, e.g. <code class="docutils literal notranslate">
 <li><a class="reference internal" href="#">Recipes</a><ul>
 <li><a class="reference internal" href="#library-generation">Library generation</a><ul>
 <li><a class="reference internal" href="#protein-sequences-to-peptide-library">Protein sequences to peptide library</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#library-import">Library import</a><ul>
+<li><a class="reference internal" href="#sdf-molfiles-to-small-molecule-libraries">SDF Molfiles to small molecule libraries</a></li>
+<li><a class="reference internal" href="#csv-file-to-small-molecule-libraries">CSV file to small molecule libraries</a><ul>
+<li><a class="reference internal" href="#sdf-files-with-incorrect-encoding-or-pre-v2000-format">SDF files with incorrect encoding or pre-v2000 format</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a class="reference internal" href="#modification-specification">Modification specification</a></li>
@@ -189,7 +239,7 @@ using a command line like bash, e.g. <code class="docutils literal notranslate">
         <li class="right" >
           <a href="demo_peptide.html" title="Tables of spectra"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.0.0-44-gffab90d documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.1.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Recipes</a></li> 
       </ul>
     </div>

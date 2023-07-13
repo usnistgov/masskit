@@ -1,6 +1,17 @@
 masskit.test\_fixtures package
 ==============================
 
+Submodules
+----------
+
+masskit.test\_fixtures.demo\_fixtures module
+--------------------------------------------
+
+.. automodule:: masskit.test_fixtures.demo_fixtures
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 Module contents
 ---------------
 

@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+masskit.apps.process.libraries.batch\_converter module
+------------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.batch_converter
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 masskit.apps.process.libraries.converter module
 -----------------------------------------------
 
@@ -52,10 +60,26 @@ masskit.apps.process.libraries.pepsearch2parquet module
    :undoc-members:
    :show-inheritance:
 
+masskit.apps.process.libraries.pubchem\_links module
+----------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.pubchem_links
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 masskit.apps.process.libraries.rewrite\_sdf module
 --------------------------------------------------
 
 .. automodule:: masskit.apps.process.libraries.rewrite_sdf
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.apps.process.libraries.transform\_table module
+------------------------------------------------------
+
+.. automodule:: masskit.apps.process.libraries.transform_table
    :members:
    :undoc-members:
    :show-inheritance:

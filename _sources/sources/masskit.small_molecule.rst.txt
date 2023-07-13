@@ -4,22 +4,6 @@ masskit.small\_molecule package
 Submodules
 ----------
 
-masskit.small\_molecule.network module
---------------------------------------
-
-.. automodule:: masskit.small_molecule.network
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-masskit.small\_molecule.plotting module
----------------------------------------
-
-.. automodule:: masskit.small_molecule.plotting
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 masskit.small\_molecule.react module
 ------------------------------------
 
