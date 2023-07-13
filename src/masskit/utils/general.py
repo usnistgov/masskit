@@ -44,7 +44,7 @@ def open_if_compressed(filename, mode, newline=None):
 
     :param filename: filename
     :param mode: file opening mode
-    :param newline
+    :param newline: specify newline character
     :return: stream
     """
     magic_dict = {
@@ -81,6 +81,7 @@ def open_if_filename(fp, mode, newline=None):
 
     :param fp: possible filename
     :param mode: file opening mode
+    :param newline: specify newline character
     :return: stream
     """
     if isinstance(fp, str) or isinstance(fp, Path) :

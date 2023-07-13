@@ -15,9 +15,6 @@ Welcome to masskit's documentation!
    demo_peptide
    recipes
 
-.. automodule:: modules
-    :members:
-
 
 Indices and tables
 ==================

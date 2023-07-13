@@ -51,7 +51,17 @@ source_suffix = {
 templates_path = ['_templates']
 
 # Suppress autodoc imports
-autodoc_mock_imports = ['search', 'setup', 'filelock', 'pyarrow', 'rdkit', 'pandas', 'pynndescent', 'arrow', 'tqdm', 'jsonpickle']
+autodoc_mock_imports = ['omegaconf', 
+                        'hydra',
+                        'rich',
+                        'search', 
+                        'setup', 
+                        'filelock', 
+                        'rdkit', 
+                        'pynndescent', 
+                        'tqdm', 
+                        'jsonpickle',
+                        'pytest']
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

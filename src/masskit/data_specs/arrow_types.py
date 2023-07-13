@@ -75,6 +75,9 @@ class MasskitPandasArray(ExtensionArray):
         return np.all(self.data == other.data)
 
     def isna(self):
+        """
+        returns array indicating if any of the data is None
+        """
         return np.array(
             [x is None for x in self.data], dtype=bool
         )
@@ -84,6 +87,14 @@ class MasskitPandasArray(ExtensionArray):
         return self.data.nbytes
 
     def take(self, indexes, fill_value=None, allow_fill=False):
+        """
+        take values from array
+
+        :param indexes: the indexes of values to take
+        :param fill_value: if allow_fill is True, use this value when index is negative
+        :param allow_fill: use fill_value if index is negative, otherwise negative index indexes from back of array
+        :return: the taken array
+        """
         indexes = np.asarray(indexes)
         if allow_fill and np.any(indexes < 0):
             raise ValueError('in MasskitPandasArray unable to use negative indices to place fill values')
@@ -91,6 +102,11 @@ class MasskitPandasArray(ExtensionArray):
         return type(self)(output)
 
     def copy(self):
+        """
+        return a copy of the array
+
+        :return: copy of the array
+        """
         return type(self)(self.data[:])
 
     @classmethod
