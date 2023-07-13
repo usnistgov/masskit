@@ -50,8 +50,8 @@ conversion:
     no_column_headers: False
     # name of the column that will contain rdkit Mol
     mol_column_name: mol
-    # name of the column containing SMILES
-    smiles_column_name: SMILES 
+    # name of the column containing SMILES.  null means "SMILES"
+    smiles_column_name: null
     delimiter: ","
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list

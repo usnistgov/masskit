@@ -47,7 +47,15 @@ command line of the format `batch_converter input.file.names=my_sdf.sdf output.f
 ### CSV file to small molecule libraries
 
 To convert an CSV file that includes SMILES molecular specifications into
-parquet format, use a command line of the format `batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet]`.
+parquet format, use a command line of the format `batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet]`. Options for csv parsing:
+
+* `conversion.csv.no_column_headers`, set this to true if the csv file does not have column headers. In this case, the columns will be named `f0`, `f1`, ...
+* the default SMILES column name is `SMILES` if there is a header and `f0` if not. To change the column name, set `conversion.csv.smiles_column_name`
+* use `conversion.csv.delimiter`, set to the column delimiter.  Tab delimited is `conversion.csv.delimiter="\t"`
+* the default rdkit Mol column name is "mol". To change this, use `conversion.csv.mol_column_name`
+
+Examples:
+To read in a headerless tab delimited file with the SMILES in the second column, `batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet] conversion.csv.no_column_headers=true conversion.csv.smiles_column_name=f1 conversion.csv.delimiter="\t"`
 
 #### SDF files with incorrect encoding or pre-v2000 format
 
