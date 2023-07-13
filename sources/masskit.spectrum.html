@@ -85,11 +85,1759 @@ $(document).ready(function(){
 </dd></dl>
 
 </section>
-<section id="masskit-spectrum-join-module">
-<h2>masskit.spectrum.join module<a class="headerlink" href="#masskit-spectrum-join-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.spectrum.join">
+<span id="masskit-spectrum-join-module"></span><h2>masskit.spectrum.join module<a class="headerlink" href="#module-masskit.spectrum.join" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.join.</span></span><span class="sig-name descname"><span class="pre">Join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.do_join">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">do_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.do_join" title="Permalink to this definition">¶</a></dt>
+<dd><p>do the join</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tiebreaker</strong> – how to deal with one to multiple matches. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.join_2_spectra">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">join_2_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectra1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectra2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.join_2_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>left join of two spectra.  iterate through all peaks for spectra1 and return joined spectra2 peaks.
+results also include unmatched spectra1 (left) peaks</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectra1</strong> – first spectra. all peaks included in result</p></li>
+<li><p><strong>spectra2</strong> – second spectra</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in spectra1. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of peak ids from spectrum1, list of peak ids from spectrum2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.join_3_spectra">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">join_3_spectra</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experimental_spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">predicted_spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theoretical_spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.join_3_spectra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Join the peaks in a single experimental spectrum to a predicted spectrum and a theoretical spectrum.
+The join lists returned include all experimental and predicted peaks, but only the theoretical
+peaks that match the experimental spectra (and not necessarily the predicted spectrum).
+Note that it is possible to get a join where the theoretical peak matches the experimental peak but
+not the predicted peak.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>experimental_spectrum</strong> – the experimental spectrum</p></li>
+<li><p><strong>predicted_spectrum</strong> – the predicted spectrum</p></li>
+<li><p><strong>theoretical_spectrum</strong> – the annotated theoretical spectrum</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>3 lists with the peak ids. first is experimental peaks matching the theoretical peaks. Second are the predicted peaks that match the experimental peaks. Third are the theoretical peaks that match the experimental peaks.  A value of None indicates no join.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.list2float32">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list2float32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.list2float32" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.list2float64">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list2float64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.list2float64" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.list2int16">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list2int16</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.list2int16" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.list2uint16">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list2uint16</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.list2uint16" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.list2uint32">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list2uint32</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.list2uint32" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.list2uint64">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">list2uint64</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">list_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.list2uint64" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.Join.to_pandas">
+<span class="sig-name descname"><span class="pre">to_pandas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.Join.to_pandas" title="Permalink to this definition">¶</a></dt>
+<dd><p>output the join results as a pandas dataframe</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.join.PairwiseJoin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.join.</span></span><span class="sig-name descname"><span class="pre">PairwiseJoin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp_lib_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theo_lib_map</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.PairwiseJoin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.join.Join" title="masskit.spectrum.join.Join"><code class="xref py py-class docutils literal notranslate"><span class="pre">Join</span></code></a></p>
+<p>Join 2 sets of spectra</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.PairwiseJoin.do_join">
+<span class="sig-name descname"><span class="pre">do_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.PairwiseJoin.do_join" title="Permalink to this definition">¶</a></dt>
+<dd><p>do the join</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tiebreaker</strong> – how to deal with one to multiple matches. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.join.ThreewayJoin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.join.</span></span><span class="sig-name descname"><span class="pre">ThreewayJoin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">exp_lib_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pred_lib_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">theo_lib_map</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.ThreewayJoin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.join.Join" title="masskit.spectrum.join.Join"><code class="xref py py-class docutils literal notranslate"><span class="pre">Join</span></code></a></p>
+<p>Join 3 sets of spectra. The join lists returned include all experimental and predicted peaks, but only the
+theoretical peaks that match the experimental spectra (and not the predicted spectrum).
+Note that it is possible to get a join where the theoretical peak matches the experimental peak but
+not the predicted peak.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.join.ThreewayJoin.do_join">
+<span class="sig-name descname"><span class="pre">do_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mz'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.join.ThreewayJoin.do_join" title="Permalink to this definition">¶</a></dt>
+<dd><p>do the join</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tiebreaker</strong> – how to deal with one to multiple matches. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="masskit-spectrum-spectrum-module">
-<h2>masskit.spectrum.spectrum module<a class="headerlink" href="#masskit-spectrum-spectrum-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.spectrum.spectrum">
+<span id="masskit-spectrum-spectrum-module"></span><h2>masskit.spectrum.spectrum module<a class="headerlink" href="#module-masskit.spectrum.spectrum" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.AccumulatorSpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">AccumulatorSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">count_spectra</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.AccumulatorSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.spectrum.Spectrum" title="masskit.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a>, <a class="reference internal" href="masskit.html#masskit.accumulator.Accumulator" title="masskit.accumulator.Accumulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Accumulator</span></code></a></p>
+<p>used to contain a spectrum that accumulates the sum of many spectra
+includes calculation of standard deviation</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.AccumulatorSpectrum.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.AccumulatorSpectrum.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a spectrum to the average.  Keeps running total of average and std deviation using
+Welford’s algorithm.  This API assumes that the spectrum being added is also evenly spaced
+with the same mz values.  However, the new spectrum doesn’t have to have the same max_mz as
+the summation spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_item</strong> – new spectrum to be added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.AccumulatorSpectrum.cosine_score">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cosine_score</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.AccumulatorSpectrum.cosine_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>cosine score on product ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum2</strong> – spectrum to compare against</p></li>
+<li><p><strong>use_same_tolerance</strong> – evaluate cosine score by using the mass tolerance for this spectrum for spectrum2</p></li>
+<li><p><strong>mz_power</strong> – what power to raise the mz value for each peak</p></li>
+<li><p><strong>intensity_power</strong> – what power to raise the intensity for each peak</p></li>
+<li><p><strong>scale</strong> – what value to scale the score by</p></li>
+<li><p><strong>skip_denom</strong> – skip computing the denominator</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in spectra1. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cosine score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.AccumulatorSpectrum.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.AccumulatorSpectrum.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>finalize the std deviation after all the the spectra have been added</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.AccumulatorSpectrum.prop_names">
+<span class="sig-name descname"><span class="pre">prop_names</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#masskit.spectrum.spectrum.AccumulatorSpectrum.prop_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">HiResIons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.spectrum.Ions" title="masskit.spectrum.spectrum.Ions"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ions</span></code></a></p>
+<p>for containing high mass resolution ions</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.cast_intensity">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cast_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.cast_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>cast a single mz value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.cast_mz">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cast_mz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.cast_mz" title="Permalink to this definition">¶</a></dt>
+<dd><p>cast a single mz value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.change_mass_info">
+<span class="sig-name descname"><span class="pre">change_mass_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.change_mass_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a new mass info, recalculate tolerance bins</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass_info</strong> – the MassInfo structure to change to</p></li>
+<li><p><strong>inplace</strong> – if true, change in place, otherwise return copy</p></li>
+<li><p><strong>take_max</strong> – for each bin take the maximum intensity ion, otherwise sum all ions mapping to the bin</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.create_starts_stops">
+<span class="sig-name descname"><span class="pre">create_starts_stops</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.create_starts_stops" title="Permalink to this definition">¶</a></dt>
+<dd><p>create start and stop arrays</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.intersect">
+<span class="sig-name descname"><span class="pre">intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the intersections between two high resolution ion series.  calls standalone function to allow use of
+numba</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>comparison_ions</strong> – the ion series to compare to</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in spectra1. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>matched peak indexes in self, matched peak indexes in comparison_ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.starts">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">starts</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.starts" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the start positions for each peak bin</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResIons.stops">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stops</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResIons.stops" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the stop positions for each peak bin</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.HiResSpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">HiResSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precursor_mass_info=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product_mass_info=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nce=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_class=&lt;class</span> <span class="pre">'masskit.spectrum.spectrum.HiResIons'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mz=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_intensity=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stops=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_arrays=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.HiResSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.spectrum.Spectrum" title="masskit.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">Ions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_info</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#masskit.spectrum.spectrum.MassInfo" title="masskit.spectrum.spectrum.MassInfo"><span class="pre">MassInfo</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">jitter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_arrays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>base class for a series of ions</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.annotations">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">annotations</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.annotations" title="Permalink to this definition">¶</a></dt>
+<dd><p>per peak annotations</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.cast_intensity">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cast_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.cast_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>cast a single mz value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.cast_mz">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">cast_mz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.cast_mz" title="Permalink to this definition">¶</a></dt>
+<dd><p>cast a single mz value</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.clear_and_intersect">
+<span class="sig-name descname"><span class="pre">clear_and_intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ion2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.clear_and_intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>_
+if indices are not provided, clear the ions of both self and ion2 of zero intensity peaks
+then intersect</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ion2</strong> – comparison ions</p></li>
+<li><p><strong>index1</strong> – intersection indices for self (can be None)</p></li>
+<li><p><strong>index2</strong> – intersection indices for ion2 (can be None)</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in spectra1. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>_description_</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.clear_computed_properties">
+<span class="sig-name descname"><span class="pre">clear_computed_properties</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.clear_computed_properties" title="Permalink to this definition">¶</a></dt>
+<dd><p>clear properties that are lazy computed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>returns self</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>create filtered version of self.  This is essentially a copy constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_mz</strong> – minimum mz value</p></li>
+<li><p><strong>max_mz</strong> – maximum mz value.  0 = ignore</p></li>
+<li><p><strong>min_intensity</strong> – minimum intensity value</p></li>
+<li><p><strong>max_intensity</strong> – maximum intensity value.  0 = ignore</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>copy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.copy_annot">
+<span class="sig-name descname"><span class="pre">copy_annot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ion2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.copy_annot" title="Permalink to this definition">¶</a></dt>
+<dd><p>copy annotations from ion2 to this set of ions using the matched ion indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ion2</strong> – the ions to compare against</p></li>
+<li><p><strong>index1</strong> – matched ions in this set of ions</p></li>
+<li><p><strong>index2</strong> – matched ions in ions2</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.cosine_score">
+<span class="sig-name descname"><span class="pre">cosine_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ion2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index1</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index2</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_denom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.cosine_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate the cosine score between this set of ions and ions2</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ion2</strong> – the ions to compare against</p></li>
+<li><p><strong>index1</strong> – matched ions in this set of ions</p></li>
+<li><p><strong>index2</strong> – matched ions in ions2</p></li>
+<li><p><strong>mz_power</strong> – what power to raise the mz value for each peak</p></li>
+<li><p><strong>intensity_power</strong> – what power to raise the intensity for each peak</p></li>
+<li><p><strong>scale</strong> – what value to scale the score by</p></li>
+<li><p><strong>skip_denom</strong> – skip computing the denominator</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in self. mz is closest mz value, intensity is closest intensity, None is no tiebreaking</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cosine score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.evenly_space">
+<span class="sig-name descname"><span class="pre">evenly_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.evenly_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert ions to  product ions with evenly spaced m/z bins.  The m/z bins are centered on
+multiples of tolerance * 2.  Multiple ions that map to the same bin are either summed or the max taken of the
+ion intensities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tolerance</strong> – the mass tolerance of the evenly spaced m/z bins (bin width is twice this value) in daltons</p></li>
+<li><p><strong>take_max</strong> – for each bin take the maximum intensity ion, otherwise sum all ions mapping to the bin</p></li>
+<li><p><strong>max_mz</strong> – maximum mz value, 2000 by default</p></li>
+<li><p><strong>include_zeros</strong> – fill out array including bins with zero intensity</p></li>
+<li><p><strong>take_sqrt</strong> – take the sqrt of the intensities</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter ions by mz and/or intensity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_mz</strong> – minimum mz value, exclusive</p></li>
+<li><p><strong>max_mz</strong> – maximum mz value, inclusive.  0 = ignore</p></li>
+<li><p><strong>min_intensity</strong> – minimum intensity value, exclusive</p></li>
+<li><p><strong>max_intensity</strong> – maximum intensity value, inclusive.  0 = ignore</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions, otherwise create copy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filtered copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.half_tolerance">
+<span class="sig-name descname"><span class="pre">half_tolerance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.half_tolerance" title="Permalink to this definition">¶</a></dt>
+<dd><p>calculate 1/2 of the tolerance interval</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mz</strong> – mz value</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>1/2 tolerance interval</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.intensity">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">intensity</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.intensity" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the intensity of the precursor.  could be a numpy array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.intersect">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">comparison_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.intersect" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.ions2array">
+<span class="sig-name descname"><span class="pre">ions2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">array</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bin_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">insert_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_norm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rand_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">down_shift</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">channel_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev_channel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.ions2array" title="Permalink to this definition">¶</a></dt>
+<dd><p>fill out an array of fixed size with the ions.  note that this func assumes spectra sorted by mz</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>array</strong> – the array to fill out</p></li>
+<li><p><strong>channel</strong> – which channel to fill out in the array</p></li>
+<li><p><strong>bin_size</strong> – the size of each bin in the array</p></li>
+<li><p><strong>precursor</strong> – if nonzero, use this value to invert the spectra by subtracting mz from this value</p></li>
+<li><p><strong>intensity_norm</strong> – value to norm the intensity</p></li>
+<li><p><strong>insert_mz</strong> – instead of putting the normalized intensity in the array, put in the normalized mz</p></li>
+<li><p><strong>mz_norm</strong> – the value to use to norm the mz values inserted</p></li>
+<li><p><strong>rand_intensity</strong> – if not 0, multiply each intensity by random value 1 +/- rand_intensity</p></li>
+<li><p><strong>down_shift</strong> – shift mz down by this value in Da</p></li>
+<li><p><strong>channel_first</strong> – channel before spectrum in input array (pytorch style).  tensorflow is channel last.</p></li>
+<li><p><strong>take_max</strong> – take the maximum intensity in a bin rather the sum of peaks in a bin</p></li>
+<li><p><strong>stddev_channel</strong> – which channel contains the std dev.  None means no std dev</p></li>
+<li><p><strong>take_sqrt</strong> – take the square root of the intensity</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.join">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">join</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns a dictionary with information on how to join this ion set to another ion set, such as for annotation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>mask out ions that are pointed to by the indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indices</strong> – indices of ions to screen out or numpy boolean mask</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>masked copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.mask_ions">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mask_ions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_ions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.mask_ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>mask out a set of ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mask</strong> – boolean mask</p></li>
+<li><p><strong>return_ions</strong> – ions to be masked</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>masked ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.mass_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mass_type</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.mass_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">merge_ions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>merge another set of ions into this one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>merge_ions</strong> – the ions to add in</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>merged copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.mz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mz</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.mz" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the mz of the precursor.  could be a numpy array.  optionally adds a jitter to the m/z values</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.neutral_loss">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">neutral_loss</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.neutral_loss" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.neutral_loss_charge">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">neutral_loss_charge</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.neutral_loss_charge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.norm">
+<span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_intensity_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>norm the intensities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_intensity_in</strong> – the intensity of the most intense peak</p></li>
+<li><p><strong>keep_type</strong> – keep the type of the intensity array</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions, otherwise create copy</p></li>
+<li><p><strong>ord</strong> – if set, normalize using norm order as in np.linalg.norm. 2 = l2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normed copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.num_ions">
+<span class="sig-name descname"><span class="pre">num_ions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.num_ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of ions in spectrum
+:return: number of ions in spectrum</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.parent_filter">
+<span class="sig-name descname"><span class="pre">parent_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h2o</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.parent_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter parent ions, including water losses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h2o</strong> – filter out water losses</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions, otherwise create copy</p></li>
+<li><p><strong>precursor_mz</strong> – precursor m/z</p></li>
+<li><p><strong>charge</strong> – charge of precursor</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filtered copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.rank">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rank</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.rank" title="Permalink to this definition">¶</a></dt>
+<dd><p>return ranks of peaks by intensity
+1=most intense, rank is integer over the size of the intensity matrix</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the rank of the ions by intensity.  could be a numpy array.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.rank_ions">
+<span class="sig-name descname"><span class="pre">rank_ions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.rank_ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>rank the ions. intensity rank, 1=most intense, rank is integer over the size of the intensity matrix</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.shift_mz">
+<span class="sig-name descname"><span class="pre">shift_mz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.shift_mz" title="Permalink to this definition">¶</a></dt>
+<dd><p>shift the mz values of all ions by the value of shift.  Negative ions are masked out</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shift</strong> – value to shift mz</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>masked copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.stddev">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stddev</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.stddev" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>the std dev of the intensity per peak</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.tolerance">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tolerance</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.tolerance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.tolerance_interval">
+<span class="sig-name descname"><span class="pre">tolerance_interval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.tolerance_interval" title="Permalink to this definition">¶</a></dt>
+<dd><p>use the mass tolerance to return the tolerance around a peak</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>mz</strong> – the peak mz in daltons</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the start and stop of the tolerance interval</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.tolerance_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tolerance_type</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.tolerance_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.total_intensity">
+<span class="sig-name descname"><span class="pre">total_intensity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.total_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>total intensity of ions
+:return: total intensity</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Ions.windowed_filter">
+<span class="sig-name descname"><span class="pre">windowed_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">7</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Ions.windowed_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter ions by examining peaks in order of intensity and filtering peaks within a window</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mz_window</strong> – half size of mz_window for filtering.  0 = no filtering</p></li>
+<li><p><strong>num_ions</strong> – number of ions allowed in full mz_window</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions, otherwise create copy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filtered copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.IonsIterator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">IonsIterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ions</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.IonsIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>iterator over ion mz and intensity</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.MassInfo">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">MassInfo</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tolerance_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neutral_loss</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">neutral_loss_charge</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">evenly_spaced</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_struct_accessor</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">arrow_struct_scalar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.MassInfo" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>information about mass measurements of an ion peak</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">Spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">precursor_mass_info=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product_mass_info=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">name=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ev=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nce=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_class=&lt;class</span> <span class="pre">'masskit.spectrum.spectrum.HiResIons'&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">struct=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mz=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_intensity=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stops=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_arrays=False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Base class for spectrum with called ions.
+The props attribute is a dict that contains any structured data</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.add_join">
+<span class="sig-name descname"><span class="pre">add_join</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">join</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">joined_spectrum</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.add_join" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a join and a corresponding joined spectrum</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>join</strong> – the result of the join expressed as a arrow struct</p></li>
+<li><p><strong>joined_spectrum</strong> – the spectrum object that is joined to this spectrum via the join</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.aromatic_rings">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">aromatic_rings</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.aromatic_rings" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.casno">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">casno</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.casno" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.change_mass_info">
+<span class="sig-name descname"><span class="pre">change_mass_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mass_info</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.change_mass_info" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a new mass info for product ions, recalculate tolerance bins</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mass_info</strong> – the MassInfo structure to change to</p></li>
+<li><p><strong>inplace</strong> – if true, change in place, otherwise return copy</p></li>
+<li><p><strong>take_max</strong> – for each bin take the maximum intensity ion, otherwise sum all ions mapping to the bin</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.charge">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">charge</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.charge" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.collision_energy">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">collision_energy</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.collision_energy" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.collision_gas">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">collision_gas</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.collision_gas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.column">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">column</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.column" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.composition">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">composition</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.composition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>create filtered version of self.  This is essentially a copy constructor</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_mz</strong> – minimum mz value</p></li>
+<li><p><strong>max_mz</strong> – maximum mz value.  0 = ignore</p></li>
+<li><p><strong>min_intensity</strong> – minimum intensity value</p></li>
+<li><p><strong>max_intensity</strong> – maximum intensity value.  0 = ignore</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>copy</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.copy_annot">
+<span class="sig-name descname"><span class="pre">copy_annot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.copy_annot" title="Permalink to this definition">¶</a></dt>
+<dd><p>copy annotations from spectrum2 to this spectrum using the matched ion indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>spectrum2</strong> – the ions to compare against</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.copy_props_from_dict">
+<span class="sig-name descname"><span class="pre">copy_props_from_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dict_in</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.copy_props_from_dict" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a dictionary, e.g. a row, copy allowed properties in the spectrum props</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>dict_in</strong> – the input dictionary.  Allowed properties are in self.prop_names</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.cosine_score">
+<span class="sig-name descname"><span class="pre">cosine_score</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_same_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_denom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.cosine_score" title="Permalink to this definition">¶</a></dt>
+<dd><p>cosine score on product ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum2</strong> – spectrum to compare against</p></li>
+<li><p><strong>use_same_tolerance</strong> – evaluate cosine score by using the mass tolerance for this spectrum for spectrum2</p></li>
+<li><p><strong>mz_power</strong> – what power to raise the mz value for each peak</p></li>
+<li><p><strong>intensity_power</strong> – what power to raise the intensity for each peak</p></li>
+<li><p><strong>scale</strong> – what value to scale the score by</p></li>
+<li><p><strong>skip_denom</strong> – skip computing the denominator</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in spectra1. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>cosine score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.create_fingerprint">
+<span class="sig-name descname"><span class="pre">create_fingerprint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.create_fingerprint" title="Permalink to this definition">¶</a></dt>
+<dd><p>create a fingerprint that corresponds to the spectra.  Each bit position
+corresponds to an integer mz value and is set if the intensity is above min_intensity</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>max_mz</strong> – the length of the fingerprint (also corresponds to maximum mz value)</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>SpectrumTanimotoFingerPrint</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.draw_spectrum">
+<span class="sig-name descname"><span class="pre">draw_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fig_format</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.draw_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.ecfp4">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ecfp4</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.ecfp4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.ecfp4_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ecfp4_count</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.ecfp4_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.estimated_ri">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimated_ri</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.estimated_ri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.estimated_ri_error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">estimated_ri_error</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.estimated_ri_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.ev">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ev</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.ev" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.evenly_space">
+<span class="sig-name descname"><span class="pre">evenly_space</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_zeros</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">take_sqrt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.evenly_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert product ions to product ions with evenly spaced m/z bins.  The m/z bins are centered on
+multiples of tolerance * 2.  Multiple ions that map to the same bin are either summed or the max taken of the
+ion intensities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>tolerance</strong> – the mass tolerance of the evenly spaced m/z bins (bin width is twice this value) in daltons</p></li>
+<li><p><strong>take_max</strong> – for each bin take the maximum intensity ion, otherwise sum all ions mapping to the bin</p></li>
+<li><p><strong>max_mz</strong> – maximum mz value, 2000 by default</p></li>
+<li><p><strong>include_zeros</strong> – fill out array including bins with zero intensity</p></li>
+<li><p><strong>inplace</strong> – do operation on current spectrum, otherwise create copy</p></li>
+<li><p><strong>take_sqrt</strong> – take the sqrt of the intensities</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normed copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.exact_mass">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exact_mass</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.exact_mass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.exact_mw">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">exact_mw</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.exact_mw" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.experimental_ri">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">experimental_ri</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.experimental_ri" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.experimental_ri_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">experimental_ri_data</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.experimental_ri_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.experimental_ri_error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">experimental_ri_error</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.experimental_ri_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.filter">
+<span class="sig-name descname"><span class="pre">filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">min_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter a spectrum by mz and/or intensity.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>min_mz</strong> – minimum mz value</p></li>
+<li><p><strong>max_mz</strong> – maximum mz value.  0 = ignore</p></li>
+<li><p><strong>min_intensity</strong> – minimum intensity value</p></li>
+<li><p><strong>max_intensity</strong> – maximum intensity value.  0 = ignore</p></li>
+<li><p><strong>inplace</strong> – do operation on current spectrum, otherwise create copy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filtered copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.filtered">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">filtered</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.filtered" title="Permalink to this definition">¶</a></dt>
+<dd><p>filtered version of product ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>function used to clean up spectrum after creation</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.formula">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">formula</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.formula" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.from_arrays">
+<span class="sig-name descname"><span class="pre">from_arrays</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mass_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product_mass_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_arrays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">starts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.from_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update or initialize from a series of arrays and the information in rows.  precursor information
+is pulled from rows unless precursor_mz and/or procursor_intensity are provided.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mz</strong> – mz array</p></li>
+<li><p><strong>intensity</strong> – intensity array</p></li>
+<li><p><strong>stddev</strong> – standard deviation of intensity</p></li>
+<li><p><strong>row</strong> – dict containing parameters and precursor info</p></li>
+<li><p><strong>precursor_mz</strong> – precursor_mz value, used preferentially to row</p></li>
+<li><p><strong>precursor_intensity</strong> – precursor intensity, optional</p></li>
+<li><p><strong>annotations</strong> – annotations on the ions</p></li>
+<li><p><strong>precursor_mass_info</strong> – MassInfo mass measurement information for the precursor</p></li>
+<li><p><strong>product_mass_info</strong> – MassInfo mass measurement information for the product</p></li>
+<li><p><strong>starts</strong> – starts array</p></li>
+<li><p><strong>stops</strong> – stops array</p></li>
+<li><p><strong>copy_arrays</strong> – if the inputs are numpy arrays, make copies</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.from_arrow">
+<span class="sig-name descname"><span class="pre">from_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_arrays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.from_arrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update or initialize from an arrow row object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row</strong> – row object from which to extract the spectrum information</p></li>
+<li><p><strong>copy_arrays</strong> – if the inputs are numpy arrays, make copies</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.from_mol">
+<span class="sig-name descname"><span class="pre">from_mol</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'NISTNO'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'int'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.from_mol" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize from rdkit mol</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – rdkit mol</p></li>
+<li><p><strong>skip_expensive</strong> – skip the expensive calculations</p></li>
+<li><p><strong>id_field</strong> – field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field)</p></li>
+<li><p><strong>id_field_type</strong> – the id field type, such as int or str</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.from_struct">
+<span class="sig-name descname"><span class="pre">from_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">copy_arrays</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.from_struct" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update or initialize from an arrow struct object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>row</strong> – row object from which to extract the spectrum information</p></li>
+<li><p><strong>copy_arrays</strong> – if the inputs are numpy arrays, make copies</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.get_float_prop">
+<span class="sig-name descname"><span class="pre">get_float_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.get_float_prop" title="Permalink to this definition">¶</a></dt>
+<dd><p>read a molecular property, and parse it as a float, ignoring non number characters
+doesn’t currently deal with exponentials</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – the rdkit molecule</p></li>
+<li><p><strong>prop_name</strong> – the name of the property</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>property value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.get_int_prop">
+<span class="sig-name descname"><span class="pre">get_int_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.get_int_prop" title="Permalink to this definition">¶</a></dt>
+<dd><p>read a molecular property, and parse it as a int, ignoring non number characters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – the rdkit molecule</p></li>
+<li><p><strong>prop_name</strong> – the name of the property</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>property value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.get_ion_annotation">
+<span class="sig-name descname"><span class="pre">get_ion_annotation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">i</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_ppm</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tex_style</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.get_ion_annotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>get the text annotations for a given ion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>i</strong> – index of the ion</p></li>
+<li><p><strong>show_ppm</strong> – show a calcuated ppm</p></li>
+<li><p><strong>tex_style</strong> – text annotations use tex for formatting</p></li>
+<li><p><strong>show_mz</strong> – show mz values in the text</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.get_prop">
+<span class="sig-name descname"><span class="pre">get_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.get_prop" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a property from property list with None as default</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>name</strong> – property name</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.get_props">
+<span class="sig-name descname"><span class="pre">get_props</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.get_props" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns back all properties for this object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of properties</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.get_string_prop">
+<span class="sig-name descname"><span class="pre">get_string_prop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">prop_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.get_string_prop" title="Permalink to this definition">¶</a></dt>
+<dd><p>read a molecular property, dealing with unicode decoding error (rdkit uses UTF-8)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – the rdkit molecule</p></li>
+<li><p><strong>prop_name</strong> – the name of the property</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>property value</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.has_2d">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_2d</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.has_2d" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.has_conformer">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_conformer</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.has_conformer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.has_tms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">has_tms</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.has_tms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.hba">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hba</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.hba" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.hbd">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">hbd</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.hbd" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">id</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.identity">
+<span class="sig-name descname"><span class="pre">identity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identity_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">identity_energy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.identity" title="Permalink to this definition">¶</a></dt>
+<dd><p>check to see if this spectrum and the passed in spectrum have the same chemical structure</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum</strong> – comparison spectrum</p></li>
+<li><p><strong>identity_name</strong> – require the name to match in addition to the inchi_key</p></li>
+<li><p><strong>identity_energy</strong> – require the collision_energy to match in addition to the inchi_key</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>are they identical?</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.inchi_key">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inchi_key</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.inchi_key" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.inchi_key_orig">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">inchi_key_orig</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.inchi_key_orig" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.insource_voltage">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">insource_voltage</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.insource_voltage" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.instrument">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instrument</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.instrument" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.instrument_model">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instrument_model</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.instrument_model" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.instrument_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">instrument_type</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.instrument_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.intersect">
+<span class="sig-name descname"><span class="pre">intersect</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.intersect" title="Permalink to this definition">¶</a></dt>
+<dd><p>intersect product ions with another spectrum’s product ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum2</strong> – comparison spectrum</p></li>
+<li><p><strong>tiebreaker</strong> – how to deal with one to multiple matches to peaks in spectra1. mz is closest mz value, intensity is closest intensity, None is report multiple matches</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>matched ions indices in this spectrum, matched ion indices in comparison spectrum</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.ion_mode">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ion_mode</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.ion_mode" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.ionization">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ionization</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.ionization" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.isomeric_smiles">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">isomeric_smiles</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.isomeric_smiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.mask">
+<span class="sig-name descname"><span class="pre">mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.mask" title="Permalink to this definition">¶</a></dt>
+<dd><p>mask out product ions that are pointed to by the indices</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indices</strong> – indices of ions to screen out or numpy boolean mask</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>masked copy if not inplace, otherwise current spectrum</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">merge_spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.merge" title="Permalink to this definition">¶</a></dt>
+<dd><p>merge the product ions of another spectrum into this one.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>merge_spectrum</strong> – the spectrum whose product ions will be merged in</p></li>
+<li><p><strong>inplace</strong> – do operation on current spectrum</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>merged copy if not inplace, otherwise current spectrum</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.mod_names">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mod_names</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.mod_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.mod_positions">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mod_positions</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.mod_positions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.name">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">name</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.nce">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">nce</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.nce" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.norm">
+<span class="sig-name descname"><span class="pre">norm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_intensity_in</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keep_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ord</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.norm" title="Permalink to this definition">¶</a></dt>
+<dd><p>norm the product intensities</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>max_intensity_in</strong> – the intensity of the most intense peak</p></li>
+<li><p><strong>keep_type</strong> – keep the type of the intensity array</p></li>
+<li><p><strong>inplace</strong> – do operation on current spectrum, otherwise create copy</p></li>
+<li><p><strong>ord</strong> – if set, normalize using norm order as in np.linalg.norm. 2 = l2</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>normed copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.num_atoms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_atoms</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.num_atoms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.num_ions">
+<span class="sig-name descname"><span class="pre">num_ions</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.num_ions" title="Permalink to this definition">¶</a></dt>
+<dd><p>number of product ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>number of ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.num_undef_double">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_undef_double</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.num_undef_double" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.num_undef_stereo">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">num_undef_stereo</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.num_undef_stereo" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.parent_filter">
+<span class="sig-name descname"><span class="pre">parent_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">h2o</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.parent_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter parent ions, including water losses.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h2o</strong> – filter out water losses</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions, otherwise create copy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filtered copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.peptide">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">peptide</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.peptide" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.peptide_len">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">peptide_len</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.peptide_len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.peptide_type">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">peptide_type</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.peptide_type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.plot">
+<span class="sig-name descname"><span class="pre">plot</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">axes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_spectrum</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">xlabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'m/z'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ylabel</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'Intensity'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_mz</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">1,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mirror_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stddev_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.3,</span> <span class="pre">0.3,</span> <span class="pre">0.3,</span> <span class="pre">0.5)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_label_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(1,</span> <span class="pre">0,</span> <span class="pre">0,</span> <span class="pre">1)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot_stddev</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_cutoff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vertical_multiplier</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_label</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">right_label_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">left_label_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_xticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_yticks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">linewidth</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>make a spectrum plot using matplotlib.  if mirror_spectrum is specified, will do a mirror plot</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>axes</strong> – matplotlib axis</p></li>
+<li><p><strong>mirror_spectrum</strong> – spectrum to mirror plot (optional)</p></li>
+<li><p><strong>mirror</strong> – if true, mirror the plot if there are two spectra.  Otherwise plot the two spectra together</p></li>
+<li><p><strong>title</strong> – title of plot</p></li>
+<li><p><strong>xlabel</strong> – xlabel of plot</p></li>
+<li><p><strong>ylabel</strong> – ylabel of plot</p></li>
+<li><p><strong>title_size</strong> – size of title font</p></li>
+<li><p><strong>label_size</strong> – size of x and y axis label fonts</p></li>
+<li><p><strong>max_mz</strong> – maximum mz to plot</p></li>
+<li><p><strong>min_mz</strong> – minimum mz to plot</p></li>
+<li><p><strong>color</strong> – color of spectrum specified as RBGA tuple</p></li>
+<li><p><strong>mirror_color</strong> – color of mirrored spectrum specified as RGBA tuple</p></li>
+<li><p><strong>stddev_color</strong> – color of error bars</p></li>
+<li><p><strong>left_label_color</strong> – color of the left top label</p></li>
+<li><p><strong>normalize</strong> – if specified, norm the spectra to this value.</p></li>
+<li><p><strong>plot_stddev</strong> – if true, plot the standard deviation</p></li>
+<li><p><strong>vertical_cutoff</strong> – if the intensity/max_intensity is below this value, don’t plot the vertical line</p></li>
+<li><p><strong>vertical_multiplier</strong> – multiply times y max values to create white space</p></li>
+<li><p><strong>right_label</strong> – label for the top right of the fiture</p></li>
+<li><p><strong>left_label</strong> – label for the top left of the figure</p></li>
+<li><p><strong>right_label_size</strong> – size of label for the top right of the fiture</p></li>
+<li><p><strong>left_label_size</strong> – size of label for the top left of the figure</p></li>
+<li><p><strong>no_xticks</strong> – turn off x ticks and labels</p></li>
+<li><p><strong>no_yticks</strong> – turn off y ticks and lables</p></li>
+<li><p><strong>linewidth</strong> – width of plotted lines</p></li>
+<li><p><strong>annotate</strong> – if peptide spectra, annotate ions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>peak_collection, mirror_peak_collection sets of peaks for picking</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.precursor_mz">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">precursor_mz</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.precursor_mz" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.props">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">props</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.props" title="Permalink to this definition">¶</a></dt>
+<dd><p>get property list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>property list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.protein_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">protein_id</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.protein_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.retention_time">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">retention_time</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.retention_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.rotatable_bonds">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rotatable_bonds</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.rotatable_bonds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.sample_inlet">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">sample_inlet</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.sample_inlet" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.scan">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">scan</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.scan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.set">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">set</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.set" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.shift_mz">
+<span class="sig-name descname"><span class="pre">shift_mz</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shift</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.shift_mz" title="Permalink to this definition">¶</a></dt>
+<dd><p>shift the mz values of all product ions by the value of shift.  Negative ions are masked out</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shift</strong> – value to shift mz</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>masked copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.single_match">
+<span class="sig-name descname"><span class="pre">single_match</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">minimum_match</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cosine_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cosine_score_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.single_match" title="Permalink to this definition">¶</a></dt>
+<dd><p>try to match two spectra and calculate the probability of a match</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum</strong> – the spectrum to match against</p></li>
+<li><p><strong>cosine_threshold</strong> – minimum score to return results</p></li>
+<li><p><strong>minimum_match</strong> – minimum number of matching peaks</p></li>
+<li><p><strong>cosine_score_scale</strong> – max value of cosine score</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>query id, hit id, cosine score, number of matching peaks</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.smiles">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">smiles</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.smiles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.spectrum_fp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spectrum_fp</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.spectrum_fp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.spectrum_fp_count">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spectrum_fp_count</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.spectrum_fp_count" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.stdnp">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stdnp</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.stdnp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.stdnp_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stdnp_data</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.stdnp_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.stdnp_error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stdnp_error</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.stdnp_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.stdpolar">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stdpolar</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.stdpolar" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.stdpolar_data">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stdpolar_data</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.stdpolar_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.stdpolar_error">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">stdpolar_error</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.stdpolar_error" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.synonyms">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">synonyms</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.synonyms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.to_msp">
+<span class="sig-name descname"><span class="pre">to_msp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">annotate_peptide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.to_msp" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert a spectrum to an msp file entry, encoded as a string</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>annotate_peptide</strong> – annotate as a peptide</p></li>
+<li><p><strong>ion_types</strong> – ion types for annotation</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>string containing spectrum in msp format</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.total_intensity">
+<span class="sig-name descname"><span class="pre">total_intensity</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.total_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>total intensity of product ions</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>total intensity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.tpsa">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">tpsa</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.tpsa" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.vial_id">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">vial_id</span></span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.vial_id" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.weighted_intensity">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">weighted_intensity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.weighted_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stein &amp; Scott 94 intensity weight</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>intensity</strong> – peak intensity</p></li>
+<li><p><strong>mz</strong> – peak mz in daltons</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>weighted intensity</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.Spectrum.windowed_filter">
+<span class="sig-name descname"><span class="pre">windowed_filter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mz_window</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_ions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.Spectrum.windowed_filter" title="Permalink to this definition">¶</a></dt>
+<dd><p>filter ions by examining peaks in order of intensity and filtering peaks within a window</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mz_window</strong> – half size of mz_window for filtering</p></li>
+<li><p><strong>num_ions</strong> – number of ions allowed in full mz_window</p></li>
+<li><p><strong>inplace</strong> – do operation on current ions, otherwise create copy</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>filtered copy if not inplace, otherwise current ions</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.cosine_score_calc">
+<span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">cosine_score_calc</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum1_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum1_intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum2_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum2_intensity</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mz_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">999</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_denom</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.cosine_score_calc" title="Permalink to this definition">¶</a></dt>
+<dd><p>the Stein and Scott 94 cosine score.  By convention, sqrt of score is taken and
+multiplied by 999.  separated out from class and placed here so that can be jit compiled by numba.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>spectrum1_mz</strong> – query spectrum mz</p></li>
+<li><p><strong>spectrum1_intensity</strong> – query spectrum intensity</p></li>
+<li><p><strong>spectrum2_mz</strong> – the comparison spectrum2 mz</p></li>
+<li><p><strong>spectrum2_intensity</strong> – the comparison spectrum2 intensity</p></li>
+<li><p><strong>index1</strong> – matched ions in spectrum1.  may include duplicate matches</p></li>
+<li><p><strong>index2</strong> – matched ions in spectrum2.  may include duplicate matches</p></li>
+<li><p><strong>mz_power</strong> – what power to raise the mz value for each peak</p></li>
+<li><p><strong>intensity_power</strong> – what power to raise the intensity for each peak</p></li>
+<li><p><strong>scale</strong> – what value to scale the score by</p></li>
+<li><p><strong>skip_denom</strong> – skip computing the denominator</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the cosine score</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.dedup_matches">
+<span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">dedup_matches</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">products1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">products2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiebreaker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'mz'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_nomatch</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.dedup_matches" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a series of indices to matched peaks in two product ion sets, get rid of duplicate matches to
+peaks in the first product ion set, using a tiebreaker.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>products1</strong> – first set of product ions</p></li>
+<li><p><strong>products2</strong> – second set of product ions</p></li>
+<li><p><strong>index1</strong> – indices into first set of product ions</p></li>
+<li><p><strong>index2</strong> – indices into the second set of product ions</p></li>
+<li><p><strong>tiebreaker</strong> – tiebreak by ‘intensity’ or ‘mz’ of duplicate matches. ‘delete’ means don’t match either.  defaults to ‘mz’</p></li>
+<li><p><strong>skip_nomatch</strong> – in the return values, skip missing matches to the first set of produc tions, defaults to True</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>matches of the first product ion set, matches of the second product ion set</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.intersect_hires">
+<span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">intersect_hires</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ions1_starts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ions1_stops</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ions2_starts</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ions2_stops</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.intersect_hires" title="Permalink to this definition">¶</a></dt>
+<dd><p>find the intersections between two high resolution ion series</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ions1_starts</strong> – start positions of the first ion series to compare</p></li>
+<li><p><strong>ions1_stops</strong> – stop positions of the first ion series to compare</p></li>
+<li><p><strong>ions2_starts</strong> – start positions of the second ion series to compare</p></li>
+<li><p><strong>ions2_stops</strong> – stop positions of the second ion series to compare</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>matched peak indexes in ions1, matched peak indexes in ion2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.my_intersect1d">
+<span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">my_intersect1d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ar1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ar2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.my_intersect1d" title="Permalink to this definition">¶</a></dt>
+<dd><p>simplified version of numpy intersect1d.  Pull outside of class so it can be jit compiled by numba (numba has only
+experimental class support).
+Note: this function does not work if there are ions in each spectra with identical mz!</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ar1</strong> – mz values for one spectra</p></li>
+<li><p><strong>ar2</strong> – mz values for another spectra</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>index of matches into array 1, index of matches into array 2</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.spectrum.spectrum.nce2ev">
+<span class="sig-prename descclassname"><span class="pre">masskit.spectrum.spectrum.</span></span><span class="sig-name descname"><span class="pre">nce2ev</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nce</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mz</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charge</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.spectrum.nce2ev" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert nce to ev.  Equation for QE and taken from 
+<a class="reference external" href="http://proteomicsnews.blogspot.com/2014/06/normalized-collision-energy-calculation.html">http://proteomicsnews.blogspot.com/2014/06/normalized-collision-energy-calculation.html</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nce</strong> – normalized collision energy</p></li>
+<li><p><strong>precursor_mz</strong> – precursor m/z</p></li>
+<li><p><strong>charge</strong> – charge</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>ev</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 <section id="module-masskit.spectrum.spectrum_plotting">
 <span id="masskit-spectrum-spectrum-plotting-module"></span><h2>masskit.spectrum.spectrum_plotting module<a class="headerlink" href="#module-masskit.spectrum.spectrum_plotting" title="Permalink to this heading">¶</a></h2>
@@ -309,8 +2057,28 @@ writes to a stream</p>
 </dd></dl>
 
 </section>
-<section id="masskit-spectrum-theoretical-spectrum-module">
-<h2>masskit.spectrum.theoretical_spectrum module<a class="headerlink" href="#masskit-spectrum-theoretical-spectrum-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.spectrum.theoretical_spectrum">
+<span id="masskit-spectrum-theoretical-spectrum-module"></span><h2>masskit.spectrum.theoretical_spectrum module<a class="headerlink" href="#module-masskit.spectrum.theoretical_spectrum" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.theoretical_spectrum.TheoreticalPeptideSpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.theoretical_spectrum.</span></span><span class="sig-name descname"><span class="pre">TheoreticalPeptideSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peptide</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">analysis_annotations</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_isotopes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.theoretical_spectrum.TheoreticalPeptideSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.theoretical_spectrum.TheoreticalSpectrum" title="masskit.spectrum.theoretical_spectrum.TheoreticalSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">TheoreticalSpectrum</span></code></a></p>
+<p>theoretical peptide spectrum</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.spectrum.theoretical_spectrum.TheoreticalSpectrum">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.spectrum.theoretical_spectrum.</span></span><span class="sig-name descname"><span class="pre">TheoreticalSpectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.theoretical_spectrum.TheoreticalSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.spectrum.spectrum.Spectrum" title="masskit.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a></p>
+<p>base class to contain a theoretical spectrum</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.spectrum.theoretical_spectrum.annotate_peptide_spectrum">
+<span class="sig-prename descclassname"><span class="pre">masskit.spectrum.theoretical_spectrum.</span></span><span class="sig-name descname"><span class="pre">annotate_peptide_spectrum</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">peptide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_charge</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mod_positions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.spectrum.theoretical_spectrum.annotate_peptide_spectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>annotate a spectrum with theoretically calculated ions</p>
+</dd></dl>
+
 </section>
 <section id="module-masskit.spectrum">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.spectrum" title="Permalink to this heading">¶</a></h2>
@@ -330,10 +2098,10 @@ writes to a stream</p>
 <li><a class="reference internal" href="#">masskit.spectrum package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
 <li><a class="reference internal" href="#module-masskit.spectrum.ipython">masskit.spectrum.ipython module</a></li>
-<li><a class="reference internal" href="#masskit-spectrum-join-module">masskit.spectrum.join module</a></li>
-<li><a class="reference internal" href="#masskit-spectrum-spectrum-module">masskit.spectrum.spectrum module</a></li>
+<li><a class="reference internal" href="#module-masskit.spectrum.join">masskit.spectrum.join module</a></li>
+<li><a class="reference internal" href="#module-masskit.spectrum.spectrum">masskit.spectrum.spectrum module</a></li>
 <li><a class="reference internal" href="#module-masskit.spectrum.spectrum_plotting">masskit.spectrum.spectrum_plotting module</a></li>
-<li><a class="reference internal" href="#masskit-spectrum-theoretical-spectrum-module">masskit.spectrum.theoretical_spectrum module</a></li>
+<li><a class="reference internal" href="#module-masskit.spectrum.theoretical_spectrum">masskit.spectrum.theoretical_spectrum module</a></li>
 <li><a class="reference internal" href="#module-masskit.spectrum">Module contents</a></li>
 </ul>
 </li>

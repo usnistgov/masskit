@@ -60,22 +60,6 @@ masskit.utils.index module
    :undoc-members:
    :show-inheritance:
 
-masskit.utils.search module
----------------------------
-
-.. automodule:: masskit.utils.search
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-masskit.utils.setup module
---------------------------
-
-.. automodule:: masskit.utils.setup
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 masskit.utils.spectrum\_writers module
 --------------------------------------
 

@@ -71,11 +71,382 @@ $(document).ready(function(){
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
-<section id="masskit-data-specs-arrow-types-module">
-<h2>masskit.data_specs.arrow_types module<a class="headerlink" href="#masskit-data-specs-arrow-types-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.data_specs.arrow_types">
+<span id="masskit-data-specs-arrow-types-module"></span><h2>masskit.data_specs.arrow_types module<a class="headerlink" href="#module-masskit.data_specs.arrow_types" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.JSONArrowArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">JSONArrowArray</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.JSONArrowArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitArrowArray" title="masskit.data_specs.arrow_types.MasskitArrowArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitArrowArray</span></code></a></p>
+<p>Extension array for JSONArrowType</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.JSONArrowScalarType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">JSONArrowScalarType</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.JSONArrowScalarType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionScalar</span></code></p>
+<p>arrow scalar extension class for jsonpickled objects</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.JSONArrowScalarType.as_py">
+<span class="sig-name descname"><span class="pre">as_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.JSONArrowScalarType.as_py" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return this scalar as a Python object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.JSONArrowType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">JSONArrowType</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.JSONArrowType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyExtensionType</span></code></p>
+<p>arrow type extension class for jsonpickled objects</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.JSONArrowType.to_pandas_dtype">
+<span class="sig-name descname"><span class="pre">to_pandas_dtype</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.JSONArrowType.to_pandas_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns pandas extension dtype</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitArrowArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MasskitArrowArray</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitArrowArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionArray</span></code></p>
+<p>Extension array for arrow arrays.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitArrowArray.to_numpy">
+<span class="sig-name descname"><span class="pre">to_numpy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitArrowArray.to_numpy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to numpy array of Spectrum objects</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitArrowArray.to_pylist">
+<span class="sig-name descname"><span class="pre">to_pylist</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitArrowArray.to_pylist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert to list of Spectrum objects</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MasskitPandasArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionArray</span></code></p>
+<p>Base class for pandas extension arrays that contain a numpy array of objects</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.copy" title="Permalink to this definition">¶</a></dt>
+<dd><p>return a copy of the array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>copy of the array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.isna">
+<span class="sig-name descname"><span class="pre">isna</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.isna" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns array indicating if any of the data is None</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.nbytes">
+<span class="sig-name descname"><span class="pre">nbytes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span></span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.nbytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of bytes needed to store this object in memory.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.take">
+<span class="sig-name descname"><span class="pre">take</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">indexes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fill_value</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_fill</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.take" title="Permalink to this definition">¶</a></dt>
+<dd><p>take values from array</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>indexes</strong> – the indexes of values to take</p></li>
+<li><p><strong>fill_value</strong> – if allow_fill is True, use this value when index is negative</p></li>
+<li><p><strong>allow_fill</strong> – use fill_value if index is negative, otherwise negative index indexes from back of array</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>the taken array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.to_mgf">
+<span class="sig-name descname"><span class="pre">to_mgf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.to_mgf" title="Permalink to this definition">¶</a></dt>
+<dd><p>write to an mgf file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – stream or filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.to_msp">
+<span class="sig-name descname"><span class="pre">to_msp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate_peptide</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ion_types</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.to_msp" title="Permalink to this definition">¶</a></dt>
+<dd><p>write to an msp file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>fp</strong> – stream or filename</p></li>
+<li><p><strong>annotate_peptide</strong> – annotate the spectrum as a peptide</p></li>
+<li><p><strong>ion_types</strong> – ion types to annotate</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasArray.to_mzxml">
+<span class="sig-name descname"><span class="pre">to_mzxml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasArray.to_mzxml" title="Permalink to this definition">¶</a></dt>
+<dd><p>write to an mgf file</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – stream or filename</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasDtype">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MasskitPandasDtype</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasDtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionDtype</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasDtype.construct_array_type">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct_array_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.construct_array_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the array type associated with this dtype.
+Returns
+——-
+type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasDtype.na_value">
+<span class="sig-name descname"><span class="pre">na_value</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.na_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasDtype.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MasskitPandasDtype.type">
+<span class="sig-name descname"><span class="pre">type</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.type" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolArrowArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MolArrowArray</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolArrowArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitArrowArray" title="masskit.data_specs.arrow_types.MasskitArrowArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitArrowArray</span></code></a></p>
+<p>Extension array for MolArrowType</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolArrowScalarType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MolArrowScalarType</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolArrowScalarType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionScalar</span></code></p>
+<p>arrow scalar extension class for spectra</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolArrowScalarType.as_py">
+<span class="sig-name descname"><span class="pre">as_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolArrowScalarType.as_py" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return this scalar as a Python object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolArrowType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MolArrowType</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolArrowType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyExtensionType</span></code></p>
+<p>arrow type extension class for Mols</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolArrowType.to_pandas_dtype">
+<span class="sig-name descname"><span class="pre">to_pandas_dtype</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolArrowType.to_pandas_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns pandas extension dtype</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolPandasArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MolPandasArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolPandasArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray" title="masskit.data_specs.arrow_types.MasskitPandasArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitPandasArray</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolPandasArray.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;masskit.data_specs.arrow_types.MolPandasDtype</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MolPandasArray.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolPandasDtype">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">MolPandasDtype</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolPandasDtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype" title="masskit.data_specs.arrow_types.MasskitPandasDtype"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitPandasDtype</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolPandasDtype.construct_array_type">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct_array_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.MolPandasDtype.construct_array_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the array type associated with this dtype.
+Returns
+——-
+type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolPandasDtype.na_value">
+<span class="sig-name descname"><span class="pre">na_value</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MolPandasDtype.na_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.MolPandasDtype.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Mol'</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.MolPandasDtype.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathArrowType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">PathArrowType</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.PathArrowType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.JSONArrowType" title="masskit.data_specs.arrow_types.JSONArrowType"><code class="xref py py-class docutils literal notranslate"><span class="pre">JSONArrowType</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathArrowType.to_pandas_dtype">
+<span class="sig-name descname"><span class="pre">to_pandas_dtype</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.PathArrowType.to_pandas_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns pandas extension dtype</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">PathPandasArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray" title="masskit.data_specs.arrow_types.MasskitPandasArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitPandasArray</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasArray.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;masskit.data_specs.arrow_types.PathPandasDtype</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasArray.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasDtype">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">PathPandasDtype</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasDtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype" title="masskit.data_specs.arrow_types.MasskitPandasDtype"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitPandasDtype</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasDtype.construct_array_type">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct_array_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasDtype.construct_array_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the array type associated with this dtype.
+Returns
+——-
+type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasDtype.na_value">
+<span class="sig-name descname"><span class="pre">na_value</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasDtype.na_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasDtype.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'shortest_path'</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasDtype.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.PathPandasDtype.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.PathPandasDtype.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumArrowArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">SpectrumArrowArray</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumArrowArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitArrowArray" title="masskit.data_specs.arrow_types.MasskitArrowArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitArrowArray</span></code></a></p>
+<p>arrow array that holds spectra</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumArrowScalarType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">SpectrumArrowScalarType</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumArrowScalarType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ExtensionScalar</span></code></p>
+<p>arrow scalar extension class for spectra</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumArrowScalarType.as_py">
+<span class="sig-name descname"><span class="pre">as_py</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumArrowScalarType.as_py" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return this scalar as a Python object.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumArrowType">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">SpectrumArrowType</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">storage_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumArrowType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PyExtensionType</span></code></p>
+<p>arrow type extension class for spectra
+parameterized by storage_type, which can be molecules_struct or peptide_struct</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumArrowType.to_pandas_dtype">
+<span class="sig-name descname"><span class="pre">to_pandas_dtype</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumArrowType.to_pandas_dtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>returns pandas extension dtype</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasArray">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">SpectrumPandasArray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasArray" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray" title="masskit.data_specs.arrow_types.MasskitPandasArray"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitPandasArray</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasArray.dtype">
+<span class="sig-name descname"><span class="pre">dtype</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;masskit.data_specs.arrow_types.SpectrumPandasDtype</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasArray.dtype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasDtype">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.data_specs.arrow_types.</span></span><span class="sig-name descname"><span class="pre">SpectrumPandasDtype</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype" title="masskit.data_specs.arrow_types.MasskitPandasDtype"><code class="xref py py-class docutils literal notranslate"><span class="pre">MasskitPandasDtype</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasDtype.construct_array_type">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">construct_array_type</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.construct_array_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the array type associated with this dtype.
+Returns
+——-
+type</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasDtype.na_value">
+<span class="sig-name descname"><span class="pre">na_value</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">nan</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.na_value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasDtype.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'Spectrum'</span></em><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasDtype.type">
+<span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>alias of <a class="reference internal" href="masskit.spectrum.html#masskit.spectrum.spectrum.Spectrum" title="masskit.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a></p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="masskit-data-specs-file-schemas-module">
-<h2>masskit.data_specs.file_schemas module<a class="headerlink" href="#masskit-data-specs-file-schemas-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.data_specs.file_schemas">
+<span id="masskit-data-specs-file-schemas-module"></span><h2>masskit.data_specs.file_schemas module<a class="headerlink" href="#module-masskit.data_specs.file_schemas" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-masskit.data_specs.schemas">
 <span id="masskit-data-specs-schemas-module"></span><h2>masskit.data_specs.schemas module<a class="headerlink" href="#module-masskit.data_specs.schemas" title="Permalink to this heading">¶</a></h2>
@@ -207,7 +578,7 @@ $(document).ready(function(){
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.data_specs.schemas.populate_properties">
-<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">populate_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">class_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field,</span> <span class="pre">pyarrow.field]</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.populate_properties" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">populate_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">class_in,</span> <span class="pre">fields=[pyarrow.Field&lt;id:</span> <span class="pre">uint64&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument_type:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument_model:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ion_mode:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ionization:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;name:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;casno:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;synonyms:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;scan:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;collision_energy:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;retention_time:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;collision_gas:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;insource_voltage:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;sample_inlet:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ev:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;nce:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;charge:</span> <span class="pre">int8&gt;,</span> <span class="pre">pyarrow.Field&lt;precursor_mz:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;exact_mass:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;exact_mw:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;set:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;composition:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;spectrum_fp:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">uint8&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;spectrum_fp_count:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide_len:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide_type:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;mod_names:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">int16&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;mod_positions:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">int32&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;protein_id:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">string&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;column:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;vial_id:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;aromatic_rings:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;ecfp4:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">uint8&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;ecfp4_count:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;formula:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;has_2d:</span> <span class="pre">bool&gt;,</span> <span class="pre">pyarrow.Field&lt;has_conformer:</span> <span class="pre">bool&gt;,</span> <span class="pre">pyarrow.Field&lt;has_tms:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;hba:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;hbd:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;inchi_key:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;inchi_key_orig:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;isomeric_smiles:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;num_atoms:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;num_undef_double:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;num_undef_stereo:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;rotatable_bonds:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;smiles:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;tpsa:</span> <span class="pre">double&gt;]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.populate_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>given a class (or any object), create a set of properties from a list of fields</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -258,7 +629,7 @@ in the metadata of field</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.data_specs.schemas.table2structarray">
-<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">table2structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyarrow.Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structarray_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyarrow.ExtensionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyarrow.StructArray</span></span></span><a class="headerlink" href="#masskit.data_specs.schemas.table2structarray" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">table2structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structarray_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExtensionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">StructArray</span></span></span><a class="headerlink" href="#masskit.data_specs.schemas.table2structarray" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert a spectrum table into a struct array.
 if an ExtensionType is passed in, will create a struct array of that type</p>
 <dl class="field-list simple">
@@ -338,8 +709,8 @@ if an ExtensionType is passed in, will create a struct array of that type</p>
     <ul>
 <li><a class="reference internal" href="#">masskit.data_specs package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#masskit-data-specs-arrow-types-module">masskit.data_specs.arrow_types module</a></li>
-<li><a class="reference internal" href="#masskit-data-specs-file-schemas-module">masskit.data_specs.file_schemas module</a></li>
+<li><a class="reference internal" href="#module-masskit.data_specs.arrow_types">masskit.data_specs.arrow_types module</a></li>
+<li><a class="reference internal" href="#module-masskit.data_specs.file_schemas">masskit.data_specs.file_schemas module</a></li>
 <li><a class="reference internal" href="#module-masskit.data_specs.schemas">masskit.data_specs.schemas module</a></li>
 <li><a class="reference internal" href="#module-masskit.data_specs.spectral_library">masskit.data_specs.spectral_library module</a></li>
 <li><a class="reference internal" href="#module-masskit.data_specs">Module contents</a></li>

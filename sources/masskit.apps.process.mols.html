@@ -82,8 +82,38 @@ $(document).ready(function(){
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
-<section id="masskit-apps-process-mols-shortest-path-module">
-<h2>masskit.apps.process.mols.shortest_path module<a class="headerlink" href="#masskit-apps-process-mols-shortest-path-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.apps.process.mols.shortest_path">
+<span id="masskit-apps-process-mols-shortest-path-module"></span><h2>masskit.apps.process.mols.shortest_path module<a class="headerlink" href="#module-masskit.apps.process.mols.shortest_path" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.get_ring_paths">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">get_ring_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rd_mol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.get_ring_paths" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.get_shortest_paths">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">get_shortest_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rd_mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_path_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.get_shortest_paths" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the shortest paths for the given rd_mol.</p>
+<dl class="simple">
+<dt>For every pair of atoms, if they are connected by a path &lt;= max_path_length</dt><dd><p>the atoms on that path are enumerated. Otherwise, if there is a path,
+then the truncated path is given.</p>
+</dd>
+<dt>The returned object is a tuple of dictionaries. The first dictionary</dt><dd><p>contains the shortest paths for those with &lt;= max_path_length. The
+second contains a pointer to the truncated path. The third contains
+the ring information for atoms inside rings.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.ordered_pair">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">ordered_pair</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">a1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">a2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.ordered_pair" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.path_generator_app">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">path_generator_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.path_generator_app" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="module-masskit.apps.process.mols">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-masskit.apps.process.mols" title="Permalink to this heading">¶</a></h2>
@@ -103,7 +133,7 @@ $(document).ready(function(){
 <li><a class="reference internal" href="#">masskit.apps.process.mols package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#masskit-apps-process-mols-shortest-path-module">masskit.apps.process.mols.shortest_path module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.mols.shortest_path">masskit.apps.process.mols.shortest_path module</a></li>
 <li><a class="reference internal" href="#module-masskit.apps.process.mols">Module contents</a></li>
 </ul>
 </li>

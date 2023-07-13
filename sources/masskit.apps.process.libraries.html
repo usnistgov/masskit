@@ -90,20 +90,254 @@ $(document).ready(function(){
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
-<section id="masskit-apps-process-libraries-batch-converter-module">
-<h2>masskit.apps.process.libraries.batch_converter module<a class="headerlink" href="#masskit-apps-process-libraries-batch-converter-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.apps.process.libraries.batch_converter">
+<span id="masskit-apps-process-libraries-batch-converter-module"></span><h2>masskit.apps.process.libraries.batch_converter module<a class="headerlink" href="#module-masskit.apps.process.libraries.batch_converter" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.batch_converter.batch_converter_app">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.batch_converter.</span></span><span class="sig-name descname"><span class="pre">batch_converter_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#masskit.apps.process.libraries.batch_converter.batch_converter_app" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
-<section id="masskit-apps-process-libraries-converter-module">
-<h2>masskit.apps.process.libraries.converter module<a class="headerlink" href="#masskit-apps-process-libraries-converter-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.apps.process.libraries.converter">
+<span id="masskit-apps-process-libraries-converter-module"></span><h2>masskit.apps.process.libraries.converter module<a class="headerlink" href="#module-masskit.apps.process.libraries.converter" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.converter.converter_app">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.converter.</span></span><span class="sig-name descname"><span class="pre">converter_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#masskit.apps.process.libraries.converter.converter_app" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.converter.disable_console_logging">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.converter.</span></span><span class="sig-name descname"><span class="pre">disable_console_logging</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.converter.disable_console_logging" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
-<section id="masskit-apps-process-libraries-fasta2peptides-module">
-<h2>masskit.apps.process.libraries.fasta2peptides module<a class="headerlink" href="#masskit-apps-process-libraries-fasta2peptides-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.apps.process.libraries.fasta2peptides">
+<span id="masskit-apps-process-libraries-fasta2peptides-module"></span><h2>masskit.apps.process.libraries.fasta2peptides module<a class="headerlink" href="#module-masskit.apps.process.libraries.fasta2peptides" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.PepTuple">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">PepTuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nterm</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cterm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.PepTuple" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">tuple</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.PepTuple.cterm">
+<span class="sig-name descname"><span class="pre">cterm</span></span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.PepTuple.cterm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.PepTuple.nterm">
+<span class="sig-name descname"><span class="pre">nterm</span></span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.PepTuple.nterm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.PepTuple.pep">
+<span class="sig-name descname"><span class="pre">pep</span></span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.PepTuple.pep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.count_rhk">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">count_rhk</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peptide</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.count_rhk" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a count of the basic residues in a peptide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>peptide</strong> – </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>count of basic residues</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.extract_peptides">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">extract_peptides</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.extract_peptides" title="Permalink to this definition">¶</a></dt>
+<dd><p>Breakdown all peptides from all of the proteins in a fasta file according to the
+specified digestion strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cfg</strong> – configuration parameters</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>non-redundant list of peptides.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.fasta">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">fasta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.fasta" title="Permalink to this definition">¶</a></dt>
+<dd><p>Iterate over a fasta file, yields tuples of (header, sequence)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – name of fasta file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.fasta_parse_id">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">fasta_parse_id</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">header</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.fasta_parse_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extract an accession from a UniProt fasta file header string
+The UniProtKB uses the following format:
+&gt;db|UniqueIdentifier|EntryName ProteinName OS=OrganismName OX=OrganismIdentifier                                 [GN=GeneName ]PE=ProteinExistence SV=SequenceVersion</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>header</strong> – UniProt formated fasta header string</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>accession string</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.main">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">main</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.main" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.nonspecific">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">nonspecific</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.nonspecific" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield eptides are peptides which were cleaved at every location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residues</strong> – protein string</p></li>
+<li><p><strong>min</strong> – minimum length for returned peptides</p></li>
+<li><p><strong>max</strong> – maximum length for returned peptides</p></li>
+<li><p><strong>missed</strong> – maximum number of possible missed cleavages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>yield peptides in order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.pepgen">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">pepgen</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">peptides</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pep2proteins</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.pepgen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.pepgen.add_row">
+<span class="sig-name descname"><span class="pre">add_row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.pepgen.add_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>add row to row cache</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>row</strong> – the new row</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.pepgen.enumerate">
+<span class="sig-name descname"><span class="pre">enumerate</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.pepgen.enumerate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform the work to generate all of the decorated peptides</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The completed pyarrow table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.pepgen.finalize_table">
+<span class="sig-name descname"><span class="pre">finalize_table</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.pepgen.finalize_table" title="Permalink to this definition">¶</a></dt>
+<dd><p>retrieve the completed table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>a pyarrow table</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.pepgen.permute_mods">
+<span class="sig-name descname"><span class="pre">permute_mods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mods</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_mods</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.pepgen.permute_mods" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield all of the possible permutations of the set of modifications
+applied to the given peptide</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pep</strong> – a peptide string</p></li>
+<li><p><strong>mods</strong> – list of mods</p></li>
+<li><p><strong>max_mods</strong> – maximum number of modifications to apply at one time</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>yield a peptide with modifications applied</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.semitryptic">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">semitryptic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.semitryptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield semi-Tryptic Peptides are peptides which were cleaved at the C-Terminal
+side of arginine (R) and lysine (K) by trypsin at one end but not the other.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residues</strong> – protein string</p></li>
+<li><p><strong>min</strong> – minimum length for returned peptides</p></li>
+<li><p><strong>max</strong> – maximum length for returned peptides</p></li>
+<li><p><strong>missed</strong> – maximum number of possible missed cleavages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>yield peptides in order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.trypsin">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">trypsin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residues</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.trypsin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Follow the rules for a tryptic digestion enzyme to yield peptides from a given
+protein string. The cleavage rule for trypsin is: after R or K, but not before P</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>residues</strong> – protein string</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>yield peptides in order</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.fasta2peptides.tryptic">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.fasta2peptides.</span></span><span class="sig-name descname"><span class="pre">tryptic</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">residues</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">missed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.fasta2peptides.tryptic" title="Permalink to this definition">¶</a></dt>
+<dd><p>Control a tryptic digest by limiting the length and allowing for missed cleavages</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>residues</strong> – protein string</p></li>
+<li><p><strong>min</strong> – minimum length for returned peptides</p></li>
+<li><p><strong>max</strong> – maximum length for returned peptides</p></li>
+<li><p><strong>missed</strong> – maximum number of possible missed cleavages</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>yield peptides in order</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
-<section id="masskit-apps-process-libraries-optimize-parquet-module">
-<h2>masskit.apps.process.libraries.optimize_parquet module<a class="headerlink" href="#masskit-apps-process-libraries-optimize-parquet-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.apps.process.libraries.optimize_parquet">
+<span id="masskit-apps-process-libraries-optimize-parquet-module"></span><h2>masskit.apps.process.libraries.optimize_parquet module<a class="headerlink" href="#module-masskit.apps.process.libraries.optimize_parquet" title="Permalink to this heading">¶</a></h2>
 </section>
-<section id="masskit-apps-process-libraries-parquet-info-module">
-<h2>masskit.apps.process.libraries.parquet_info module<a class="headerlink" href="#masskit-apps-process-libraries-parquet-info-module" title="Permalink to this heading">¶</a></h2>
+<section id="module-masskit.apps.process.libraries.parquet_info">
+<span id="masskit-apps-process-libraries-parquet-info-module"></span><h2>masskit.apps.process.libraries.parquet_info module<a class="headerlink" href="#module-masskit.apps.process.libraries.parquet_info" title="Permalink to this heading">¶</a></h2>
 </section>
 <section id="module-masskit.apps.process.libraries.pepsearch2parquet">
 <span id="masskit-apps-process-libraries-pepsearch2parquet-module"></span><h2>masskit.apps.process.libraries.pepsearch2parquet module<a class="headerlink" href="#module-masskit.apps.process.libraries.pepsearch2parquet" title="Permalink to this heading">¶</a></h2>
@@ -206,12 +440,12 @@ $(document).ready(function(){
 <span id="masskit-apps-process-libraries-transform-table-module"></span><h2>masskit.apps.process.libraries.transform_table module<a class="headerlink" href="#module-masskit.apps.process.libraries.transform_table" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.transform_table.cast_columns">
-<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">cast_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyarrow.Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.cast_columns" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">cast_columns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.cast_columns" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.transform_table.compress_start_stop">
-<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">compress_start_stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyarrow.Table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.compress_start_stop" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">compress_start_stop</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.compress_start_stop" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -221,7 +455,7 @@ $(document).ready(function(){
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.transform_table.get_sort_index">
-<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">get_sort_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyarrow.Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.get_sort_index" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">get_sort_index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.get_sort_index" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -231,7 +465,7 @@ $(document).ready(function(){
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.transform_table.misc_operations">
-<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">misc_operations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">pyarrow.Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.misc_operations" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">misc_operations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cfg</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.misc_operations" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -241,7 +475,7 @@ $(document).ready(function(){
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.transform_table.str2pyarrow_type">
-<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">str2pyarrow_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">pyarrow.DataType</span></span></span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.str2pyarrow_type" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.transform_table.</span></span><span class="sig-name descname"><span class="pre">str2pyarrow_type</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">DataType</span></span></span><a class="headerlink" href="#masskit.apps.process.libraries.transform_table.str2pyarrow_type" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </section>
@@ -271,11 +505,11 @@ $(document).ready(function(){
 <li><a class="reference internal" href="#">masskit.apps.process.libraries package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#masskit-apps-process-libraries-batch-converter-module">masskit.apps.process.libraries.batch_converter module</a></li>
-<li><a class="reference internal" href="#masskit-apps-process-libraries-converter-module">masskit.apps.process.libraries.converter module</a></li>
-<li><a class="reference internal" href="#masskit-apps-process-libraries-fasta2peptides-module">masskit.apps.process.libraries.fasta2peptides module</a></li>
-<li><a class="reference internal" href="#masskit-apps-process-libraries-optimize-parquet-module">masskit.apps.process.libraries.optimize_parquet module</a></li>
-<li><a class="reference internal" href="#masskit-apps-process-libraries-parquet-info-module">masskit.apps.process.libraries.parquet_info module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.libraries.batch_converter">masskit.apps.process.libraries.batch_converter module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.libraries.converter">masskit.apps.process.libraries.converter module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.libraries.fasta2peptides">masskit.apps.process.libraries.fasta2peptides module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.libraries.optimize_parquet">masskit.apps.process.libraries.optimize_parquet module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.libraries.parquet_info">masskit.apps.process.libraries.parquet_info module</a></li>
 <li><a class="reference internal" href="#module-masskit.apps.process.libraries.pepsearch2parquet">masskit.apps.process.libraries.pepsearch2parquet module</a></li>
 <li><a class="reference internal" href="#module-masskit.apps.process.libraries.pubchem_links">masskit.apps.process.libraries.pubchem_links module</a></li>
 <li><a class="reference internal" href="#module-masskit.apps.process.libraries.rewrite_sdf">masskit.apps.process.libraries.rewrite_sdf module</a></li>
