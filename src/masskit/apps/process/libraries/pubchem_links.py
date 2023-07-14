@@ -76,6 +76,106 @@ class Download:
                     self.progress.update(task_id, advance=len(chunk))
         self.progress.console.print(f"Downloaded {path}")
 
+class PubChemCAS:
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+        self.progress = Progress(
+            TextColumn("[bold blue]{task.fields[filename]}", justify="right"),
+            BarColumn(bar_width=None),
+            "[progress.percentage]{task.percentage:>3.1f}%",
+            "•",
+            MofNCompleteColumn(),
+            "•",
+            TimeRemainingColumn(),
+            transient=False,
+            console=global_console,
+            )
+        self.cas_schema = pa.schema([
+            pa.field("cid", pa.int64()),
+            pa.field("cas", pa.string()),
+            pa.field("name", pa.string())
+        ])
+        self.parse_pubchem_json()
+
+    def pubchem_cas(self, session, page):
+        parameters = {
+            'source': 'CAS Common Chemistry',
+            'heading_type': 'Compound',
+            'heading': 'CAS',
+            'page': str(page),
+            'response_type': 'save',
+            'response_basename': 'PubChemAnnotations_CAS'
+        }
+        r = session.get(self.cfg.pubchem.cas.urlbase, timeout=5, params=parameters)
+        #print(r.url)
+        #print(r.headers)
+        r.raise_for_status()
+        rjson = r.json()['Annotations']
+        return rjson
+
+
+    def get_pubchem_cas(self):
+        annots = []
+        with self.progress:
+            task_id = self.progress.add_task(
+                "download",
+                filename=self.cfg.pubchem.cas.file, 
+                start=False,
+                )
+            with requests.Session() as s:
+                rjson = self.pubchem_cas(s, 1)
+                annots.extend(rjson['Annotation'])
+                total_pages = rjson['TotalPages']
+                self.progress.update(task_id, total=total_pages)
+                self.progress.start_task(task_id)
+                self.progress.update(task_id, advance=1)
+                for pageno in range(2, total_pages+1):
+                    rjson = self.pubchem_cas(s, pageno)
+                    annots.extend(rjson['Annotation'])
+                    self.progress.update(task_id, advance=1)
+            self.progress.console.print(f"Downloaded {self.cfg.pubchem.cas.file}")
+        return annots
+
+    def use_pubchem_cache(self, filename):
+        path = Path(filename).expanduser()
+        if (not path.is_file()):
+            Path(path.parent).mkdir(parents=True, exist_ok=True)
+            data = self.get_pubchem_cas()
+            fresh_data = json.dumps(data)
+            if len(fresh_data)>0:
+                with path.open('w') as f:
+                    f.write(fresh_data)
+        else:
+            self.progress.console.print(f"Using cache file {filename}")
+        with path.open('r') as f:
+            cache_data = json.load(f)
+        return cache_data
+
+    def parse_pubchem_json(self):
+        path = Path(self.cfg.cache.dir).expanduser()
+
+        parquet_file = path / self.cfg.pubchem.cas.parquet
+        if parquet_file.is_file():
+            self.progress.console.print(f"Using cache file {parquet_file}")
+            return
+
+        cache_file = path / self.cfg.pubchem.cas.file
+        casdata = self.use_pubchem_cache(cache_file)
+        
+        records = self.cas_schema.empty_table().to_pydict()
+        for entry in casdata:
+            cas = entry.get('SourceID')
+            name = entry.get('Name')
+            recs = entry.get('LinkedRecords')
+            if recs: 
+                cid_list = recs.get('CID')
+                for cid in cid_list:
+                    records["cid"].append(cid)
+                    records["cas"].append(cas)
+                    records["name"].append(name)
+        table = pa.table(records, self.cas_schema)
+        pq.write_table(table, parquet_file)       
 
 class PubChemWiki:
 
@@ -159,7 +259,6 @@ class PubChemWiki:
 
     def parse_pubchem_json(self):
         self.path = Path(self.cfg.cache.dir).expanduser()
-        #cache_file = f"{self.cfg.cache.dir}/{self.cfg.pubchem.wikipedia.file}"
         cache_file = self.path / self.cfg.pubchem.wikipedia.file
         wikidata = self.use_pubchem_cache(cache_file)
 
@@ -282,6 +381,7 @@ def cache_pubchem_files(cfg: DictConfig):
 
     for key in cfg.pubchem.keys():
         if key == "wikipedia": continue
+        if key == "cas": continue
         dlurl = cfg.pubchem[key].url
         filename = dlurl.split('/')[-1]
         csv_file = dlpath / filename
@@ -308,14 +408,92 @@ def cache_pubchem_files(cfg: DictConfig):
             pq.write_table(table, xfile[1])
 
 
+class Analyze:
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+        self.cache_path = Path(self.cfg.cache.dir).expanduser()
+        self.load_nist_data()
+        self.load_cas()
+        self.wikipedia_counts()
+        self.pmid_counts()
+        self.patent_counts()
+        self.do_joins()
+        self.save_data()
+
+    def load_nist_data(self):
+        tables = []
+        for file in self.cfg.nist.files:
+            table = pq.read_table(file, columns=['id', 'name', 'inchi_key'])
+            tables.append(table)
+        tables
+        all_inchi_keys = pa.concat_arrays( [ i.column("inchi_key").combine_chunks() for i in tables ] )
+        inchi_keys = set(all_inchi_keys.unique().to_pylist())
+
+        # Find the overlapping set with PubChem
+        cid2inchi_file = self.cache_path / self.cfg.pubchem.inchi.parquet
+        cid2inchi_full = pq.read_table(cid2inchi_file, columns=['cid', 'inchi_key'])
+        table2 = pa.table({'inchi_key': inchi_keys})
+        self.cid2inchi = cid2inchi_full.join(table2,keys='inchi_key',join_type='inner')
+        print(f"InChI keys matched: {self.cid2inchi.num_rows} out of {len(inchi_keys)}.")
+
+    def load_cas(self):
+        cid2cas_file = self.cache_path / self.cfg.pubchem.cas.parquet
+        self.cid2cas = pq.read_table(cid2cas_file)
+        table = self.cid2inchi.join(self.cid2cas, keys='cid', join_type='inner')
+        print(f"cas counts, num rows: {table.num_rows}")
+
+    def pmid_counts(self):
+        cid2pubmed_file = self.cache_path / self.cfg.pubchem.pmid.parquet
+        cid2pmid_full = pq.read_table(cid2pubmed_file, columns=['cid', 'pmid'])
+        cid2pmid_matched = self.cid2inchi.join(cid2pmid_full, keys='cid', join_type='inner')
+        self.cid2pmid = cid2pmid_matched.group_by(['cid', 'inchi_key']).aggregate([("pmid", "count_distinct")])
+        print(f"pmid counts, num rows: {self.cid2pmid.num_rows}")
+
+    def patent_counts(self):
+        cid2patent_file = self.cache_path / self.cfg.pubchem.patent.parquet
+        cid2patent_full = pq.read_table(cid2patent_file)
+
+        # The Patent table is too big, so we need to join by parts
+        sz = 50000000
+        tables = []
+        for i in track(range(0, cid2patent_full.num_rows, sz)):
+            subtbl = cid2patent_full.slice(offset=i,length=sz)
+            jointbl = self.cid2inchi.join(subtbl, keys='cid', join_type='inner')
+            tables.append(jointbl)
+            #print(f"Working on row numbers {i:,d} through {i+sz-1:,d}")
+        cid2patent_matched= pa.concat_tables(tables)
+        self.cid2patent = cid2patent_matched.group_by(['cid', 'inchi_key']).aggregate([("patent_id", "count")])
+        print(f"patent counts, num rows: {self.cid2patent.num_rows}")
+
+    def wikipedia_counts(self):
+        cid2wikipedia_file = self.cache_path / self.cfg.queries.wikipedia.parquet
+        self.cid2wikipedia = pq.read_table(cid2wikipedia_file, columns=['cid', 'average_pageviews'])
+        print(f"Wikipedia counts, num rows: {self.cid2wikipedia.num_rows}")
+        #wiki_counts = cid2wikipedia.sort_by([("average_pageviews","descending")])
+    
+    def do_joins(self):
+        table = self.cid2inchi.join(self.cid2cas, keys='cid', join_type='left outer')
+        table = table.join(self.cid2wikipedia, keys='cid', join_type='left outer')
+        table = table.join(self.cid2pmid, keys=['cid', 'inchi_key'], join_type='left outer')
+        table = table.join(self.cid2patent, keys=['cid', 'inchi_key'], join_type='left outer')
+
+        self.data = table.sort_by([("cid","ascending")])
+
+    def save_data(self):
+        pq.write_table(self.data, "pubchem_links.parquet")
+
 # Join arrow tables:
 # https://stackoverflow.com/questions/72122461/join-two-pyarrow-tables
 
 @hydra.main(config_path="conf", config_name="config_pubchem_links", version_base=None)
 def main(cfg: DictConfig) -> int:
     global_console.print("Attempting to find or download data files:")
+    casdata = PubChemCAS(cfg)
     wikidata = PubChemWiki(cfg)
     cache_pubchem_files(cfg)
+
+    res = Analyze(cfg)
 
     return 0
 

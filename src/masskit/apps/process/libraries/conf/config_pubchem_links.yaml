@@ -14,6 +14,10 @@ pubchem:
   wikipedia:
     urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
     file: pubchem-wiki.json
+  cas:
+    urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
+    file: pubchem-cas.json
+    parquet: cid-cas.parquet
   inchi:
     description: 'This is a listing of all CIDs with their full InChI strings and
     InChI keys. It is a gzipped text file with CID, tab, InChI, tab,
@@ -69,3 +73,8 @@ pubchem:
         type: int64
       - name: pmtype
         type: int8
+nist:
+  files:
+    - /data/aiomics/massspec_cache/nist/tandem/2020/hr_msms_nist.parquet
+    - /data/aiomics/massspec_cache/nist/ei/2020/mainlib_2020.parquet
+    
