@@ -128,12 +128,12 @@ IF DEFINED USE_ML (
 )
 
 ECHO Initializing the conda %ENVNAME% environment
-call mamba activate %ENVNAME%
+call conda activate %ENVNAME%
 IF ERRORLEVEL 1 (
     ECHO Creating conda environment
     mamba create -y -n %ENVNAME%
     mamba install -y -n %ENVNAME% -c nodefaults %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
-    call mamba activate %ENVNAME%
+    call conda activate %ENVNAME%
 )
 
 ENDLOCAL
