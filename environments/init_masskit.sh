@@ -112,6 +112,7 @@ BASE_PACKAGES="
   pyarrow=12.* \
   pybind11 \
   pynndescent \
+  pyside6 \
   pytest \
   python=3 \
   rdkit \
@@ -145,12 +146,12 @@ if [ $USE_ML -eq 1 ]; then
 fi
 
 echo "Initializing the conda $ENVNAME environment"
-if ! conda activate $ENVNAME; then
+if ! mamba activate $ENVNAME; then
     # conda activate $SETUP_ENVNAME
     echo "Creating conda environment"
-    conda create -y -n $ENVNAME
+    mamba create -y -n $ENVNAME
     mamba install -y -n $ENVNAME -c nodefaults ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
-    conda activate $ENVNAME
+    mamba activate $ENVNAME
 
     # # Check for bayesian_torch
     # (python -c "import bayesian_torch" 2> /dev/null) && has_lib=1 || has_lib=0

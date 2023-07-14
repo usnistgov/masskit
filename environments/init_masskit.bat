@@ -92,6 +92,7 @@ arrow-cpp=12.*^
  pyarrow=12.*^
  pybind11^
  pynndescent^
+ pyside6^
  pytest^
  python=3^
  rdkit=2021.09.4^
@@ -127,12 +128,12 @@ IF DEFINED USE_ML (
 )
 
 ECHO Initializing the conda %ENVNAME% environment
-call conda activate %ENVNAME%
+call mamba activate %ENVNAME%
 IF ERRORLEVEL 1 (
     ECHO Creating conda environment
-    conda create -y -n %ENVNAME%
+    mamba create -y -n %ENVNAME%
     mamba install -y -n %ENVNAME% -c nodefaults %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
-    call conda activate %ENVNAME%
+    call mamba activate %ENVNAME%
 )
 
 ENDLOCAL
