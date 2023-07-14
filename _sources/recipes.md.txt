@@ -10,6 +10,7 @@ in fasta format and generates a peptide library in parquet format. The default c
 
 * to change the name of the input file, specify `input.file=myfilename.fasta` on the
 command line.
+  * note that `fasta2peptides` expects the fasta header lines to have the format `>db|UniqueIdentifier|EntryName`.
 * to change the name of the output file, specify `output.file=myfilename.parquet` on
 the command line.
 * the program supports the following options:
@@ -23,7 +24,11 @@ the command line.
   * `peptide.nce=[30]` is a list of NCE values to generate per peptide
   * `peptide.use_basic_limit=True` limits the max charge of a peptide to the number of basic residues
 
-An example command line: `fasta2peptides input.file=uniprot.fasta output.file=uniprot_peptides.parquet`
+#### An example command line to convert `uniprot.fasta` to `uniprot_peptides.parquet`
+
+```bash
+fasta2peptides input.file=uniprot.fasta output.file=uniprot_peptides.parquet
+```
 
 ## Library import
 
@@ -42,20 +47,11 @@ file without exhausting memory.
 ### SDF Molfiles to small molecule libraries
 
 To convert an SDF file (also known as a Molfile) into parquet format, use a
-command line of the format `batch_converter input.file.names=my_sdf.sdf output.file.name=my_sdf output.file.types=[parquet]`.
+command line of the format:
 
-### CSV file to small molecule libraries
-
-To convert an CSV file that includes SMILES molecular specifications into
-parquet format, use a command line of the format `batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet]`. Options for csv parsing:
-
-* `conversion.csv.no_column_headers`, set this to true if the csv file does not have column headers. In this case, the columns will be named `f0`, `f1`, ...
-* the default SMILES column name is `SMILES` if there is a header and `f0` if not. To change the column name, set `conversion.csv.smiles_column_name`
-* use `conversion.csv.delimiter`, set to the column delimiter.  Tab delimited is `conversion.csv.delimiter="\t"`
-* the default rdkit Mol column name is "mol". To change this, use `conversion.csv.mol_column_name`
-
-Examples:
-To read in a headerless tab delimited file with the SMILES in the second column, `batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet] conversion.csv.no_column_headers=true conversion.csv.smiles_column_name=f1 conversion.csv.delimiter="\t"`
+```bash
+batch_converter input.file.names=my_sdf.sdf output.file.name=my_sdf output.file.types=[parquet]
+```
 
 #### SDF files with incorrect encoding or pre-v2000 format
 
@@ -63,10 +59,36 @@ Some SDF files include characters encoded using non-ASCII encodings,
 such as Latin-1 (ISO-8859-1) while rdkit and python support ASCII and
 UTF-8 (unicode).  Other SDF files are written in a pre version v2000
 format that does not include 'M  END' section separators.  To address
-these issues, use the command line program
-`rewrite_sdf input.file.name=my_input.sdf output.file.name=my_output.sdf`.
+these issues, use the command line program:
+
+```bash
+rewrite_sdf input.file.name=my_input.sdf output.file.name=my_output.sdf
+```
+
 If the encoding is not latin-1, set the `input.file.encoding` option
 to the encoding used.
+
+### CSV file to small molecule libraries
+
+To convert an CSV file that includes SMILES molecular specifications into
+parquet format, use a command line of the format:
+
+```bash
+batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet]
+```
+
+Options for csv parsing:
+
+* `conversion.csv.no_column_headers`, set this to true if the csv file does not have column headers. In this case, the columns will be named `f0`, `f1`, ...
+* the default SMILES column name is `SMILES` if there is a header and `f0` if not. To change the column name, set `conversion.csv.smiles_column_name`
+* use `conversion.csv.delimiter`, set to the column delimiter.  Tab delimited is `conversion.csv.delimiter="\t"`
+* the default rdkit Mol column name is "mol". To change this, use `conversion.csv.mol_column_name`
+
+#### Example of reading in a headerless tab delimited file with the SMILES in the second column
+
+```bash
+batch_converter input.file.names=my_csv.csv output.file.name=my_csv output.file.types=[parquet] conversion.csv.no_column_headers=true conversion.csv.smiles_column_name=f1 conversion.csv.delimiter="\t"
+```
 
 ## Modification specification
 

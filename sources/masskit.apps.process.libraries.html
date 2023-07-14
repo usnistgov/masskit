@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>masskit.apps.process.libraries package &#8212; masskit 1.1.0 documentation</title>
+    <title>masskit.apps.process.libraries package &#8212; masskit 1.1.0-8-g811254f documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -56,7 +56,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.apps.process.libraries package</a></li> 
       </ul>
     </div>  
@@ -356,12 +356,79 @@ protein string. The cleavage rule for trypsin is: after R or K, but not before P
 <section id="module-masskit.apps.process.libraries.pubchem_links">
 <span id="masskit-apps-process-libraries-pubchem-links-module"></span><h2>masskit.apps.process.libraries.pubchem_links module<a class="headerlink" href="#module-masskit.apps.process.libraries.pubchem_links" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.pubchem_links.</span></span><span class="sig-name descname"><span class="pre">Analyze</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.do_joins">
+<span class="sig-name descname"><span class="pre">do_joins</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.do_joins" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.load_cas">
+<span class="sig-name descname"><span class="pre">load_cas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.load_cas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.load_nist_data">
+<span class="sig-name descname"><span class="pre">load_nist_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.load_nist_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.patent_counts">
+<span class="sig-name descname"><span class="pre">patent_counts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.patent_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.pmid_counts">
+<span class="sig-name descname"><span class="pre">pmid_counts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.pmid_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.save_data">
+<span class="sig-name descname"><span class="pre">save_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.save_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Analyze.wikipedia_counts">
+<span class="sig-name descname"><span class="pre">wikipedia_counts</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Analyze.wikipedia_counts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Download">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.pubchem_links.</span></span><span class="sig-name descname"><span class="pre">Download</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">urls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dest_dir</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Download" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.Download.download_url">
 <span class="sig-name descname"><span class="pre">download_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">task_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">rich.progress.TaskID</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.Download.download_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.PubChemCAS">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.apps.process.libraries.pubchem_links.</span></span><span class="sig-name descname"><span class="pre">PubChemCAS</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cfg</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.PubChemCAS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.PubChemCAS.get_pubchem_cas">
+<span class="sig-name descname"><span class="pre">get_pubchem_cas</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.PubChemCAS.get_pubchem_cas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.PubChemCAS.parse_pubchem_json">
+<span class="sig-name descname"><span class="pre">parse_pubchem_json</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.PubChemCAS.parse_pubchem_json" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.PubChemCAS.pubchem_cas">
+<span class="sig-name descname"><span class="pre">pubchem_cas</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.PubChemCAS.pubchem_cas" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.libraries.pubchem_links.PubChemCAS.use_pubchem_cache">
+<span class="sig-name descname"><span class="pre">use_pubchem_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.libraries.pubchem_links.PubChemCAS.use_pubchem_cache" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -551,7 +618,7 @@ protein string. The cleavage rule for trypsin is: after R or K, but not before P
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.apps.process.libraries package</a></li> 
       </ul>
     </div>
