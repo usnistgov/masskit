@@ -2,18 +2,18 @@ input:
   file:
     # list of input file names
     names:
-      - ~/data/nist/ei/2020/sdf/nist_ri.sdf
+      - ~/data/nist/ei/2020/ureplib_with_exp_RI_fixed.sdf
     # input file type
     type:
     # what is the source of the file? nist or pubchem
-    source: nist_ri
+    source:
   # number of records to generate
   num:
 
 conversion:
   id:
     # name of the id field, like NISTNO. if an integer and reading sdfs, this is the start value of the ids
-    field: 1
+    field: NISTNO
   small_molecule:
     # maximum bound of 3D conformer in angstroms (0=no limit)
     max_bound: 0.0
@@ -24,17 +24,28 @@ conversion:
     comment_fields:
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
-    probabilities: [0.0, 1.0, 0.0, 0.0]
+    probabilities: [0.0, 0.0, 0.0, 1.0]
   spectra:
     # min peak intensity allowed in spectral fingerprint
     min_intensity: 0.0
     # the max mz value allowed in spectral fingerprint
     max_mz: 2000
-
+  csv:
+    id:
+      field:
+      initial_value: 0
+    # csv has no column headers in first line
+    no_column_headers: False
+    # name of the column that will contain rdkit Mol
+    mol_column_name: mol
+    # name of the column containing SMILES.  null means "SMILES"
+    smiles_column_name: null
+    delimiter: ","
+    
 output:
   file:
     # output file or output file prefix
-    name: ~/data/nist/ei/2020/ri_2020.parquet
+    name: ~/data/nist/ei/2020/replib_2020.parquet
     # parquet, msp, mzxml
     types:
 

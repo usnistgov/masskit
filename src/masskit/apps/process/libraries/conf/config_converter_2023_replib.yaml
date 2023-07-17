@@ -30,7 +30,18 @@ conversion:
     min_intensity: 0.0
     # the max mz value allowed in spectral fingerprint
     max_mz: 2000
-
+  csv:
+    id:
+      field:
+      initial_value: 0
+    # csv has no column headers in first line
+    no_column_headers: False
+    # name of the column that will contain rdkit Mol
+    mol_column_name: mol
+    # name of the column containing SMILES.  null means "SMILES"
+    smiles_column_name: null
+    delimiter: ","
+    
 output:
   file:
     # output file or output file prefix
