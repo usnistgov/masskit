@@ -31,7 +31,7 @@ If you do not have either installed we recommend installing [mambaforge](https:/
 
 ### Windows
 
-- If you intend to use Masskit AI, please use the [Masskit AI instructions](https://github.com/usnistgov/masskit#installation) instructions instead.
+- If you intend to use Masskit AI, please use the [Masskit AI instructions](https://github.com/usnistgov/masskit_ai#installation) instructions instead.
 - Download the latest Masskit Windows zip file from the
 [Releases](https://github.com/usnistgov/masskit/releases) page.
 - Extract the contents of the file to a directory on your computer by navigating explorer to the
