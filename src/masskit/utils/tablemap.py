@@ -252,10 +252,10 @@ class ArrowLibraryMap(TableMap):
         format = msuf.load_default_config_schema('msp', spectrum_type)
         format['id']['field'] = id_field
         format['comment_fields'] = comment_fields
-        return ArrowLibraryMap(msuf.load_msp2array(fp,
-                                                   num=num,
-                                                   min_intensity=min_intensity, 
-                                                   format=format))
+        loader = msuf.MSPLoader(num=num,
+                                min_intensity=min_intensity, 
+                                format=format)
+        return ArrowLibraryMap(loader.load(fp))
 
     @staticmethod
     def from_mgf(file, num=None, title_fields=None, min_intensity=0.0, spectrum_type=None):
@@ -272,10 +272,10 @@ class ArrowLibraryMap(TableMap):
         fp = open_if_filename(file, 'r')
         format = msuf.load_default_config_schema('msp', spectrum_type)
         format['title_fields'] = title_fields
-        return ArrowLibraryMap(msuf.load_mgf2array(fp, num=num, 
-                                                   title_fields=title_fields,
-                                                   min_intensity=min_intensity, 
-                                                   format=format))
+        loader = msuf.MGFLoader(num=num,
+                                min_intensity=min_intensity, 
+                                format=format)
+        return ArrowLibraryMap(loader.load(fp))
 
 
     @staticmethod
@@ -302,16 +302,15 @@ class ArrowLibraryMap(TableMap):
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
+        fp = open_if_filename(file, mode="rb")
+        fp = Chem.ForwardSDMolSupplier(fp, sanitize=False)
         format = msuf.load_default_config_schema('msp', spectrum_type)
         format['id']['field'] = id_field
+        loader = msuf.SDFLoader(num=num,
+                                min_intensity=min_intensity, 
+                                format=format)
 
-        return ArrowLibraryMap(msuf.load_sdf2array(file, 
-                                                   num=num, 
-                                                   skip_expensive=skip_expensive, 
-                                                   max_size=max_size,
-                                                   min_intensity=min_intensity,
-                                                   set_probabilities=set_probabilities,
-                                                   format=format))
+        return ArrowLibraryMap(loader.load(fp))
 
 
 class PandasLibraryMap(TableMap):
