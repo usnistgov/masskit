@@ -1,0 +1,6 @@
+format: arrow
+id:
+  field:
+  field_type: int
+  initial_value: 0
+schema_group: mol

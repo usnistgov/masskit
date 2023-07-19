@@ -249,12 +249,13 @@ class ArrowLibraryMap(TableMap):
         :return: ArrowLibraryMap
         """
         fp = open_if_filename(file, 'r')
+        format = msuf.load_default_config_schema('msp', spectrum_type)
+        format['id']['field'] = id_field
+        format['comment_fields'] = comment_fields
         return ArrowLibraryMap(msuf.load_msp2array(fp,
                                                    num=num,
-                                                   id_field=id_field,
-                                                   comment_fields=comment_fields,
                                                    min_intensity=min_intensity, 
-                                                   spectrum_type=spectrum_type))
+                                                   format=format))
 
     @staticmethod
     def from_mgf(file, num=None, title_fields=None, min_intensity=0.0, spectrum_type=None):
@@ -269,10 +270,12 @@ class ArrowLibraryMap(TableMap):
         :return: ArrowLibraryMap
         """
         fp = open_if_filename(file, 'r')
+        format = msuf.load_default_config_schema('msp', spectrum_type)
+        format['title_fields'] = title_fields
         return ArrowLibraryMap(msuf.load_mgf2array(fp, num=num, 
                                                    title_fields=title_fields,
                                                    min_intensity=min_intensity, 
-                                                   spectrum_type=spectrum_type))
+                                                   format=format))
 
 
     @staticmethod
@@ -280,7 +283,6 @@ class ArrowLibraryMap(TableMap):
                  num=None,
                  skip_expensive=True,
                  max_size=0,
-                 source=None,
                  id_field=None,
                  min_intensity=0.0,
                  set_probabilities=(0.01, 0.97, 0.01, 0.01),
@@ -293,7 +295,6 @@ class ArrowLibraryMap(TableMap):
         :param num: number of rows.  None means all
         :param skip_expensive: don't compute fields that are computationally expensive
         :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
-        :param source: where did the sdf come from?  pubchem, nist, ?
         :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if an integer,
           use the integer as the starting value for an assigned id
         :param min_intensity: the minimum intensity to set the fingerprint bit
@@ -301,15 +302,16 @@ class ArrowLibraryMap(TableMap):
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
+        format = msuf.load_default_config_schema('msp', spectrum_type)
+        format['id']['field'] = id_field
+
         return ArrowLibraryMap(msuf.load_sdf2array(file, 
                                                    num=num, 
                                                    skip_expensive=skip_expensive, 
                                                    max_size=max_size,
-                                                   source=source, 
-                                                   id_field=id_field, 
                                                    min_intensity=min_intensity,
                                                    set_probabilities=set_probabilities,
-                                                   spectrum_type=spectrum_type))
+                                                   format=format))
 
 
 class PandasLibraryMap(TableMap):

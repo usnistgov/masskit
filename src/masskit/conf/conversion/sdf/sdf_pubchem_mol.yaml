@@ -1,0 +1,10 @@
+format: sdf
+source: pubchem
+id:
+  field: PUBCHEM_COMPOUND_CID
+  field_type: int
+  initial_value: 0
+name:
+  field: 
+    - PUBCHEM_IUPAC_NAME
+schema_group: mol

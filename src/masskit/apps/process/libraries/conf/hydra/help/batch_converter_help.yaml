@@ -10,10 +10,19 @@ template: |-
   `${hydra.help.app_name} input.file.names=mysdf.sdf output.file.name=output.msp`
 
   `${hydra.help.app_name} input.file.names=mysdf.msp output.file.name=output
-    output.file.types=[parquet,msp] input.file.spectrum_type=mol`
+    output.file.types=[parquet,msp] conversion/msp=msp_peptide`
 
-  where input.file.spectrum_type can be set to `mol` for small molecule
-  spectra and `peptide` for peptide spectra.
+  Various settings for file formats:
+  conversion/arrow=arrow_mol
+  conversion/arrow=arrow_peptide
+  conversion/csv=csv_mol
+  conversion/mgf=mgf_peptide
+  conversion/msp=msp_mol
+  conversion/msp=msp_peptide
+  conversion/parquet=parquet_mol
+  conversion/parquet=parquet_peptide
+  conversion/sdf=sdf_nist_mol
+  conversion/sdf=sdf_pubchem_mol
 
   Applications can be configured two ways: by groups of configurations and
   overriding individual configuration values. 

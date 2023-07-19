@@ -1,27 +1,25 @@
+defaults:
+  - conversion/msp: msp_mol
+  - conversion/mgf: mgf_peptide
+  - conversion/sdf: sdf_nist_mol
+  - conversion/parquet: parquet_mol
+  - conversion/arrow: arrow_mol
+  - conversion/csv: csv_mol
+  - override hydra/help: batch_converter_help
+  - _self_
+
 input:
   file:
     # list of input file names
     names:
       - ~/data/nist/tandem/2023/sdf/lr_msms_nist.sdf
-    # input file type
-    type: sdf
-    # what is the source of the file? nist or pubchem
-    source: nist
   # number of records to generate
   num:
 
 conversion:
-  id:
-    # name of the id field, like NISTNO. if an integer and reading sdfs, this is the start value of the ids
-    field: NISTNO
   small_molecule:
     # maximum bound of 3D conformer in angstroms (0=no limit)
     max_bound: 0.0
-  msp:
-    # Dict containing instructions on how to parse the value in subfields in msp Comment fields.  For example,
-    # "--comment_fields \"{'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}\""
-    #  where the format is {comment_field_name: (regex, type, field_name)}
-    comment_fields:
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
     probabilities: [0.0, 0.0, 0.0, 1.0]
@@ -30,17 +28,6 @@ conversion:
     min_intensity: 0.0
     # the max mz value allowed in spectral fingerprint
     max_mz: 2000
-  csv:
-    id:
-      field:
-      initial_value: 0
-    # csv has no column headers in first line
-    no_column_headers: False
-    # name of the column that will contain rdkit Mol
-    mol_column_name: mol
-    # name of the column containing SMILES.  null means "SMILES"
-    smiles_column_name: null
-    delimiter: ","
 
 output:
   file:
@@ -56,5 +43,7 @@ hydra:
   output_subdir: hydra
   sweep:
     dir: hydra_sweep
+  searchpath:
+    - pkg://masskit.conf
   job:
     chdir: False

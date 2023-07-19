@@ -7,7 +7,7 @@ from itertools import groupby, combinations
 from collections import namedtuple
 import pyarrow as pa
 import pyarrow.parquet as pq
-from masskit.data_specs.file_schemas import flat_peptide_schema
+from masskit.data_specs.file_schemas import schema_groups
 from masskit.peptide.spectrum_generator import generate_mods
 from masskit.utils.general import open_if_filename
 from masskit.utils.files import empty_records, add_row_to_records, records2table
@@ -234,7 +234,7 @@ class pepgen:
         self.digest = cfg.protein.cleavage.digest
         self.limit_rhk = cfg.peptide.use_basic_limit
         # initialize data structs
-        self.records = empty_records(flat_peptide_schema)
+        self.records = empty_records(schema_groups["peptide"]["flat_schema"])
         self.tables = []
         self.table = []
 
@@ -255,8 +255,8 @@ class pepgen:
         # self.records['stops']=None
         add_row_to_records(self.records, row)
         if len(self.records["id"]) % 25000 == 0:
-            self.tables.append(records2table(self.records, 'peptide'))
-            self.records = empty_records(flat_peptide_schema)
+            self.tables.append(records2table(self.records, schema_groups["peptide"]))
+            self.records = empty_records(schema_groups["peptide"]["flat_schema"])
 
     def finalize_table(self):
         """
@@ -264,7 +264,7 @@ class pepgen:
 
         :return: a pyarrow table
         """
-        self.tables.append(records2table(self.records, 'peptide'))
+        self.tables.append(records2table(self.records, schema_groups["peptide"]))
         table = pa.concat_tables(self.tables)
         return table
 
