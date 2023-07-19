@@ -20,7 +20,7 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 from masskit.constants import SET_NAMES
 from masskit.data_specs.schemas import mod_names_field, \
     hitlist_schema, table2structarray, table_add_structarray
-from masskit.data_specs.file_schemas import schema_groups, flat_peptide_schema, flat_molecule_schema
+from masskit.data_specs.file_schemas import schema_groups
 from masskit.data_specs.arrow_types import MolArrowType, SpectrumArrowType
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
@@ -1315,7 +1315,7 @@ class BatchFileWriter:
         :param row_batch_size: size of batches to write 
         :param num_workers: number of threads for processing
         :param column_name: name of the struct column
-=        """
+        """
         super().__init__()
         self.format = format
         self.row_batch_size = row_batch_size

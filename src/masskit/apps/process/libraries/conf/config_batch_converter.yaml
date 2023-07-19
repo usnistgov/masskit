@@ -6,6 +6,9 @@ defaults:
   - conversion/arrow: arrow_mol
   - conversion/csv: csv_mol
   - override hydra/help: batch_converter_help
+  - override hydra/hydra_logging: none
+   # should hydra configure python logging?
+  - override hydra/job_logging: none
   - _self_
 
 input:
@@ -42,12 +45,17 @@ output:
 
 hydra:
   run:
-    # working directory
-    dir: hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
-  output_subdir: hydra
+    # directory to store log files and yaml config
+    # e.g. "." or hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: .
+  # subdir of hydra.run.dir that contains hydra config yaml
+  # if set to null, will not create. Otherwise, set to "hydra"
+  output_subdir: null
   sweep:
+    # directory to store log files and yaml config for multiruns
     dir: hydra_sweep
   searchpath:
     - pkg://masskit.conf
   job:
+    # change directory to output_subdir?
     chdir: False
