@@ -21,6 +21,7 @@ template: |-
   conversion/msp=msp_peptide
   conversion/parquet=parquet_mol
   conversion/parquet=parquet_peptide
+  conversion/sdf=sdf_mol
   conversion/sdf=sdf_nist_mol
   conversion/sdf=sdf_pubchem_mol
 

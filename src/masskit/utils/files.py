@@ -223,7 +223,7 @@ class BatchLoader:
         
         :param row_batch_size: the number of rows for a single batch
         :param file_type: the type of file, e.g. mgf, msp, csv, etc.
-        :param format: the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_nist_mol, sdf_pubchem_mol. If none, use default.
+        :param format: the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_mol, sdf_nist_mol, sdf_pubchem_mol. If none, use default.
         :param num: number of records to read per batch
         """
         self.row_batch_size = row_batch_size
@@ -710,9 +710,12 @@ class SDFLoader(BatchLoader):
                 else:
                     self.current_id = mol.GetProp(self.format['id']['field'])
 
+            # workaround for getting private props like _NAME
+            props = mol.GetPropsAsDict(includePrivate=True)
+
             for field in self.format['name']['field']:
-                if mol.HasProp(field):
-                    current_name = mol.GetProp(field)
+                if field in props:
+                    current_name = props[field]
                     break
 
             new_row, mol = self.mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
@@ -1200,7 +1203,7 @@ default_formats ={
     'mgf': 'mgf_peptide',
     'msp': 'msp_mol',
     'parquet': 'parquet_mol',
-    'sdf': 'sdf_nist_mol',
+    'sdf': 'sdf_mol',
     }
 
 
@@ -1209,7 +1212,7 @@ def load_default_config_schema(file_type, format=None):
     for a given file type and format, return configuration
 
     :param file_type: the type of file, e.g. mgf, msp, arrow, parquet, sdf
-    :param format: the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_nist_mol, sdf_pubchem_mol. If none, use default
+    :param format: the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_mol, sdf_nist_mol, sdf_pubchem_mol. If none, use default
     :return: config
     """
     if format is None:

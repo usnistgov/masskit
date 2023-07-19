@@ -40,6 +40,7 @@ def SRM1950_lumos_short_parquet(SRM1950_lumos_short_sdf, tmpdir_factory):
         cfg = compose(config_name="config_batch_converter",
                       overrides=[f"input.file.names={SRM1950_lumos_short_sdf}",
                                  f"output.file.name={out}",
+                                 f"conversion/sdf=sdf_nist_mol"
                                 ])
         batch_converter_app(cfg)
         return out
@@ -129,6 +130,7 @@ def config_batch_converter_sdf(test_new_sdf, batch_converted_sdf_files):
                                  f"output.file.name={batch_converted_sdf_files}",
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100",
+                                 f"conversion/sdf=sdf_nist_mol"
                                 ])
         return cfg
 
@@ -153,7 +155,7 @@ def config_batch_converter_csv(test_csv, batch_converted_csv_files):
     
 @pytest.fixture(scope="session")
 def batch_converted_pubchem_sdf_files(tmpdir_factory):
-    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_sdf'
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_pubchem_sdf'
 
 @pytest.fixture(scope="session")
 def pubchem_sdf(data_dir):
@@ -170,6 +172,23 @@ def config_batch_converter_pubchem_sdf(pubchem_sdf, batch_converted_pubchem_sdf_
                                  f"conversion/sdf=sdf_pubchem_mol"])
         return cfg
 
+@pytest.fixture(scope="session")
+def batch_converted_plain_sdf_files(tmpdir_factory):
+    return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_plain_sdf'
+
+@pytest.fixture(scope="session")
+def plain_sdf(data_dir):
+    return data_dir / "plain.sdf"
+
+@pytest.fixture(scope="session")
+def config_batch_converter_plain_sdf(plain_sdf, batch_converted_plain_sdf_files):
+    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+        cfg = compose(config_name="config_batch_converter",
+                      overrides=[f"input.file.names={plain_sdf}",
+                                 f"output.file.name={batch_converted_plain_sdf_files}",
+                                 f"output.file.types=[parquet]",
+                                 f"conversion.row_batch_size=100"])
+        return cfg
     
 @pytest.fixture(scope="session")
 def batch_converted_csv_path_file(tmpdir_factory):
