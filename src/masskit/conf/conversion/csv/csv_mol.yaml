@@ -1,0 +1,19 @@
+format: csv
+id:
+  field:
+  field_type: int
+  initial_value: 0
+schema_group: mol
+
+# skip computation of computed properties
+skip_computed_props: True
+# skip computation of computed properties expensive to compute
+skip_expensive: True
+
+# csv has no column headers in first line
+no_column_headers: False
+# name of the column that will contain rdkit Mol
+mol_column_name: mol
+# name of the column containing SMILES.  null means "SMILES"
+smiles_column_name: SMILES
+delimiter: ","

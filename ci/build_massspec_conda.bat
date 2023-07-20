@@ -1,6 +1,6 @@
 @echo OFF
 
-rem This script is intended to be executed by CI/CD in the msdc_services\libraries directory
+rem This script is intended to be executed by CI/CD
 
 rmdir /s/q %CONDA_PREFIX%\conda-bld\*
 python setup.py bdist_conda

@@ -24,8 +24,8 @@ def test_load_spectrum():
     assert spectrum.id == 1234
     return
 
-def test_rdkit():
-    suppl = Chem.SDMolSupplier("data/test.new.sdf", sanitize=False)
+def test_rdkit(data_dir):
+    suppl = Chem.SDMolSupplier(str(data_dir / "test.new.sdf"), sanitize=False)
     for mol in suppl:
         spectrum = mss.Spectrum()
         spectrum.from_mol(mol)

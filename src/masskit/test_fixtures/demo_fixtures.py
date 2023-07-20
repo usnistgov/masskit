@@ -10,7 +10,7 @@ def cho_uniq_short_parquet():
         cfg = compose(config_name="config_batch_converter",
                       overrides=[f"input.file.names={data_dir / 'cho_uniq_short.msp'}",
                                  f"output.file.name={out}",
-                                 f"input.file.spectrum_type=peptide"])
+                                ])
         batch_converter_app(cfg)
         return out
     raise ValueError()

@@ -29,3 +29,13 @@ nested_molecule_spectrum_schema = pa.schema(base_property_fields + molecule_prop
 csv_drop_fields = ['mol', 'shortest_paths', 'spectrum', 'predicted_spectrum', 'theoretical_spectrum', 'spectrum_fp', 'spectrum_fp_count', 'ecfp4', 'ecfp4_count']
 # fields useful for dropping out for display
 display_drop_fields = ['mol', 'shortest_paths', 'spectrum_fp', 'spectrum_fp_count', 'ecfp4', 'ecfp4_count']
+
+# groups of related schemas
+schema_groups = {
+    "peptide": {"storage_type": peptide_struct,
+                "flat_schema": flat_peptide_schema,
+                "nested_schema": nested_peptide_spectrum_schema},
+    "mol": {"storage_type": molecules_struct,
+            "flat_schema": flat_molecule_schema,
+            "nested_schema": nested_molecule_spectrum_schema},
+}

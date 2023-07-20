@@ -1,0 +1,15 @@
+format: sdf
+source:
+id:
+  field:
+  field_type: int
+  initial_value: 0
+name:
+  field: 
+    - _Name
+schema_group: mol
+
+# skip computation of computed properties
+skip_computed_props: True
+# skip computation of computed properties expensive to compute
+skip_expensive: True

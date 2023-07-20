@@ -1,0 +1,6 @@
+format: parquet
+id:
+  field:
+  initial_value: 0
+schema_group: mol
+

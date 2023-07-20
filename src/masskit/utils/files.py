@@ -5,23 +5,22 @@ from io import StringIO
 import logging
 from multiprocessing import Pool
 import os
+from pathlib import Path
+import pkgutil
 import re
 from typing import Dict, List, Union
 import masskit.small_molecule
-from matplotlib.pyplot import annotate
 import numpy as np
 import pandas as pd
 import pyarrow as pa
 import pyarrow.parquet as pq
 from pyarrow import csv as pacsv
 import json
-from omegaconf import ListConfig
+from omegaconf import DictConfig, ListConfig, OmegaConf
 from masskit.constants import SET_NAMES
-from masskit.data_specs.schemas import set_field_int_metadata, \
-    mod_names_field, hitlist_schema, table2structarray, table_add_structarray, molecules_struct, \
-    peptide_struct
-from masskit.data_specs.file_schemas import nested_peptide_spectrum_schema, \
-    nested_molecule_spectrum_schema, flat_peptide_schema, flat_molecule_schema
+from masskit.data_specs.schemas import mod_names_field, \
+    hitlist_schema, table2structarray, table_add_structarray
+from masskit.data_specs.file_schemas import schema_groups
 from masskit.data_specs.arrow_types import MolArrowType, SpectrumArrowType
 from masskit.peptide.encoding import mod_masses
 from masskit.small_molecule import threed, utils
@@ -67,6 +66,7 @@ def seek_size(fp):
     fp.seek(pos) # back to where we were
     return size
 
+
 def get_progress(fp):
     """
     Given a fp pointer, return best possible progress meter
@@ -96,141 +96,6 @@ def get_progress(fp):
         )
         total = 0
     return prog, total
-
-def load_mgf2array(
-    fp,
-    num=0,
-    id_field=0,
-    set_probabilities=(0.01, 0.97, 0.01, 0.01),
-    row_entries=None,
-    title_fields=None,
-    min_intensity=0.0,
-    spectrum_type=None,
-
-):
-    """
-    Read stream in MGF format and return as Pandas data frame.
-
-    :param fp: stream or filename
-    :param num: the maximum number of records to generate (0=all)
-    :param id_field: the spectrum id to begin with
-    :param set_probabilities: how to divide into dev, train, valid, test
-    :param row_entries: dict containing additional row columns
-    :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE regex match group 1 is the value
-    :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param spectrum_type: the type of spectrum file
-    :return: one dataframe
-    """
-    # Scan:3\w  scan
-    # \wRT:0.015\w  retention_time
-    # \wHCD=10.00%\w  collision_energy
-    # sample is from filename  _Urine3667_
-    # ionization, energy, date, sample, run#, from filename
-    if spectrum_type is None:
-        spectrum_type = 'peptide'
-    records_schema = spectrum_types[spectrum_type]['flat_schema']
-    records = empty_records(records_schema)
-    tables = []
-
-    spectrum_id = id_field  # a made up integer spectrum id
-    # move forward to first begin ions
-    for line in fp:
-        mz = []
-        intensity = []
-        row = {
-            "id": spectrum_id,
-            "set": np.random.choice(SET_NAMES, p=set_probabilities),
-        }
-        if row_entries:
-            row = {**row, **row_entries}  # merge in the passed in row entries
-        try:
-            while not line.lower().startswith("BEGIN IONS".lower()):
-                line = next(fp)
-            # move to first header
-            line = next(fp).strip()
-            spectrum_id += 1  # increment id
-
-            while not line.lower().startswith("END IONS".lower()):
-                if len(line) > 0:
-                    if (
-                        line[0].isdigit() or line[0] == "-" or line[0] == "."
-                    ):  # read in peak
-                        values = line.split()
-                        if (
-                            len(values) == 2
-                        ):  # have not yet dealt with case where there is a charge appended
-                            mz.append(float(values[0]))
-                            intensity.append(float(values[1]))
-                    elif line[0] in "#;/!":  # skip comments
-                        pass
-                    else:  # header
-                        values = line.split("=", maxsplit=1)
-                        if len(values) == 2:
-                            if values[0] == "TITLE":
-                                row["name"] = values[1].rstrip()
-                                if title_fields:
-                                    for column_name, regex in title_fields.items():
-                                        m = re.search(regex, values[1])
-                                        if m:
-                                            row[column_name] = m.group(1)
-                            elif values[0] == "PEPMASS":
-                                mass_values = values[1].split(" ")
-                                row["precursor_mz"] = float(mass_values[0])
-                                if len(mass_values) > 1:
-                                    row["precursor_intensity"] = float(mass_values[1])
-                            elif values[0] == "SEQ":
-                                row["peptide"] = values[1]
-                                row["peptide_len"] = len(values[1])
-                            elif values[0] == "RTINMINUTES":
-                                row["retention_time"] = float(values[1]) * 60.0
-                            elif values[0] == "RTINSECONDS":
-                                row["retention_time"] = float(values[1])
-                            elif values[0] == "CHARGE":
-                                number, sign = re.match(
-                                    r"^(\d+)([+\-]*)$", values[1]
-                                ).groups()
-                                row["charge"] = int(sign + number)
-                            else:
-                                row[values[0]] = values[1].rstrip()
-                line = next(fp).strip()
-        except StopIteration:
-            pass
-        # finalize the spectrum only if it has peaks
-        if len(mz) != 0:      
-            row['mz'] = mz
-            row['intensity'] = intensity
-            spectrum = Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
-                                     precursor_intensity=row.get('precursor_intensity', None))
-            spectrum.charge = row.get('charge', None)
-            spectrum.peptide = row.get('peptide', None)
-            spectrum.peptide_len = row.get('peptide_len', None)
-            spectrum.mod_names = row.get('mod_names', None)
-            spectrum.mod_positions = row.get('mod_positions', None)
-            row['product_massinfo'] = spectrum.product_mass_info.__dict__
-            row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
-            row["spectrum_fp"] = fingerprint.to_numpy()
-            row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-            row['precursor_mz'] = spectrum.precursor.mz
-
-            add_row_to_records(records, row)
-
-        if num is not None and len(records['id']) >= num:
-            break
-
-        # check to see if we have enough records to log
-        if len(records["id"]) % 5000 == 0:
-            logging.info(f"read record {len(records['id'])}, spectrum_id={spectrum_id}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(records2table(records, spectrum_type))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(records_schema)
-
-    tables.append(records2table(records, spectrum_type))
-    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-    table = pa.concat_tables(tables)
-    return table
 
 
 def write_parquet(fp, table):
@@ -269,7 +134,7 @@ def read_parquet(fp, columns=None, num=None, filters=None):
 def spectra_to_array(spectra,
                      min_intensity=0,
                      write_starts_stops=False,
-                     spectrum_type=None
+                     schema_group=None
                      ):
     """
     convert an array-like of spectra to an arrow_table
@@ -277,12 +142,13 @@ def spectra_to_array(spectra,
     :param spectra: iteratable containing the spectrums
     :param min_intensity: the minimum intensity to set the fingerprint bit
     :param write_starts_stops: put the starts and stops arrays into the arrow Table
-    :param spectrum_type: the type of spectrum file
+    :param schema_group: the schema group of spectrum file
     :return: arrow table of spectra
     """
-    if spectrum_type is None:
-        spectrum_type = 'peptide'
-    records_schema = spectrum_types[spectrum_type]['flat_schema']
+    if schema_group is None:
+        schema_group = 'peptide'
+    
+    records_schema = schema_groups[schema_group]['flat_schema']
     records = empty_records(records_schema)
 
     for s in spectra:
@@ -349,215 +215,673 @@ nist_mod_2_unimod = {
     'TMT': 'TMT6plex',
 }
 
-def load_msp2array(
-    fp,
-    num=None,
-    id_field=0,
-    title_fields=None,
-    comment_fields=None,
-    min_intensity=20,
-    spectrum_type=None
-):
-    """
-    Read stream or filename in MSP format and return as pyarrow Table.
 
-    :param fp: stream or filename
-    :param num: the maximum number of records to generate (None=all)
-    :param id_field: the spectrum id to begin with
-    :param title_fields: dict containing column names with corresponding regex to extract field values from the TITLE. regex match group 1 is the value
-    :param comment_fields: a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {'Filter':(r'@hcd(\d+\.?\d* )', float, 'nce')}
-    :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param spectrum_type: type of spectrum file
-    :return: arrow table
-    """
+class BatchLoader:
+    def __init__(self, file_type, row_batch_size=5000, format=None, num=None):
+        """
+        initialize stream batch loader
+        
+        :param row_batch_size: the number of rows for a single batch
+        :param file_type: the type of file, e.g. mgf, msp, csv, etc.
+        :param format: the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_mol, sdf_nist_mol, sdf_pubchem_mol. If none, use default.
+        :param num: number of records to read per batch
+        """
+        self.row_batch_size = row_batch_size
+        self.num = num
+        if format is None:
+            self.format = load_default_config_schema(file_type)
+        else:
+            self.format = format
 
-    tables = []
-    if spectrum_type is None:
-        spectrum_type = 'mol'
-    record_type = spectrum_types[spectrum_type]['flat_schema']
-    records = empty_records(record_type)
+        self.schema_group = schema_groups[self.format['schema_group']]
 
-    spectrum_id = id_field  # a made up integer spectrum id
-    # move forward to first begin ions
-    line = fp.readline()
-    # skip to first full entry
-    while line and not line.lower().startswith("Name: ".lower()):
+
+    def setup(self):
+        """
+        set up loading
+        """
+        self.tables = []
+        self.records = empty_records(self.schema_group['flat_schema'])
+
+        if self.format['id']['field_type'] == 'int':
+            self.current_id = self.format['id']['initial_value']
+        else:
+            self.current_id = 0
+
+    def loop_end(self):
+        """
+        end of loop to read in one record
+        """
+        if not self.format['id']['field']:
+            self.current_id += 1
+
+        if len(self.records["id"]) % 25000 == 0:
+            self.tables.append(records2table(self.records, self.schema_group))
+            logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
+            self.records = empty_records(self.schema_group['flat_schema'])
+
+    def finalize(self):
+        """
+        finalized the chunk
+        """
+        if self.records:
+            self.tables.append(records2table(self.records, self.schema_group))
+        logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
+        table = pa.concat_tables(self.tables)
+        return table
+    
+    def load(self, fp):
+        """
+        read in a chunk from a stream
+        
+        :param fp: the stream
+        """
+        raise NotImplementedError
+    
+    # fingerprint generator
+    ecfp4 = ECFPFingerprint()
+    # smarts for tms for substructure matching
+    tms = Chem.MolFromSmarts("[#14]([CH3])([CH3])[CH3]")
+    # only enumerate unique stereoisomers
+    opts = StereoEnumerationOptions(unique=True)
+    # fingerprint generator that respects counts but not chirality as mass spec tends to be chirality blind
+
+    @classmethod
+    def mol2row(cls, mol, max_size:int=0, skip_computed_props=True, skip_expensive:bool=True) -> Dict:
+        """
+        Convert an rdkit Mol into a row
+        
+        :param mol: the molecule
+        :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
+        :param skip_computed_props: skip computing properties
+        :param skip_expensive: skip computing computationally expensive properties
+        :return: row as dict, mol
+        """
+        if mol is None or mol.GetNumAtoms() < 1:
+            logging.info(f"Unable to use molecule object")
+            return {}, mol
+
+        try:
+            mol = masskit.small_molecule.utils.standardize_mol(mol)
+        except ValueError as e:
+            logging.info(f"Unable to standardize")
+            return {}, mol
+        
+        if len(mol.GetPropsAsDict()) == 0:
+            logging.info(f"All molecular props unavailable")
+
+        new_row = {
+            "mol": Chem.rdMolInterchange.MolToJSON(mol)
+        }
+        
+        if not skip_computed_props:
+            # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
+            # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
+
+            new_row["has_2d"] = True
+            new_row["inchi_key"] = Chem.inchi.MolToInchiKey(mol)
+            new_row["isomeric_smiles"] = Chem.MolToSmiles(mol)
+            new_row["smiles"] = Chem.MolToSmiles(mol, isomericSmiles=False)
+
+            if not skip_expensive:
+                mol, conformer_ids, return_value = threed.create_conformer(mol)
+                if return_value == -1:
+                    logging.info(f"Not able to create conformer")
+                    return {}, mol
+                # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
+
+                # calculation MMFF94 partial charges
+                partial_charges = []
+                try:
+                    mol_copy = copy.deepcopy(
+                        mol
+                    )  # the MMFF calculation sanitizes the molecule
+                    fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
+                    if fps is not None:
+                        for atom_num in range(0, mol_copy.GetNumAtoms()):
+                            partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
+                except ValueError:
+                    logging.info(f"unable to run MMFF")
+                new_row["num_conformers"] = len(conformer_ids)
+                new_row["partial_charges"] = partial_charges
+                bounding_box = threed.bounding_box(mol)
+                new_row["min_x"] = bounding_box[0, 0]
+                new_row["max_x"] = bounding_box[0, 1]
+                new_row["min_y"] = bounding_box[1, 0]
+                new_row["max_y"] = bounding_box[1, 1]
+                new_row["min_z"] = bounding_box[2, 0]
+                new_row["max_z"] = bounding_box[2, 1]
+                new_row["has_conformer"] = True
+                new_row["max_bound"] = np.max(np.abs(bounding_box))
+                if max_size != 0 and new_row["max_bound"] > max_size:
+                    logging.info(f"larger than the max bound")
+                    return {}, mol
+                try:
+                    new_row["num_stereoisomers"] = len(
+                        tuple(EnumerateStereoisomers(mol, options=cls.opts))
+                    )  # GetStereoisomerCount(mol)
+                except RuntimeError as err:
+                    logging.info(
+                        f"Unable to create stereoisomer count, error = {err}"
+                    )
+                    new_row["num_stereoisomers"] = None
+            else:
+                # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
+                new_row["has_conformer"] = False
+
+            # calculate solvent accessible surface area per atom
+            # try:
+            #     radii = []
+            #     for atom in mol.GetAtoms():
+            #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
+            #     rdFreeSASA.CalcSASA(mol, radii=radii)
+            # except:
+            #     logging.info("unable to create sasa")
+            
+            new_row["has_tms"] = len(
+                mol.GetSubstructMatches(cls.tms)
+            )  # count of trimethylsilane matches
+            new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
+            new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
+            new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
+            new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
+            new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
+            new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
+            new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
+            new_row["num_atoms"] = mol.GetNumAtoms()
+            cls.ecfp4.object2fingerprint(mol)  # expressed as a bit vector
+            new_row["ecfp4"] = cls.ecfp4.to_numpy()
+            new_row["ecfp4_count"] = cls.ecfp4.get_num_on_bits()
+            # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
+            # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
+            # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
+            # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
+            # number of undefined stereoisomers
+            new_row[
+                "num_undef_stereo"
+            ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
+            # get number of unspecified double bonds
+            new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+
+        return new_row, mol
+
+
+class MSPLoader(BatchLoader):   
+    def __init__(self, row_batch_size=5000, format=None, min_intensity=0, num=None):
+        super().__init__('msp', row_batch_size=row_batch_size, format=format, num=num)
+
+        if self.format['comment_fields']:
+            self.format['comment_fields'] = eval(self.format['comment_fields'][0])
+        self.min_intensity = min_intensity
+        
+    def load(self, fp):
+        self.setup()
+
+        # move forward to first begin ions
         line = fp.readline()
-
-    while line:
-        row = {}
-        mz = []
-        intensity = []
-        row["id"] = spectrum_id
-        spectrum_id += 1  # increment id
+        # skip to first full entry
+        while line and not line.lower().startswith("Name: ".lower()):
+            line = fp.readline()
 
         while line:
-            line = line.strip()
-            if (
-                line and (line[0].isdigit() or line[0] == "-" or line[0] == ".")
-            ):  # read in peak
-                peak_list = line.split(';')
-                for peak in peak_list:
-                    values = peak.strip().split(None, 2)  # split on first two whitespaces
-                    if (len(values) >= 2):
-                        # have not yet dealt with case where there is a charge appended
-                        mz.append(float(values[0]))
-                        intensity.append(float(values[1]))
-            else:  # header
-                values = re.split(r": ", line, 1)
-                if len(values) == 2:
-                    # Name: DLPQGFSALEPLVDLPIGINITR/3_1(19,N,G:G2Hx5)  -> peptide, charge, position of mod, mod
-                    if values[0] == "Name":
-                        m = re.match(
-                            r"([A-Z]+)/(\d)+(_\d+)*\((\d+),[A-Z]+,(.*)\)", values[1]
-                        )
-                        if m is not None:
-                            row["name"] = m.group(0)
-                            row["peptide"] = m.group(1)
-                            row["peptide_len"] = len(m.group(1))
-                            # row['glycosylation'] = m.group(5)
-                            # row['glycosylation_pos'] = int(m.group(4))
-                            row["charge"] = int(m.group(2))
-                        else:
-                            m = re.match(r"([A-Z]+)/(\d)+", values[1])
+            row = {}
+            mz = []
+            intensity = []
+            row["id"] = self.current_id
+
+            while line:
+                line = line.strip()
+                if (
+                    line and (line[0].isdigit() or line[0] == "-" or line[0] == ".")
+                ):  # read in peak
+                    peak_list = line.split(';')
+                    for peak in peak_list:
+                        values = peak.strip().split(None, 2)  # split on first two whitespaces
+                        if (len(values) >= 2):
+                            # have not yet dealt with case where there is a charge appended
+                            mz.append(float(values[0]))
+                            intensity.append(float(values[1]))
+                else:  # header
+                    values = re.split(r": ", line, 1)
+                    if len(values) == 2:
+                        # Name: DLPQGFSALEPLVDLPIGINITR/3_1(19,N,G:G2Hx5)  -> peptide, charge, position of mod, mod
+                        if values[0] == "Name":
+                            m = re.match(
+                                r"([A-Z]+)/(\d)+(_\d+)*\((\d+),[A-Z]+,(.*)\)", values[1]
+                            )
                             if m is not None:
                                 row["name"] = m.group(0)
                                 row["peptide"] = m.group(1)
                                 row["peptide_len"] = len(m.group(1))
+                                # row['glycosylation'] = m.group(5)
+                                # row['glycosylation_pos'] = int(m.group(4))
                                 row["charge"] = int(m.group(2))
-                        if title_fields:
-                            for column_name, regex in title_fields.items():
-                                m = re.search(regex, values[1])
-                                if m:
-                                    row[column_name] = m.group(1)
-                    elif values[0] == "PrecursorMZ" or values[0] == "PRECURSORMZ":
-                        row["precursor_mz"] = float(values[1].rstrip())
-                    elif values[0] == "NCE":
-                        row["nce"] = float(values[1].rstrip())
-                    elif values[0] == "eV":
-                        row["ev"] = float(values[1].rstrip())
-                    elif values[0] == "Ion_mode":
-                        row["ion_mode"] = values[1].rstrip()
-                    elif values[0] == "Collision_energy":
-                        parse_energy(row, values[1])
-                    elif values[0] == "Instrument":
-                        row["instrument"] = values[1].rstrip()
-                    elif values[0] == "Instrument_type":
-                        row["instrument_type"] = values[1].rstrip()
-                    elif values[0] == "InstrumentModel":
-                        row["instrument_model"] = values[1].rstrip()
-                    elif values[0] == "Ionization":
-                        row["ionization"] = values[1].rstrip()
-                    elif values[0] == "Precursor_type":
-                        row["precursor_type"] = values[1].rstrip()
-                    elif values[0] == "ProteinId":
-                            row["protein_id"] = values[1].rstrip().split(',')
-                    elif values[0] == "Comment":
-                        # iterate through name=value pairs.  If the value is bracketed by quotes, the regex
-                        # takes the whole value
-                        # alternative mechanism to decode quoted string is csv.reader([match.group(2)])
-                        if 'Single ' in values[1]:
-                            row['composition'] = 'bestof'
-                        elif 'Consensus ' in values[1]:
-                            row['composition'] = 'consensus'
+                            else:
+                                m = re.match(r"([A-Z]+)/(\d)+", values[1])
+                                if m is not None:
+                                    row["name"] = m.group(0)
+                                    row["peptide"] = m.group(1)
+                                    row["peptide_len"] = len(m.group(1))
+                                    row["charge"] = int(m.group(2))
+                            if self.format['title_fields']:
+                                for column_name, regex in self.format['title_fields'].items():
+                                    m = re.search(regex, values[1])
+                                    if m:
+                                        row[column_name] = m.group(1)
+                        elif values[0] == "PrecursorMZ" or values[0] == "PRECURSORMZ":
+                            row["precursor_mz"] = float(values[1].rstrip())
+                        elif values[0] == "NCE":
+                            row["nce"] = float(values[1].rstrip())
+                        elif values[0] == "eV":
+                            row["ev"] = float(values[1].rstrip())
+                        elif values[0] == "Ion_mode":
+                            row["ion_mode"] = values[1].rstrip()
+                        elif values[0] == "Collision_energy":
+                            parse_energy(row, values[1])
+                        elif values[0] == "Instrument":
+                            row["instrument"] = values[1].rstrip()
+                        elif values[0] == "Instrument_type":
+                            row["instrument_type"] = values[1].rstrip()
+                        elif values[0] == "InstrumentModel":
+                            row["instrument_model"] = values[1].rstrip()
+                        elif values[0] == "Ionization":
+                            row["ionization"] = values[1].rstrip()
+                        elif values[0] == "Precursor_type":
+                            row["precursor_type"] = values[1].rstrip()
+                        elif values[0] == "ProteinId":
+                                row["protein_id"] = values[1].rstrip().split(',')
+                        elif values[0] == "Comment":
+                            # iterate through name=value pairs.  If the value is bracketed by quotes, the regex
+                            # takes the whole value
+                            # alternative mechanism to decode quoted string is csv.reader([match.group(2)])
+                            if 'Single ' in values[1]:
+                                row['composition'] = 'bestof'
+                            elif 'Consensus ' in values[1]:
+                                row['composition'] = 'consensus'
 
-                        for match in re.finditer(
-                            r'([^= ]+)=(("([^"]+)")|([^" ]+))', values[1].rstrip()
-                        ):
-                            if match.group(1) == "Parent":
-                                row["precursor_mz"] = float(match.group(2))
-                            elif match.group(1) == "PrecursorMonoisoMZ" and "precursor_mz" not in row:
-                                # use the precursor mass instead of parent if parent not available
-                                row["precursor_mz"] = float(match.group(2))
-                            elif match.group(1) == "Pep":
-                                if match.group(2).casefold() == 'Tryptic'.casefold():
-                                    row["peptide_type"] = 'tryptic'
-                                elif match.group(2).casefold() == 'N-Semitryptic'.casefold():
-                                    row["peptide_type"] = 'semitryptic'
-                                elif match.group(2).casefold() == 'C-Semitryptic'.casefold():
-                                    row["peptide_type"] = 'semitryptic'
-                                elif match.group(2).casefold() == 'SemiTryptic'.casefold():
-                                    row["peptide_type"] = 'semitryptic'
-                                elif match.group(2).casefold() == 'NonTryptic'.casefold():
-                                    row["peptide_type"] = 'nontryptic'
-                            elif match.group(1) == "NCE":
-                                row["nce"] = float(match.group(2))
-                            elif match.group(1) == "CE":
-                                parse_energy(row, match.group(2))
-                            elif match.group(1) == "HCD":
-                                parse_energy(row, match.group(2))
-                            elif match.group(1) == "Mods":
-                                submatch = re.findall(r'\((\d+),[A-Z]+,([^\)]*)\)', match.group(2))
-                                if not submatch:
-                                    # deal with older format of modifications
-                                    submatch = re.findall(r'/(\d+),[A-Z]+,([^/]*)', match.group(2))
-                                row["mod_names"] = [mod_masses.dictionary.index(nist_mod_2_unimod.get(x[1], x[1])) for x in submatch]
-                                row["mod_positions"] = [int(x[0]) for x in submatch]
-                            elif match.group(1) == "Filter":
-                                submatch = re.search(r'@hcd(\d+\.*\d*) ', match.group(2))
-                                if submatch:
-                                    row["nce"] = float(submatch.group(1))
-                            elif comment_fields:
-                                for subfield_name, (regex, field_type, field_name) in comment_fields.items():
-                                    if match.group(1) == subfield_name:
-                                        submatch = re.search(regex, match.group(2))
-                                        if submatch:
-                                            #row[field_name] = field_type(submatch.group(1))
-                                            pass
-            line = fp.readline()
-            if not line or re.match("^Name:", line):
+                            for match in re.finditer(
+                                r'([^= ]+)=(("([^"]+)")|([^" ]+))', values[1].rstrip()
+                            ):
+                                if match.group(1) == "Parent":
+                                    row["precursor_mz"] = float(match.group(2))
+                                elif match.group(1) == "PrecursorMonoisoMZ" and "precursor_mz" not in row:
+                                    # use the precursor mass instead of parent if parent not available
+                                    row["precursor_mz"] = float(match.group(2))
+                                elif match.group(1) == "Pep":
+                                    if match.group(2).casefold() == 'Tryptic'.casefold():
+                                        row["peptide_type"] = 'tryptic'
+                                    elif match.group(2).casefold() == 'N-Semitryptic'.casefold():
+                                        row["peptide_type"] = 'semitryptic'
+                                    elif match.group(2).casefold() == 'C-Semitryptic'.casefold():
+                                        row["peptide_type"] = 'semitryptic'
+                                    elif match.group(2).casefold() == 'SemiTryptic'.casefold():
+                                        row["peptide_type"] = 'semitryptic'
+                                    elif match.group(2).casefold() == 'NonTryptic'.casefold():
+                                        row["peptide_type"] = 'nontryptic'
+                                elif match.group(1) == "NCE":
+                                    row["nce"] = float(match.group(2))
+                                elif match.group(1) == "CE":
+                                    parse_energy(row, match.group(2))
+                                elif match.group(1) == "HCD":
+                                    parse_energy(row, match.group(2))
+                                elif match.group(1) == "Mods":
+                                    submatch = re.findall(r'\((\d+),[A-Z]+,([^\)]*)\)', match.group(2))
+                                    if not submatch:
+                                        # deal with older format of modifications
+                                        submatch = re.findall(r'/(\d+),[A-Z]+,([^/]*)', match.group(2))
+                                    row["mod_names"] = [mod_masses.dictionary.index(nist_mod_2_unimod.get(x[1], x[1])) for x in submatch]
+                                    row["mod_positions"] = [int(x[0]) for x in submatch]
+                                elif match.group(1) == "Filter":
+                                    submatch = re.search(r'@hcd(\d+\.*\d*) ', match.group(2))
+                                    if submatch:
+                                        row["nce"] = float(submatch.group(1))
+                                elif self.format['comment_fields']:
+                                    for subfield_name, (regex, field_type, field_name) in self.format['comment_fields'].items():
+                                        if match.group(1) == subfield_name:
+                                            submatch = re.search(regex, match.group(2))
+                                            if submatch:
+                                                #row[field_name] = field_type(submatch.group(1))
+                                                pass
+                line = fp.readline()
+                if not line or re.match("^Name:", line):
+                    break
+
+            # finalize the spectrum only if it has peaks
+            if len(mz) != 0:
+                row['mz'] = mz
+                row['intensity'] = intensity
+                spectrum = Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
+                                        precursor_intensity=row.get('precursor_intensity', None))
+                spectrum.charge = row.get('charge', None)
+                spectrum.peptide = row.get('peptide', None)
+                spectrum.peptide_len = row.get('peptide_len', None)
+                spectrum.protein_id = row.get('protein_id')
+                spectrum.mod_names = row.get('mod_names', None)
+                spectrum.mod_positions = row.get('mod_positions', None)
+                row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                fingerprint = spectrum.filter(min_intensity=self.min_intensity).create_fingerprint(max_mz=2000)
+                row["spectrum_fp"] = fingerprint.to_numpy()
+                row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+                add_row_to_records(self.records, row)
+            else:
+                pass
+
+            if self.num is not None and len(self.records['id']) >= self.num:
                 break
 
-        # finalize the spectrum only if it has peaks
-        if len(mz) != 0:
-            row['mz'] = mz
-            row['intensity'] = intensity
-            spectrum = Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
-                                     precursor_intensity=row.get('precursor_intensity', None))
-            spectrum.charge = row.get('charge', None)
-            spectrum.peptide = row.get('peptide', None)
-            spectrum.peptide_len = row.get('peptide_len', None)
-            spectrum.protein_id = row.get('protein_id')
-            spectrum.mod_names = row.get('mod_names', None)
-            spectrum.mod_positions = row.get('mod_positions', None)
-            row['product_massinfo'] = spectrum.product_mass_info.__dict__
-            row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-            fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
-            row["spectrum_fp"] = fingerprint.to_numpy()
-            row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-            add_row_to_records(records, row)
+            self.loop_end()
+        return self.finalize()
+
+class MGFLoader(BatchLoader):   
+    def __init__(self, row_batch_size=5000, format=None, num=None, 
+                 set_probabilities=(0.01, 0.97, 0.01, 0.01), 
+                 min_intensity=0.0):
+        super().__init__('mgf', row_batch_size=row_batch_size, format=format, num=num)
+        self.min_intensity = min_intensity
+        self.set_probabilities = set_probabilities
+        
+    def load(self, fp):
+        self.setup()
+        for line in fp:
+            mz = []
+            intensity = []
+            row = {
+                "id": self.current_id,
+                "set": np.random.choice(SET_NAMES, p=self.set_probabilities),
+            }
+            if self.format['row_entries']:
+                row = {**row, **self.format['row_entries']}  # merge in the passed in row entries
+            try:
+                while not line.lower().startswith("BEGIN IONS".lower()):
+                    line = next(fp)
+                # move to first header
+                line = next(fp).strip()
+
+                while not line.lower().startswith("END IONS".lower()):
+                    if len(line) > 0:
+                        if (
+                            line[0].isdigit() or line[0] == "-" or line[0] == "."
+                        ):  # read in peak
+                            values = line.split()
+                            if (
+                                len(values) == 2
+                            ):  # have not yet dealt with case where there is a charge appended
+                                mz.append(float(values[0]))
+                                intensity.append(float(values[1]))
+                        elif line[0] in "#;/!":  # skip comments
+                            pass
+                        else:  # header
+                            values = line.split("=", maxsplit=1)
+                            if len(values) == 2:
+                                if values[0] == "TITLE":
+                                    row["name"] = values[1].rstrip()
+                                    if self.format['title_fields']:
+                                        for column_name, regex in self.format['title_fields'].items():
+                                            m = re.search(regex, values[1])
+                                            if m:
+                                                row[column_name] = m.group(1)
+                                elif values[0] == "PEPMASS":
+                                    mass_values = values[1].split(" ")
+                                    row["precursor_mz"] = float(mass_values[0])
+                                    if len(mass_values) > 1:
+                                        row["precursor_intensity"] = float(mass_values[1])
+                                elif values[0] == "SEQ":
+                                    row["peptide"] = values[1]
+                                    row["peptide_len"] = len(values[1])
+                                elif values[0] == "RTINMINUTES":
+                                    row["retention_time"] = float(values[1]) * 60.0
+                                elif values[0] == "RTINSECONDS":
+                                    row["retention_time"] = float(values[1])
+                                elif values[0] == "CHARGE":
+                                    number, sign = re.match(
+                                        r"^(\d+)([+\-]*)$", values[1]
+                                    ).groups()
+                                    row["charge"] = int(sign + number)
+                                else:
+                                    row[values[0]] = values[1].rstrip()
+                    line = next(fp).strip()
+            except StopIteration:
+                pass
+            # finalize the spectrum only if it has peaks
+            if len(mz) != 0:      
+                row['mz'] = mz
+                row['intensity'] = intensity
+                spectrum = Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
+                                        precursor_intensity=row.get('precursor_intensity', None))
+                spectrum.charge = row.get('charge', None)
+                spectrum.peptide = row.get('peptide', None)
+                spectrum.peptide_len = row.get('peptide_len', None)
+                spectrum.mod_names = row.get('mod_names', None)
+                spectrum.mod_positions = row.get('mod_positions', None)
+                row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                fingerprint = spectrum.filter(min_intensity=self.min_intensity).create_fingerprint(max_mz=2000)
+                row["spectrum_fp"] = fingerprint.to_numpy()
+                row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+                row['precursor_mz'] = spectrum.precursor.mz
+
+                add_row_to_records(self.records, row)
+
+            if self.num is not None and len(self.records['id']) >= self.num:
+                break
+
+            self.loop_end()
+        return self.finalize()
+
+class SDFLoader(BatchLoader):   
+    def __init__(self, row_batch_size=5000, format=None, num=None,
+                 set_probabilities=(0.01, 0.97, 0.01, 0.01), 
+                 min_intensity=0.0):
+        super().__init__('sdf', row_batch_size=row_batch_size, format=format, num=num)
+        self.min_intensity = min_intensity
+        self.set_probabilities = set_probabilities
+
+        
+    def load(self, fp):
+        # max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
+        # precursor_mass_info: mass information for precursor. if None, will use default.
+        # product_mass_info: mass information for product. if None, will use default.
+        # suppress_rdkit_warnings: don't print out spurious rdkit warnings
+        max_size=0
+        precursor_mass_info=None
+        product_mass_info=None
+        suppress_rdkit_warnings=True
+
+        self.setup()
+        current_name = None
+
+        # Turn off RDKit error messages
+        if suppress_rdkit_warnings:
+            RDLogger.DisableLog('rdApp.*')
+
+        while True:
+            try:
+                mol = next(fp)
+            except StopIteration:
+                break
+            if mol is None:
+                logging.info(f'unable to read mol after mol with name {current_name} and id {self.current_id}')
+                continue
+
+            if self.format['id']['field'] and mol.HasProp(self.format['id']['field']):
+                if self.format['id']['field_type'] == 'int':
+                    self.current_id = int(mol.GetProp(self.format['id']['field']))
+                else:
+                    self.current_id = mol.GetProp(self.format['id']['field'])
+
+            # workaround for getting private props like _NAME
+            props = mol.GetPropsAsDict(includePrivate=True)
+
+            for field in self.format['name']['field']:
+                if field in props:
+                    current_name = props[field]
+                    break
+
+            new_row, mol = self.mol2row(mol, 
+                                        skip_computed_props=self.format['skip_computed_props'],
+                                        skip_expensive=self.format['skip_expensive'], 
+                                        max_size=max_size
+                                        )
+            if new_row is None or not new_row:
+                logging.info(f'unable to standardize mol with name {current_name} and id {self.current_id}')
+                continue
+
+            # create useful set labels for training
+            spectrum = None
+            if self.format['source'] == "nist":
+                # create the mass spectrum
+                spectrum = Spectrum(product_mass_info=product_mass_info,
+                                        precursor_mass_info=precursor_mass_info)
+                spectrum.from_mol(mol, 
+                                  self.format['skip_expensive'], 
+                                  id_field=self.format['id']['field'], 
+                                  id_field_type=self.format['id']['field_type']
+                                  )
+                spectrum.id = self.current_id
+                spectrum.name = current_name
+                try:
+                    new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=self.set_probabilities)
+                    new_row["precursor_mz"] = spectrum.precursor.mz
+                    new_row["casno"] = spectrum.casno
+                    new_row["synonyms"] = json.dumps(spectrum.synonyms)
+                    new_row["spectrum"] = spectrum
+                    new_row["column"] = spectrum.column
+                    new_row["experimental_ri"] = spectrum.experimental_ri
+                    new_row["experimental_ri_error"] = spectrum.experimental_ri_error
+                    new_row["experimental_ri_data"] = spectrum.experimental_ri_data
+                    new_row["stdnp"] = spectrum.stdnp
+                    new_row["stdnp_error"] = spectrum.stdnp_error
+                    new_row["stdnp_data"] = spectrum.stdnp_data
+                    new_row["stdpolar"] = spectrum.stdpolar
+                    new_row["stdpolar_error"] = spectrum.stdpolar_error
+                    new_row["stdpolar_data"] = spectrum.stdpolar_data
+                    new_row["estimated_ri"] = spectrum.estimated_ri
+                    new_row["estimated_ri_error"] = spectrum.estimated_ri_error
+                    new_row["exact_mass"] = spectrum.exact_mass
+                    new_row["ion_mode"] = spectrum.ion_mode
+                    new_row["charge"] = spectrum.charge
+                    new_row["instrument"] = spectrum.instrument
+                    new_row["instrument_type"] = spectrum.instrument_type
+                    new_row["instrument_model"] = spectrum.instrument_model
+                    new_row["ionization"] = spectrum.ionization
+                    new_row["collision_gas"] = spectrum.collision_gas
+                    new_row["sample_inlet"] = spectrum.sample_inlet
+                    new_row["spectrum_type"] = spectrum.spectrum_type
+                    new_row["precursor_type"] = spectrum.precursor_type
+                    new_row["inchi_key_orig"] = spectrum.inchi_key
+                    new_row["vial_id"] = spectrum.vial_id
+                    new_row["collision_energy"] = spectrum.collision_energy
+                    new_row["nce"] = spectrum.nce
+                    new_row["ev"] = spectrum.ev
+                    new_row["insource_voltage"] = spectrum.insource_voltage
+                    new_row["mz"] = spectrum.products.mz
+                    new_row["intensity"] = spectrum.products.intensity
+                    new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
+                    new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
+                    fingerprint = spectrum.filter(min_intensity=self.min_intensity).create_fingerprint(max_mz=2000)
+                    new_row["spectrum_fp"] = fingerprint.to_numpy()
+                    new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
+                except AttributeError:
+                    raise ValueError('attribute error from spectrum: ' + spectrum.id)
+            elif self.format['source'] == "pubchem":
+                if mol.HasProp("PUBCHEM_XLOGP3"):
+                    new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
+                if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
+                    new_row["component_count"] = float(
+                        mol.GetProp("PUBCHEM_COMPONENT_COUNT")
+                    )
+            elif self.format['source'] == 'nist_ri':
+                new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
+                new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=self.set_probabilities)
+                if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
+                    ri_string = mol.GetProp("COLUMN CLASS")
+                    if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
+                        new_row['column'] = 'SemiStdNP'
+                        new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['experimental_ri_error'] = 0.0
+                        new_row['experimental_ri_data'] = 1
+                    elif ri_string == 'Standard non-polar':
+                        new_row['column'] = 'StdNP'
+                        new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['stdnp_error'] = 0.0
+                        new_row['stdnp_data'] = 1
+                    elif ri_string == 'Standard polar':
+                        new_row['column'] = 'StdPolar'
+                        new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
+                        new_row['stdpolar_error'] = 0.0
+                        new_row['stdpolar_data'] = 1
+
+            new_row["id"] = self.current_id
+            new_row["name"] = current_name
+            add_row_to_records(self.records, new_row)
+
+            if self.num is not None and len(self.records['id']) >= self.num:
+                break
+
+            self.loop_end()
+        return self.finalize()
+
+class CSVLoader(BatchLoader):   
+    def __init__(self, row_batch_size=5000, format=None, num=None):
+        super().__init__('csv', row_batch_size=row_batch_size, format=format, num=num)
+        
+    def load(self, fp):
+        self.setup()
+        suppress_rdkit_warnings=True
+
+        # Turn off RDKit error messages
+        if suppress_rdkit_warnings:
+            RDLogger.DisableLog('rdApp.*')
+
+        for next_chunk in fp:
+            if next_chunk is None:
+                break
+            table = pa.Table.from_batches([next_chunk])
+            column_names = table.column_names
+
+            # edit possibly overlapping column names
+            column_names = [f'{self.format["mol_column_name"]}_original' if self.format["mol_column_name"] == x else x for x in column_names]
+            if self.current_id is not None:
+                column_names = ['id_original' if 'id' in x else x for x in column_names]
+            table = table.rename_columns(column_names)
+
+            ids = []
+            mols = []
+
+            for i in range(len(table)):
+                try:
+                    mol = Chem.MolFromSmiles(table[self.format['smiles_column_name']][i].as_py())
+                    mol = masskit.small_molecule.utils.standardize_mol(mol)
+                except ValueError as e:
+                    logging.info(f"Unable to standardize {table[self.format['smiles_column_name']][i].as_py()}")
+                    continue
+                mols.append(Chem.rdMolInterchange.MolToJSON(mol))
+                if self.current_id is not None:
+                    ids.append(self.current_id)
+                    self.current_id += 1
+            table = table.append_column('mol', pa.array(mols, type=MolArrowType()))
+            if self.current_id is not None:
+                table = table.append_column('id', pa.array(ids, type=pa.uint64()))
+            self.tables.append(table)
+
+        if len(self.tables) == 0:
+            table = pa.table([])
         else:
-            pass
-
-        if num is not None and len(records['id']) >= num:
-            break
-
-        # check to see if we have enough records to log
-        if len(records["id"]) % 5000 == 0:
-            #print(f"read record {len(records)}, spectrum_id={spectrum_id}")
-            logging.info(f"read record {len(records['id'])}, spectrum_id={spectrum_id}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(records2table(records, spectrum_type))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(record_type)
-
-    tables.append(records2table(records, spectrum_type))
-    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-    table = pa.concat_tables(tables)
-    return table
+            table = pa.concat_tables(self.tables)
+        return table
 
 
-def records2table(records, spectrum_type):
+def records2table(records, schema_group):
     """
     convert a flat table with spectral records into a table with a nested spectrum
 
     :param records: records to be added to a table
-    :param spectrum_type: which type of spectrum
+    :param schema_group: the schema group
     """
-    table = pa.table(records, spectrum_types[spectrum_type]['flat_schema'])
-    structarray = table2structarray(table, SpectrumArrowType(storage_type=spectrum_types[spectrum_type]['storage_type']))
-    table = table.select([x for x in table.column_names if x in spectrum_types[spectrum_type]['nested_schema'].names])
+    table = pa.table(records, schema_group['flat_schema'])
+    structarray = table2structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
+    table = table.select([x for x in table.column_names if x in schema_group['nested_schema'].names])
     table = table_add_structarray(table, structarray)
     return table
 
@@ -720,487 +1044,6 @@ def parse_glycopeptide_annot(annots, peak_index):
             )
     return parsed_annots
 
-def mol2row(mol, max_size:int=0, skip_expensive:bool=True) -> Dict:
-    """
-    Convert an rdkit Mol into a row
-    
-    :param mol: the molecule
-    :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
-    :param skip_expensive: skip expensive calculations for better perf
-    :return: row as dict, mol
-    """
-    ecfp4 = ECFPFingerprint()
-    # smarts for tms for substructure matching
-    tms = Chem.MolFromSmarts("[#14]([CH3])([CH3])[CH3]")
-    # only enumerate unique stereoisomers
-    opts = StereoEnumerationOptions(unique=True)
-    # fingerprint generator that respects counts but not chirality as mass spec tends to be chirality blind
-
-    if mol is None or mol.GetNumAtoms() < 1:
-        logging.info(f"Unable to use molecule object")
-        return {}, mol
-
-    try:
-        mol = masskit.small_molecule.utils.standardize_mol(mol)
-    except ValueError as e:
-        logging.info(f"Unable to standardize")
-        return {}, mol
-    
-    if len(mol.GetPropsAsDict()) == 0:
-        logging.info(f"All molecular props unavailable")
-
-    # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
-    # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
-    new_row = {
-        "has_2d": True,
-        "inchi_key": Chem.inchi.MolToInchiKey(mol),
-        "isomeric_smiles": Chem.MolToSmiles(mol),
-        "smiles": Chem.MolToSmiles(mol, isomericSmiles=False),
-    }
-
-    # todo: note that MolToInchiKey may generate a different value than what is in the spectrum.
-    # a replib example is 75992
-    # this may be fixed by workarounds with rdkit inchi generation created on 10/23/2019. need to check
-
-    if not skip_expensive:
-        mol, conformer_ids, return_value = threed.create_conformer(mol)
-        if return_value == -1:
-            logging.info(f"Not able to create conformer")
-            return {}, mol
-        # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
-
-        # calculation MMFF94 partial charges
-        partial_charges = []
-        try:
-            mol_copy = copy.deepcopy(
-                mol
-            )  # the MMFF calculation sanitizes the molecule
-            fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
-            if fps is not None:
-                for atom_num in range(0, mol_copy.GetNumAtoms()):
-                    partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
-        except ValueError:
-            logging.info(f"unable to run MMFF")
-        new_row["num_conformers"] = len(conformer_ids)
-        new_row["partial_charges"] = partial_charges
-        bounding_box = threed.bounding_box(mol)
-        new_row["min_x"] = bounding_box[0, 0]
-        new_row["max_x"] = bounding_box[0, 1]
-        new_row["min_y"] = bounding_box[1, 0]
-        new_row["max_y"] = bounding_box[1, 1]
-        new_row["min_z"] = bounding_box[2, 0]
-        new_row["max_z"] = bounding_box[2, 1]
-        new_row["has_conformer"] = True
-        new_row["max_bound"] = np.max(np.abs(bounding_box))
-        if max_size != 0 and new_row["max_bound"] > max_size:
-            logging.info(f"larger than the max bound")
-            return {}, mol
-        try:
-            new_row["num_stereoisomers"] = len(
-                tuple(EnumerateStereoisomers(mol, options=opts))
-            )  # GetStereoisomerCount(mol)
-        except RuntimeError as err:
-            logging.info(
-                f"Unable to create stereoisomer count, error = {err}"
-            )
-            new_row["num_stereoisomers"] = None
-    else:
-        # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
-        new_row["has_conformer"] = False
-
-    # calculate solvent accessible surface area per atom
-    # try:
-    #     radii = []
-    #     for atom in mol.GetAtoms():
-    #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
-    #     rdFreeSASA.CalcSASA(mol, radii=radii)
-    # except:
-    #     logging.info("unable to create sasa")
-    new_row["has_tms"] = len(
-        mol.GetSubstructMatches(tms)
-    )  # count of trimethylsilane matches
-    new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
-    new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
-    new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
-    new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
-    new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
-    new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
-    new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
-    new_row["mol"] = Chem.rdMolInterchange.MolToJSON(mol)
-    new_row["num_atoms"] = mol.GetNumAtoms()
-    ecfp4.object2fingerprint(mol)  # expressed as a bit vector
-    new_row["ecfp4"] = ecfp4.to_numpy()
-    new_row["ecfp4_count"] = ecfp4.get_num_on_bits()
-    # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
-    # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
-    # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
-    # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
-    # number of undefined stereoisomers
-    new_row[
-        "num_undef_stereo"
-    ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
-    # get number of unspecified double bonds
-    new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
-
-    return new_row, mol
-
-def load_csv2array(
-    fp,
-    id_field=None,
-    suppress_rdkit_warnings=True,
-    no_column_headers=False,
-    mol_column_name=None,
-    smiles_column_name=None,
-):
-    """
-    read in csv file with SMILES in one column and convert to an arrow table
-    SMILES are standardized and converted into an rdkit Mol object
-
-    :param fp: name of the file to read or a file object
-    :param id_field: integer value that is the start of the id values. If none, no id field is created
-    :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
-    :param no_column_headers: the csv has no headers.  In that case, the columns are labeled f0, f1, ...
-    :param mol_column_name: name of the rdkit Mol column in the output table
-    :param smiles_column_name: the name of the SMILES column. default is "SMILES" or "f0" if no headers
-    :return: arrow table
-    """
-    # Turn off RDKit error messages
-    if suppress_rdkit_warnings:
-        RDLogger.DisableLog('rdApp.*')
-
-    tables = []
-
-    if smiles_column_name is None:
-        if no_column_headers:
-            smiles_column_name = "f0"
-        else:
-            smiles_column_name = "SMILES"
-    if mol_column_name is None:
-        mol_column_name = 'mol'
-
-    if type(id_field) is int or id_field is None:
-        id_value = id_field
-    else:
-        id_value = None
-
-    for next_chunk in fp:
-        if next_chunk is None:
-            break
-        table = pa.Table.from_batches([next_chunk])
-        column_names = table.column_names
-
-        # edit possibly overlapping column names
-        column_names = [f'{mol_column_name}_original' if mol_column_name == x else x for x in column_names]
-        if id_value is not None:
-            column_names = ['id_original' if 'id' in x else x for x in column_names]
-        table = table.rename_columns(column_names)
-
-        ids = []
-        mols = []
-
-        for i in range(len(table)):
-            try:
-                mol = Chem.MolFromSmiles(table[smiles_column_name][i].as_py())
-                mol = masskit.small_molecule.utils.standardize_mol(mol)
-            except ValueError as e:
-                logging.info(f"Unable to standardize {table[smiles_column_name][i].as_py()}")
-                continue
-            mols.append(Chem.rdMolInterchange.MolToJSON(mol))
-            if id_value is not None:
-                ids.append(id_value)
-                id_value += 1
-        table = table.append_column('mol', pa.array(mols, type=MolArrowType()))
-        if id_value is not None:
-            table = table.append_column('id', pa.array(ids, type=pa.uint64()))
-        tables.append(table)
-
-    if len(tables) == 0:
-        table = pa.table([])
-    else:
-        table = pa.concat_tables(tables)
-    return table
-
-
-def load_smiles2array(
-    fp,
-    num=None,
-    id_field=0,
-    skip_expensive=True,
-    suppress_rdkit_warnings=True,
-    spectrum_type=None
-):
-    """
-    Read file of SMILES and return pyarrow table.
-
-    :param fp: name of the file to read or a file object
-    :param num: the maximum number of records to generate (None=all)
-    :param skip_expensive: skip expensive calculations for better perf
-    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum
-    :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
-    :param spectrum_type: the type of spectrum file
-    :return: arrow table with records
-    """
-    if spectrum_type is None:
-        spectrum_type = 'mol'
-    tables = []
-    records_schema = spectrum_types[spectrum_type]['flat_schema']
-    # create arrow schema and batch table
-    records = empty_records(records_schema)
-
-    # generate id using id_field as start
-    if type(id_field) is int:
-        current_id = id_field
-    else:
-        current_id = 0
-
-    # Turn off RDKit error messages
-    if suppress_rdkit_warnings:
-        RDLogger.DisableLog('rdApp.*')
-
-    fp = open_if_filename(fp, 'r')
-    for smiles in fp:
-        mol = Chem.MolFromSmiles(smiles)
-        new_row, mol = mol2row(mol, skip_expensive=skip_expensive)
-        if new_row is None or not new_row:
-            continue
-
-        new_row["id"] = current_id
-        current_id += 1
-
-        add_row_to_records(records, new_row)
-        if num is not None and len(records['id']) >= num:
-            break
-
-        if len(records['id']) % 10000 == 0:
-            logging.info(f"processed record {len(records['id'])}")
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            tables.append(records2table(records, spectrum_type))
-            logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-            records = empty_records(records_schema)
-
-    if records:
-        tables.append(records2table(records, spectrum_type))
-    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-    table = pa.concat_tables(tables)
-
-    return table
-
-
-def load_sdf2array(
-    fp,
-    max_size=0,
-    num=None,
-    source=None,
-    skip_expensive=True,
-    id_field=None,
-    id_field_type=None,
-    min_intensity=0,
-    precursor_mass_info=None,
-    product_mass_info=None,
-    set_probabilities=(0.01, 0.97, 0.01, 0.01),
-    suppress_rdkit_warnings=True,
-    spectrum_type=None
-):
-    """
-    Read file in SDF format and return as Lists of Dicts.
-
-    :param fp: ForwardSDMolSupplier iterator
-    :param max_size: the maximum bounding box size (used to filter out large molecules. 0=no bound)
-    :param num: the maximum number of records to generate (None=all)
-    :param source: where did the sdf come from?  pubchem, nist, ?
-    :param precursor_mass_info: mass information for precursor. if None, will use default.
-    :param product_mass_info: mass information for product. if None, will use default.
-    :param skip_expensive: skip expensive calculations for better perf
-    :param id_field: field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum
-    :param id_field_type: the id field type, such as int or str
-    :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param set_probabilities: how to divide into dev, train, valid, test
-    :param suppress_rdkit_warnings: don't print out spurious rdkit warnings
-    :param spectrum_type: the type of spectrum file
-    :return: arrow table with records
-    """
-    if source == None:
-        source = 'nist'
-
-    if source == 'nist':
-        if id_field is None:
-            id_field = 'NISTNO'
-        if id_field_type is None:
-            id_field_type = 'int'
-        name_field = ["_NAME", "NAME"]
-    elif source == 'pubchem':
-        if id_field is None:
-            id_field = 'PUBCHEM_COMPOUND_CID'
-        if id_field_type is None:
-            id_field_type = 'int'
-        name_field = ['PUBCHEM_IUPAC_NAME']
-    elif source == 'nist_ri':
-        if id_field is None:
-            id_field = 1
-        if id_field_type is None:
-            id_field_type = 'int'
-        name_field = ["_NAME", "NAME"]
-    else:
-        raise ValueError('unsupported sdf format')
-
-    current_id = None
-    current_name = None
-
-    # generate id using id_field as start
-    if type(id_field) is int:
-        current_id = id_field
-        id_field_type = 'int'
-
-    # list of batch tables
-    tables = []
-    # create arrow schema and batch table
-    if spectrum_type is None:
-        spectrum_type = 'mol'
-    records_schema = spectrum_types[spectrum_type]['flat_schema']
-    records = empty_records(records_schema)
-
-    # Turn off RDKit error messages
-    if suppress_rdkit_warnings:
-        RDLogger.DisableLog('rdApp.*')
-
-    # warning: for some reason, setting sanitize=False in SDMolSupplier can create false stereochemistry information, so
-    # there is only one stereoisomer per molecule.
-    while True:
-        try:
-            mol = next(fp)
-        except StopIteration:
-            break
-        if mol is None:
-            logging.info(f'unable to read mol after mol with name {current_name} and id {current_id}')
-            continue
-
-        if type(id_field) is not int:
-            if mol.HasProp(id_field):
-                if id_field_type == 'int':
-                    current_id = int(mol.GetProp(id_field))
-                else:
-                    current_id = mol.GetProp(id_field)
-
-        for field in name_field:
-            if mol.HasProp(field):
-                current_name = mol.GetProp(field)
-                break
-
-        new_row, mol = mol2row(mol, skip_expensive=skip_expensive, max_size=max_size)
-        if new_row is None or not new_row:
-            logging.info(f'unable to standardize mol with name {current_name} and id {current_id}')
-            continue
-
-        # create useful set labels for training
-        new_row["set"] = np.random.choice(["dev", "train", "valid", "test"], p=set_probabilities)
-        spectrum = None
-        if source == "nist":
-            # create the mass spectrum
-            spectrum = Spectrum(product_mass_info=product_mass_info,
-                                    precursor_mass_info=precursor_mass_info)
-            spectrum.from_mol(
-                mol, skip_expensive, id_field=id_field, id_field_type=id_field_type
-            )
-            spectrum.id = current_id
-            spectrum.name = current_name
-            try:
-                new_row["precursor_mz"] = spectrum.precursor.mz
-                new_row["casno"] = spectrum.casno
-                new_row["synonyms"] = json.dumps(spectrum.synonyms)
-                new_row["spectrum"] = spectrum
-                new_row["column"] = spectrum.column
-                new_row["experimental_ri"] = spectrum.experimental_ri
-                new_row["experimental_ri_error"] = spectrum.experimental_ri_error
-                new_row["experimental_ri_data"] = spectrum.experimental_ri_data
-                new_row["stdnp"] = spectrum.stdnp
-                new_row["stdnp_error"] = spectrum.stdnp_error
-                new_row["stdnp_data"] = spectrum.stdnp_data
-                new_row["stdpolar"] = spectrum.stdpolar
-                new_row["stdpolar_error"] = spectrum.stdpolar_error
-                new_row["stdpolar_data"] = spectrum.stdpolar_data
-                new_row["estimated_ri"] = spectrum.estimated_ri
-                new_row["estimated_ri_error"] = spectrum.estimated_ri_error
-                new_row["exact_mass"] = spectrum.exact_mass
-                new_row["ion_mode"] = spectrum.ion_mode
-                new_row["charge"] = spectrum.charge
-                new_row["instrument"] = spectrum.instrument
-                new_row["instrument_type"] = spectrum.instrument_type
-                new_row["instrument_model"] = spectrum.instrument_model
-                new_row["ionization"] = spectrum.ionization
-                new_row["collision_gas"] = spectrum.collision_gas
-                new_row["sample_inlet"] = spectrum.sample_inlet
-                new_row["spectrum_type"] = spectrum.spectrum_type
-                new_row["precursor_type"] = spectrum.precursor_type
-                new_row["inchi_key_orig"] = spectrum.inchi_key
-                new_row["vial_id"] = spectrum.vial_id
-                new_row["collision_energy"] = spectrum.collision_energy
-                new_row["nce"] = spectrum.nce
-                new_row["ev"] = spectrum.ev
-                new_row["insource_voltage"] = spectrum.insource_voltage
-                new_row["mz"] = spectrum.products.mz
-                new_row["intensity"] = spectrum.products.intensity
-                new_row['product_massinfo'] = spectrum.product_mass_info.__dict__
-                new_row['precursor_massinfo'] = spectrum.precursor_mass_info.__dict__
-                fingerprint = spectrum.filter(min_intensity=min_intensity).create_fingerprint(max_mz=2000)
-                new_row["spectrum_fp"] = fingerprint.to_numpy()
-                new_row["spectrum_fp_count"] = fingerprint.get_num_on_bits()
-            except AttributeError:
-                logging.info('attribute error from spectrum: ' + spectrum.id)
-                raise
-        elif source == "pubchem":
-            if mol.HasProp("PUBCHEM_XLOGP3"):
-                new_row["xlogp"] = float(mol.GetProp("PUBCHEM_XLOGP3"))
-            if mol.HasProp("PUBCHEM_COMPONENT_COUNT"):
-                new_row["component_count"] = float(
-                    mol.GetProp("PUBCHEM_COMPONENT_COUNT")
-                )
-        elif source == 'nist_ri':
-            new_row["inchi_key_orig"] = mol.GetProp("INCHIKEY")
-            if mol.HasProp("COLUMN CLASS") and mol.HasProp("KOVATS INDEX"):
-                ri_string = mol.GetProp("COLUMN CLASS")
-                if ri_string in ['Semi-standard non-polar', 'All column types', 'SSNP']:
-                    new_row['column'] = 'SemiStdNP'
-                    new_row['experimental_ri'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['experimental_ri_error'] = 0.0
-                    new_row['experimental_ri_data'] = 1
-                elif ri_string == 'Standard non-polar':
-                    new_row['column'] = 'StdNP'
-                    new_row['stdnp'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['stdnp_error'] = 0.0
-                    new_row['stdnp_data'] = 1
-                elif ri_string == 'Standard polar':
-                    new_row['column'] = 'StdPolar'
-                    new_row['stdpolar'] = float(mol.GetProp("KOVATS INDEX"))
-                    new_row['stdpolar_error'] = 0.0
-                    new_row['stdpolar_data'] = 1
-
-        new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
-        new_row["id"] = current_id
-        new_row["name"] = current_name
-        if type(id_field) is int:
-            current_id += 1
-
-        add_row_to_records(records, new_row)
-        if num is not None and len(records['id']) >= num:
-            break
-
-        # check to see if we have enough records to add to the pyarrow table
-        if len(records["id"]) % 25000 == 0:
-            # TODO: generalize struct
-            tables.append(records2table(records, spectrum_type))
-            records = empty_records(records_schema)
-
-    if records:
-        tables.append(records2table(records, spectrum_type))
-    logging.info(f"created chunk {len(tables)} with {len(records['id'])} records")
-    table = pa.concat_tables(tables)
-
-    return table
-
 
 mq2unimod = {
     'CHEMMOD:57.0214637236': 4,  # Carbamidomethyl (C)
@@ -1360,102 +1203,83 @@ def load_mzTab(fp, dedup=True, decoy_func=None):
     return mztr.get_hitlist()
 
 
-# describe types of file formats and associated data structures
-spectrum_types = {
-    "peptide": {"storage_type": peptide_struct,
-                "flat_schema": flat_peptide_schema,
-                "nested_schema": nested_peptide_spectrum_schema},
-    "mol": {"storage_type": molecules_struct,
-            "flat_schema": flat_molecule_schema,
-            "nested_schema": nested_molecule_spectrum_schema},
-}
+default_formats ={
+    'arrow': 'arrow_mol',
+    'csv': 'csv_mol',
+    'mgf': 'mgf_peptide',
+    'msp': 'msp_mol',
+    'parquet': 'parquet_mol',
+    'sdf': 'sdf_mol',
+    }
 
+
+def load_default_config_schema(file_type, format=None):
+    """
+    for a given file type and format, return configuration
+
+    :param file_type: the type of file, e.g. mgf, msp, arrow, parquet, sdf
+    :param format: the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_mol, sdf_nist_mol, sdf_pubchem_mol. If none, use default
+    :return: config
+    """
+    if format is None:
+        format = default_formats[file_type]
+
+    config_file = pkgutil.get_loader(f'masskit.conf.conversion.{file_type}').get_filename()
+    format_config = OmegaConf.load(Path(config_file).parent / f'{format}.yaml')
+    return dict(format_config)
 
 class BatchFileReader:
-    def __init__(self, filename: Union[str, os.PathLike],
-                 format:str=None, row_batch_size:int=5000,
-                 id_field: Union[str, int]=0,
-                 comment_fields:str=None, spectrum_type:str=None,
-                 column_name:str=None,
-                 no_column_headers=False,
-                 mol_column_name=None,
-                 smiles_column_name=None,
-                 delimiter=None,
+    def __init__(self, 
+                 filename: Union[str, os.PathLike],
+                 format:Union[Dict, DictConfig]=None, 
+                 row_batch_size:int=5000,
                  ) -> None:
         """
         read files in batches of pyarrow Tables
 
         :param filename: input file
-        :param format: format of the input file: mgf, msp, sdf, smiles, csv
+        :param format: format of the input file using configuration dictionary
         :param row_batch_size: size of batches to read (except parquet files, which use existing batches)
-        :param id_field: the integer start value or string name of the id fields
-        :param comment_fields: used for parsing msp file Comment lines
-        :param spectrum_type: the type file (see spectrum_types: 'mol', 'peptide',...)
-        :param column_name: name of the struct column
-        :param no_column_headers: if csv, the csv has no headers.  In that case, the columns are labeled f0, f1, ...
-        :param mol_column_name: if csv, name of the rdkit Mol column in the output table
-        :param smiles_column_name: if csv, the name of the SMILES column. default is "SMILES" or "f0" if no headers
-        :param delimiter: if csv, the column delimiter. "," is the default
         """
         super().__init__()
         self.format = format
         self.row_batch_size = row_batch_size
-        self.id_field = id_field
         self.filename = str(filename)
-        self.comment_fields = comment_fields
-        self.spectrum_type = spectrum_type
-        if column_name is None:
-            self.column_name = 'spectrum'
-        else:
-            self.column_name = column_name
-        if format == 'parquet':
+        if format['format'] == 'parquet':
             self.dataset = pq.ParquetFile(filename)
-            if spectrum_type is None:
-                self.spectrum_type = "peptide"
-        elif format == 'arrow':
+        elif format['format'] == 'arrow':
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
-            if spectrum_type is None:
-                self.spectrum_type = "peptide"           
-        elif format == 'mgf':
+        elif format['format'] in ['mgf', 'msp']:
             self.dataset = open_if_filename(filename, mode="r")
-            if spectrum_type is None:
-                self.spectrum_type = "peptide"           
-        elif format in ['msp', 'smiles']:
-            self.dataset = open_if_filename(filename, mode="r")
-            if spectrum_type is None:
-                self.spectrum_type = "mol"
-        elif format == 'csv':
-            read_options = pacsv.ReadOptions(autogenerate_column_names=no_column_headers,
+        elif format['format'] == 'csv':
+            read_options = pacsv.ReadOptions(autogenerate_column_names=format['no_column_headers'],
                                               block_size=row_batch_size)
-            parse_options = pacsv.ParseOptions(delimiter=delimiter)
+            parse_options = pacsv.ParseOptions(delimiter=format['delimiter'])
             self.dataset =  pacsv.open_csv(filename, read_options=read_options, parse_options=parse_options)
-            if spectrum_type is None:
-                self.spectrum_type = "mol"
-            self.no_column_headers = no_column_headers
-            self.mol_column_name = mol_column_name
-            self.smiles_column_name = smiles_column_name
-        elif format == 'sdf':
+        elif format['format'] == 'sdf':
             self.dataset = open_if_filename(filename, mode="rb")
             self.dataset = Chem.ForwardSDMolSupplier(self.dataset, sanitize=False)
-            if spectrum_type is None:
-                self.spectrum_type = "mol"           
         else:
-            raise ValueError(f'Unknown format {self.format}')
-        if self.id_field is None:
-            self.id_field = 0
+            raise ValueError(f'Unknown format {self.format["format"]}')
         
+    loaders = {'msp': MSPLoader,
+               'sdf': SDFLoader,
+               'mgf': MGFLoader,
+               'csv': CSVLoader,
+               }
+    
     def iter_tables(self) -> pa.Table:
         """
         read batch generator, returns a Table
         """
         batch_num = 0
-        if self.format == 'parquet':
+        if self.format['format'] == 'parquet':
             for batch in self.dataset.iter_batches():
                 table = pa.Table.from_batches(batch)  # schema is inferred from batch
                 logging.info(f'processing batch {batch_num} with size {len(table)}')
                 batch_num += 1
                 yield table 
-        elif self.format == 'arrow':
+        elif self.format['format'] == 'arrow':
             # the entire table is memmapped as self.dataset
             # get the length, which is computed from the number of rows in all batches
             # not clear if this goes through the entire memmap -- need to test
@@ -1468,75 +1292,21 @@ class BatchFileReader:
                 logging.info(f'processing batch {batch_num} with size {len(batch)}')
                 batch_num += 1
                 yield batch
-        elif self.format == 'msp':
+        elif self.format['format'] in ['msp', 'mgf', 'sdf', 'csv']:
+            loader = self.loaders[self.format['format']](num=self.row_batch_size, 
+                                                         format=self.format,
+                                                        )
             while True:
-                batch = load_msp2array(self.dataset, 
-                                       num=self.row_batch_size, 
-                                       id_field=self.id_field,
-                                       comment_fields=self.comment_fields,
-                                       spectrum_type=self.spectrum_type)
+                batch = loader.load(self.dataset)
                 if len(batch) == 0:
                     break
-                if isinstance(self.id_field, int):
-                    self.id_field += len(batch)
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
-                batch_num += 1
-                yield batch
-        elif self.format == 'mgf':
-            while True:
-                batch = load_mgf2array(self.dataset, 
-                                       num=self.row_batch_size, 
-                                       id_field=self.id_field,
-                                       spectrum_type=self.spectrum_type)
-                if len(batch) == 0:
-                    break
-                if isinstance(self.id_field, int):
-                    self.id_field += len(batch)
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
-                batch_num += 1
-                yield batch
-        elif self.format == 'sdf':
-            while True:
-                batch = load_sdf2array(self.dataset, 
-                                       num=self.row_batch_size, 
-                                       id_field=self.id_field,
-                                       spectrum_type=self.spectrum_type)
-                if len(batch) == 0:
-                    break
-                if isinstance(self.id_field, int):
-                    self.id_field += len(batch)
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
-                batch_num += 1
-                yield batch
-        elif self.format == 'smiles':
-            while True:
-                batch = load_smiles2array(self.dataset, 
-                                          num=self.row_batch_size, 
-                                          id_field=self.id_field,
-                                          spectrum_type=self.spectrum_type)
-                if len(batch) == 0:
-                    break
-                if isinstance(self.id_field, int):
-                    self.id_field += len(batch)
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
-                batch_num += 1
-                yield batch
-        elif self.format == 'csv':
-            while True:
-                batch = load_csv2array(self.dataset, 
-                                       id_field=self.id_field,
-                                       no_column_headers=self.no_column_headers,
-                                       mol_column_name=self.mol_column_name,
-                                       smiles_column_name=self.smiles_column_name)
-                if len(batch) == 0:
-                    break
-                if isinstance(self.id_field, int):
-                    self.id_field += len(batch)
+                if self.format['id']['field_type'] == 'int':
+                    self.format['id']['initial_value'] += len(batch)
                 logging.info(f'processing batch {batch_num} with size {len(batch)}')
                 batch_num += 1
                 yield batch
         else:
-            raise ValueError(f'Unknown format {self.format}')
+            raise ValueError(f'Unknown format {self.format["format"]}')
         
 
 class BatchFileWriter:
@@ -1554,7 +1324,7 @@ class BatchFileWriter:
         :param row_batch_size: size of batches to write 
         :param num_workers: number of threads for processing
         :param column_name: name of the struct column
-=        """
+        """
         super().__init__()
         self.format = format
         self.row_batch_size = row_batch_size

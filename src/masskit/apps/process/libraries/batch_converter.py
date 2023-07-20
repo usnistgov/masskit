@@ -11,12 +11,6 @@ def batch_converter_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)
 
-    if config.conversion.msp.comment_fields:
-        comment_fields = eval(config.conversion.msp.comment_fields[0])
-    else:
-        comment_fields = None
-
-
     output_file_root, output_file_extension = parse_filename(Path(config.output.file.name).expanduser())
     if config.output.file.types:
         output_file_extension = config.output.file.types if isinstance(config.output.file.types, list) or \
@@ -40,33 +34,17 @@ def batch_converter_app(config: DictConfig) -> None:
         input_file = str(Path(input_file).expanduser())
         # use the file extension to determine file type unless specified in the arguments
         input_file_root, input_file_extension = parse_filename(input_file)
-        if config.input.file.type:
-            input_file_extension = config.input.file.type
         if (
             input_file_root == output_file_root
             and input_file_extension in output_file_extension
         ):
             raise ValueError("output file will overwrite input file")
 
-        # use a named id field or use an integer initial value for the id
-        conversion = config.conversion.get(input_file_extension, None)
-        if conversion is not None and conversion.get('id', None) is not None:
-            if conversion.id['field']:
-                id_field = conversion.id['field']
-            else:
-                id_field = conversion.id['initial_value']
-        else:
-            id_field = None
+        format = dict(config.conversion.get(input_file_extension.lower(), None))
 
-        reader = BatchFileReader(input_file, format=input_file_extension,
+        reader = BatchFileReader(input_file, 
+                                 format=format,
                                  row_batch_size=config.conversion.get("row_batch_size", 5000),
-                                 id_field=id_field,
-                                 comment_fields=comment_fields,
-                                 spectrum_type=config.input.file.get('spectrum_type', 'mol'),
-                                 no_column_headers=config.conversion.csv.get("no_column_headers", False),
-                                 mol_column_name=config.conversion.csv.get("mol_column_name", None),
-                                 smiles_column_name=config.conversion.csv.get("smiles_column_name", None),
-                                 delimiter=config.conversion.csv.get("delimiter", None),
                                  )
 
         for writer in writers:

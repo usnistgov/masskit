@@ -1,6 +1,10 @@
 defaults:
   - override hydra/help: fasta2peptides_help
-  
+  - override hydra/hydra_logging: none
+   # should hydra configure python logging?
+  - override hydra/job_logging: none
+  - _self_
+
 # fasta filename
 input:
   file:
@@ -32,3 +36,20 @@ peptide:
     - 30
   # If True, do not generate peptides that have more basic residues (RHK) than the precursor charge
   use_basic_limit: True
+
+hydra:
+  run:
+    # directory to store log files and yaml config
+    # e.g. "." or hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: .
+  # subdir of hydra.run.dir that contains hydra config yaml
+  # if set to null, will not create. Otherwise, set to "hydra"
+  output_subdir: null
+  sweep:
+    # directory to store log files and yaml config for multiruns
+    dir: hydra_sweep
+  searchpath:
+    - pkg://masskit.conf
+  job:
+    # change directory to output_subdir?
+    chdir: False

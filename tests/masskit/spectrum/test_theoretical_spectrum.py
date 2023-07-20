@@ -181,15 +181,15 @@ def peptide_parent_spectrum():
 
 
 @pytest.fixture
-def peptide_exp_spectrum():
-    arrow_map = ArrowLibraryMap.from_msp("data/Exp_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_57eV_NCE40_msp.txt",
-                                         spectrum_type='peptide')
+def peptide_exp_spectrum(data_dir):
+    arrow_map = ArrowLibraryMap.from_msp(data_dir / "Exp_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_57eV_NCE40_msp.txt",
+                                         spectrum_type='msp_peptide')
     return arrow_map[0]['spectrum']
 
 @pytest.fixture
 def peptide_pred_spectrum():
-    arrow_map = ArrowLibraryMap.from_msp("data/Predicted_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_msp.txt",
-                                         spectrum_type='peptide')
+    arrow_map = ArrowLibraryMap.from_msp(data_dir / "Predicted_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_msp.txt",
+                                         spectrum_type='msp_peptide')
     return arrow_map[0]['spectrum']
 
 def test_annotate_peptide_exp_spectrum(peptide_exp_spectrum):
