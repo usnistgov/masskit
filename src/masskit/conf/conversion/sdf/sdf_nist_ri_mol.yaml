@@ -10,3 +10,8 @@ name:
     - NAME
     - _Name
 schema_group: mol
+
+# skip computation of computed properties
+skip_computed_props: False
+# skip computation of computed properties expensive to compute
+skip_expensive: True
