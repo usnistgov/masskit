@@ -1,0 +1,12 @@
+# RI library, 2023 and later
+format: sdf
+source: nist
+id:
+  field: ID
+  field_type: int
+  initial_value: 0
+name:
+  field: 
+    - NAME
+    - _Name
+schema_group: mol

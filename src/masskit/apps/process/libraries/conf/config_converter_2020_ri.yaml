@@ -1,7 +1,7 @@
 defaults:
   - conversion/msp: msp_mol
   - conversion/mgf: mgf_peptide
-  - conversion/sdf: sdf_nist_mol
+  - conversion/sdf: sdf_nist_ri_old_mol
   - conversion/parquet: parquet_mol
   - conversion/arrow: arrow_mol
   - conversion/csv: csv_mol
