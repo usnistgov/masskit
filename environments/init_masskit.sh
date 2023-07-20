@@ -87,6 +87,7 @@ then
     fi
 fi
 
+export MAMBA_NO_BANNER=1
 
 # Note: Please keep lists alphabetical
 

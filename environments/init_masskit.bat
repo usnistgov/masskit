@@ -131,8 +131,8 @@ ECHO Initializing the conda %ENVNAME% environment
 call conda activate %ENVNAME%
 IF ERRORLEVEL 1 (
     ECHO Creating conda environment
-    mamba create -y -n %ENVNAME%
-    mamba install -y -n %ENVNAME% -c nodefaults %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
+    mamba create --no-banner -y -n %ENVNAME%
+    mamba install --no-banner -y -n %ENVNAME% -c nodefaults %ML_CHANNELS% -c conda-forge %BASE_PACKAGES% %ML_PACKAGES%
     call conda activate %ENVNAME%
 )
 
