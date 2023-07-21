@@ -41,7 +41,7 @@ installed `mambaforge` or a `conda` distribution.
 - In the prompt window, use `cd masskit*` to change to the directory starting with `masskit` in
 the directory you extracted the downloads to.
 - Run `call init_masskit.bat` to create the `masskit` package environment.
-- Run `pip install masskit*.whl`.
+- Run `pip install --find-links=. masskit`.
 
 Whenever using the programs in Masskit, please make sure you initialize the appropriate package environment:
 
