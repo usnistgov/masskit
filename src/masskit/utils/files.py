@@ -575,7 +575,7 @@ class MSPLoader(BatchLoader):
 
 class MGFLoader(BatchLoader):   
     def __init__(self, row_batch_size=5000, format=None, num=None, 
-                 set_probabilities=(0.01, 0.97, 0.01, 0.01), 
+                 set_probabilities=(0.00, 0.93, 0.02, 0.05), 
                  min_intensity=0.0):
         super().__init__('mgf', row_batch_size=row_batch_size, format=format, num=num)
         self.min_intensity = min_intensity
@@ -671,7 +671,7 @@ class MGFLoader(BatchLoader):
 
 class SDFLoader(BatchLoader):   
     def __init__(self, row_batch_size=5000, format=None, num=None,
-                 set_probabilities=(0.01, 0.97, 0.01, 0.01), 
+                 set_probabilities=(0.0, 0.93, 0.02, 0.05), 
                  min_intensity=0.0):
         super().__init__('sdf', row_batch_size=row_batch_size, format=format, num=num)
         self.min_intensity = min_intensity
