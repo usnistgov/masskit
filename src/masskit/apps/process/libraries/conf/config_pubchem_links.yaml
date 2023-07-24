@@ -38,9 +38,9 @@ pubchem:
   patent:
     description: "This is a listing of all patent documents linked to CIDs. 
     These are in Google's 'publication number' format, following PubChem's
-		matching of depositor-supplied patent identifiers to publication
-		numbers. It is a gzipped text file with CID, tab, and publication
-		number on each line."
+    matching of depositor-supplied patent identifiers to publication
+    numbers. It is a gzipped text file with CID, tab, and publication
+    number on each line."
     url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-Patent.gz
     parquet: cid-patent.parquet
     headers:
@@ -55,7 +55,7 @@ pubchem:
     description: 'This is a listing of all PubMed IDs (PMIDs) linked to CIDs. It 
     is a gzipped text file with CID, tab, PMID, tab, and type on 
     each line. The types are:-
-        
+ 
         1   PMIDs provided by PubChem Substance depositors
         2   PMIDs from the MeSH heading(s) linked to the given CID
         3   PMIDs provided by PubMed publishers
@@ -75,6 +75,12 @@ pubchem:
         type: int8
 nist:
   files:
-    - /data/aiomics/massspec_cache/nist/tandem/2020/hr_msms_nist.parquet
-    - /data/aiomics/massspec_cache/nist/ei/2020/mainlib_2020.parquet
-    
+    - /data/aiomics/massspec_cache/nist/ei/2023/old/main_2023.parquet
+    - /data/aiomics/massspec_cache/nist/ei/2023/old/rep_2023.parquet
+    - /data/aiomics/massspec_cache/nist/ei/2023/old/ri_2023.parquet
+    - /data/aiomics/massspec_cache/nist/tandem/2023/old/apci_msms_2023.parquet
+    - /data/aiomics/massspec_cache/nist/tandem/2023/old/hr_msms_2023.parquet
+    - /data/aiomics/massspec_cache/nist/tandem/2023/old/lr_msms_2023.parquet
+#    - /data/aiomics/massspec_cache/nist/tandem/2020/hr_msms_nist.parquet
+#    - /data/aiomics/massspec_cache/nist/ei/2020/mainlib_2020.parquet
+
