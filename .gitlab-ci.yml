@@ -24,7 +24,7 @@ build masskit:
   stage: build
   script:
     - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
-    - VERBOSE=1 pip wheel .
+    - VERBOSE=1 pip wheel --no-build-isolation .
   tags:
     - linux
     - masskit
