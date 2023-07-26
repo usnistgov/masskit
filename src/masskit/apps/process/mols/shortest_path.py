@@ -6,8 +6,6 @@ import jsonpickle
 import logging
 import hydra
 from omegaconf import DictConfig
-from masskit.utils.general import parse_filename
-from masskit.utils.tablemap import ArrowLibraryMap
 import pyarrow as pa
 import pyarrow.parquet as pq
 from rdkit import Chem

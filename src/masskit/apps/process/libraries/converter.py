@@ -36,7 +36,7 @@ def converter_app(config: DictConfig) -> None:
     else:
         comment_fields = None
 
-    output_file_root, output_file_extension = parse_filename(Path(config.output.file.name).expanduser())
+    output_file_root, output_file_extension, compression = parse_filename(Path(config.output.file.name).expanduser())
     if config.output.file.types:
         output_file_extension = config.output.file.types if type(config.output.file.types) is list else\
             [config.output.file.types]
@@ -55,7 +55,7 @@ def converter_app(config: DictConfig) -> None:
     for input_file in input_files:
         input_file = str(Path(input_file).expanduser())
         # use the file extension to determine file type unless specified in the arguments
-        input_file_root, input_file_extension = parse_filename(input_file)
+        input_file_root, input_file_extension, compression = parse_filename(input_file)
         if config.input.file.type:
             input_file_extension = config.input.file.type
         if (

@@ -1246,17 +1246,22 @@ class BatchFileReader:
         self.row_batch_size = row_batch_size
         self.filename = str(filename)
         if format['format'] == 'parquet':
+            # does not support compression, but parquet compresses itself so no need
             self.dataset = pq.ParquetFile(filename)
         elif format['format'] == 'arrow':
+            # as a memory map, does not support compression
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
         elif format['format'] in ['mgf', 'msp']:
+            # supports gz and bz2 compression
             self.dataset = open_if_filename(filename, mode="r")
         elif format['format'] == 'csv':
+            # supports gz and bz2 compression
             read_options = pacsv.ReadOptions(autogenerate_column_names=format['no_column_headers'],
                                               block_size=row_batch_size)
             parse_options = pacsv.ParseOptions(delimiter=format['delimiter'])
             self.dataset =  pacsv.open_csv(filename, read_options=read_options, parse_options=parse_options)
         elif format['format'] == 'sdf':
+             # supports gz and bz2 compression
             self.dataset = open_if_filename(filename, mode="rb")
             self.dataset = Chem.ForwardSDMolSupplier(self.dataset, sanitize=False)
         else:
