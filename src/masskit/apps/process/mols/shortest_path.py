@@ -1,4 +1,6 @@
 from contextlib import contextmanager
+from functools import partial
+from multiprocessing import Pool
 from pathlib import Path
 import jsonpickle
 import logging
@@ -145,6 +147,10 @@ class BatchWriter:
         self.close()
 
 
+def mol2path(mol, max_path_length=5):
+    return jsonpickle.encode(get_shortest_paths(
+            mol, max_path_length), keys=True)
+
 
 @hydra.main(config_path="conf", config_name="config_path", version_base=None)
 def path_generator_app(config: DictConfig) -> None:
@@ -156,11 +162,12 @@ def path_generator_app(config: DictConfig) -> None:
     table = pq.read_table(input_file)
 
     shortest_paths = []
+    mols = table['mol'].combine_chunks().to_numpy()
 
-    for i in range(len(table)):
-        rd_mol = table['mol'][i].as_py()
-        shortest_paths.append(jsonpickle.encode(get_shortest_paths(
-            rd_mol, config.conversion.max_path_length), keys=True))
+    with Pool(config.get('num_workers', 8)) as p:
+        shortest_paths = p.map(partial(mol2path, 
+                                       max_path_length=config.conversion.max_path_length), 
+                                       mols)
 
     # delete shortest_paths column if it already exists
     try:
@@ -170,7 +177,7 @@ def path_generator_app(config: DictConfig) -> None:
     new_arrays = []
     new_array = pa.array(shortest_paths)
     if type(new_array) is pa.ChunkedArray:
-        for array in new_array.iter_chunks():
+        for array in new_array.iterchunks():
             new_arrays.append(pa.ExtensionArray.from_storage(PathArrowType(), array))
     else:
         new_arrays.append(pa.ExtensionArray.from_storage(PathArrowType(), new_array))

@@ -8,6 +8,8 @@ input:
 conversion:
   max_path_length: 5
 
+num_workers: 8 
+
 output:
   file:
     # output file or output file prefix

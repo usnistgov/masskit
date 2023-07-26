@@ -1307,8 +1307,20 @@ class BatchFileReader:
                 yield batch
         else:
             raise ValueError(f'Unknown format {self.format["format"]}')
-        
 
+# processing functions defined at top level of module to allow pickling
+# for multiprocessing
+        
+def spectrum2msp(spectrum, annotate=False):
+    output = StringIO()
+    spectra_to_msp(output, [spectrum], annotate_peptide=annotate)
+    return output.getvalue() 
+
+def spectrum2mgf(spectrum):
+    output = StringIO()
+    spectra_to_mgf(output, [spectrum])
+    return output.getvalue() 
+        
 class BatchFileWriter:
     def __init__(self, filename: Union[str, os.PathLike], 
                  format:str=None, annotate:bool=False, 
@@ -1348,16 +1360,6 @@ class BatchFileWriter:
 
         :param table: table to write
         """
-
-        def spectrum2msp(spectrum, annotate=False):
-            output = StringIO()
-            spectra_to_msp(output, [spectrum], annotate_peptide=annotate)
-            return output.getvalue() 
-
-        def spectrum2mgf(spectrum):
-            output = StringIO()
-            spectra_to_mgf(output, [spectrum])
-            return output.getvalue() 
 
         if self.format == 'parquet':
             if self.dataset == None:
