@@ -883,9 +883,11 @@ def records2table(records, schema_group):
     :param schema_group: the schema group
     """
     table = pa.table(records, schema_group['flat_schema'])
-    structarray = table2structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
+    if 'spectrum' in records:
+        structarray = table2structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
     table = table.select([x for x in table.column_names if x in schema_group['nested_schema'].names])
-    table = table_add_structarray(table, structarray)
+    if 'spectrum' in records:
+        table = table_add_structarray(table, structarray)
     return table
 
 

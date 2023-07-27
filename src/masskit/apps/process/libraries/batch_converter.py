@@ -27,12 +27,6 @@ overall_progress = Progress(
     TimeElapsedColumn(), MofNCompleteColumn()
 )
 
-writer_progress = Progress(
-    TextColumn(
-        "[blue]{task.description} {task.fields[filename]}: ", justify="right"),
-    TimeElapsedColumn(), MofNCompleteColumn()
-)
-
 batch_progress = Progress(
     TextColumn(
         "[blue]{task.description}: {task.completed}", justify="right"),
@@ -40,7 +34,7 @@ batch_progress = Progress(
 )
 
 progress_group = Group(
-    overall_progress, writer_progress, batch_progress,
+    overall_progress, batch_progress,
 )
 
 # logging.basicConfig(level="NOTSET", handlers=[RichHandler(level="NOTSET")])
@@ -95,32 +89,32 @@ def batch_converter_app(config: DictConfig) -> None:
                                      row_batch_size=config.conversion.get(
                                          "row_batch_size", 5000),
                                      )
-            writer_task_id = writer_progress.add_task(
-                "Write", total=len(writers))
-            for writer in writers:
-                writer_progress.update(
-                    writer_task_id, description="Write", filename=writer.filename)
-                num_rows = 0
-                batch_task_id = batch_progress.add_task(" Write batch")
-                for table in reader.iter_tables():
-                    batch_progress.update(
-                        batch_task_id, description=" Write batch")
-                    if config.input.num is not None and config.input.num > 0 and len(table) + num_rows > config.input.num:
-                        table = table.slice(0, config.input.num - num_rows)
-                        writer.write_table(table)
-                        batch_progress.update(batch_task_id, advance=1)
-                        break
-                    writer.write_table(table)
-                    num_rows += len(table)
+            num_rows = 0
+            batch_task_id = batch_progress.add_task(" Write batch")
+            for table in reader.iter_tables():
+                batch_progress.update(
+                    batch_task_id, description=" Write batch")
+                if config.input.num is not None and config.input.num > 0 and len(table) + num_rows > config.input.num:
+                    table = table.slice(0, config.input.num - num_rows)
+                    write_batch(writers, table)
                     batch_progress.update(batch_task_id, advance=1)
-                batch_progress.stop_task(batch_task_id)
-                batch_progress.update(batch_task_id, visible=False)
-                writer_progress.update(writer_task_id, advance=1)
-            writer_progress.stop_task(writer_task_id)
-            writer_progress.update(writer_task_id, visible=False)
+                    break
+                write_batch(writers, table)
+                num_rows += len(table)
+                batch_progress.update(batch_task_id, advance=1)
+            batch_progress.stop_task(batch_task_id)
+            batch_progress.update(batch_task_id, visible=False)
             overall_progress.update(overall_task_id, advance=1)
         for writer in writers:
             writer.close()
+
+def write_batch(writers, table):
+    for writer in writers:
+        writer.write_table(table)
+
+
+
+
 
 
 if __name__ == "__main__":
