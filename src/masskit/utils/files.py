@@ -310,99 +310,102 @@ class BatchLoader:
         if len(mol.GetPropsAsDict()) == 0:
             logging.info(f"All molecular props unavailable")
 
-        new_row = {
-            "mol": Chem.rdMolInterchange.MolToJSON(mol)
-        }
-        
-        if not skip_computed_props:
-            # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
-            # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
-
-            new_row["has_2d"] = True
-            new_row["inchi_key"] = Chem.inchi.MolToInchiKey(mol)
-            new_row["isomeric_smiles"] = Chem.MolToSmiles(mol)
-            new_row["smiles"] = Chem.MolToSmiles(mol, isomericSmiles=False)
-
-            if not skip_expensive:
-                mol, conformer_ids, return_value = threed.create_conformer(mol)
-                if return_value == -1:
-                    logging.info(f"Not able to create conformer")
-                    return {}, mol
-                # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
-
-                # calculation MMFF94 partial charges
-                partial_charges = []
-                try:
-                    mol_copy = copy.deepcopy(
-                        mol
-                    )  # the MMFF calculation sanitizes the molecule
-                    fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
-                    if fps is not None:
-                        for atom_num in range(0, mol_copy.GetNumAtoms()):
-                            partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
-                except ValueError:
-                    logging.info(f"unable to run MMFF")
-                new_row["num_conformers"] = len(conformer_ids)
-                new_row["partial_charges"] = partial_charges
-                bounding_box = threed.bounding_box(mol)
-                new_row["min_x"] = bounding_box[0, 0]
-                new_row["max_x"] = bounding_box[0, 1]
-                new_row["min_y"] = bounding_box[1, 0]
-                new_row["max_y"] = bounding_box[1, 1]
-                new_row["min_z"] = bounding_box[2, 0]
-                new_row["max_z"] = bounding_box[2, 1]
-                new_row["has_conformer"] = True
-                new_row["max_bound"] = np.max(np.abs(bounding_box))
-                if max_size != 0 and new_row["max_bound"] > max_size:
-                    logging.info(f"larger than the max bound")
-                    return {}, mol
-                try:
-                    new_row["num_stereoisomers"] = len(
-                        tuple(EnumerateStereoisomers(mol, options=cls.opts))
-                    )  # GetStereoisomerCount(mol)
-                except RuntimeError as err:
-                    logging.info(
-                        f"Unable to create stereoisomer count, error = {err}"
-                    )
-                    new_row["num_stereoisomers"] = None
-            else:
-                # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
-                new_row["has_conformer"] = False
-
-            # calculate solvent accessible surface area per atom
-            # try:
-            #     radii = []
-            #     for atom in mol.GetAtoms():
-            #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
-            #     rdFreeSASA.CalcSASA(mol, radii=radii)
-            # except:
-            #     logging.info("unable to create sasa")
+        try:
+            new_row = {
+                "mol": Chem.rdMolInterchange.MolToJSON(mol)
+            }
             
-            new_row["has_tms"] = len(
-                mol.GetSubstructMatches(cls.tms)
-            )  # count of trimethylsilane matches
-            new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
-            new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
-            new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
-            new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
-            new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
-            new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
-            new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
-            new_row["num_atoms"] = mol.GetNumAtoms()
-            cls.ecfp4.object2fingerprint(mol)  # expressed as a bit vector
-            new_row["ecfp4"] = cls.ecfp4.to_numpy()
-            new_row["ecfp4_count"] = cls.ecfp4.get_num_on_bits()
-            # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
-            # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
-            # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
-            # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
-            # number of undefined stereoisomers
-            new_row[
-                "num_undef_stereo"
-            ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
-            # get number of unspecified double bonds
-            new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+            if not skip_computed_props:
+                # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
+                # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
 
+                new_row["has_2d"] = True
+                new_row["inchi_key"] = Chem.inchi.MolToInchiKey(mol)
+                new_row["isomeric_smiles"] = Chem.MolToSmiles(mol)
+                new_row["smiles"] = Chem.MolToSmiles(mol, isomericSmiles=False)
+
+                if not skip_expensive:
+                    mol, conformer_ids, return_value = threed.create_conformer(mol)
+                    if return_value == -1:
+                        logging.info(f"Not able to create conformer")
+                        return {}, mol
+                    # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
+
+                    # calculation MMFF94 partial charges
+                    partial_charges = []
+                    try:
+                        mol_copy = copy.deepcopy(
+                            mol
+                        )  # the MMFF calculation sanitizes the molecule
+                        fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
+                        if fps is not None:
+                            for atom_num in range(0, mol_copy.GetNumAtoms()):
+                                partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
+                    except ValueError:
+                        logging.info(f"unable to run MMFF")
+                    new_row["num_conformers"] = len(conformer_ids)
+                    new_row["partial_charges"] = partial_charges
+                    bounding_box = threed.bounding_box(mol)
+                    new_row["min_x"] = bounding_box[0, 0]
+                    new_row["max_x"] = bounding_box[0, 1]
+                    new_row["min_y"] = bounding_box[1, 0]
+                    new_row["max_y"] = bounding_box[1, 1]
+                    new_row["min_z"] = bounding_box[2, 0]
+                    new_row["max_z"] = bounding_box[2, 1]
+                    new_row["has_conformer"] = True
+                    new_row["max_bound"] = np.max(np.abs(bounding_box))
+                    if max_size != 0 and new_row["max_bound"] > max_size:
+                        logging.info(f"larger than the max bound")
+                        return {}, mol
+                    try:
+                        new_row["num_stereoisomers"] = len(
+                            tuple(EnumerateStereoisomers(mol, options=cls.opts))
+                        )  # GetStereoisomerCount(mol)
+                    except RuntimeError as err:
+                        logging.info(
+                            f"Unable to create stereoisomer count, error = {err}"
+                        )
+                        new_row["num_stereoisomers"] = None
+                else:
+                    # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
+                    new_row["has_conformer"] = False
+
+                # calculate solvent accessible surface area per atom
+                # try:
+                #     radii = []
+                #     for atom in mol.GetAtoms():
+                #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
+                #     rdFreeSASA.CalcSASA(mol, radii=radii)
+                # except:
+                #     logging.info("unable to create sasa")
+                
+                new_row["has_tms"] = len(
+                    mol.GetSubstructMatches(cls.tms)
+                )  # count of trimethylsilane matches
+                new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
+                new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
+                new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
+                new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
+                new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
+                new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
+                new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
+                new_row["num_atoms"] = mol.GetNumAtoms()
+                cls.ecfp4.object2fingerprint(mol)  # expressed as a bit vector
+                new_row["ecfp4"] = cls.ecfp4.to_numpy()
+                new_row["ecfp4_count"] = cls.ecfp4.get_num_on_bits()
+                # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
+                # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
+                # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
+                # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
+                # number of undefined stereoisomers
+                new_row[
+                    "num_undef_stereo"
+                ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
+                # get number of unspecified double bonds
+                new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+        except Exception as e:
+            logging.info("Exception thrown when creating Mol properties: {str(e)}")
+            return {}, mol
         return new_row, mol
 
 
