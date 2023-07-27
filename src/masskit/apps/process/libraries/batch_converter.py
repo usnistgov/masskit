@@ -27,7 +27,7 @@ overall_progress = Progress(
     TimeElapsedColumn(), MofNCompleteColumn()
 )
 
-write_progress = Progress(
+writer_progress = Progress(
     TextColumn(
         "[blue]{task.description} {task.fields[filename]}: ", justify="right"),
     TimeElapsedColumn(), MofNCompleteColumn()
@@ -40,7 +40,7 @@ batch_progress = Progress(
 )
 
 progress_group = Group(
-    overall_progress, write_progress, batch_progress,
+    overall_progress, writer_progress, batch_progress,
 )
 
 # logging.basicConfig(level="NOTSET", handlers=[RichHandler(level="NOTSET")])
@@ -95,10 +95,10 @@ def batch_converter_app(config: DictConfig) -> None:
                                      row_batch_size=config.conversion.get(
                                          "row_batch_size", 5000),
                                      )
-            writer_task_id = write_progress.add_task(
+            writer_task_id = writer_progress.add_task(
                 "Write", total=len(writers))
             for writer in writers:
-                write_progress.update(
+                writer_progress.update(
                     writer_task_id, description="Write", filename=writer.filename)
                 num_rows = 0
                 batch_task_id = batch_progress.add_task(" Write batch")
@@ -113,7 +113,9 @@ def batch_converter_app(config: DictConfig) -> None:
                     writer.write_table(table)
                     num_rows += len(table)
                     batch_progress.update(batch_task_id, advance=1)
-                write_progress.update(writer_task_id, advance=1)
+                batch_progress.stop_task(batch_task_id)
+                writer_progress.update(writer_task_id, advance=1)
+            writer_progress.stop_task(writer_task_id)
             overall_progress.update(overall_task_id, advance=1)
         for writer in writers:
             writer.close()
