@@ -114,8 +114,10 @@ def batch_converter_app(config: DictConfig) -> None:
                     num_rows += len(table)
                     batch_progress.update(batch_task_id, advance=1)
                 batch_progress.stop_task(batch_task_id)
+                batch_progress.update(batch_task_id, visible=False)
                 writer_progress.update(writer_task_id, advance=1)
             writer_progress.stop_task(writer_task_id)
+            writer_progress.update(writer_task_id, visible=False)
             overall_progress.update(overall_task_id, advance=1)
         for writer in writers:
             writer.close()
