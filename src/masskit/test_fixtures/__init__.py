@@ -1,7 +1,7 @@
 import os
 import pytest
 from hydra import compose, initialize
-from masskit.apps.process.libraries import fasta2peptides
+from masskit.apps.process.libraries.fasta2peptides import fasta2peptides_app
 import pyarrow as pa
 import pyarrow.parquet as pq
 from pathlib import Path
@@ -17,6 +17,7 @@ in the conftest.py file at the root of the package unit tests
 
 """
 
+
 @pytest.fixture(scope="session")
 def data_dir():
     """
@@ -27,28 +28,34 @@ def data_dir():
     elif Path("data").exists():
         return Path("data")
     else:
-        raise FileNotFoundError(f'Unable to find test data directory, cwd={os.getcwd()}')
+        raise FileNotFoundError(
+            f'Unable to find test data directory, cwd={os.getcwd()}')
+
 
 @pytest.fixture(scope="session")
 def SRM1950_lumos_short_sdf(data_dir):
     return data_dir / "SRM1950_lumos_short.sdf"
 
+
 @pytest.fixture(scope="session")
 def SRM1950_lumos_short_parquet(SRM1950_lumos_short_sdf, tmpdir_factory):
-    out = tmpdir_factory.mktemp('batch_converter') / 'SRM1950_lumos_short.parquet'
+    out = tmpdir_factory.mktemp('batch_converter') / \
+        'SRM1950_lumos_short.parquet'
     with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
         cfg = compose(config_name="config_batch_converter",
                       overrides=[f"input.file.names={SRM1950_lumos_short_sdf}",
                                  f"output.file.name={out}",
                                  f"conversion/sdf=sdf_nist_mol"
-                                ])
+                                 ])
         batch_converter_app(cfg)
         return out
     assert False
 
+
 @pytest.fixture(scope="session")
 def cho_uniq_short_msp(data_dir):
     return data_dir / "cho_uniq_short.msp"
+
 
 @pytest.fixture(scope="session")
 def cho_uniq_short_parquet(cho_uniq_short_msp, tmpdir_factory):
@@ -63,43 +70,52 @@ def cho_uniq_short_parquet(cho_uniq_short_msp, tmpdir_factory):
         return out
     assert False
 
+
 @pytest.fixture(scope="session")
 def cho_uniq_short_table(cho_uniq_short_parquet):
     table = pq.read_table(cho_uniq_short_parquet)
     return table
+
 
 @pytest.fixture(scope="session")
 def SRM1950_lumos_table(SRM1950_lumos_short_parquet):
     table = pq.read_table(SRM1950_lumos_short_parquet)
     return table
 
+
 @pytest.fixture(scope="session")
 def cho_uniq_short_recordbatch(cho_uniq_short_table):
     return cho_uniq_short_table.to_batches()
+
 
 @pytest.fixture(scope="session")
 def SRM1950_lumos_recordbatch(SRM1950_lumos_table):
     return SRM1950_lumos_table.to_batches()
 
+
 @pytest.fixture(scope="session")
 def cho_uniq_short_structarray(cho_uniq_short_recordbatch):
     return pa.StructArray.from_arrays(
-        cho_uniq_short_recordbatch[0].columns, 
+        cho_uniq_short_recordbatch[0].columns,
         names=cho_uniq_short_recordbatch[0].schema.names)
+
 
 @pytest.fixture(scope="session")
 def SRM1950_lumos_structarray(SRM1950_lumos_recordbatch):
     return pa.StructArray.from_arrays(
-        SRM1950_lumos_recordbatch[0].columns, 
+        SRM1950_lumos_recordbatch[0].columns,
         names=SRM1950_lumos_recordbatch[0].schema.names)
+
 
 @pytest.fixture(scope="session")
 def human_uniprot_trunc_parquet(tmpdir_factory):
     return tmpdir_factory.mktemp('fasta2peptides') / 'human_uniprot_trunc.parquet'
 
+
 @pytest.fixture(scope="session")
 def human_uniprot_trunc_fasta(data_dir):
     return data_dir / "human_uniprot_trunc.fasta"
+
 
 @pytest.fixture(scope="session")
 def config_fasta2peptides(human_uniprot_trunc_parquet, human_uniprot_trunc_fasta):
@@ -109,18 +125,22 @@ def config_fasta2peptides(human_uniprot_trunc_parquet, human_uniprot_trunc_fasta
                                  f"output.file={human_uniprot_trunc_parquet}"])
         return cfg
 
+
 @pytest.fixture(scope="session")
 def create_peptide_parquet_file(config_fasta2peptides):
-    fasta2peptides.main(config_fasta2peptides)
+    fasta2peptides_app(config_fasta2peptides)
     return config_fasta2peptides.output.file
+
 
 @pytest.fixture(scope="session")
 def batch_converted_sdf_files(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_sdf'
 
+
 @pytest.fixture(scope="session")
 def test_new_sdf(data_dir):
     return data_dir / "test.new.sdf"
+
 
 @pytest.fixture(scope="session")
 def config_batch_converter_sdf(test_new_sdf, batch_converted_sdf_files):
@@ -131,16 +151,19 @@ def config_batch_converter_sdf(test_new_sdf, batch_converted_sdf_files):
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100",
                                  f"conversion/sdf=sdf_nist_mol"
-                                ])
+                                 ])
         return cfg
+
 
 @pytest.fixture(scope="session")
 def batch_converted_csv_files(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_csv'
 
+
 @pytest.fixture(scope="session")
 def test_csv(data_dir):
     return data_dir / "test.csv"
+
 
 @pytest.fixture(scope="session")
 def config_batch_converter_csv(test_csv, batch_converted_csv_files):
@@ -150,16 +173,19 @@ def config_batch_converter_csv(test_csv, batch_converted_csv_files):
                                  f"output.file.name={batch_converted_csv_files}",
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100",
-                                ])
+                                 ])
         return cfg
-    
+
+
 @pytest.fixture(scope="session")
 def batch_converted_pubchem_sdf_files(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_pubchem_sdf'
 
+
 @pytest.fixture(scope="session")
 def pubchem_sdf(data_dir):
     return data_dir / "pubchem.sdf"
+
 
 @pytest.fixture(scope="session")
 def config_batch_converter_pubchem_sdf(pubchem_sdf, batch_converted_pubchem_sdf_files):
@@ -172,13 +198,16 @@ def config_batch_converter_pubchem_sdf(pubchem_sdf, batch_converted_pubchem_sdf_
                                  f"conversion/sdf=sdf_pubchem_mol"])
         return cfg
 
+
 @pytest.fixture(scope="session")
 def batch_converted_plain_sdf_files(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_plain_sdf'
 
+
 @pytest.fixture(scope="session")
 def plain_sdf(data_dir):
     return data_dir / "plain.sdf"
+
 
 @pytest.fixture(scope="session")
 def config_batch_converter_plain_sdf(plain_sdf, batch_converted_plain_sdf_files):
@@ -189,12 +218,14 @@ def config_batch_converter_plain_sdf(plain_sdf, batch_converted_plain_sdf_files)
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100"])
         return cfg
-    
+
+
 @pytest.fixture(scope="session")
 def batch_converted_csv_path_file(tmpdir_factory):
     return tmpdir_factory.mktemp('batch_converter') / 'batch_converted_csv_path_file'
 
 # configurations are kept here so that the config_path can resolve correctly
+
 
 @pytest.fixture(scope="session")
 def config_shortest_path_csv(batch_converted_csv_files, batch_converted_csv_path_file):

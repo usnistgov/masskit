@@ -14,6 +14,25 @@ try:
 except ImportError:
     logging.debug("Unable to import boto3")
     boto3 = None
+from hydra.core.config_search_path import ConfigSearchPath
+from hydra.plugins.search_path_plugin import SearchPathPlugin
+
+
+class MassKitSearchPathPlugin(SearchPathPlugin):
+    """
+    add the cwd to the search path for configuration yaml files
+    """
+
+    def manipulate_search_path(self, search_path: ConfigSearchPath) -> None:
+        # Appends the search path for this plugin to the end of the search path
+        # Note that foobar/conf is outside of the example plugin module.
+        # There is no requirement for it to be packaged with the plugin, it just needs
+        # be available in a package.
+        # Remember to verify the config is packaged properly (build sdist and look inside,
+        # and verify MANIFEST.in is correct).
+        search_path.prepend(
+            provider="masskit-searchpath-plugin", path="."
+        )
 
 
 def class_for_name(module_name_list, class_name):
@@ -137,13 +156,12 @@ def parse_filename(filename: str):
     path = Path(filename).expanduser()
     root = path.with_suffix("")
     suffix = path.suffix
-    if suffix in ['.gz','.bzip2','.bz2']:
+    if suffix in ['.gz', '.bzip2', '.bz2']:
         if suffix == '.bzip2':
             suffix = '.bz2'
         return root.with_suffix(""), root.suffix[1:], suffix[1:]
     else:
         return root, suffix[1:], ''
-
 
 
 def search_for_file(filename, directories):

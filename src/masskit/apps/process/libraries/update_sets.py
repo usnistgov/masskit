@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import logging
 from pathlib import Path
 import hydra
@@ -5,6 +6,12 @@ from omegaconf import DictConfig
 import pyarrow as pa
 import pyarrow.parquet as pq
 import pyarrow.compute as pc
+from masskit.utils.general import MassKitSearchPathPlugin
+from hydra.core.plugins import Plugins
+
+
+Plugins.instance().register(MassKitSearchPathPlugin)
+
 
 """
 Takes the set field in one parquet file and updates the set of the corresponding records in another parquet file.
@@ -24,19 +31,20 @@ def update_sets_app(config: DictConfig) -> None:
 
     print(f"File with new set info: {input_source}")
     print(f"File to be updated: {input_update}")
-    
+
     source_table = pq.read_table(input_source, columns=['inchi_key', 'set'])
     source_table = source_table.append_column("connectivity",
-                                              pc.utf8_slice_codeunits(source_table['inchi_key'],0,14))
+                                              pc.utf8_slice_codeunits(source_table['inchi_key'], 0, 14))
 
     update_table = pq.read_table(input_update, columns=['inchi_key', 'set'])
     update_table = update_table.append_column("connectivity",
-                                              pc.utf8_slice_codeunits(update_table['inchi_key'],0,14))
+                                              pc.utf8_slice_codeunits(update_table['inchi_key'], 0, 14))
 
     connectivity_dict = dict()
     for i in range(source_table.num_rows):
-        connectivity_dict[source_table['connectivity'][i]] = source_table['set'][i].as_py()
-        #print(source_table['connectivity'][i], source_table['set'][i])
+        connectivity_dict[source_table['connectivity']
+                          [i]] = source_table['set'][i].as_py()
+        # print(source_table['connectivity'][i], source_table['set'][i])
 
     new_set = []
     for i in range(update_table.num_rows):
@@ -57,6 +65,7 @@ def update_sets_app(config: DictConfig) -> None:
     output_file = Path(config.output.file.name).expanduser()
     print(f"Writing new dataset to {output_file}")
     pq.write_table(update_table, output_file, row_group_size=5000)
-    
+
+
 if __name__ == "__main__":
     update_sets_app()
