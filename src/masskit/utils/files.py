@@ -257,7 +257,7 @@ class BatchLoader:
 
         if len(self.records["id"]) % 25000 == 0:
             self.tables.append(records2table(self.records, self.schema_group))
-            logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
+            # logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
             self.records = empty_records(self.schema_group['flat_schema'])
 
     def finalize(self):
@@ -266,7 +266,7 @@ class BatchLoader:
         """
         if self.records:
             self.tables.append(records2table(self.records, self.schema_group))
-        logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
+        # logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
         table = pa.concat_tables(self.tables)
         return table
     
@@ -1281,7 +1281,7 @@ class BatchFileReader:
         if self.format['format'] == 'parquet':
             for batch in self.dataset.iter_batches():
                 table = pa.Table.from_batches(batch)  # schema is inferred from batch
-                logging.info(f'processing batch {batch_num} with size {len(table)}')
+                # logging.info(f'processing batch {batch_num} with size {len(table)}')
                 batch_num += 1
                 yield table 
         elif self.format['format'] == 'arrow':
@@ -1294,7 +1294,7 @@ class BatchFileReader:
                 if len(batch) == 0:
                     break
                 start += self.row_batch_size
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                # logging.info(f'processing batch {batch_num} with size {len(batch)}')
                 batch_num += 1
                 yield batch
         elif self.format['format'] in ['msp', 'mgf', 'sdf', 'csv']:
@@ -1307,7 +1307,7 @@ class BatchFileReader:
                     break
                 if self.format['id']['field_type'] == 'int':
                     self.format['id']['initial_value'] += len(batch)
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                # logging.info(f'processing batch {batch_num} with size {len(batch)}')
                 batch_num += 1
                 yield batch
         else:
