@@ -3,6 +3,8 @@ cache:
   clear_cache: False
 queries:
   wikipedia:
+    pubchem_urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
+    file: pubchem-wiki.json
     user_agent: Wiki Query Agent (douglas.slotta@nist.gov)
     reqs_per_second: 100
     parquet: cid-wikipedia.parquet
@@ -10,14 +12,25 @@ queries:
     file: pubchem-inchi.json
     group_size: 100
     reqs_per_second: 4
-pubchem:
-  wikipedia:
-    urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
-    file: pubchem-wiki.json
   cas:
     urlbase: https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/annotations/heading/JSON/
     file: pubchem-cas.json
     parquet: cid-cas.parquet
+pubchem:
+  title:
+    description: 'This is a listing of all CIDs with the name chosen as title for
+    the respective compound summary page. It is a gzipped text file 
+    with CID, tab, title on each line.'
+    url: https://ftp.ncbi.nlm.nih.gov/pubchem/Compound/Extras/CID-Title.gz
+    parquet: cid-title.parquet
+    headers:
+      - cid
+      - title
+    types:
+      - name: cid
+        type: int64
+      - name: title
+        type: string
   inchi:
     description: 'This is a listing of all CIDs with their full InChI strings and
     InChI keys. It is a gzipped text file with CID, tab, InChI, tab,
@@ -51,6 +64,12 @@ pubchem:
         type: int64
       - name: patent_id
         type: string
+    process:
+      type: count
+      groupby:
+        - cid
+      aggregate: patent_id
+      agg_newname: patent_ids
   pmid:
     description: 'This is a listing of all PubMed IDs (PMIDs) linked to CIDs. It 
     is a gzipped text file with CID, tab, PMID, tab, and type on 
@@ -73,6 +92,12 @@ pubchem:
         type: int64
       - name: pmtype
         type: int8
+    process:
+      type: count_distinct
+      groupby:
+        - cid
+      aggregate: pmid
+      agg_newname: pmids
 nist:
   files:
     - /data/aiomics/massspec_cache/nist/ei/2023/old/main_2023.parquet

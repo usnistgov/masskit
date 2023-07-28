@@ -107,7 +107,7 @@ class PubChemCAS:
             'response_type': 'save',
             'response_basename': 'PubChemAnnotations_CAS'
         }
-        r = session.get(self.cfg.pubchem.cas.urlbase, timeout=5, params=parameters)
+        r = session.get(self.cfg.queries.cas.urlbase, timeout=5, params=parameters)
         #print(r.url)
         #print(r.headers)
         r.raise_for_status()
@@ -120,7 +120,7 @@ class PubChemCAS:
         with self.progress:
             task_id = self.progress.add_task(
                 "download",
-                filename=self.cfg.pubchem.cas.file, 
+                filename=self.cfg.queries.cas.file, 
                 start=False,
                 )
             with requests.Session() as s:
@@ -134,7 +134,7 @@ class PubChemCAS:
                     rjson = self.pubchem_cas(s, pageno)
                     annots.extend(rjson['Annotation'])
                     self.progress.update(task_id, advance=1)
-            self.progress.console.print(f"Downloaded {self.cfg.pubchem.cas.file}")
+            self.progress.console.print(f"Downloaded {self.cfg.queries.cas.file}")
         return annots
 
     def use_pubchem_cache(self, filename):
@@ -155,12 +155,12 @@ class PubChemCAS:
     def parse_pubchem_json(self):
         path = Path(self.cfg.cache.dir).expanduser()
 
-        parquet_file = path / self.cfg.pubchem.cas.parquet
+        parquet_file = path / self.cfg.queries.cas.parquet
         if parquet_file.is_file():
             self.progress.console.print(f"Using cache file {parquet_file}")
             return
 
-        cache_file = path / self.cfg.pubchem.cas.file
+        cache_file = path / self.cfg.queries.cas.file
         casdata = self.use_pubchem_cache(cache_file)
         
         records = self.cas_schema.empty_table().to_pydict()
@@ -211,7 +211,7 @@ class PubChemWiki:
             'response_type': 'save',
             'response_basename': 'PubChemAnnotations_Wikipedia'
         }
-        r = session.get(self.cfg.pubchem.wikipedia.urlbase, timeout=5, params=parameters)
+        r = session.get(self.cfg.queries.wikipedia.pubchem_urlbase, timeout=5, params=parameters)
         #print(r.url)
         #print(r.headers)
         r.raise_for_status()
@@ -224,7 +224,7 @@ class PubChemWiki:
         with self.progress:
             task_id = self.progress.add_task(
                 "download",
-                filename=self.cfg.pubchem.wikipedia.file, 
+                filename=self.cfg.queries.wikipedia.file, 
                 start=False,
                 )
             with requests.Session() as s:
@@ -239,7 +239,7 @@ class PubChemWiki:
                     rjson = self.pubchem_wiki(s, pageno)
                     annots.extend(rjson['Annotation'])
                     self.progress.update(task_id, advance=1)
-            self.progress.console.print(f"Downloaded {self.cfg.pubchem.wikipedia.file}")
+            self.progress.console.print(f"Downloaded {self.cfg.queries.wikipedia.file}")
         return annots
 
     def use_pubchem_cache(self, filename):
@@ -259,7 +259,7 @@ class PubChemWiki:
 
     def parse_pubchem_json(self):
         self.path = Path(self.cfg.cache.dir).expanduser()
-        cache_file = self.path / self.cfg.pubchem.wikipedia.file
+        cache_file = self.path / self.cfg.queries.wikipedia.file
         wikidata = self.use_pubchem_cache(cache_file)
 
         self.cid2url = dict()
@@ -341,72 +341,103 @@ class PubChemWiki:
 
 # Obsolete function to get the InChI data for a set of CIDs
 # Now we are downloading the complete list from a file they publish.
-def get_pubchem_inchi(CIDs, cfg):
-    print(f"Fetching InChI from PubChem for {len(CIDs)} CIDs:")
-    annots = []
-    num_groups = math.ceil(len(CIDs)/cfg.queries.cid2inchi.group_size)
-    cid_str = [str(x) for x in CIDs]
+# def get_pubchem_inchi(CIDs, cfg):
+#     print(f"Fetching InChI from PubChem for {len(CIDs)} CIDs:")
+#     annots = []
+#     num_groups = math.ceil(len(CIDs)/cfg.queries.cid2inchi.group_size)
+#     cid_str = [str(x) for x in CIDs]
 
-    with requests.Session() as s:
-        for i in track(range(num_groups), transient=False, description="Fetching PubChem InChI entries:"):
-            cid = ",".join(cid_str[i:i+cfg.queries.cid2inchi.group_size])
-            req = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/InChI,InChIKey/JSON"
-            r = s.get(req,timeout=5)
-            r.raise_for_status()
-            rjson = r.json()['PropertyTable']
-            annots.extend(rjson['Properties'])
-            time.sleep(1/cfg.queries.cid2inchi.reqs_per_second)
-    print()
-    return annots
+#     with requests.Session() as s:
+#         for i in track(range(num_groups), transient=False, description="Fetching PubChem InChI entries:"):
+#             cid = ",".join(cid_str[i:i+cfg.queries.cid2inchi.group_size])
+#             req = f"https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/cid/{cid}/property/InChI,InChIKey/JSON"
+#             r = s.get(req,timeout=5)
+#             r.raise_for_status()
+#             rjson = r.json()['PropertyTable']
+#             annots.extend(rjson['Properties'])
+#             time.sleep(1/cfg.queries.cid2inchi.reqs_per_second)
+#     print()
+#     return annots
 
-def get_csv_type(t):
-    if t == 'int8':
-        return pa.int8()
-    if t == 'int64':
-        return pa.int64()
-    
-    return pa.string()
+class PubChemFTP:
 
-def get_convert_options(col_types):
-    col_types = {}
-    for field in col_types:
-        col_types[field['name']] = get_csv_type(field['type'])
-    return pv.ConvertOptions(column_types=col_types)
+    def __init__(self, cfg):
+        self.cfg = cfg
+        self.cache_pubchem_files(self.cfg.pubchem)
 
-def cache_pubchem_files(cfg: DictConfig):
-    dlpath = Path(cfg.cache.dir).expanduser()
-    dlpath.mkdir(parents=True, exist_ok=True)
-    dlurls = []
-    transform_files = []
+    def get_csv_type(self, t):
+        if t == 'int8':
+            return pa.int8()
+        if t == 'int64':
+            return pa.int64()
+        
+        return pa.string()
 
-    for key in cfg.pubchem.keys():
-        if key == "wikipedia": continue
-        if key == "cas": continue
-        dlurl = cfg.pubchem[key].url
-        filename = dlurl.split('/')[-1]
-        csv_file = dlpath / filename
-        if not csv_file.is_file():
-            dlurls.append(dlurl)
+    def get_convert_options(self, col_types):
+        col_types = {}
+        for field in col_types:
+            col_types[field['name']] = self.get_csv_type(field['type'])
+        return pv.ConvertOptions(column_types=col_types)
+
+    def cache_pubchem_files(self, cfg: DictConfig):
+        dlpath = Path(self.cfg.cache.dir).expanduser()
+        dlpath.mkdir(parents=True, exist_ok=True)
+        dlurls = []
+        csv_files = {}
+
+        # Check which files need downloaded
+        for key in cfg.keys():
+            dlurl = cfg[key].url
+            filename = dlurl.split('/')[-1]
+            csv_file = dlpath / filename
+            if not csv_file.is_file():
+                dlurls.append(dlurl)
+            else:
+                global_console.print(f"Using cached source file: {csv_file}")
+            csv_files[key] = csv_file
+
+        # Perform required downloads
+        if len(dlurls) > 0:
+            Download(dlurls, dlpath)
+
+        # Transform CSV file to Parquet
+        for key in cfg.keys():
+            pqfile = dlpath / cfg[key].parquet
+            if not pqfile.is_file():
+                csv_file = csv_files[key]
+                global_console.print(f"transforming {csv_file.name} -> {pqfile.name}")
+                convert_opts = self.get_convert_options(cfg[key].types)
+                read_opts = pv.ReadOptions(column_names=cfg[key].headers)
+                old_column_names = read_opts.column_names
+                new_column_names = self.get_new_columns(old_column_names, cfg[key])
+                print(f"\t{old_column_names} -> {new_column_names}")
+                table = pv.read_csv(csv_file, 
+                                    parse_options=pv.ParseOptions(delimiter='\t'),
+                                    convert_options=convert_opts,
+                                    read_options=read_opts
+                                    )
+                #global_console.print(table)
+                table = self.process(table, cfg[key], new_column_names)
+                pq.write_table(table, pqfile)
+            else:
+                global_console.print(f"Using cached processed file: {pqfile}")
+
+    def get_new_columns(self, old_columns, cfg: DictConfig):
+        if "process" in cfg:
+            new_columns = list(cfg.process.groupby)
+            new_columns.append(cfg.process.agg_newname)
+            return new_columns
         else:
-            global_console.print(f"Using cache file {csv_file}")
-        pqfile = dlpath / cfg.pubchem[key].parquet
-        transform_files.append( (csv_file,pqfile,key) )        
-    if len(dlurls) > 0:
-        Download(dlurls, dlpath)
-    for xfile in transform_files:
-        if not xfile[1].is_file():
-            global_console.print(f"transforming {xfile[0].name} -> {xfile[1].name}")
-            convert_opts = get_convert_options(cfg.pubchem[xfile[2]].types)
-            read_opts = pv.ReadOptions(column_names=cfg.pubchem[xfile[2]].headers)
-            print(read_opts.column_names)
-            table = pv.read_csv(xfile[0], 
-                                parse_options=pv.ParseOptions(delimiter='\t'),
-                                convert_options=convert_opts,
-                                read_options=read_opts
-                                )
-            #global_console.print(table)
-            pq.write_table(table, xfile[1])
+            return old_columns
 
+    def process(self, table: pa.Table, cfg: DictConfig, column_names):
+        if "process" in cfg:
+            agg_list = [(cfg.process.aggregate, cfg.process.type)]
+            sort_order = []
+            for name in cfg.process.groupby:
+                sort_order.append( (name, "ascending") )
+            table = table.group_by(cfg.process.groupby).aggregate(agg_list).sort_by(sort_order).rename_columns(column_names)
+        return table
 
 class Analyze:
 
@@ -438,7 +469,7 @@ class Analyze:
         print(f"InChI keys matched: {self.cid2inchi.num_rows} out of {len(inchi_keys)}.")
 
     def load_cas(self):
-        cid2cas_file = self.cache_path / self.cfg.pubchem.cas.parquet
+        cid2cas_file = self.cache_path / self.cfg.queries.cas.parquet
         self.cid2cas = pq.read_table(cid2cas_file)
         table = self.cid2inchi.join(self.cid2cas, keys='cid', join_type='inner')
         print(f"cas counts, num rows: {table.num_rows}")
@@ -488,12 +519,18 @@ class Analyze:
 
 @hydra.main(config_path="conf", config_name="config_pubchem_links", version_base=None)
 def main(cfg: DictConfig) -> int:
+    # for k in cfg.pubchem.keys():
+    #     print(k)
+    #     print(cfg.pubchem[k].types)
+    #     if "process" in cfg.pubchem[k]:
+    #         print(cfg.pubchem[k].process)    
+    # return 0
     global_console.print("Attempting to find or download data files:")
     casdata = PubChemCAS(cfg)
     wikidata = PubChemWiki(cfg)
-    cache_pubchem_files(cfg)
+    pubchemdata = PubChemFTP(cfg)
 
-    res = Analyze(cfg)
+    #res = Analyze(cfg)
 
     return 0
 
