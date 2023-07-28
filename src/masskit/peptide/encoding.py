@@ -572,7 +572,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     arrays['ion_type_array'] = pa.DictionaryArray.from_arrays(
         indices=pa.array(arrays['ion_type_array'], type=pa.int32()),
         dictionary=ion_types.dictionary)
-    arrays['charge_array'] = pa.array(arrays['charge_array'], type=pa.int8())
+    arrays['charge_array'] = pa.array(arrays['charge_array'], type=pa.int16())
     arrays['isotope_array'] = pa.array(arrays['isotope_array'], type=pa.uint8())
     arrays['ion_subtype_array'] = pa.DictionaryArray.from_arrays(
         indices=arrays['ion_subtype_array'],

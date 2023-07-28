@@ -264,8 +264,6 @@ class pepgen:
         # self.records['mz']=None
         # self.records['precursor_intensity']=None
         # self.records['precursor_massinfo']=None
-        # self.records['starts']=None
-        # self.records['stops']=None
         add_row_to_records(self.records, row)
         if len(self.records["id"]) % 25000 == 0:
             self.tables.append(records2table(

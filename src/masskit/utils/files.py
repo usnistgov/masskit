@@ -133,7 +133,7 @@ def read_parquet(fp, columns=None, num=None, filters=None):
 
 def spectra_to_array(spectra,
                      min_intensity=0,
-                     write_starts_stops=False,
+                     write_tolerance=False,
                      schema_group=None
                      ):
     """
@@ -141,7 +141,7 @@ def spectra_to_array(spectra,
 
     :param spectra: iteratable containing the spectrums
     :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param write_starts_stops: put the starts and stops arrays into the arrow Table
+    :param write_tolerance: put the tolerance into the arrow Table
     :param schema_group: the schema group of spectrum file
     :return: arrow table of spectra
     """
@@ -168,9 +168,8 @@ def spectra_to_array(spectra,
         # row['stddev'] = s.stddev
         row['product_massinfo'] = s.product_mass_info.__dict__
         row['mz'] = s.products.mz
-        if write_starts_stops:
-            row['starts'] = s.products.starts
-            row['stops'] = s.products.stops
+        if write_tolerance:
+            row['tolerance'] = s.products.tolerance
         row['precursor_intensity'] = s.precursor.intensity
         # Temp hack because PyArrow can't convert empty structs to pandas
         if (s.precursor_mass_info):

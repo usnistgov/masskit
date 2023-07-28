@@ -27,8 +27,6 @@ hi_res1.from_arrays(
     precursor_mz=555.0,
     product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
 )
-# print(hi_res1.products.starts.tolist())
-# print(hi_res1.products.stops.tolist())
 
 hi_res2 = spec.Spectrum()
 hi_res2.from_arrays(
