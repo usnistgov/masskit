@@ -1,4 +1,5 @@
 import math
+import pandas as pd
 import pyarrow as pa
 import numpy as np
 from masskit.accumulator import Accumulator
@@ -139,9 +140,8 @@ class Ions(ABC):
             mass_info: MassInfo = None,
             jitter=0,
             copy_arrays=True,
-            starts=None,
-            stops=None
-    ):
+            tolerance=None,
+                ):
         """
         :param mz: mz values in array-like or scalar
         :param intensity: corresponding intensities in array-like or scalar
@@ -150,8 +150,7 @@ class Ions(ABC):
         :param mass_info:  dict containing mass type, tolerance, tolerance type
         :param jitter: used to add random jitter value to the mz values.  useful for creating fake data
         :param copy_arrays: if the inputs are numpy arrays, make copies
-        :param starts: used for high resolution spectra, mz bin start
-        :param stops: used for high resolution spectra, mz bin stop
+        :param tolerance: mass tolerance array
         """
 
         def init_arrays(array_in, copy_arrays_in):
@@ -220,8 +219,7 @@ class Ions(ABC):
 
         self.mass_info = mass_info
         self.jitter = jitter
-        self.starts = starts  # used for high resolution spectra, mz bin start
-        self.stops = stops  # used for high resolution spectra, mz bin end
+        self.tolerance = tolerance  # used for high resolution spectra, mass tolerance
         self.join = None
         return
 
@@ -272,8 +270,7 @@ class Ions(ABC):
 
         :return: returns self
         """
-        self.starts = None
-        self.stops = None
+        self.tolerance = None
         self.rank = None
         return self
 
@@ -693,28 +690,23 @@ class Ions(ABC):
         :param mz: mz value
         :return: 1/2 tolerance interval
         """
+        is_mz_array = isinstance(mz,(list,pd.core.series.Series,np.ndarray,pa.Array))
         if self.mass_info is None:
-            return 0.0
+            if is_mz_array:
+                return np.full_like(mz, 0.0, dtype=np.float64)
+            else:
+                return 0.0
         if self.mass_info.tolerance_type == "ppm":
             return mz * self.mass_info.tolerance / 1000000.0
         elif self.mass_info.tolerance_type == "daltons":
-            return self.mass_info.tolerance
+            if is_mz_array:
+                return np.full_like(mz, self.mass_info.tolerance, dtype=np.float64)
+            else:
+                return self.mass_info.tolerance
         else:
             raise ValueError(
                 f"mass tolerance type {self.mass_info.tolerance_type} not supported"
             )
-
-    def tolerance_interval(self, mz):
-        """
-        use the mass tolerance to return the tolerance around a peak
-
-        :param mz: the peak mz in daltons
-        :return: the start and stop of the tolerance interval
-        """
-        tolerance = self.half_tolerance(mz)
-        start = mz - tolerance
-        stop = mz + tolerance
-        return start, stop
 
     @abstractmethod
     def intersect(self, comparison_ions, tiebreaker=None):
@@ -945,7 +937,10 @@ class Ions(ABC):
         :param take_sqrt: take the sqrt of the intensities
         """
         if tolerance is None and self.mass_info is not None:
-            tolerance = self.half_tolerance()
+            if self.mass_info.tolerance_type == "daltons":
+                tolerance = self.mass_info.tolerance
+            else:
+                raise ValueError('please specify fixed mass tolerance for evenly_space')
         if tolerance is None:
             raise ValueError("unable to evenly space ions")
 
@@ -1026,38 +1021,38 @@ class HiResIons(Ions):
             self.mass_info = MassInfo(20.0, "ppm", "monoisotopic", "", 1)
 
     @property
+    def tolerance(self):
+        """
+        :return: the mass tolerance for each peak bin
+        """
+        if not hasattr(self, "_tolerance") or self._tolerance is None:
+            self.create_tolerance()
+        return self._tolerance
+
+    @tolerance.setter
+    def tolerance(self, value):
+        self._tolerance = value
+        return
+    
+    @property
     def starts(self):
         """
         :return: the start positions for each peak bin
         """
-        if not hasattr(self, "_starts") or self._starts is None:
-            self.create_starts_stops()
-        return self._starts
-
-    @starts.setter
-    def starts(self, value):
-        self._starts = value
-        return
+        return self.mz - self.tolerance
 
     @property
     def stops(self):
         """
         :return: the stop positions for each peak bin
         """
-        if not hasattr(self, "_starts") or self._stops is None:
-            self.create_starts_stops()
-        return self._stops
+        return self.mz + self.tolerance
 
-    @stops.setter
-    def stops(self, value):
-        self._stops = value
-        return
-
-    def create_starts_stops(self):
+    def create_tolerance(self):
         """
         create start and stop arrays
         """
-        self.starts, self.stops = self.tolerance_interval(self.mz)
+        self.tolerance = self.half_tolerance(self.mz)
 
     def intersect(self, comparison_ions, tiebreaker=None):
         """
@@ -1113,7 +1108,7 @@ class HiResIons(Ions):
         return_ions.mass_info = copy.deepcopy(mass_info)
         if hasattr(mass_info, "evenly_spaced") and mass_info.evenly_spaced:
             self.evenly_space(take_max=take_max)
-        return_ions.create_starts_stops()
+        return_ions.create_tolerance()
         return return_ions
 
 
@@ -1298,7 +1293,7 @@ class Spectrum:
     def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, 
                  ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None,
                  row=None, struct=None, precursor_mz=None, precursor_intensity=None, stddev=None,
-                 annotations=None, starts=None, stops=None, copy_arrays=False):
+                 annotations=None, tolerance=None, copy_arrays=False):
         """
         construct a spectrum.  Can initialize with arrays (mz, intensity) or arrow row object
 
@@ -1312,8 +1307,7 @@ class Spectrum:
         :param annotations: annotations on the ions
         :param precursor_mass_info: MassInfo mass measurement information for the precursor
         :param product_mass_info: MassInfo mass measurement information for the product
-        :param starts: starts array
-        :param stops: stops array
+        :param tolerance: mass tolerance array
         :param copy_arrays: if the inputs are numpy arrays, make copies
         """
         
@@ -1352,8 +1346,7 @@ class Spectrum:
                 precursor_mass_info=precursor_mass_info,
                 product_mass_info=product_mass_info,
                 copy_arrays=copy_arrays,
-                starts=starts,
-                stops=stops,
+                tolerance=tolerance,
                 )
         elif row is not None:
             self.from_arrow(row, copy_arrays=copy_arrays)
@@ -1467,8 +1460,7 @@ class Spectrum:
             mass_info=MassInfo(arrow_struct_accessor=row.precursor_massinfo),
         )
 
-        starts = row.starts() if row.get('starts') is not None else None
-        stops = row.stops() if row.get('stops') is not None else None
+        tolerance = row.tolerance() if row.get('tolerance') is not None else None
 
         self.products = self.product_class(
             row.mz(),
@@ -1477,8 +1469,7 @@ class Spectrum:
             mass_info=MassInfo(arrow_struct_accessor=row.product_massinfo),
             annotations=annotations,
             copy_arrays=copy_arrays,
-            starts=starts,
-            stops=stops
+            tolerance=tolerance
         )
         return self
 
@@ -1523,8 +1514,7 @@ class Spectrum:
             mass_info=MassInfo(arrow_struct_scalar=struct['precursor_massinfo']),
         )
 
-        starts = struct2numpy(struct, 'starts')
-        stops = struct2numpy(struct, 'stops')
+        tolerance = struct2numpy(struct, 'tolerance')
 
         annotations = struct.get("annotations", None)
         if annotations is not None:
@@ -1538,8 +1528,7 @@ class Spectrum:
             mass_info=MassInfo(arrow_struct_scalar=struct['product_massinfo']),
             annotations=annotations,
             copy_arrays=copy_arrays,
-            starts=starts,
-            stops=stops
+            tolerance=tolerance
         )
         return self
     
@@ -1555,8 +1544,7 @@ class Spectrum:
             precursor_mass_info=None,
             product_mass_info=None,
             copy_arrays=True,
-            starts=None,
-            stops=None,
+            tolerance=None,
     ):
         """
         Update or initialize from a series of arrays and the information in rows.  precursor information
@@ -1571,8 +1559,7 @@ class Spectrum:
         :param annotations: annotations on the ions
         :param precursor_mass_info: MassInfo mass measurement information for the precursor
         :param product_mass_info: MassInfo mass measurement information for the product
-        :param starts: starts array
-        :param stops: stops array
+        :param tolerance: mass tolerance array
         :param copy_arrays: if the inputs are numpy arrays, make copies
         """
 
@@ -1608,8 +1595,7 @@ class Spectrum:
             mass_info=product_mass_info,
             annotations=annotations,
             copy_arrays=copy_arrays,
-            starts=starts,
-            stops=stops
+            tolerance=tolerance,
         )
         return self
 
@@ -2605,5 +2591,22 @@ class AccumulatorSpectrum(Spectrum, Accumulator):
 mds.populate_properties(AccumulatorSpectrum, fields=mds.spectrum_accumulator_fields)
 
 class HiResSpectrum(Spectrum):
-    def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, starts=None, stops=None, copy_arrays=False):
-        super().__init__(precursor_mass_info, product_mass_info, name, id, ev, nce, charge, ion_class, mz, intensity, row, precursor_mz, precursor_intensity, stddev, annotations, starts, stops, copy_arrays)
+    def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, tolerance=None, copy_arrays=False):
+        super().__init__(precursor_mass_info=precursor_mass_info, 
+                         product_mass_info=product_mass_info, 
+                         name=name, 
+                         id=id, 
+                         ev=ev, 
+                         nce=nce, 
+                         charge=charge, 
+                         ion_class=ion_class, 
+                         mz=mz, 
+                         intensity=intensity, 
+                         row=row, 
+                         precursor_mz=precursor_mz, 
+                         precursor_intensity=precursor_intensity, 
+                         stddev=stddev, 
+                         annotations=annotations, 
+                         tolerance=tolerance, 
+                         copy_arrays=copy_arrays,
+                         )

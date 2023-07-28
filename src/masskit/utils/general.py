@@ -3,6 +3,7 @@ import os
 import logging
 from pathlib import Path, PurePosixPath
 import tarfile
+from typing import Iterable
 import numpy as np
 import gzip
 import bz2
@@ -13,6 +14,26 @@ try:
 except ImportError:
     logging.debug("Unable to import boto3")
     boto3 = None
+from hydra.core.config_search_path import ConfigSearchPath
+from hydra.plugins.search_path_plugin import SearchPathPlugin
+
+
+class MassKitSearchPathPlugin(SearchPathPlugin):
+    """
+    add the cwd to the search path for configuration yaml files
+    """
+
+    def manipulate_search_path(self, search_path: ConfigSearchPath) -> None:
+        # Appends the search path for this plugin to the end of the search path
+        # Note that foobar/conf is outside of the example plugin module.
+        # There is no requirement for it to be packaged with the plugin, it just needs
+        # be available in a package.
+        # Remember to verify the config is packaged properly (build sdist and look inside,
+        # and verify MANIFEST.in is correct).
+        search_path.prepend(
+            provider="masskit-searchpath-plugin", path="."
+        )
+
 
 def class_for_name(module_name_list, class_name):
     """
@@ -37,6 +58,7 @@ def class_for_name(module_name_list, class_name):
     if c is None:
         raise ImportError(f"unable to find {class_name}")
     return c
+
 
 def open_if_compressed(filename, mode, newline=None):
     """
@@ -75,6 +97,7 @@ def open_if_compressed(filename, mode, newline=None):
     else:
         return open(filename, mode, newline=newline)
 
+
 def open_if_filename(fp, mode, newline=None):
     """
     if the fp is a string, open the file, and uncompress if needed
@@ -84,7 +107,7 @@ def open_if_filename(fp, mode, newline=None):
     :param newline: specify newline character
     :return: stream
     """
-    if isinstance(fp, str) or isinstance(fp, Path) :
+    if isinstance(fp, str) or isinstance(fp, Path):
         fp = open_if_compressed(fp, mode, newline=newline)
         if not fp:
             raise ValueError(f"not able to open file")
@@ -95,15 +118,50 @@ def discounted_cumulative_gain(relevance_array):
     return np.sum((np.power(2.0, relevance_array) - 1.0) / np.log2(np.arange(2, len(relevance_array) + 2)))
 
 
+def expand_path(path_pattern) -> Iterable[Path]:
+    """
+    expand a path with globs (wildcards) into a generator of Paths
+
+    :param path_pattern: the path to be globbed
+    :return: iterable of Path
+    """
+    p = Path(path_pattern).expanduser()
+    parts = p.parts[p.is_absolute():]
+    return Path(p.root).glob(str(Path(*parts)))
+
+
+def expand_path_list(path_list):
+    """
+    given a file path or list of file paths that may contain wildcards,
+    expand ~ to the user directory and glob the wildcards
+
+    :param path_list: list or str of paths, may include ~ and *
+    :return: list of expanded paths
+    """
+    path_list = path_list if not isinstance(path_list, str) else [path_list]
+    return_val = []
+    for path in path_list:
+        paths = list(expand_path(path))
+        return_val.extend(paths)
+    return return_val
+
+
 def parse_filename(filename: str):
     """
-    parse filename into root and extension
+    parse filename into root, extension, and compression extension
 
     :param filename: filename
-    :return: root, extension
+    :return: root, extension, compression
     """
     path = Path(filename).expanduser()
-    return path.with_suffix(""), path.suffix[1:]
+    root = path.with_suffix("")
+    suffix = path.suffix
+    if suffix in ['.gz', '.bzip2', '.bz2']:
+        if suffix == '.bzip2':
+            suffix = '.bz2'
+        return root.with_suffix(""), root.suffix[1:], suffix[1:]
+    else:
+        return root, suffix[1:], ''
 
 
 def search_for_file(filename, directories):
@@ -136,12 +194,14 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
     if cache_directory is None:
         cache_directory = Path.home() / Path('.masskit_cache')
     else:
-        cache_directory = Path(cache_directory).expanduser()  # expand tilde notation
+        # expand tilde notation
+        cache_directory = Path(cache_directory).expanduser()
     if search_path is None:
         search_path = [Path.home() / Path('.masskit_cache')]
     if cache_directory not in search_path:
         search_path.append(cache_directory)
-    search_path = [Path(x).expanduser() for x in search_path]  # expand tilde notation
+    search_path = [Path(x).expanduser()
+                   for x in search_path]  # expand tilde notation
 
     # treat as an url
     url = urlparse(filename, allow_fragments=False)
@@ -161,7 +221,6 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
     else:
         final_filename = Path(file_path.name)
 
-
     # look for the non-tgz version of the file.  If it's there, return the path
     if not is_url and file_path.is_file():
         return file_path
@@ -169,22 +228,23 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
         file_path = search_for_file(final_filename, search_path)
         if file_path is not None:
             return file_path
-        
+
     # assume we need to download the file
     if is_url:
-        cache_directory.mkdir(parents=True, exist_ok=True)  # make the cache directory if necessary
+        # make the cache directory if necessary
+        cache_directory.mkdir(parents=True, exist_ok=True)
         if url.scheme == "s3":
             s3 = boto3.client("s3")
             with open(cache_directory / url_path.name, "wb") as f:
                 s3.download_fileobj(url.netloc, url.path, f)
-        else: 
+        else:
             request.urlretrieve(url.geturl(), cache_directory / url_path.name)
 
         if is_tgz:
             with tarfile.open(cache_directory / url_path.name, 'r:gz') as tgz_ref:
                 tgz_ref.extractall(cache_directory)
             os.remove(cache_directory / url_path.name)
-        
+
         if (cache_directory / final_filename).is_file():
             return cache_directory / final_filename
 

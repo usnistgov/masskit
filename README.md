@@ -27,7 +27,7 @@ Masskit does this by taking advantage of modern software and hardware architectu
 ### Requirements
 
 - Masskit is installed using the package managers [`conda`](https://conda.io/) and [`mamba`](https://mamba.readthedocs.io/).
-If you do not have either installed we recommend installing [mambaforge](https://github.com/conda-forge/miniforge#mambaforge).
+If you do not have either installed we recommend installing [mambaforge](https://github.com/conda-forge/miniforge#mambaforge). Detailed installation instructions for macOS and Linux can be found [here](https://github.com/robotology/robotology-superbuild/blob/master/doc/install-mambaforge.md).
 
 ### Windows
 
@@ -38,10 +38,10 @@ If you do not have either installed we recommend installing [mambaforge](https:/
 Downloads folder, right clicking on the zip file, and selecting `Extract all...`.
 - Run `Miniforge Prompt` or `Anaconda Prompt` from the Start menu depending on whether you
 installed `mambaforge` or a `conda` distribution.
-- In the prompt window, use `cd` to change to the directory starting with `masskit` in
+- In the prompt window, use `cd masskit*` to change to the directory starting with `masskit` in
 the directory you extracted the downloads to.
 - Run `call init_masskit.bat` to create the `masskit` package environment.
-- Run `pip install masskit-1.1.0-py3-none-any.whl`.
+- Run `pip install --find-links=. masskit`.
 
 Whenever using the programs in Masskit, please make sure you initialize the appropriate package environment:
 
@@ -60,7 +60,8 @@ Whenever using the programs in Masskit, please make sure you initialize the appr
 - If you are not using Masskit AI, run `source environments/init_masskit.sh`
 - Run `pip install .`
 
-Whenever using the programs in Masskit, please make sure you initialize the appropriate package environment:
+Whenever using the programs in Masskit, please make sure you have initialized the appropriate package environment:
 
-- If you use `mamba` run `mamba activate masskit`
-- If you use `conda` run `conda activate masskit`.
+- If you installed using `init_masskit.sh` without options run `conda activate masskit`
+- If you installed using `init_masskit.sh -c` run `conda activate masskit_ai_cpu`.
+- If you installed using `init_masskit.sh -m` run `conda activate masskit_ai`

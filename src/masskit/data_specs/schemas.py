@@ -136,7 +136,7 @@ massinfo_struct_fields = \
         # ("tolerance_type", pa.string()),
         # ("mass_type", pa.string()),
         ("neutral_loss", pa.string()),
-        ("neutral_loss_charge", pa.int64()),
+        ("neutral_loss_charge", pa.int16()),
         ("evenly_spaced", pa.bool_())
     ]
 
@@ -151,7 +151,7 @@ massinfo_struct = pa.struct(massinfo_struct_fields)
 ion_annot_fields = \
     [
         ("ion_type", pa.dictionary(pa.int32(), pa.string())),  # ion type or canonical SMILES
-        ("product_charge", pa.int8()),  # charge of ion
+        ("product_charge", pa.int16()),  # charge of ion
         ("isotope", pa.uint8()),   # which isotopic peak?  0 is monoisotopic
         ("ion_subtype", pa.dictionary(pa.int32(), pa.string())),  # subtype of ion_type
         ("position", pa.uint16()),  # position of bond break in polymer
@@ -183,31 +183,30 @@ base_experimental_fields = [
     pa.field("casno", pa.string()),
     pa.field("synonyms", pa.string()),
     pa.field("scan", pa.string()),
-    pa.field("collision_energy", pa.float64(), metadata={'description': 'collision energy, either ev or calculated from nce'}),
+    pa.field("collision_energy", pa.float32(), metadata={'description': 'collision energy, either ev or calculated from nce'}),
     pa.field("retention_time", pa.float64(), metadata={'description': 'retention time in seconds'}),
     pa.field("collision_gas", pa.string()),
     pa.field("insource_voltage", pa.int64()),
     pa.field("sample_inlet", pa.string()),
-    pa.field("ev", pa.float64(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
-    pa.field("nce", pa.float64(), metadata={'description': 'normalized collision energy'})
+    pa.field("ev", pa.float32(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
+    pa.field("nce", pa.float32(), metadata={'description': 'normalized collision energy'})
 ]
 
 # large measured spectrum fields shared by all types of experiments
 base_spectrum_large_fields = [
-    pa.field("intensity", pa.large_list(pa.float64())),
+    pa.field("intensity", pa.large_list(pa.float32())),
     pa.field("stddev", pa.large_list(pa.float64())),
     pa.field("product_massinfo", massinfo_struct),
     pa.field("mz", pa.large_list(pa.float64())),
     pa.field("precursor_intensity", pa.float64()),
     pa.field("precursor_massinfo", massinfo_struct),
-    pa.field("starts", pa.large_list(pa.float64())),
-    pa.field("stops", pa.large_list(pa.float64())),
+    pa.field("tolerance", pa.large_list(pa.float64())),  # mz tolerance
 ]
 
 # small measured spectrum fields shared by all types of experiments
 precursor_mz_field = pa.field("precursor_mz", pa.float64())
 base_spectrum_small_fields = [
-    pa.field("charge", pa.int8()),
+    pa.field("charge", pa.int16()),
     precursor_mz_field,
 ]
 
@@ -264,40 +263,46 @@ peptide_property_fields = peptide_metadata_fields
 # experimental metadata fields used in small molecule experiments, measured or recorded
 molecule_experimental_fields = [
     pa.field("column", pa.string()),
-    pa.field("experimental_ri", pa.float64()),
+    pa.field("experimental_ri", pa.float32()),
     pa.field("experimental_ri_data", pa.int32()),
-    pa.field("experimental_ri_error", pa.float64()),
-    pa.field("stdnp", pa.float64()),
+    pa.field("experimental_ri_error", pa.float32()),
+    pa.field("stdnp", pa.float32()),
     pa.field("stdnp_data", pa.int32()),
-    pa.field("stdnp_error", pa.float64()),
-    pa.field("stdpolar", pa.float64()),
+    pa.field("stdnp_error", pa.float32()),
+    pa.field("stdpolar", pa.float32()),
     pa.field("stdpolar_data", pa.int32()),
-    pa.field("stdpolar_error", pa.float64()),
+    pa.field("stdpolar_error", pa.float32()),
     pa.field("vial_id", pa.int64())
 ]
 
 # annotation fields used in small molecule experiments that are calculated from structure
 molecule_annotation_fields = [
-    pa.field("aromatic_rings", pa.int64()),
+    pa.field("aromatic_rings", pa.int32()),
     pa.field("ecfp4", pa.large_list(pa.uint8()), metadata={b"fp_size": (4096).to_bytes(8, byteorder='big')}),
     pa.field("ecfp4_count", pa.int32()),
-    pa.field("estimated_ri", pa.float64()),
-    pa.field("estimated_ri_error", pa.float64()),
+    pa.field("estimated_ri", pa.float32()),  # standard semipolar
+    pa.field("estimated_ri_error", pa.float32()),  
+    pa.field("estimated_ri_stdnp", pa.float32()),  # standard nonpolar
+    pa.field("estimated_ri_stdnp_error", pa.float32()),
+    pa.field("estimated_ri_stdpolar", pa.float32()),  # standard polar
+    pa.field("estimated_ri_stdpolar_error", pa.float32()),
     pa.field("formula", pa.string()),
     pa.field("has_2d", pa.bool_()),
     pa.field("has_conformer", pa.bool_()),
-    pa.field("has_tms", pa.int64()),
-    pa.field("hba", pa.int64()),
-    pa.field("hbd", pa.int64()),
+    pa.field("has_tms", pa.int32()),
+    pa.field("hba", pa.int32()),
+    pa.field("hbd", pa.int32()),
     pa.field("inchi_key", pa.string()),
     pa.field("inchi_key_orig", pa.string()),
     pa.field("isomeric_smiles", pa.string()),
-    pa.field("num_atoms", pa.int64()),
-    pa.field("num_undef_double", pa.int64()),
-    pa.field("num_undef_stereo", pa.int64()),
-    pa.field("rotatable_bonds", pa.int64()),
+    pa.field("num_atoms", pa.int32()),
+    pa.field("num_undef_double", pa.int32()),
+    pa.field("num_undef_stereo", pa.int32()),
+    pa.field("rotatable_bonds", pa.int32()),
     pa.field("smiles", pa.string()),
-    pa.field("tpsa", pa.float64()),
+    pa.field("tpsa", pa.float32()),
+    pa.field("logp", pa.float32()),
+    pa.field("fragments", pa.int32()),
 ]
 
 # small molecule experimental metadata
@@ -318,7 +323,7 @@ accumulator_fields = [
 accumulator_property_fields = compose_fields(property_fields, accumulator_fields)
 
 spectrum_accumulator_fields = [
-    pa.field('cosine_score', pa.float64()),
+    pa.field('cosine_score', pa.float32()),
 ]
 
 # struct for peptide spectra
@@ -433,13 +438,13 @@ hitlist_fields = [
     pa.field("peptide", pa.string()),
     pa.field("mod_names", pa.large_list(pa.int32())),
     pa.field("mod_positions", pa.large_list(pa.int32())),
-    pa.field("charge", pa.int8()),
+    pa.field("charge", pa.int16()),
     #pa.field("ev", pa.float64(), metadata={'description': 'collision energy (voltage drop to collision cell)'}),
     pa.field("query_id", pa.uint64()),
     pa.field("hit_id", pa.uint64()),
     pa.field("accession", pa.string()),
-    pa.field("protein_start", pa.uint16()),
-    pa.field("protein_stop", pa.uint16()),
+    pa.field("protein_start", pa.uint32()),
+    pa.field("protein_stop", pa.uint32()),
     pa.field("source_search", pa.string()),
     pa.field("decoy_hit", pa.bool_()),
     pa.field("raw_score", pa.float32())

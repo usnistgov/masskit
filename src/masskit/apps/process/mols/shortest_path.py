@@ -1,9 +1,11 @@
+from contextlib import contextmanager
+from functools import partial
+from multiprocessing import Pool
 from pathlib import Path
 import jsonpickle
 import logging
 import hydra
 from omegaconf import DictConfig
-from masskit.utils.tablemap import ArrowLibraryMap
 import pyarrow as pa
 import pyarrow.parquet as pq
 from rdkit import Chem
@@ -89,32 +91,129 @@ def get_shortest_paths(rd_mol, max_path_length=5):
     return paths_dict, pointer_dict, ring_dict
 
 
+@contextmanager
+def batch_reader(input_file, row_batch_size=5000):
+        format = Path(input_file).suffix[1:].lower()
+        if format == 'parquet':
+            dataset = pq.ParquetFile(input_file)
+        elif format == 'arrow':
+            dataset = pa.ipc.RecordBatchStreamReader(pa.memory_map(input_file, 'r'))
+        else:
+            raise ValueError(f"incorrect file type {format}")
+        
+        try:
+            if format == 'parquet':
+                for batch in dataset.iter_batches():
+                    table = pa.Table.from_batches(batch)  # schema is inferred from batch
+                    yield table 
+            elif format == 'arrow':
+                while True:
+                    batch = dataset.read_next_batch()
+                    table = pa.Table.from_batches([batch])
+                    yield table
+        finally:
+            dataset.close()
+
+class BatchWriter:
+    """
+    Doesn't admit well to being a context manager as the file can't be
+    opened until write_table() is called as the file open functions
+    require a table schema
+    """
+    def __init__(self, output_file):
+        self.format = Path(output_file).suffix[1:].lower()
+        if self.format not in ['arrow', 'parquet']:
+            raise ValueError(f"incorrect file type {self.format}")
+        self.dataset = None
+
+    def write_table(self, table):
+        if self.format == 'parquet':
+            if self.dataset == None:
+                self.dataset = pq.ParquetWriter(pa.OSFile(self.filename, 'wb'), table.schema)
+            self.dataset.write_table(table)
+        elif self.format == 'arrow':
+            if self.dataset == None:
+                self.dataset = pa.RecordBatchFileWriter(pa.OSFile(self.filename, 'wb'), table.schema)
+            self.dataset.write_table(table)
+
+    def close(self):
+        if self.dataset is not None:
+            self.dataset.close()
+
+    def __del__(self):
+        # explictly close as writer can be threaded
+        self.close()
+
+
+def mol2path(mol, max_path_length=5):
+    return jsonpickle.encode(get_shortest_paths(
+            mol, max_path_length), keys=True)
+
+
 @hydra.main(config_path="conf", config_name="config_path", version_base=None)
 def path_generator_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)
 
     input_file = Path(config.input.file.name).expanduser()
-    library_map = ArrowLibraryMap.from_parquet(input_file, num=config.input.num)
+
+    table = pq.read_table(input_file)
 
     shortest_paths = []
+    mols = table['mol'].combine_chunks().to_numpy()
 
-    for i in range(len(library_map)):
-        rd_mol = library_map[i]['mol']
-        shortest_paths.append(jsonpickle.encode(get_shortest_paths(
-            rd_mol, config.conversion.max_path_length), keys=True))
+    with Pool(config.get('num_workers', 8)) as p:
+        shortest_paths = p.map(partial(mol2path, 
+                                       max_path_length=config.conversion.max_path_length), 
+                                       mols)
 
-    table = library_map.to_arrow()
     # delete shortest_paths column if it already exists
     try:
         table = table.remove_column(table.column_names.index("shortest_paths"))
     except ValueError:
         pass
-    new_array = pa.ExtensionArray.from_storage(PathArrowType(), pa.array(shortest_paths))
-    table = table.add_column(table.num_columns,"shortest_paths", new_array)
+    new_arrays = []
+    new_array = pa.array(shortest_paths)
+    if type(new_array) is pa.ChunkedArray:
+        for array in new_array.iterchunks():
+            new_arrays.append(pa.ExtensionArray.from_storage(PathArrowType(), array))
+    else:
+        new_arrays.append(pa.ExtensionArray.from_storage(PathArrowType(), new_array))
+    table = table.add_column(table.num_columns,"shortest_paths", new_arrays)
     # output the files
     output_file = Path(config.output.file.name).expanduser()
     pq.write_table(table, output_file)
+"""
+# batched addition of shortest_path.  Currently not implemented as ParquetFile.iter_batches()
+# cannot handle nested data conversions for chunked array outputs.  Will be fixed in a future
+# version of arrow.  See https://github.com/apache/arrow/issues/32723
+     
+     input_file = Path(config.input.file.name).expanduser()
+
+    output = BatchWriter(config.output.file.name)
+    # library_map = ArrowLibraryMap.from_parquet(input_file, num=config.input.num)
+    with batch_reader(input_file) as reader:
+
+        shortest_paths = []
+        for table in reader:
+
+            for i in range(len(table)):
+                shortest_paths.append(jsonpickle.encode(get_shortest_paths(
+                    table['mol'][i], config.conversion.max_path_length), keys=True))
+            try:
+                table = table.remove_column(table.column_names.index("shortest_paths"))
+            except ValueError:
+                pass
+            new_array = pa.array(shortest_paths)
+            if type(new_array) is pa.ChunkedArray:
+                raise NotImplemented()
+            else:
+                new_array = pa.ExtensionArray.from_storage(PathArrowType(), new_array)
+            table = table.add_column(table.num_columns,"shortest_paths", new_array)
+            output.write_table(table)
+
+    output.close()
+    """
 
 if __name__ == "__main__":
     path_generator_app()

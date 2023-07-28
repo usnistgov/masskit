@@ -2,9 +2,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 from rdkit.Chem import Descriptors
 from masskit.small_molecule.utils import standardize_mol
-import logging
 from rdkit.Chem.MolStandardize import rdMolStandardize
-# import molvs
 
 
 class Reactor:
@@ -104,10 +102,6 @@ class Reactor:
         :param reactant_names: list of replacement group names
         :param functional_group_names: list of functional group names
         """
-        if reactant_names is None:
-            reactant_names = self.reactant_names
-        if functional_group_names is None:
-            functional_group_names = self.functional_group_names
 
         self.reactions = []
         for replacement_group in reactant_names:
@@ -130,7 +124,8 @@ class Reactor:
         # run the reaction
         for reaction in self.reactions:
             for molecule in molecules:
-                products = reaction.RunReactants((molecule,), maxProducts=maxProducts)
+                products = reaction.RunReactants(
+                    (molecule,), maxProducts=maxProducts)
                 all_products.extend([x[0] for x in products])
         # dedup molecules
         deduplicated_products = set()
@@ -141,7 +136,11 @@ class Reactor:
                 # mass filter
                 if mass_range:
                     if mass_range[0] <= Descriptors.ExactMolWt(molecule) <= mass_range[1]:
-                        deduplicated_products.add(Chem.MolToSmiles(molecule, isomericSmiles=True))
+                        deduplicated_products.add(
+                            Chem.MolToSmiles(molecule, isomericSmiles=True))
+                else:
+                    deduplicated_products.add(
+                        Chem.MolToSmiles(molecule, isomericSmiles=True))
             except:  # unable to standardize
                 continue
         return [Chem.MolFromSmiles(x) for x in deduplicated_products]
@@ -178,91 +177,20 @@ class Reactor:
         self.create_reactions(reactant_names=reactant_names,
                               functional_group_names=functional_group_names)
 
-        products = self.apply_reactions(molecules, maxProducts=maxProducts, mass_range=mass_range)
+        products = self.apply_reactions(
+            molecules, maxProducts=maxProducts, mass_range=mass_range)
         new_products = products
         for i in range(max_passes):
-            new_products = self.apply_reactions(new_products, maxProducts=maxProducts, mass_range=mass_range)
+            new_products = self.apply_reactions(
+                new_products, maxProducts=maxProducts, mass_range=mass_range)
             if not new_products:
                 break
             products.extend(new_products)
             if len(products) > maxProducts:
                 break
         if include_original_molecules:
-            molecules.extend(products)  # use molecules to keep the correct order
+            # use molecules to keep the correct order
+            molecules.extend(products)
             return molecules
         else:
             return products
-
-
-if __name__ == '__main__':
-
-    import unittest
-
-    class TestReactionMethods(unittest.TestCase):
-        """
-        unit tests
-        """
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            self.maxDiff = None
-            self.reaction = Reactor()
-
-            self. finalM = self.do_standardization('O=C(C)Oc1ccccc1C(=O)O')
-            self.m = self.do_standardization('CCCCCC1=CC2=C([C@@H]3C=C(CC[C@H]3C(O2)(C)C)C)C(=C1C(=O)O)O')
-            self.phenol = self.do_standardization('c1ccc(cc1)O')
-            self.benzamide = self.do_standardization('c1ccc(cc1)C(=O)N')
-            self.tris = self.do_standardization('OCC(N)(CO)CO')
-            self.from_sandy = self.do_standardization('Cc1ccc(cc1)S(=O)(=O)NC(=O)NCCC')
-
-        def do_standardization(self, smiles):
-            mol = Chem.MolFromSmiles(smiles)
-            mol = self.reaction.standardization_function(mol)
-            return mol
-
-        def test_react(self):
-            self.do_reaction(self.finalM, ['CC(=O)Oc1ccccc1C(=O)OC(=O)C(F)(F)F', 'COC(=O)c1ccccc1OC(C)=O',
-                                           'CC(=O)Oc1ccccc1C(=O)O[Si](C)(C)CC(C)C', 'CC(=O)OC(=O)c1ccccc1OC(C)=O',
-                                           'CC(=O)Oc1ccccc1C(=O)O[Si](C)(C)C'])
-            self.do_reaction(self.phenol, ['C[Si](C)(C)Oc1ccccc1'], reactant_names=['trimethylsilylation'])
-            self.do_reaction(self.m, ['CCCCCc1cc2c(c(O[Si](C)(C)C)c1C(=O)O)[C@@H]1C=C(C)CC[C@H]1C(C)(C)O2',
-                                      'CCCCCc1cc2c(c(O)c1C(=O)O[Si](C)(C)C)[C@@H]1C=C(C)CC[C@H]1C(C)(C)O2',
-                                      'CCCCCc1cc2c(c(O[Si](C)(C)C)c1C(=O)O[Si](C)(C)C)[C@@H]1C=C(C)CC[C@H]1C(C)(C)O2'],
-                             reactant_names=['trimethylsilylation']
-                             )
-            self.do_reaction(self.benzamide, ['C[Si](C)(C)NC(=O)c1ccccc1', 'C[Si](C)(C)N(C(=O)c1ccccc1)[Si](C)(C)C'],
-                             reactant_names=['trimethylsilylation']
-                             )
-            self.do_reaction(self.tris, ['C[Si](C)(C)NC(CO)(CO)CO', 'C[Si](C)(C)OCC(N)(CO)CO',
-                                         'C[Si](C)(C)OCC(N)(CO)CO[Si](C)(C)C', 'C[Si](C)(C)N(C(CO)(CO)CO)[Si](C)(C)C',
-                                         'C[Si](C)(C)NC(CO)(CO)CO[Si](C)(C)C',
-                                         'C[Si](C)(C)OCC(N)(CO[Si](C)(C)C)CO[Si](C)(C)C',
-                                         'C[Si](C)(C)NC(CO)(CO[Si](C)(C)C)CO[Si](C)(C)C',
-                                         'C[Si](C)(C)OCC(CO)(CO)N([Si](C)(C)C)[Si](C)(C)C',
-                                         'C[Si](C)(C)NC(CO[Si](C)(C)C)(CO[Si](C)(C)C)CO[Si](C)(C)C',
-                                         'C[Si](C)(C)OCC(CO)(CO[Si](C)(C)C)N([Si](C)(C)C)[Si](C)(C)C',
-                                         'C[Si](C)(C)OCC(CO[Si](C)(C)C)(CO[Si](C)(C)C)N([Si](C)(C)C)[Si](C)(C)C'],
-                             reactant_names=['trimethylsilylation']
-                             )
-            self.do_reaction(self.from_sandy, ['CCCN(C(=O)NS(=O)(=O)c1ccc(C)cc1)[Si](C)(C)C',
-                                               'CCCN=C(O)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1',
-                                               'CCCN(C(O)=NS(=O)(=O)c1ccc(C)cc1)[Si](C)(C)C',
-                                               'CCCN=C(NS(=O)(=O)c1ccc(C)cc1)O[Si](C)(C)C',
-                                               'CCCNC(=O)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1',
-                                               'CCCNC(=NS(=O)(=O)c1ccc(C)cc1)O[Si](C)(C)C',
-                                               'CCCN(C(=O)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1)[Si](C)(C)C',
-                                               'CCCN=C(O[Si](C)(C)C)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1',
-                                               'CCCN(C(=NS(=O)(=O)c1ccc(C)cc1)O[Si](C)(C)C)[Si](C)(C)C'],
-                             num_tautomers=5, reactant_names=['trimethylsilylation'])
-
-            return
-
-        def do_reaction(self, molecule, comparison, num_tautomers=0, reactant_names=None):
-            # logging.info(f"reactant={Chem.MolToSmiles(molecule)}")
-            products = self.reaction.react(molecule, reactant_names=reactant_names,
-                                           num_tautomers=num_tautomers)
-            smiles = [Chem.MolToSmiles(x) for x in products]
-            self.assertCountEqual(smiles, comparison)
-            logging.info(f"products={smiles}")
-
-    logging.getLogger().setLevel(logging.INFO)
-    unittest.main()

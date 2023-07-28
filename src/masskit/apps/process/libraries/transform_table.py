@@ -25,11 +25,18 @@ from rich.progress import (
     track,
     TransferSpeedColumn,
 )
+from masskit.utils.general import MassKitSearchPathPlugin
+from hydra.core.plugins import Plugins
+
+
+Plugins.instance().register(MassKitSearchPathPlugin)
+
 
 global_console = Console()
 progress = Progress(
-    #TextColumn("[bold blue]{task.fields[filename,action]}", justify="right"),
-    TextColumn("[bold blue]{task.fields[filename]}: [blue]{task.description}", justify="right"),
+    # TextColumn("[bold blue]{task.fields[filename,action]}", justify="right"),
+    TextColumn(
+        "[bold blue]{task.fields[filename]}: [blue]{task.description}", justify="right"),
     BarColumn(bar_width=None),
     "[progress.percentage]{task.percentage:>3.1f}%",
     "•",
@@ -60,6 +67,7 @@ _list_types = [
     pa.large_list
 ]
 
+
 def str2pyarrow_type(s: str) -> pa.DataType:
     for nt in _numeric_types:
         if s == str(nt):
@@ -70,6 +78,7 @@ def str2pyarrow_type(s: str) -> pa.DataType:
             if s == str(lt(nt)):
                 return lt(nt)
     return pa.null()
+
 
 def cast_columns(table: pa.Table, cfg: DictConfig):
     columns = table.column_names
@@ -84,19 +93,20 @@ def cast_columns(table: pa.Table, cfg: DictConfig):
         )
     return table
 
+
 def compress_start_stop(table: pa.Table):
     offsets = table["stops"].combine_chunks().offsets
     flat_values = pc.cast(
-            pc.divide(
-                pc.subtract(
-                    pc.list_flatten(
-                        table["stops"]
-                    ), 
-                    pc.list_flatten(
-                        table["starts"]
-                    )
-                ),2
-            ).combine_chunks(),
+        pc.divide(
+            pc.subtract(
+                pc.list_flatten(
+                    table["stops"]
+                ),
+                pc.list_flatten(
+                    table["starts"]
+                )
+            ), 2
+        ).combine_chunks(),
         pa.float32()
     )
     new_values = pa.LargeListArray.from_arrays(offsets, flat_values)
@@ -111,12 +121,14 @@ def misc_operations(table: pa.Table, cfg: DictConfig):
             table = compress_start_stop(table)
     return table
 
+
 def get_sort_index(table: pa.Table, cfg: DictConfig):
     sort_keys = []
     for skey in cfg:
         sort_keys.append((skey.field, skey.order))
     sortidx = pc.sort_indices(table, sort_keys)
     return sortidx
+
 
 def process_and_cache(infile: Path, outfile: Path, sort: DictConfig, batch_size=500, casts=None, operations=None) -> Path:
     task_id = progress.add_task(
@@ -141,12 +153,13 @@ def process_and_cache(infile: Path, outfile: Path, sort: DictConfig, batch_size=
     progress.start_task(task_id)
     with pa.OSFile(str(outfile), 'wb') as sink:
         with pa.ipc.new_file(sink, table.schema) as writer:
-            for start in range(0,len(sortidx),batch_size):
-                subset = sortidx.slice(start,batch_size)
+            for start in range(0, len(sortidx), batch_size):
+                subset = sortidx.slice(start, batch_size)
                 batch = table.take(subset)
                 writer.write(batch)
                 progress.update(task_id, advance=len(batch))
-                #print(f"Wrote batch {start}:{start+len(batch)}")
+                # print(f"Wrote batch {start}:{start+len(batch)}")
+
 
 def concat_to_output(files: list, sort: DictConfig, output: DictConfig):
     task_id = progress.add_task(
@@ -170,28 +183,30 @@ def concat_to_output(files: list, sort: DictConfig, output: DictConfig):
     progress.start_task(task_id)
     with pa.OSFile(output.arrow_file, 'wb') as sink:
         with pa.ipc.new_file(sink, big_table.schema) as writer:
-            for start in range(0,len(sortidx),output.batch_size):
-                subset = sortidx.slice(start,output.batch_size)
+            for start in range(0, len(sortidx), output.batch_size):
+                subset = sortidx.slice(start, output.batch_size)
                 batch = big_table.take(subset)
                 writer.write(batch)
                 progress.update(task_id, advance=len(batch))
-                #print(f"Wrote batch {start}:{start+len(batch)}")
+                # print(f"Wrote batch {start}:{start+len(batch)}")
+
 
 @hydra.main(config_path="conf", config_name="config_transform_table", version_base=None)
-def main(cfg: DictConfig) -> None:
+def transform_table_app(cfg: DictConfig) -> None:
     # print(OmegaConf.to_yaml(cfg))
 
-    with tempfile.TemporaryDirectory(prefix=os.path.join(cfg.temp.dir,'')) as tempdirname:
+    with tempfile.TemporaryDirectory(prefix=os.path.join(cfg.temp.dir, '')) as tempdirname:
         files = []
         with progress:
             for filename in cfg.input.files:
                 ifile = Path(filename)
                 ofile = Path(tempdirname) / ifile.name
-                process_and_cache(ifile, ofile, cfg.sort, batch_size=cfg.output.batch_size, casts=cfg.casts, operations=cfg.operations)
+                process_and_cache(ifile, ofile, cfg.sort, batch_size=cfg.output.batch_size,
+                                  casts=cfg.casts, operations=cfg.operations)
                 files.append(ofile)
-            #global_console.print("All files loaded")
+            # global_console.print("All files loaded")
             concat_to_output(files, cfg.sort, cfg.output)
-    
+
     # Create parquet file
     print(f"Creating {cfg.output.parquet_file}...", end='')
     with pa.memory_map(cfg.output.arrow_file, 'rb') as source:
@@ -199,5 +214,6 @@ def main(cfg: DictConfig) -> None:
     pq.write_table(table, cfg.output.parquet_file)
     print("done.")
 
+
 if __name__ == "__main__":
-    main()
+    transform_table_app()

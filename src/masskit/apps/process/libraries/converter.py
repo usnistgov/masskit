@@ -4,9 +4,10 @@ from pathlib import Path
 import hydra
 from omegaconf import DictConfig
 from masskit.data_specs.spectral_library import *
-from masskit.utils.general import parse_filename
+from masskit.utils.general import MassKitSearchPathPlugin, parse_filename
 from masskit.utils.tablemap import ArrowLibraryMap
 import pyarrow as pa
+from hydra.core.plugins import Plugins
 
 """
 takes a variety of inputs, including parquet, mgf and msp formatted files and converts them to
@@ -16,13 +17,18 @@ converter.py --config[-path|-name|-dir] config_converter
 converter.py input.file.names=TestUniqSynPho202249.msp output.file.name=TestUniqSynPho202249.mzxml
 """
 
+
 def disable_console_logging():
     log = logging.getLogger()
     xhdl = None
     for hdl in log.handlers:
         if hdl.name == "console":
             xhdl = hdl
-    if xhdl: log.removeHandler(xhdl)
+    if xhdl:
+        log.removeHandler(xhdl)
+
+
+Plugins.instance().register(MassKitSearchPathPlugin)
 
 
 @hydra.main(config_path="conf", config_name="config_converter", version_base=None)
@@ -36,7 +42,8 @@ def converter_app(config: DictConfig) -> None:
     else:
         comment_fields = None
 
-    output_file_root, output_file_extension = parse_filename(Path(config.output.file.name).expanduser())
+    output_file_root, output_file_extension, compression = parse_filename(
+        Path(config.output.file.name).expanduser())
     if config.output.file.types:
         output_file_extension = config.output.file.types if type(config.output.file.types) is list else\
             [config.output.file.types]
@@ -48,14 +55,16 @@ def converter_app(config: DictConfig) -> None:
 
     tables = []
 
-    input_files = config.input.file.names if not isinstance(config.input.file.names, str) else [config.input.file.names]
+    input_files = config.input.file.names if not isinstance(
+        config.input.file.names, str) else [config.input.file.names]
 
     id_field = config.conversion.id.field
 
     for input_file in input_files:
         input_file = str(Path(input_file).expanduser())
         # use the file extension to determine file type unless specified in the arguments
-        input_file_root, input_file_extension = parse_filename(input_file)
+        input_file_root, input_file_extension, compression = parse_filename(
+            input_file)
         if config.input.file.type:
             input_file_extension = config.input.file.type
         if (
@@ -101,7 +110,8 @@ def converter_app(config: DictConfig) -> None:
         if type(id_field) is int:
             id_field += len(table)
 
-    library_map = ArrowLibraryMap(pa.concat_tables([table.to_arrow() for table in tables], promote=True), num=config.input.num)
+    library_map = ArrowLibraryMap(pa.concat_tables(
+        [table.to_arrow() for table in tables], promote=True), num=config.input.num)
 
     # output the files
     for output_extension in output_file_extension:

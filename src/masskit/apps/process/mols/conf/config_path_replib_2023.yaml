@@ -1,17 +1,19 @@
 input:
   file:
     # list of input file names
-    name: ~/data/nist/ei/2023/rep_2023.parquet
+    name: ~/data/nist/ei/2023/replib_2023.parquet
   # number of records to generate
   num:
 
 conversion:
   max_path_length: 5
 
+num_workers: 8 
+
 output:
   file:
     # output file or output file prefix
-    name: ~/data/nist/ei/2023/rep_2023_path.parquet
+    name: ~/data/nist/ei/2023/replib_2023_path.parquet
 
 hydra:
   run:

@@ -133,7 +133,7 @@ def read_parquet(fp, columns=None, num=None, filters=None):
 
 def spectra_to_array(spectra,
                      min_intensity=0,
-                     write_starts_stops=False,
+                     write_tolerance=False,
                      schema_group=None
                      ):
     """
@@ -141,7 +141,7 @@ def spectra_to_array(spectra,
 
     :param spectra: iteratable containing the spectrums
     :param min_intensity: the minimum intensity to set the fingerprint bit
-    :param write_starts_stops: put the starts and stops arrays into the arrow Table
+    :param write_tolerance: put the tolerance into the arrow Table
     :param schema_group: the schema group of spectrum file
     :return: arrow table of spectra
     """
@@ -168,9 +168,8 @@ def spectra_to_array(spectra,
         # row['stddev'] = s.stddev
         row['product_massinfo'] = s.product_mass_info.__dict__
         row['mz'] = s.products.mz
-        if write_starts_stops:
-            row['starts'] = s.products.starts
-            row['stops'] = s.products.stops
+        if write_tolerance:
+            row['tolerance'] = s.products.tolerance
         row['precursor_intensity'] = s.precursor.intensity
         # Temp hack because PyArrow can't convert empty structs to pandas
         if (s.precursor_mass_info):
@@ -257,7 +256,7 @@ class BatchLoader:
 
         if len(self.records["id"]) % 25000 == 0:
             self.tables.append(records2table(self.records, self.schema_group))
-            logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
+            # logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
             self.records = empty_records(self.schema_group['flat_schema'])
 
     def finalize(self):
@@ -266,7 +265,7 @@ class BatchLoader:
         """
         if self.records:
             self.tables.append(records2table(self.records, self.schema_group))
-        logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
+        # logging.info(f"created chunk {len(self.tables)} with {len(self.records['id'])} records")
         table = pa.concat_tables(self.tables)
         return table
     
@@ -310,99 +309,104 @@ class BatchLoader:
         if len(mol.GetPropsAsDict()) == 0:
             logging.info(f"All molecular props unavailable")
 
-        new_row = {
-            "mol": Chem.rdMolInterchange.MolToJSON(mol)
-        }
-        
-        if not skip_computed_props:
-            # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
-            # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
-
-            new_row["has_2d"] = True
-            new_row["inchi_key"] = Chem.inchi.MolToInchiKey(mol)
-            new_row["isomeric_smiles"] = Chem.MolToSmiles(mol)
-            new_row["smiles"] = Chem.MolToSmiles(mol, isomericSmiles=False)
-
-            if not skip_expensive:
-                mol, conformer_ids, return_value = threed.create_conformer(mol)
-                if return_value == -1:
-                    logging.info(f"Not able to create conformer")
-                    return {}, mol
-                # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
-
-                # calculation MMFF94 partial charges
-                partial_charges = []
-                try:
-                    mol_copy = copy.deepcopy(
-                        mol
-                    )  # the MMFF calculation sanitizes the molecule
-                    fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
-                    if fps is not None:
-                        for atom_num in range(0, mol_copy.GetNumAtoms()):
-                            partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
-                except ValueError:
-                    logging.info(f"unable to run MMFF")
-                new_row["num_conformers"] = len(conformer_ids)
-                new_row["partial_charges"] = partial_charges
-                bounding_box = threed.bounding_box(mol)
-                new_row["min_x"] = bounding_box[0, 0]
-                new_row["max_x"] = bounding_box[0, 1]
-                new_row["min_y"] = bounding_box[1, 0]
-                new_row["max_y"] = bounding_box[1, 1]
-                new_row["min_z"] = bounding_box[2, 0]
-                new_row["max_z"] = bounding_box[2, 1]
-                new_row["has_conformer"] = True
-                new_row["max_bound"] = np.max(np.abs(bounding_box))
-                if max_size != 0 and new_row["max_bound"] > max_size:
-                    logging.info(f"larger than the max bound")
-                    return {}, mol
-                try:
-                    new_row["num_stereoisomers"] = len(
-                        tuple(EnumerateStereoisomers(mol, options=cls.opts))
-                    )  # GetStereoisomerCount(mol)
-                except RuntimeError as err:
-                    logging.info(
-                        f"Unable to create stereoisomer count, error = {err}"
-                    )
-                    new_row["num_stereoisomers"] = None
-            else:
-                # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
-                new_row["has_conformer"] = False
-
-            # calculate solvent accessible surface area per atom
-            # try:
-            #     radii = []
-            #     for atom in mol.GetAtoms():
-            #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
-            #     rdFreeSASA.CalcSASA(mol, radii=radii)
-            # except:
-            #     logging.info("unable to create sasa")
+        try:
+            new_row = {
+                "mol": Chem.rdMolInterchange.MolToJSON(mol)
+            }
             
-            new_row["has_tms"] = len(
-                mol.GetSubstructMatches(cls.tms)
-            )  # count of trimethylsilane matches
-            new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
-            new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
-            new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
-            new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
-            new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
-            new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
-            new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
-            new_row["num_atoms"] = mol.GetNumAtoms()
-            cls.ecfp4.object2fingerprint(mol)  # expressed as a bit vector
-            new_row["ecfp4"] = cls.ecfp4.to_numpy()
-            new_row["ecfp4_count"] = cls.ecfp4.get_num_on_bits()
-            # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
-            # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
-            # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
-            # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
-            # number of undefined stereoisomers
-            new_row[
-                "num_undef_stereo"
-            ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
-            # get number of unspecified double bonds
-            new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+            if not skip_computed_props:
+                # calculate some identifiers before adding explicit hydrogens.  In particular, it seems that rdkit
+                # ignores stereochemistry when creating the inchi key if you add explicit hydrogens
 
+                new_row["has_2d"] = True
+                new_row["inchi_key"] = Chem.inchi.MolToInchiKey(mol)
+                new_row["isomeric_smiles"] = Chem.MolToSmiles(mol)
+                new_row["smiles"] = Chem.MolToSmiles(mol, isomericSmiles=False)
+
+                if not skip_expensive:
+                    mol, conformer_ids, return_value = threed.create_conformer(mol)
+                    if return_value == -1:
+                        logging.info(f"Not able to create conformer")
+                        return {}, mol
+                    # do not call Chem.AllChem.Compute2DCoords(mol) after this point as it will erase the 3d conformers
+
+                    # calculation MMFF94 partial charges
+                    partial_charges = []
+                    try:
+                        mol_copy = copy.deepcopy(
+                            mol
+                        )  # the MMFF calculation sanitizes the molecule
+                        fps = AllChem.MMFFGetMoleculeProperties(mol_copy)
+                        if fps is not None:
+                            for atom_num in range(0, mol_copy.GetNumAtoms()):
+                                partial_charges.append(fps.GetMMFFPartialCharge(atom_num))
+                    except ValueError:
+                        logging.info(f"unable to run MMFF")
+                    new_row["num_conformers"] = len(conformer_ids)
+                    new_row["partial_charges"] = partial_charges
+                    new_row["logp"] = Chem.Descriptors.MolLogP(mol)
+                    bounding_box = threed.bounding_box(mol)
+                    new_row["min_x"] = bounding_box[0, 0]
+                    new_row["max_x"] = bounding_box[0, 1]
+                    new_row["min_y"] = bounding_box[1, 0]
+                    new_row["max_y"] = bounding_box[1, 1]
+                    new_row["min_z"] = bounding_box[2, 0]
+                    new_row["max_z"] = bounding_box[2, 1]
+                    new_row["has_conformer"] = True
+                    new_row["max_bound"] = np.max(np.abs(bounding_box))
+                    if max_size != 0 and new_row["max_bound"] > max_size:
+                        logging.info(f"larger than the max bound")
+                        return {}, mol
+                    try:
+                        new_row["num_stereoisomers"] = len(
+                            tuple(EnumerateStereoisomers(mol, options=cls.opts))
+                        )  # GetStereoisomerCount(mol)
+                    except RuntimeError as err:
+                        logging.info(
+                            f"Unable to create stereoisomer count, error = {err}"
+                        )
+                        new_row["num_stereoisomers"] = None
+                else:
+                    # Chem.AssignStereochemistry(mol)  # normally done in threed.create_conformer
+                    new_row["has_conformer"] = False
+
+                # calculate solvent accessible surface area per atom
+                # try:
+                #     radii = []
+                #     for atom in mol.GetAtoms():
+                #         radii.append(utils.symbol_radius[atom.GetSymbol().upper()])
+                #     rdFreeSASA.CalcSASA(mol, radii=radii)
+                # except:
+                #     logging.info("unable to create sasa")
+                
+                new_row["has_tms"] = len(
+                    mol.GetSubstructMatches(cls.tms)
+                )  # count of trimethylsilane matches
+                new_row["exact_mw"] = Chem.rdMolDescriptors.CalcExactMolWt(mol)
+                new_row["hba"] = Chem.rdMolDescriptors.CalcNumHBA(mol)
+                new_row["hbd"] = Chem.rdMolDescriptors.CalcNumHBD(mol)
+                new_row["rotatable_bonds"] = Chem.rdMolDescriptors.CalcNumRotatableBonds(mol)
+                new_row["tpsa"] = Chem.rdMolDescriptors.CalcTPSA(mol)
+                new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
+                new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
+                new_row["num_atoms"] = mol.GetNumAtoms()
+                new_row['fragments'] = len(Chem.rdmolops.GetMolFrags(mol, sanitizeFrags=False))
+                cls.ecfp4.object2fingerprint(mol)  # expressed as a bit vector
+                new_row["ecfp4"] = cls.ecfp4.to_numpy()
+                new_row["ecfp4_count"] = cls.ecfp4.get_num_on_bits()
+                # see https://cactus.nci.nih.gov/presentations/meeting-08-2011/Fri_Aft_Greg_Landrum_RDKit-PostgreSQL.pdf
+                # new_row['tt'] = Torsions.GetTopologicalTorsionFingerprintAsIntVect(mol)
+                # calc number of stereoisomers.  doesn't work as some bonds have incompletely specified stereochemistry
+                # new_row['num_stereoisomers'] = len(tuple(EnumerateStereoisomers(mol)))
+                # number of undefined stereoisomers
+                new_row[
+                    "num_undef_stereo"
+                ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
+                # get number of unspecified double bonds
+                new_row["num_undef_double"] = len(utils.get_unspec_double_bonds(mol))
+        except Exception as e:
+            logging.info("Exception thrown when creating Mol properties: {str(e)}")
+            return {}, mol
         return new_row, mol
 
 
@@ -575,7 +579,7 @@ class MSPLoader(BatchLoader):
 
 class MGFLoader(BatchLoader):   
     def __init__(self, row_batch_size=5000, format=None, num=None, 
-                 set_probabilities=(0.01, 0.97, 0.01, 0.01), 
+                 set_probabilities=(0.00, 0.93, 0.02, 0.05), 
                  min_intensity=0.0):
         super().__init__('mgf', row_batch_size=row_batch_size, format=format, num=num)
         self.min_intensity = min_intensity
@@ -671,7 +675,7 @@ class MGFLoader(BatchLoader):
 
 class SDFLoader(BatchLoader):   
     def __init__(self, row_batch_size=5000, format=None, num=None,
-                 set_probabilities=(0.01, 0.97, 0.01, 0.01), 
+                 set_probabilities=(0.0, 0.93, 0.02, 0.05), 
                  min_intensity=0.0):
         super().__init__('sdf', row_batch_size=row_batch_size, format=format, num=num)
         self.min_intensity = min_intensity
@@ -880,9 +884,12 @@ def records2table(records, schema_group):
     :param schema_group: the schema group
     """
     table = pa.table(records, schema_group['flat_schema'])
-    structarray = table2structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
+    has_spectra = 'mz' in records and any(v is not None for v in records['mz'])
+    if has_spectra:
+        structarray = table2structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
     table = table.select([x for x in table.column_names if x in schema_group['nested_schema'].names])
-    table = table_add_structarray(table, structarray)
+    if has_spectra:
+        table = table_add_structarray(table, structarray)
     return table
 
 
@@ -1246,17 +1253,22 @@ class BatchFileReader:
         self.row_batch_size = row_batch_size
         self.filename = str(filename)
         if format['format'] == 'parquet':
+            # does not support compression, but parquet compresses itself so no need
             self.dataset = pq.ParquetFile(filename)
         elif format['format'] == 'arrow':
+            # as a memory map, does not support compression
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
         elif format['format'] in ['mgf', 'msp']:
+            # supports gz and bz2 compression
             self.dataset = open_if_filename(filename, mode="r")
         elif format['format'] == 'csv':
+            # supports gz and bz2 compression
             read_options = pacsv.ReadOptions(autogenerate_column_names=format['no_column_headers'],
                                               block_size=row_batch_size)
             parse_options = pacsv.ParseOptions(delimiter=format['delimiter'])
             self.dataset =  pacsv.open_csv(filename, read_options=read_options, parse_options=parse_options)
         elif format['format'] == 'sdf':
+             # supports gz and bz2 compression
             self.dataset = open_if_filename(filename, mode="rb")
             self.dataset = Chem.ForwardSDMolSupplier(self.dataset, sanitize=False)
         else:
@@ -1276,7 +1288,7 @@ class BatchFileReader:
         if self.format['format'] == 'parquet':
             for batch in self.dataset.iter_batches():
                 table = pa.Table.from_batches(batch)  # schema is inferred from batch
-                logging.info(f'processing batch {batch_num} with size {len(table)}')
+                # logging.info(f'processing batch {batch_num} with size {len(table)}')
                 batch_num += 1
                 yield table 
         elif self.format['format'] == 'arrow':
@@ -1289,7 +1301,7 @@ class BatchFileReader:
                 if len(batch) == 0:
                     break
                 start += self.row_batch_size
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                # logging.info(f'processing batch {batch_num} with size {len(batch)}')
                 batch_num += 1
                 yield batch
         elif self.format['format'] in ['msp', 'mgf', 'sdf', 'csv']:
@@ -1302,13 +1314,25 @@ class BatchFileReader:
                     break
                 if self.format['id']['field_type'] == 'int':
                     self.format['id']['initial_value'] += len(batch)
-                logging.info(f'processing batch {batch_num} with size {len(batch)}')
+                # logging.info(f'processing batch {batch_num} with size {len(batch)}')
                 batch_num += 1
                 yield batch
         else:
             raise ValueError(f'Unknown format {self.format["format"]}')
-        
 
+# processing functions defined at top level of module to allow pickling
+# for multiprocessing
+        
+def spectrum2msp(spectrum, annotate=False):
+    output = StringIO()
+    spectra_to_msp(output, [spectrum], annotate_peptide=annotate)
+    return output.getvalue() 
+
+def spectrum2mgf(spectrum):
+    output = StringIO()
+    spectra_to_mgf(output, [spectrum])
+    return output.getvalue() 
+        
 class BatchFileWriter:
     def __init__(self, filename: Union[str, os.PathLike], 
                  format:str=None, annotate:bool=False, 
@@ -1348,16 +1372,6 @@ class BatchFileWriter:
 
         :param table: table to write
         """
-
-        def spectrum2msp(spectrum, annotate=False):
-            output = StringIO()
-            spectra_to_msp(output, [spectrum], annotate_peptide=annotate)
-            return output.getvalue() 
-
-        def spectrum2mgf(spectrum):
-            output = StringIO()
-            spectra_to_mgf(output, [spectrum])
-            return output.getvalue() 
 
         if self.format == 'parquet':
             if self.dataset == None:

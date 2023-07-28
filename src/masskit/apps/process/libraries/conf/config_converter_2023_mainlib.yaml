@@ -22,7 +22,7 @@ conversion:
     max_bound: 0.0
   set:
     # probabilities of dev, train, valid, and test sets as space delimited list
-    probabilities: [0.0, 0.0, 0.0, 1.0]
+    probabilities: [0.0, 0.93, 0.02, 0.05]
   spectra:
     # min peak intensity allowed in spectral fingerprint
     min_intensity: 0.0
