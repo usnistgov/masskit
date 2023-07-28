@@ -344,6 +344,7 @@ class BatchLoader:
                         logging.info(f"unable to run MMFF")
                     new_row["num_conformers"] = len(conformer_ids)
                     new_row["partial_charges"] = partial_charges
+                    new_row["logp"] = Chem.Descriptors.MolLogP(mol)
                     bounding_box = threed.bounding_box(mol)
                     new_row["min_x"] = bounding_box[0, 0]
                     new_row["max_x"] = bounding_box[0, 1]
@@ -389,6 +390,7 @@ class BatchLoader:
                 new_row["aromatic_rings"] = Chem.rdMolDescriptors.CalcNumAromaticRings(mol)
                 new_row["formula"] = Chem.rdMolDescriptors.CalcMolFormula(mol)
                 new_row["num_atoms"] = mol.GetNumAtoms()
+                new_row['fragments'] = len(Chem.rdmolops.GetMolFrags(mol, sanitizeFrags=False))
                 cls.ecfp4.object2fingerprint(mol)  # expressed as a bit vector
                 new_row["ecfp4"] = cls.ecfp4.to_numpy()
                 new_row["ecfp4_count"] = cls.ecfp4.get_num_on_bits()
