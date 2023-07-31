@@ -302,7 +302,7 @@ molecule_annotation_fields = [
     pa.field("smiles", pa.string()),
     pa.field("tpsa", pa.float32()),
     pa.field("logp", pa.float32()),
-    pa.field("fragments", pa.int32()),
+    pa.field("fragments", pa.int32()),  # number of unbonded molecules in Mol
 ]
 
 # small molecule experimental metadata

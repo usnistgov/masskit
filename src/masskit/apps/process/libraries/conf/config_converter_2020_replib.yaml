@@ -12,7 +12,7 @@ input:
   file:
     # list of input file names
     names:
-      - ~/data/nist/ei/2020/ureplib_with_exp_RI_fixed.sdf
+      - ~/data/nist/ei/2020/sdf/ureplib_with_exp_RI_fixed.sdf
   # number of records to generate
   num:
 
