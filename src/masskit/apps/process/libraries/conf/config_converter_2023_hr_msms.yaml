@@ -12,8 +12,7 @@ input:
   file:
     # list of input file names
     names:
-      - ~/data/nist/tandem/2023/sdf/hr_msms_nist.sdf
-      - ~/data/nist/tandem/2023/sdf/hr_msms_nist#2.sdf
+      - ~/data/nist/tandem/2023/sdf/hr_msms_nist*.SDF
   # number of records to generate
   num:
 
@@ -33,7 +32,7 @@ conversion:
 output:
   file:
     # output file or output file prefix
-    name: ~/.masskit_cache/hr_msms_2023.parquet
+    name: ~/data/nist/tandem/2023/hr_msms_2023.parquet
     # parquet, msp, mzxml
     types: parquet
 

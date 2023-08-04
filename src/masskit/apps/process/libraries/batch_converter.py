@@ -1,48 +1,22 @@
 #!/usr/bin/env python
 import logging
+from tqdm.contrib.logging import logging_redirect_tqdm
+from tqdm import tqdm
 from pathlib import Path
 import hydra
 from omegaconf import DictConfig, ListConfig
 from masskit.utils.files import BatchFileReader, BatchFileWriter
 from masskit.utils.general import MassKitSearchPathPlugin, expand_path_list, parse_filename
 from hydra.core.plugins import Plugins
-from rich.live import Live
-from rich.progress import (
-    BarColumn,
-    Progress,
-    TextColumn,
-    SpinnerColumn,
-    TimeElapsedColumn,
-    MofNCompleteColumn
-)
-from rich.console import Group
-from rich.panel import Panel
+
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 
 
-overall_progress = Progress(
-    TextColumn(
-        "[blue]{task.description} {task.fields[filename]}: ", justify="right"),
-    TimeElapsedColumn(), MofNCompleteColumn()
-)
-
-batch_progress = Progress(
-    TextColumn(
-        "[blue]{task.description}: {task.completed}", justify="right"),
-    SpinnerColumn("simpleDots")
-)
-
-progress_group = Group(
-    overall_progress, batch_progress,
-)
-
-# logging.basicConfig(level="NOTSET", handlers=[RichHandler(level="NOTSET")])
-# logger = logging.getLogger('rich')
-
-
 @hydra.main(config_path="conf", config_name="config_batch_converter", version_base=None)
 def batch_converter_app(config: DictConfig) -> None:
+
+    logging.basicConfig(level=logging.INFO)
 
     output_file_root, output_file_extension, compression = parse_filename(
         Path(config.output.file.name).expanduser())
@@ -57,7 +31,7 @@ def batch_converter_app(config: DictConfig) -> None:
 
     input_files = expand_path_list(config.input.file.names)
 
-    with Live(progress_group):
+    with logging_redirect_tqdm():
         # create the batch writers
         writers = []
         for output_extension in output_file_extension:
@@ -66,13 +40,8 @@ def batch_converter_app(config: DictConfig) -> None:
                                            annotate=config.conversion.get(
                 "annotate", False),
                 row_batch_size=config.conversion.get("row_batch_size", 5000)))
-        overall_task_id = overall_progress.add_task(
-            "Load", total=len(input_files))
-        for input_file in input_files:
+        for input_file in tqdm(input_files, desc="load files"):
             input_file = str(input_file)
-            overall_progress.update(
-                overall_task_id, description="Load", filename=input_file)
-            # use the file extension to determine file type unless specified in the arguments
             input_file_root, input_file_extension, compression = parse_filename(
                 input_file)
             if (
@@ -90,21 +59,13 @@ def batch_converter_app(config: DictConfig) -> None:
                                          "row_batch_size", 5000),
                                      )
             num_rows = 0
-            batch_task_id = batch_progress.add_task(" Write batch")
-            for table in reader.iter_tables():
-                batch_progress.update(
-                    batch_task_id, description=" Write batch")
+            for table in tqdm(reader.iter_tables(), desc="read batches", leave=False, unit=' batches'):
                 if config.input.num is not None and config.input.num > 0 and len(table) + num_rows > config.input.num:
                     table = table.slice(0, config.input.num - num_rows)
                     write_batch(writers, table)
-                    batch_progress.update(batch_task_id, advance=1)
                     break
                 write_batch(writers, table)
                 num_rows += len(table)
-                batch_progress.update(batch_task_id, advance=1)
-            batch_progress.stop_task(batch_task_id)
-            batch_progress.update(batch_task_id, visible=False)
-            overall_progress.update(overall_task_id, advance=1)
         for writer in writers:
             writer.close()
 

@@ -1287,7 +1287,7 @@ class BatchFileReader:
         batch_num = 0
         if self.format['format'] == 'parquet':
             for batch in self.dataset.iter_batches():
-                table = pa.Table.from_batches(batch)  # schema is inferred from batch
+                table = pa.Table.from_batches([batch])  # schema is inferred from batch
                 # logging.info(f'processing batch {batch_num} with size {len(table)}')
                 batch_num += 1
                 yield table 
