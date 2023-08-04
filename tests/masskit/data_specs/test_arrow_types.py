@@ -10,7 +10,7 @@ def test_arrow_types(SRM1950_lumos_table):
     spectrum_array = array.chunk(0).to_numpy()
     assert spectrum_array[0].name == 'N-Acetyl-L-alanine'
     
-def test_table2structarray(SRM1950_lumos_table):
+def test_table_to_structarray(SRM1950_lumos_table):
     assert SRM1950_lumos_table['spectrum'][0].as_py().name == 'N-Acetyl-L-alanine'
     df = SRM1950_lumos_table.to_pandas()
     assert df['spectrum'].iloc[0].name == 'N-Acetyl-L-alanine'

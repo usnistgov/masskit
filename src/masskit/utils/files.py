@@ -887,7 +887,7 @@ def records2table(records, schema_group):
     table = pa.table(records, schema_group['flat_schema'])
     has_spectra = 'mz' in records and any(v is not None for v in records['mz'])
     if has_spectra:
-        structarray = table_to_structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
+        structarray = table_to_structarray(table, SpectrumArrowType)
     table = table.select([x for x in table.column_names if x in schema_group['nested_schema'].names])
     if has_spectra:
         table = table_add_structarray(table, structarray)
