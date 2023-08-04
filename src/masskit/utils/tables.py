@@ -1,8 +1,9 @@
 import numpy as np
 import pyarrow as pa
 import string
+import itertools
 from types import MethodType
-
+from ..data_specs.arrow_types import SpectrumArrowType
 ALPHABET = np.array(list(string.ascii_letters))
 
 
@@ -33,21 +34,89 @@ def create_dataset(rows=5, cols=[int, float, str, list], names=ALPHABET):
     return pa.table(data)
 
 
-def table_to_struct(table):
-    fields, arrs = [], []
-    for column_index in range(table.num_columns):
-        fields.append(table.field(column_index))
-        arrs.append(table.column(column_index).flatten()[0].chunks[0])
-    return pa.StructArray.from_arrays(arrs, fields=fields)
+# def table_to_struct(table: pa.Table) -> pa.StructArray:
+#     fields, arrs = [], []
+#     for column_index in range(table.num_columns):
+#         fields.append(table.field(column_index))
+#         arrs.append(table.column(column_index).flatten()[0].chunks[0])
+#     return pa.StructArray.from_arrays(arrs, fields=fields)
+
+def table_to_structarray(table: pa.Table, structarray_type:pa.ExtensionType=None) -> pa.StructArray:
+    """
+    convert a spectrum table into a struct array.
+    if an ExtensionType is passed in, will create a struct array of that type
+
+    :param table: spectrum table
+    :param structarray_type: the type of the array returned, e.g. SpectrumArrowType()
+    :return: StructArray
+    """
+    
+    # combine chunks as StructArray.from_arrays() only takes Arrays, not ChunkedArray
+    table = table.combine_chunks()
+    # TODO: this should be modified to work on ChunkedArrays to created ChunkedArray of Struct
+    # to improve performance, or Structs should be created in the first place
+    arrays = [table.column(i).chunk(0) for i in range(table.num_columns)]
+    column_names = table.column_names
+
+    output = pa.StructArray.from_arrays(arrays, names=column_names)
+    if structarray_type is not None:
+        output = pa.ExtensionArray.from_storage(structarray_type(storage_type=output.type), output)
+    return output
 
 
-def struct_to_table(struct):
-    fields, arrs = [], []
-    for x in struct.slice(0, 1)[0].keys():
-        fields.append(x)
-        arrs.append(st.field(x))
-    return pa.table(arrs, fields)
+def structarray_to_table(struct: pa.StructArray) -> pa.Table:
+    names, arrs = [], []
+    for x in struct[0].keys():
+        names.append(x)
+        arrs.append(struct.field(x))
+    return pa.table(arrs, names)
 
+
+def optimize_structarray(struct: pa.ChunkedArray) -> pa.ChunkedArray:
+    flat_struct = struct.combine_chunks()
+    if hasattr(flat_struct, 'storage'):
+        flat_struct = flat_struct.storage
+    table = structarray_to_table(flat_struct)
+    table = optimize_table(table)
+    # TODO: Need to find a better way to identify an extension array
+    extension_type = None
+    if "SpectrumArrowArray" in str(struct.chunk(0).__class__):
+        extension_type = SpectrumArrowType
+    flat_struct = table_to_structarray(table, structarray_type=extension_type)
+    return flat_struct
+
+def is_struct_or_extstruct(chunked_array: pa.ChunkedArray) -> bool:
+    if pa.types.is_struct(chunked_array.chunk(0).type):
+        return True
+    if hasattr(chunked_array.chunk(0), 'storage'):
+        if pa.types.is_struct(chunked_array.chunk(0).storage.type):
+            return True
+    return False
+
+def optimize_table(table: pa.Table) -> pa.Table:
+    drops = []
+    for idx, name, col in zip(itertools.count(), table.column_names, table.columns):
+        if col.length() == col.null_count:
+            drops.append(name)
+        elif is_struct_or_extstruct(col):
+            new_struct = optimize_structarray(col)
+            table = table.set_column(idx, name, new_struct)
+    return table.drop_columns(drops)
+
+
+def table_add_structarray(table: pa.Table, structarray: pa.StructArray, column_name:str=None) -> pa.Table:  
+    """
+    add a struct array to a table
+
+    :param table: table to be added to
+    :param structarray: structarray to add to table
+    :param column_name: name of column to add
+    :return: new table with appended column
+    """
+    if column_name is None:
+        column_name = 'spectrum'
+    table = table.append_column(column_name, structarray)
+    return table
 
 def struct_view(struct_name, parent):
     class struct_accessor:

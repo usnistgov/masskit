@@ -19,7 +19,8 @@ import json
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from masskit.constants import SET_NAMES
 from masskit.data_specs.schemas import mod_names_field, \
-    hitlist_schema, table2structarray, table_add_structarray
+    hitlist_schema
+from . tables import table_to_structarray, table_add_structarray
 from masskit.data_specs.file_schemas import schema_groups
 from masskit.data_specs.arrow_types import MolArrowType, SpectrumArrowType
 from masskit.peptide.encoding import mod_masses
@@ -886,7 +887,7 @@ def records2table(records, schema_group):
     table = pa.table(records, schema_group['flat_schema'])
     has_spectra = 'mz' in records and any(v is not None for v in records['mz'])
     if has_spectra:
-        structarray = table2structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
+        structarray = table_to_structarray(table, SpectrumArrowType(storage_type=schema_group['storage_type']))
     table = table.select([x for x in table.column_names if x in schema_group['nested_schema'].names])
     if has_spectra:
         table = table_add_structarray(table, structarray)

@@ -4,14 +4,14 @@ import numpy as np
 import pandas as pd
 from abc import ABC, abstractmethod
 from scipy import sparse
-from masskit.spectrum.spectrum import Spectrum
-from masskit.utils.general import open_if_filename
+from ..spectrum.spectrum import Spectrum
+from . general import open_if_filename
 #from masskit.utils.search import tanimoto_search
-from masskit.utils.tables import row_view
+from . tables import row_view
 import pynndescent
 import pickle
-from masskit.utils.fingerprints import SpectrumFloatFingerprint, SpectrumTanimotoFingerPrint
-from masskit.utils.hitlist import Hitlist
+from . fingerprints import SpectrumFloatFingerprint, SpectrumTanimotoFingerPrint
+from . hitlist import Hitlist
 
 # try:
 #     from numba import jit, prange

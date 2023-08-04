@@ -1,11 +1,11 @@
 import csv
 import numpy as np
 from abc import ABC, abstractmethod
-from masskit.data_specs.schemas import min_spectrum_field_names, property_schema
+from ..data_specs.schemas import min_spectrum_field_names, property_schema
 import masskit.utils.files as msuf
 import masskit.utils.spectrum_writers as msus
-from masskit.utils.general import open_if_filename
-from masskit.utils.tables import row_view
+from . general import open_if_filename
+from . tables import row_view
 import jsonpickle
 from rdkit import Chem
 
