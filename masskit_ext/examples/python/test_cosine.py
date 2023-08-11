@@ -1,5 +1,7 @@
 import masskit.spectrum.spectrum as mss
+import pytest
 
+@pytest.fixture
 def predicted_spectrum1():
     ps = mss.Spectrum()
     ps.from_arrays(
@@ -22,6 +24,7 @@ def predicted_spectrum1():
     )
     return ps
 
+@pytest.fixture
 def spectrum1():
     s = mss.Spectrum()
     s.from_arrays(
@@ -50,7 +53,7 @@ def test_cosine_score(spectrum1, predicted_spectrum1):
     return score
     #assert score == approx(992.2658666598618)
 
-ps1 = predicted_spectrum1()
-s1 = spectrum1()
-res = test_cosine_score(s1, ps1)
-print(res)
+# ps1 = predicted_spectrum1()
+# s1 = spectrum1()
+# res = test_cosine_score(s1, ps1)
+# print(res)
