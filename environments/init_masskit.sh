@@ -9,6 +9,10 @@ if [ $sourced -ne 1 ]; then
     exit 1
 fi
 
+# Get the script location
+SCRIPT_FILE=`realpath ${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}`
+SCRIPT_DIR="$(dirname "${SCRIPT_FILE}")"
+
 # default name of environment to set up
 ENVNAME=masskit
 # Allow customizable suffixes, e.g. branch specific CI/CD testing
@@ -96,54 +100,20 @@ export MAMBA_NO_BANNER=1
 # (11.3 at the time of this comment) Why? I dunno.
 # gxx is not available on windows
 
-BASE_PACKAGES="
-  arrow-cpp=12.* \
-  conda-build \
-  cmake \
-  cython \
-  hydra-core \
-  imageio \
-  jsonpickle \
-  jupyter \
-  matplotlib \
-  matplotlib-venn \
-  numba \
-  numpy \
-  pandas \
-  pyarrow=12.* \
-  pybind11 \
-  pynndescent \
-  pyside6 \
-  pytest \
-  python=3 \
-  rdkit \
-  rich \
-  ruff \
-  scikit-build-core \
-  sqlalchemy \
-  sqlparse"
+BASE_PACKAGES="--file=${SCRIPT_DIR}/base_packages.txt"
 
 ML_CHANNELS=
 ML_PACKAGES=
 if [ $USE_ML -eq 1 ]; then
   ML_CHANNELS="-c pytorch -c nvidia"
-  CUDATOOLKIT="cudatoolkit=11.*"
+  CUDATOOLKIT=""
   if [ $CPUONLY -eq 1 ]; then
-    CUDATOOLKIT=cpuonly
+    CUDATOOLKIT="${SCRIPT_DIR}/nocuda_packages.txt"
+  else
+    CUDATOOLKIT="${SCRIPT_DIR}/cuda_packages.txt"
   fi
 
-  ML_PACKAGES="\
-    boto3 \
-    $CUDATOOLKIT \
-    imbalanced-learn \
-    jupyter \
-    levenshtein \
-    mlflow-skinny \
-    pytorch \
-    pytorch-lightning \
-    scikit-learn \
-    torchmetrics \
-    torchvision"
+  ML_PACKAGES="--file=$CUDATOOLKIT --file=${SCRIPT_DIR}/ml_packages.txt"
 fi
 
 echo "Initializing the conda $ENVNAME environment"

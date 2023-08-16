@@ -1,0 +1,9 @@
+boto3
+imbalanced-learn
+levenshtein
+mlflow-skinny
+pytorch
+pytorch-lightning
+scikit-learn
+torchmetrics
+torchvision
