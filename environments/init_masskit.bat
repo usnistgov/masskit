@@ -3,6 +3,8 @@ SETLOCAL
 REM EnableDelayedExpansion
 SET ENVNAME=masskit
 
+SET SCRIPT_DIR=%~dp0
+
 :processargs
 SET ARG=%1
 IF DEFINED ARG (
@@ -65,7 +67,7 @@ IF DEFINED SUFFIX (
 
 IF DEFINED REMOVE (
     echo Trying to remove existing %ENVNAME% environment
-    call conda env remove --name %ENVNAME%
+    conda env remove --name %ENVNAME%
 )
 
 :: Install mamba if needed
@@ -75,56 +77,21 @@ IF ERRORLEVEL 1 (
     conda install -y mamba -n base -c conda-forge
 )
 
-SET BASE_PACKAGES=^
-arrow-cpp=12.*^
- conda-build^
- cmake^
- cython^
- hydra-core^
- imageio^
- jsonpickle^
- jupyter^
- matplotlib^
- matplotlib-venn^
- numba^
- numpy^
- pandas^
- pyarrow=12.*^
- pybind11^
- pynndescent^
- pyside6^
- pytest^
- python=3^
- rdkit=2021.09.4^
- rich^
- ruff^
- scikit-build-core^
- sqlalchemy^
- sqlparse
+SET BASE_PACKAGES=--file=%SCRIPT_DIR%base_packages.txt
 
 SET ML_CHANNELS=
 SET ML_PACKAGES=
 
 IF DEFINED USE_ML (
   SET ML_CHANNELS=-c pytorch -c nvidia
-  SET CUDATOOLKIT=cudatoolkit=11.*
+  SET CUDATOOLKIT=%SCRIPT_DIR%cuda_packages.txt
   IF DEFINED CPUONLY (
-    SET CUDATOOLKIT=cpuonly
+    SET CUDATOOLKIT=%SCRIPT_DIR%nocuda_packages.txt
   )
 )
 
 IF DEFINED USE_ML (
-  SET ML_PACKAGES=%CUDATOOLKIT%^
- boto3^
- imbalanced-learn^
- jupyter^
- levenshtein^
- mlflow-skinny^
- pytorch^
- pytorch-lightning^
- scikit-learn^
- torchmetrics^
- torchvision
+  SET ML_PACKAGES=--file=%CUDATOOLKIT% --file=%SCRIPT_DIR%ml_packages.txt
 )
 
 ECHO Initializing the conda %ENVNAME% environment
@@ -137,4 +104,4 @@ IF ERRORLEVEL 1 (
 )
 
 ENDLOCAL
-::EXIT /B
+::EXIT /B %ERRORLEVEL%
