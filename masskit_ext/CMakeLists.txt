@@ -1,7 +1,7 @@
 ﻿# CMakeList.txt : CMake project for masskit_ext, include source and define
 # project specific logic here.
 #
-cmake_minimum_required (VERSION 3.15)
+cmake_minimum_required (VERSION 3.16)
 message(STATUS "Building using CMake version: ${CMAKE_VERSION}")
 message(STATUS "Building on: ${CMAKE_HOST_SYSTEM_NAME}")
 

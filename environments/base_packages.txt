@@ -1,4 +1,4 @@
-arrow-cpp=12.*
+arrow-cpp=13.*
 conda-build
 cmake
 cython
@@ -11,10 +11,10 @@ matplotlib-venn
 numba
 numpy
 pandas
-pyarrow=12.*
+pyarrow=13.*
 pybind11
 pynndescent
-pyside6
+pyside2
 pytest
 python=3.*
 rdkit
