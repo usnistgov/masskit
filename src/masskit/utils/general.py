@@ -5,6 +5,7 @@ from pathlib import Path, PurePosixPath
 import tarfile
 from typing import Iterable
 import numpy as np
+import pandas as pd
 import gzip
 import bz2
 from urllib import request
@@ -17,6 +18,16 @@ except ImportError:
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
 
+
+def is_list_like(obj):
+    """
+    is the object list-like?
+
+    :param obj: the object to be tested
+    :return: true if list like
+    """
+    valid_types = (list, tuple, set, np.ndarray, pd.Series)
+    return isinstance(obj, valid_types)
 
 class MassKitSearchPathPlugin(SearchPathPlugin):
     """
