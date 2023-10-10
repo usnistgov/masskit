@@ -1,11 +1,13 @@
 import os
-import pytest
-from hydra import compose, initialize
-from masskit.apps.process.libraries.fasta2peptides import fasta2peptides_app
+from pathlib import Path
+
 import pyarrow as pa
 import pyarrow.parquet as pq
-from pathlib import Path
-from masskit.apps.process.libraries.batch_converter import batch_converter_app
+import pytest
+from hydra import compose, initialize
+
+from ..apps.process.libraries.batch_converter import batch_converter_app
+from ..apps.process.libraries.fasta2peptides import fasta2peptides_app
 
 """
 pytest fixtures

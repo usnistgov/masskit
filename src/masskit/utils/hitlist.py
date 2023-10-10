@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import numpy as np
 import pandas as pd
 
-from masskit.utils.general import discounted_cumulative_gain
+from . import general as _mkgeneral
 
 
 class Score(ABC):
@@ -383,12 +383,12 @@ class CompareRecallDCG(HitlistCompare):
                     relevance_comparison = df_intersection[self.truth_score].values[0:recall_value]
                     # replace na's (hits not found by the golden search) with 0, which will not add to the dcg
                     relevance_comparison = np.nan_to_num(relevance_comparison)
-                    columns[('comparison_dcg', recall_value)].append(discounted_cumulative_gain(relevance_comparison))
+                    columns[('comparison_dcg', recall_value)].append(_mkgeneral.discounted_cumulative_gain(relevance_comparison))
 
                     # compute dcg for golden score so this can be used in comparisons.
                     truth_hits = truth_hits.sort_values(by=self.truth_score, ascending=self.truth_score_ascending)
                     relevance_golden = truth_hits[self.truth_score].values[0:recall_value]
-                    columns[('truth_dcg', recall_value)].append(discounted_cumulative_gain(relevance_golden))
+                    columns[('truth_dcg', recall_value)].append(_mkgeneral.discounted_cumulative_gain(relevance_golden))
                 else:
                     logging.warning("Unable to compute dcg with ascending scores")
             pass

@@ -1,21 +1,24 @@
-import importlib
-import os
-import logging
-from pathlib import Path, PurePosixPath
-import tarfile
-from typing import Iterable
-import numpy as np
-import gzip
 import bz2
+import gzip
+import importlib
+import logging
+import os
+import tarfile
+from pathlib import Path, PurePosixPath
+from typing import Iterable
 from urllib import request
 from urllib.parse import urlparse
+
+import numpy as np
+from hydra.core.config_search_path import ConfigSearchPath
+from hydra.plugins.search_path_plugin import SearchPathPlugin
+
 try:
     import boto3
 except ImportError:
     logging.debug("Unable to import boto3")
     boto3 = None
-from hydra.core.config_search_path import ConfigSearchPath
-from hydra.plugins.search_path_plugin import SearchPathPlugin
+
 
 
 class MassKitSearchPathPlugin(SearchPathPlugin):

@@ -1,9 +1,12 @@
+import itertools
+import string
+from types import MethodType
+
 import numpy as np
 import pyarrow as pa
-import string
-import itertools
-from types import MethodType
-from ..data_specs.arrow_types import SpectrumArrowType
+
+from ..data_specs import arrow_types as _mkarrow_types
+
 ALPHABET = np.array(list(string.ascii_letters))
 
 
@@ -81,7 +84,7 @@ def optimize_structarray(struct: pa.ChunkedArray) -> pa.ChunkedArray:
     # TODO: Need to find a better way to identify an extension array
     extension_type = None
     if "SpectrumArrowArray" in str(struct.chunk(0).__class__):
-        extension_type = SpectrumArrowType
+        extension_type = _mkarrow_types.SpectrumArrowType
     flat_struct = table_to_structarray(table, structarray_type=extension_type)
     return flat_struct
 
@@ -229,7 +232,7 @@ def row_view_raw(table, idx=0):
 if __name__ == "__main__":
 
     table = create_dataset(cols=[int, float, list])
-    st = table_to_struct(create_dataset(names=["john", "paul", "george", "ringo"]))
+    st = table_to_structarray(create_dataset(names=["john", "paul", "george", "ringo"]))
     table = table.append_column("singers", st)
     print(table.to_pandas())
 

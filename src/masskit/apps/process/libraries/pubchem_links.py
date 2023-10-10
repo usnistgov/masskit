@@ -1,39 +1,27 @@
 #!/usr/bin/env python
-import sys
 import json
-import time
 import math
-
+import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import urlparse
 from typing import Iterable
-
-import requests
+from urllib.parse import urlparse
 
 import hydra
-from omegaconf import DictConfig
-
 import pyarrow as pa
 import pyarrow.csv as pv
 import pyarrow.parquet as pq
-
-from concurrent.futures import ThreadPoolExecutor
-from rich.console import Console
-from rich.progress import (
-    BarColumn,
-    DownloadColumn,
-    MofNCompleteColumn,
-    Progress,
-    TaskID,
-    TextColumn,
-    TimeRemainingColumn,
-    track,
-    TransferSpeedColumn,
-)
-from masskit.utils.general import MassKitSearchPathPlugin
+import requests
 from hydra.core.plugins import Plugins
+from omegaconf import DictConfig
+from rich.console import Console
+from rich.progress import (BarColumn, DownloadColumn, MofNCompleteColumn,
+                           Progress, TaskID, TextColumn, TimeRemainingColumn,
+                           TransferSpeedColumn, track)
 
+from masskit.utils.general import MassKitSearchPathPlugin
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 

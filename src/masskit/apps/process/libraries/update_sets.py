@@ -1,14 +1,15 @@
 #!/usr/bin/env python
 import logging
 from pathlib import Path
-import hydra
-from omegaconf import DictConfig
-import pyarrow as pa
-import pyarrow.parquet as pq
-import pyarrow.compute as pc
-from masskit.utils.general import MassKitSearchPathPlugin
-from hydra.core.plugins import Plugins
 
+import hydra
+import pyarrow as pa
+import pyarrow.compute as pc
+import pyarrow.parquet as pq
+from hydra.core.plugins import Plugins
+from omegaconf import DictConfig
+
+from masskit.utils.general import MassKitSearchPathPlugin
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 

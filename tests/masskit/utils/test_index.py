@@ -1,13 +1,15 @@
-from masskit.utils.fingerprints import ECFPFingerprint
-from masskit.utils.hitlist import CompareRecallDCG, CosineScore, TanimotoScore
+import logging
+import random
+
+import numpy as np
 import pytest
 from pytest import approx
-import numpy as np
+
 import masskit.spectrum.spectrum as mss
+from masskit.utils.fingerprints import ECFPFingerprint, SpectrumFloatFingerprint
+from masskit.utils.hitlist import CompareRecallDCG, CosineScore, TanimotoScore, Hitlist
 from masskit.utils.index import *
 from masskit.utils.tablemap import ArrowLibraryMap
-import random
-import logging
 
 
 @pytest.fixture

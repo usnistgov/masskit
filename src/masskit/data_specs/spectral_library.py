@@ -1,4 +1,5 @@
 import pandas as pd
+
 try:
     from IPython import display
 except ImportError:

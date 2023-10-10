@@ -5,13 +5,12 @@ try:
     from rdkit.Chem.rdMolTransforms import GetBondLength
 except ImportError:
     pass
-import numpy as np
-from masskit.small_molecule import utils
-import unittest
-from math import *
-import logging
 import copy
+import logging
+import unittest
 from random import randrange
+
+import numpy as np
 
 
 def create_conformer(mol, num_conformers=10):

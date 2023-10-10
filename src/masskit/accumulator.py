@@ -1,6 +1,8 @@
-from abc import ABC, abstractmethod
 import math
+from abc import ABC, abstractmethod
+
 import pyarrow as pa
+
 
 class Accumulator(ABC):
     """

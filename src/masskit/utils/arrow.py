@@ -1,10 +1,13 @@
-import os
-from pathlib import Path
-import tempfile
-from masskit.utils.tablemap import ArrowLibraryMap
 import hashlib
+import os
+import tempfile
+from pathlib import Path
+
 import pyarrow as pa
 from filelock import FileLock
+
+from . import tablemap as _mktablemap
+
 
 def create_object_id(filename, filters):
     """
@@ -46,10 +49,10 @@ def save_to_arrow(filename, columns=None, filters=None, tempdir=None):
             # read in arrow file as memory map
             data = pa.ipc.RecordBatchFileReader(pa.memory_map(str(temp_file_path), 'r')).read_all()
             # create ArrowLibraryMap
-            data = ArrowLibraryMap(data)
+            data = _mktablemap.ArrowLibraryMap(data)
         else:
             # read from parquet file
-            data = ArrowLibraryMap.from_parquet(filename, columns=columns, filters=filters)
+            data = _mktablemap.ArrowLibraryMap.from_parquet(filename, columns=columns, filters=filters)
             with pa.OSFile(str(temp_file_path), 'wb') as sink:
                 with pa.RecordBatchFileWriter(sink, data.to_arrow().schema) as writer:
                     writer.write_table(data.to_arrow())

@@ -1,7 +1,9 @@
 import logging
 import math
 from abc import ABC, abstractmethod
+
 import numpy as np
+
 try:
     from rdkit import DataStructs
     from rdkit.Chem import rdFingerprintGenerator
@@ -543,7 +545,8 @@ class SpectrumTanimotoFingerPrint(SpectrumFingerprint):
 
 if __name__ == "__main__":
     import unittest
-    from masskit.spectrum.spectrum import Spectrum, MassInfo
+
+    from masskit.spectrum.spectrum import MassInfo, Spectrum
 
     class TestFingerprintMethods(unittest.TestCase):
         """

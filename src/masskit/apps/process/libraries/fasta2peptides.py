@@ -1,20 +1,21 @@
 #!/usr/bin/env python
-import logging
-from pathlib import Path
-import hydra
-from omegaconf import DictConfig, OmegaConf
-from itertools import groupby, combinations
 from collections import namedtuple
+from itertools import combinations, groupby
+from pathlib import Path
+
+import hydra
 import pyarrow as pa
 import pyarrow.parquet as pq
-from masskit.data_specs.file_schemas import schema_groups
-from masskit.peptide.spectrum_generator import generate_mods
-from masskit.utils.general import open_if_filename
-from masskit.utils.files import empty_records, add_row_to_records, records2table
-from masskit.peptide.encoding import calc_precursor_mz, parse_modification_encoding
-from masskit.utils.general import MassKitSearchPathPlugin
 from hydra.core.plugins import Plugins
+from omegaconf import DictConfig
 
+from masskit.data_specs.file_schemas import schema_groups
+from masskit.peptide.encoding import (calc_precursor_mz,
+                                      parse_modification_encoding)
+from masskit.peptide.spectrum_generator import generate_mods
+from masskit.utils.files import (add_row_to_records, empty_records,
+                                 records2table)
+from masskit.utils.general import MassKitSearchPathPlugin, open_if_filename
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 PepTuple = namedtuple('PepTuple', ['nterm', 'pep', 'cterm'])

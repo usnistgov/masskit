@@ -1,11 +1,11 @@
-from collections import OrderedDict
 import string
+from collections import OrderedDict
 
 import numpy as np
-import masskit.data_specs.schemas as mds
-import pyarrow as pa
 import pandas as pd
+import pyarrow as pa
 
+from ..data_specs import schemas as _mkschemas
 
 # borrowed from https://github.com/tbepler/protein-sequence-embedding-iclr2019/blob/master/src/alphabets.py
 
@@ -577,7 +577,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     arrays['ion_subtype_array'] = pa.DictionaryArray.from_arrays(
         indices=arrays['ion_subtype_array'],
         dictionary=named_ions.dictionary)
-    fields = mds.ion_annot_fields[0:6]
+    fields = _mkschemas.ion_annot_fields[0:6]
     arrays_out = list(arrays.values())[0:6] 
     if analysis is not None:
         analysis['aa_before_array'] = pa.DictionaryArray.from_arrays(
@@ -592,7 +592,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
         analysis['ptm_after_array'] = pa.DictionaryArray.from_arrays(
             indices=pa.concat_arrays(analysis['ptm_after_array']),
             dictionary=mod_masses.dictionary)
-        fields += mds.ion_annot_fields[6:]
+        fields += _mkschemas.ion_annot_fields[6:]
         arrays_out += list(analysis.values())
 
     annotations = pa.StructArray.from_arrays(arrays=arrays_out, fields=fields)

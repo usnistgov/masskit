@@ -1,24 +1,24 @@
+import copy
+import logging
 import math
+import random
+import re
+from abc import ABC, abstractmethod
+from base64 import b64encode
+from io import BytesIO, StringIO
+
+import numpy as np
 import pandas as pd
 import pyarrow as pa
-import numpy as np
-from masskit.accumulator import Accumulator
-import masskit.utils.textalloc as ta
-from masskit.constants import EPSILON
-import masskit.data_specs.schemas as mds
-from masskit.peptide.encoding import h2o_mass
-from masskit.spectrum.ipython import is_notebook
-import re
 import scipy.stats as sts
-import logging
-import copy
-import random
-from masskit.utils.fingerprints import SpectrumTanimotoFingerPrint
-from abc import ABC, abstractmethod
-from masskit.spectrum.spectrum_plotting import draw_spectrum, spectrum_plot
-from io import StringIO, BytesIO
-from base64 import b64encode
 
+from .. import accumulator as _mkaccumulator
+from ..data_specs import schemas as _mkschemas
+from ..peptide import encoding as _mkencoding
+from ..utils import fingerprints as _mkfingerprints
+from ..utils import textalloc as _mktextalloc
+from . import ipython as _mkipython
+from . import spectrum_plotting as _mkspectrum_plotting
 
 # try:
 #     from numba import jit
@@ -494,9 +494,9 @@ class Ions(ABC):
         tolerance = self.half_tolerance(precursor_mz)
         mask = (return_ions.mz < precursor_mz - tolerance) | (return_ions.mz > precursor_mz + tolerance)
         if h2o and charge is not None and charge != 0:
-            h2o_neutral_loss = (precursor_mz * charge - h2o_mass)/charge
+            h2o_neutral_loss = (precursor_mz * charge - _mkencoding.h2o_mass)/charge
             mask &= (return_ions.mz < h2o_neutral_loss - tolerance) | (return_ions.mz > h2o_neutral_loss + tolerance)
-            h2o_neutral_loss = (precursor_mz * charge - 2 * h2o_mass)/charge
+            h2o_neutral_loss = (precursor_mz * charge - 2 * _mkencoding.h2o_mass)/charge
             mask &= (return_ions.mz < h2o_neutral_loss - tolerance) | (return_ions.mz > h2o_neutral_loss + tolerance)
         return Ions.mask_ions(mask, return_ions)
 
@@ -1443,7 +1443,7 @@ class Spectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in mds.property_fields:
+        for field in _mkschemas.property_fields:
             attribute = row.get(field.name)
             if attribute is not None:
                 setattr(self, field.name, attribute())
@@ -1484,7 +1484,7 @@ class Spectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in mds.property_fields:
+        for field in _mkschemas.property_fields:
             attribute = struct.get(field.name)
             if attribute is not None:
                 if pa.types.is_list(field.type) or pa.types.is_large_list(field.type):
@@ -1683,7 +1683,8 @@ class Spectrum:
         """
         #todo: check to see if annotation should be turned on
         if annotate_peptide:
-            from masskit.spectrum.theoretical_spectrum import annotate_peptide_spectrum
+            from masskit.spectrum.theoretical_spectrum import \
+                annotate_peptide_spectrum
             annotate_peptide_spectrum(self, ion_types=ion_types)
 
         ret_value = ""
@@ -2362,7 +2363,7 @@ class Spectrum:
         else:
             stddev = None
 
-        line_collections = spectrum_plot(
+        line_collections = _mkspectrum_plotting.spectrum_plot(
             axes,
             self.products.mz,
             self.products.intensity,
@@ -2405,7 +2406,7 @@ class Spectrum:
                     xx.append(self.products.mz[j])
                     yy.append(self.products.intensity[j])
 
-            ta.allocate_text(axes,xx,yy,
+            _mktextalloc.allocate_text(axes,xx,yy,
                             annots,
                             x_lines=[np.array([self.products.mz[i],self.products.mz[i]]) for i in range(len(self.products))],
                             y_lines=[np.array([0,self.products.intensity[i]]) for i in range(len(self.products))], 
@@ -2436,7 +2437,7 @@ class Spectrum:
             return f"<spectrum {self.id}>"
 
     def draw_spectrum(self, fig_format, output):
-        return draw_spectrum(self, fig_format, output)
+        return _mkspectrum_plotting.draw_spectrum(self, fig_format, output)
 
     def _repr_png_(self):
         """
@@ -2455,7 +2456,7 @@ class Spectrum:
         return self.draw_spectrum("svg", StringIO())
 
     def __str__(self):
-        if is_notebook():
+        if _mkipython.is_notebook():
             val = b64encode(self._repr_png_()).decode("ascii")
             return \
                 f'<img data-content="masskit/spectrum" src="data:image/png;base64,{val}" alt="spectrum {self.name}"/>'
@@ -2470,7 +2471,7 @@ class Spectrum:
         :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :return: SpectrumTanimotoFingerPrint
         """
-        fp = SpectrumTanimotoFingerPrint(dimension=max_mz)
+        fp = _mkfingerprints.SpectrumTanimotoFingerPrint(dimension=max_mz)
         fp.object2fingerprint(self)
         return fp
     
@@ -2506,9 +2507,9 @@ class Spectrum:
 
 
 # Add properties from the schema to Spectrum
-mds.populate_properties(Spectrum)
+_mkschemas.populate_properties(Spectrum)
 
-class AccumulatorSpectrum(Spectrum, Accumulator):
+class AccumulatorSpectrum(Spectrum, _mkaccumulator.Accumulator):
     """
     used to contain a spectrum that accumulates the sum of many spectra
     includes calculation of standard deviation
@@ -2588,7 +2589,7 @@ class AccumulatorSpectrum(Spectrum, Accumulator):
         self.__class__ = Spectrum
 
 
-mds.populate_properties(AccumulatorSpectrum, fields=mds.spectrum_accumulator_fields)
+_mkschemas.populate_properties(AccumulatorSpectrum, fields=_mkschemas.spectrum_accumulator_fields)
 
 class HiResSpectrum(Spectrum):
     def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, tolerance=None, copy_arrays=False):

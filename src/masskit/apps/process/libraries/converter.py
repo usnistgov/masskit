@@ -1,13 +1,15 @@
 #!/usr/bin/env python
 import logging
 from pathlib import Path
+
 import hydra
+import pyarrow as pa
+from hydra.core.plugins import Plugins
 from omegaconf import DictConfig
+
 from masskit.data_specs.spectral_library import *
 from masskit.utils.general import MassKitSearchPathPlugin, parse_filename
 from masskit.utils.tablemap import ArrowLibraryMap
-import pyarrow as pa
-from hydra.core.plugins import Plugins
 
 """
 takes a variety of inputs, including parquet, mgf and msp formatted files and converts them to

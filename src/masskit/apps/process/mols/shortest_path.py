@@ -1,14 +1,16 @@
+import logging
 from contextlib import contextmanager
 from functools import partial
 from multiprocessing import Pool
 from pathlib import Path
-import jsonpickle
-import logging
+
 import hydra
-from omegaconf import DictConfig
+import jsonpickle
 import pyarrow as pa
 import pyarrow.parquet as pq
+from omegaconf import DictConfig
 from rdkit import Chem
+
 from masskit.data_specs.arrow_types import PathArrowType
 
 """

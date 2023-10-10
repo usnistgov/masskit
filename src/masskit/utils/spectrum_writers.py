@@ -1,9 +1,11 @@
 import base64
 import zlib
 from collections import OrderedDict
-from masskit.constants import EPSILON
-from masskit.utils.general import open_if_filename
+
 import numpy as np
+
+from .. import constants as _mkconstants
+from ..utils import general as _mkgeneral
 
 
 def spectra_to_msp(fp, spectra, annotate_peptide=False, ion_types=None):
@@ -15,7 +17,7 @@ def spectra_to_msp(fp, spectra, annotate_peptide=False, ion_types=None):
     :param annotate_peptide: annotate the spectra as peptide
     :param ion_types: ion types for annotation
     """
-    fp = open_if_filename(fp, 'w+')
+    fp = _mkgeneral.open_if_filename(fp, 'w+')
 
     for i in range(len(spectra)):
         print(spectra[i].to_msp(annotate_peptide=annotate_peptide, ion_types=ion_types), file=fp)
@@ -30,7 +32,7 @@ def spectra_to_mgf(fp, spectra, charge_list=None):
     :param spectra: name of the column containing the spectrum
     :param charge_list: list of charges for Mascot to search, otherwise use the CHARGE field
     """
-    fp = open_if_filename(fp, 'w+')
+    fp = _mkgeneral.open_if_filename(fp, 'w+')
     if charge_list is not None:
         charge_string = "CHARGE="
         for charge in charge_list:
@@ -59,7 +61,7 @@ def spectra_to_mgf(fp, spectra, charge_list=None):
     return
 
 
-def spectra_to_mzxml(fp, spectra, mzxml_attributes=None, min_intensity=EPSILON, compress=True, use_id_as_scan=True):
+def spectra_to_mzxml(fp, spectra, mzxml_attributes=None, min_intensity=_mkconstants.EPSILON, compress=True, use_id_as_scan=True):
     """
     write out an array-like of spectra in mzxml format
 
@@ -71,7 +73,7 @@ def spectra_to_mzxml(fp, spectra, mzxml_attributes=None, min_intensity=EPSILON, 
     :param compress: should the data be compressed?
     """
 
-    fp = open_if_filename(fp, 'w')
+    fp = _mkgeneral.open_if_filename(fp, 'w')
 
     """
     Notes:

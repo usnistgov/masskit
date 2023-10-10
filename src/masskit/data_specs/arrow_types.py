@@ -1,14 +1,16 @@
+import numbers
+
 import jsonpickle
 import numpy as np
 import pyarrow as pa
-import masskit.spectrum.spectrum as mss
+from pandas.api.extensions import register_extension_dtype
 from pandas.core.arrays import ExtensionArray
 from pandas.core.dtypes.base import ExtensionDtype
-from pandas.api.extensions import register_extension_dtype
-import numbers
 from rdkit import Chem
 
-from masskit.utils.spectrum_writers import spectra_to_mgf, spectra_to_msp, spectra_to_mzxml
+import masskit.spectrum.spectrum as mss
+
+from ..utils import spectrum_writers as _mkspectrum_writers
 
 
 class MasskitArrowArray(pa.ExtensionArray):
@@ -122,7 +124,7 @@ class MasskitPandasArray(ExtensionArray):
         :param annotate_peptide: annotate the spectrum as a peptide
         :param ion_types: ion types to annotate
         """
-        spectra_to_msp(fp, self.data, annotate_peptide=annotate_peptide, ion_types=ion_types)
+        _mkspectrum_writers.spectra_to_msp(fp, self.data, annotate_peptide=annotate_peptide, ion_types=ion_types)
         
     def to_mgf(self, fp):
         """
@@ -130,7 +132,7 @@ class MasskitPandasArray(ExtensionArray):
 
         :param fp: stream or filename
         """
-        spectra_to_mgf(fp, self.data)
+        _mkspectrum_writers.spectra_to_mgf(fp, self.data)
 
     def to_mzxml(self, fp):
         """
@@ -138,7 +140,7 @@ class MasskitPandasArray(ExtensionArray):
 
         :param fp: stream or filename
         """
-        spectra_to_mzxml(fp, self.data)
+        _mkspectrum_writers.spectra_to_mzxml(fp, self.data)
 
 
 

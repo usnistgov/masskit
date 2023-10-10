@@ -1,8 +1,10 @@
-from tqdm import tqdm
-from masskit.utils.textalloc.non_overlapping_boxes import get_non_overlapping_boxes
-import numpy as np
 import time
 from typing import List, Tuple, Union
+
+import numpy as np
+from tqdm import tqdm
+
+from .non_overlapping_boxes import get_non_overlapping_boxes
 
 
 def allocate_text(

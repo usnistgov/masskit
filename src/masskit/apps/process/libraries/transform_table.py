@@ -1,33 +1,23 @@
 #!/usr/bin/env python
-import sys
-import os
-import tempfile
 import logging
+import os
+import sys
+import tempfile
 from pathlib import Path
 
 import hydra
-from omegaconf import DictConfig, OmegaConf
-
 import pyarrow as pa
-import pyarrow.parquet as pq
 import pyarrow.compute as pc
 import pyarrow.feather as feather
-
-from rich.console import Console
-from rich.progress import (
-    BarColumn,
-    DownloadColumn,
-    MofNCompleteColumn,
-    Progress,
-    TaskID,
-    TextColumn,
-    TimeRemainingColumn,
-    track,
-    TransferSpeedColumn,
-)
-from masskit.utils.general import MassKitSearchPathPlugin
+import pyarrow.parquet as pq
 from hydra.core.plugins import Plugins
+from omegaconf import DictConfig, OmegaConf
+from rich.console import Console
+from rich.progress import (BarColumn, DownloadColumn, MofNCompleteColumn,
+                           Progress, TaskID, TextColumn, TimeRemainingColumn,
+                           TransferSpeedColumn, track)
 
+from masskit.utils.general import MassKitSearchPathPlugin
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 

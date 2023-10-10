@@ -1,17 +1,18 @@
 #!/usr/bin/env python
 
-import pyarrow as pa
-import pyarrow.parquet as pq
-import pandas as pd
-import numpy as np
-import math
-from rich.console import Console
-from rich.columns import Columns
-from rich.panel import Panel
-
 # Initial parsing geneated with duckview
 # filename -c --columns collist -s --start 0 -e --end 100 -i --info
 import argparse
+import math
+
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
+from rich.columns import Columns
+from rich.console import Console
+from rich.panel import Panel
+
 
 class parquet_info:
 

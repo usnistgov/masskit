@@ -1,10 +1,11 @@
 #!/usr/bin/env python
+import re
+
 import hydra
 import rich.progress
-import re
-from masskit.utils.general import MassKitSearchPathPlugin
 from hydra.core.plugins import Plugins
 
+from masskit.utils.general import MassKitSearchPathPlugin
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 

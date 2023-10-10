@@ -1,8 +1,11 @@
 import math
+
 import imageio
 import numpy as np
-from masskit.constants import EPSILON
-from matplotlib import collections as mc, pyplot as plt
+from matplotlib import collections as mc
+from matplotlib import pyplot as plt
+
+from .. import constants as _mkconstants
 
 
 def unsparsify_spectrum(spectrum, max_mz):
@@ -72,7 +75,7 @@ def normalize_intensity(intensity, normalize=999.0):
     :return:
     """
     divisor = intensity.max()
-    return intensity * normalize / (divisor + EPSILON)
+    return intensity * normalize / (divisor + _mkconstants.EPSILON)
 
 
 def line_plot(mz_in, intensity_in, color, linewidth=1):

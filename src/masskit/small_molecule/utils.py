@@ -4,9 +4,9 @@ try:
 except ImportError:
     pass
 import copy
-import numpy as np
 import unittest
 
+import numpy as np
 
 # various Van der Waals atomic radii.  Recipe for creation is
 # from mendeleev import get_table

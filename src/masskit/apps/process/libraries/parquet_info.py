@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+
 import pyarrow.parquet as pq
 
 if __name__ == '__main__':

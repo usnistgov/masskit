@@ -1,7 +1,10 @@
 import tempfile
-from hydra import compose, initialize
 from pathlib import Path
-from masskit.apps.process.libraries.batch_converter import batch_converter_app
+
+from hydra import compose, initialize
+
+from ..apps.process.libraries.batch_converter import batch_converter_app
+
 
 def cho_uniq_short_parquet():
     data_dir = Path("../../../tests/data")

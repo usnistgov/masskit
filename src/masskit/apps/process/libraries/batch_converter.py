@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 import logging
-from tqdm.contrib.logging import logging_redirect_tqdm
-from tqdm import tqdm
 from pathlib import Path
-import hydra
-from omegaconf import DictConfig, ListConfig
-from masskit.utils.files import BatchFileReader, BatchFileWriter
-from masskit.utils.general import MassKitSearchPathPlugin, expand_path_list, parse_filename
-from hydra.core.plugins import Plugins
 
+import hydra
+from hydra.core.plugins import Plugins
+from omegaconf import DictConfig, ListConfig
+from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
+
+from masskit.utils.files import BatchFileReader, BatchFileWriter
+from masskit.utils.general import (MassKitSearchPathPlugin, expand_path_list,
+                                   parse_filename)
 
 Plugins.instance().register(MassKitSearchPathPlugin)
 

@@ -1,13 +1,12 @@
+from typing import List, Tuple
+
 import numpy as np
-from typing import Tuple, List
-from masskit.utils.textalloc.candidates import generate_candidates
-from masskit.utils.textalloc.overlap_functions import (
-    non_overlapping_with_points,
-    non_overlapping_with_lines,
-    non_overlapping_with_boxes,
-    inside_plot,
-)
 from tqdm import tqdm
+
+from .candidates import generate_candidates
+from .overlap_functions import (inside_plot, non_overlapping_with_boxes,
+                                non_overlapping_with_lines,
+                                non_overlapping_with_points)
 
 
 def get_non_overlapping_boxes(

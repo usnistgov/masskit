@@ -1,12 +1,14 @@
 #!/usr/bin/env python
-import pandas as pd
 import argparse
 import glob
-import re
-import json
 import hashlib
+import json
 import logging
+import re
 import sys
+
+import pandas as pd
+
 from masskit.utils.hitlist import Hitlist
 
 """

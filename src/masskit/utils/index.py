@@ -1,17 +1,15 @@
 import logging
+import pickle
 import timeit
+from abc import ABC, abstractmethod
+
 import numpy as np
 import pandas as pd
-from abc import ABC, abstractmethod
-from scipy import sparse
-from ..spectrum.spectrum import Spectrum
-from . general import open_if_filename
-#from masskit.utils.search import tanimoto_search
-from . tables import row_view
 import pynndescent
-import pickle
-from . fingerprints import SpectrumFloatFingerprint, SpectrumTanimotoFingerPrint
-from . hitlist import Hitlist
+from scipy import sparse
+
+from . import fingerprints as _mkfingerprints
+from . import hitlist as _mkhitlist
 
 # try:
 #     from numba import jit, prange
@@ -242,7 +240,7 @@ class DescentIndex(Index):
     :param dimension: the number of features in the fingerprint
     :param fingerprint_factory: class used to encapsulate the fingerprint
     """
-    def __init__(self, index_name=None, dimension=2000, fingerprint_factory=SpectrumFloatFingerprint):
+    def __init__(self, index_name=None, dimension=2000, fingerprint_factory=_mkfingerprints.SpectrumFloatFingerprint):
         super().__init__(index_name=index_name, dimension=dimension, fingerprint_factory=fingerprint_factory)
 
     def create(self, table_map, metric=None, column_name=None):
@@ -372,7 +370,7 @@ class DescentIndex(Index):
 
         mux = pd.MultiIndex.from_arrays([query_ids.flatten(), indices.flatten()], names=["query_id", "hit_id"])
         result_df = pd.DataFrame({"raw_score": distances.flatten()}, index=mux)
-        return Hitlist(result_df)
+        return _mkhitlist.Hitlist(result_df)
 
     def save(self, file=None):
         if file is None:
@@ -444,7 +442,7 @@ class BruteForceIndex(Index):
 
         mux = pd.MultiIndex.from_arrays([query_ids, hit_ids], names=["query_id", "hit_id"])
         result_df = pd.DataFrame({"raw_score": matches, "cosine_score": cosine_scores}, index=mux)
-        return Hitlist(result_df)
+        return _mkhitlist.Hitlist(result_df)
 
     def save(self, file=None):
         if file is None:
@@ -523,7 +521,7 @@ class DotProductIndex(Index):
         result_df = pd.DataFrame({"hybrid_score": cosine_scores.flatten()}, index=mux)
         # for some reason, pandas insists on converting float32 to object, so convert it back
         result_df = result_df.astype({"hybrid_score": np.float32})
-        return Hitlist(result_df)
+        return _mkhitlist.Hitlist(result_df)
 
     def save(self, file=None):
         if file is None:
@@ -548,7 +546,7 @@ class TanimotoIndex(Index):
     :param dimension: the number of features in the fingerprint
     :param fingerprint_factory: class used to encapsulate the fingerprint
     """
-    def __init__(self, index_name=None, dimension=4096, fingerprint_factory=SpectrumTanimotoFingerPrint):
+    def __init__(self, index_name=None, dimension=4096, fingerprint_factory=_mkfingerprints.SpectrumTanimotoFingerPrint):
         super().__init__(index_name=index_name, dimension=dimension, fingerprint_factory=fingerprint_factory)
         self.index_count = None
 
@@ -632,7 +630,7 @@ class TanimotoIndex(Index):
         result_df = pd.DataFrame({"tanimoto": tanimotos.flatten()}, index=mux)
         # for some reason, pandas insists on converting float32 to object, so convert it back
         result_df = result_df.astype({"tanimoto": np.float32})
-        return Hitlist(result_df)
+        return _mkhitlist.Hitlist(result_df)
 
     def save(self, file=None):
         if file is None:
