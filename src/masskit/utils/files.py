@@ -24,7 +24,7 @@ from ..data_specs import file_schemas as _mkfile_schemas
 from ..data_specs import schemas as _mkschemas
 from ..small_molecule import threed as _mkthreed
 from ..small_molecule import utils as _mksmutils
-from ..spectrum import spectrum as _mkspectrum
+from ..spectra import spectrum as _mkspectrum
 from . import fingerprints as _mkfingerprints
 from . import general as _mkgeneral
 from . import hitlist as _mkhitlist

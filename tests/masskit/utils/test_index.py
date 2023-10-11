@@ -5,7 +5,7 @@ import numpy as np
 import pytest
 from pytest import approx
 
-import masskit.spectrum.spectrum as mss
+import masskit.spectra.spectrum as mss
 from masskit.utils.fingerprints import (ECFPFingerprint,
                                         SpectrumFloatFingerprint)
 from masskit.utils.hitlist import (CompareRecallDCG, CosineScore, Hitlist,

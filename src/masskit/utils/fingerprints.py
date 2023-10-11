@@ -546,7 +546,7 @@ class SpectrumTanimotoFingerPrint(SpectrumFingerprint):
 if __name__ == "__main__":
     import unittest
 
-    from masskit.spectrum.spectrum import MassInfo, Spectrum
+    from ..spectra.spectrum import MassInfo, Spectrum
 
     class TestFingerprintMethods(unittest.TestCase):
         """

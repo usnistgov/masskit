@@ -1,5 +1,11 @@
 #!/bin/env python
 import numpy as np
+
+import masskit.spectra.spectrum as spec
+import masskit_ext
+# import masskit
+from masskit.utils.files import spectra_to_array
+
 # import pandas as pd
 # import pyarrow as pa
 # import pyarrow.parquet as pq
@@ -7,10 +13,6 @@ import numpy as np
 # import os
 # import sys
 
-# import masskit
-from masskit.utils.files import spectra_to_array
-import masskit.spectrum.spectrum as spec
-import masskit_ext
 
 FILENAME = "test.msp"
 

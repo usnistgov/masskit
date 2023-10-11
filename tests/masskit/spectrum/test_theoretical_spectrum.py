@@ -4,8 +4,8 @@ import numpy as np
 import pytest
 from pytest import approx
 
-import masskit.spectrum.spectrum as mss
-import masskit.spectrum.theoretical_spectrum as msts
+import masskit.spectra.spectrum as mss
+import masskit.spectra.theoretical_spectrum as msts
 from masskit.utils.tablemap import ArrowLibraryMap
 
 

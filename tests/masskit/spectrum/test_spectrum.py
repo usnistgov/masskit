@@ -3,7 +3,7 @@ import pytest
 from pytest import approx
 from rdkit import Chem
 
-import masskit.spectrum.spectrum as mss
+import masskit.spectra.spectrum as mss
 
 
 def test_load_spectrum():

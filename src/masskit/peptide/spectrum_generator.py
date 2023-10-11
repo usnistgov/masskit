@@ -4,7 +4,7 @@ import random
 import pandas as pd
 
 from .. import data as _mkdata
-from ..spectrum import theoretical_spectrum as _mktheoretical_spectrum
+from ..spectra import theoretical_spectrum as _mktheoretical_spectrum
 from . import encoding as _mkencoding
 
 """

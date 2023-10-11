@@ -1,5 +1,7 @@
-import masskit.spectrum.spectrum as mss
 import pytest
+
+import masskit.spectra.spectrum as mss
+
 
 @pytest.fixture
 def predicted_spectrum1():
