@@ -3,6 +3,7 @@ import random
 
 import pandas as pd
 
+from .. import data as _mkdata
 from ..spectrum import theoretical_spectrum as _mktheoretical_spectrum
 from . import encoding as _mkencoding
 
@@ -26,7 +27,7 @@ def create_peptide_name(peptide, precursor_charge, mod_names=None, mod_positions
         for mod in range(len(mod_names)):
             if mod == 0:
                 output += f'_{len(mod_names)}'
-            output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{_mkencoding.mod_masses.id2row[mod_names[mod]]})'
+            output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{_mkdata.mod_masses.id2row[mod_names[mod]]})'
     if ev is not None:
         output += f'_{ev}'
     return output
@@ -47,7 +48,7 @@ def generate_mods(peptide, mod_list, n_peptide=False, c_peptide=False, mod_proba
         return [], []
 
     def add_mod(mod_name_in, mod_pos_in, mod_names_in, mod_positions_in):
-        mod_names_in.append(_mkencoding.mod_masses.df.at[mod_name_in, 'id'])
+        mod_names_in.append(_mkdata.mod_masses.df.at[mod_name_in, 'id'])
         mod_positions_in.append(mod_pos_in)
     
     mod_names = []

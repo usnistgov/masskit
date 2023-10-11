@@ -9,7 +9,7 @@ from functools import partial
 from io import StringIO
 from multiprocessing import Pool
 from pathlib import Path
-from typing import Dict, List, Union
+from typing import Dict, Union
 
 import numpy as np
 import pandas as pd
@@ -18,11 +18,10 @@ import pyarrow.parquet as pq
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from pyarrow import csv as pacsv
 
-from .. import constants as _mkconstants
+from .. import data as _mkdata
 from ..data_specs import arrow_types as _mkarrow_types
 from ..data_specs import file_schemas as _mkfile_schemas
 from ..data_specs import schemas as _mkschemas
-from ..peptide import encoding as _mkencoding
 from ..small_molecule import threed as _mkthreed
 from ..small_molecule import utils as _mksmutils
 from ..spectrum import spectrum as _mkspectrum
@@ -537,7 +536,7 @@ class MSPLoader(BatchLoader):
                                     if not submatch:
                                         # deal with older format of modifications
                                         submatch = re.findall(r'/(\d+),[A-Z]+,([^/]*)', match.group(2))
-                                    row["mod_names"] = [_mkencoding.mod_masses.dictionary.index(nist_mod_2_unimod.get(x[1], x[1])) for x in submatch]
+                                    row["mod_names"] = [_mkdata.mod_masses.dictionary.index(nist_mod_2_unimod.get(x[1], x[1])) for x in submatch]
                                     row["mod_positions"] = [int(x[0]) for x in submatch]
                                 elif match.group(1) == "Filter":
                                     submatch = re.search(r'@hcd(\d+\.*\d*) ', match.group(2))
@@ -596,7 +595,7 @@ class MGFLoader(BatchLoader):
             intensity = []
             row = {
                 "id": self.current_id,
-                "set": np.random.choice(_mkconstants.SET_NAMES, p=self.set_probabilities),
+                "set": np.random.choice(_mkdata.SET_NAMES, p=self.set_probabilities),
             }
             if self.format['row_entries']:
                 row = {**row, **self.format['row_entries']}  # merge in the passed in row entries
@@ -926,7 +925,7 @@ def create_table_with_mod_dict(records, schema):
     # ptm_before_array = pa.DictionaryArray.from_arrays(
     #     indices=pa.array(ptm_before_array, type=pa.int16()),
     #     dictionary=mod_masses.dictionary)
-    mod_names = pa.DictionaryArray.from_arrays(indices=pa.array(records['mod_names'], type=pa.list_(pa.int16())), dictionary=_mkencoding.mod_masses.dictionary)
+    mod_names = pa.DictionaryArray.from_arrays(indices=pa.array(records['mod_names'], type=pa.list_(pa.int16())), dictionary=_mkdata.mod_masses.dictionary)
     del records['mod_names']
     table = pa.table(records, schema)
     table.append_column(_mkschemas.mod_names_field, mod_names)

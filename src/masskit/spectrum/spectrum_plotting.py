@@ -5,7 +5,7 @@ import numpy as np
 from matplotlib import collections as mc
 from matplotlib import pyplot as plt
 
-from .. import constants as _mkconstants
+from .. import data as _mkdata
 
 
 def unsparsify_spectrum(spectrum, max_mz):
@@ -75,7 +75,7 @@ def normalize_intensity(intensity, normalize=999.0):
     :return:
     """
     divisor = intensity.max()
-    return intensity * normalize / (divisor + _mkconstants.EPSILON)
+    return intensity * normalize / (divisor + _mkdata.EPSILON)
 
 
 def line_plot(mz_in, intensity_in, color, linewidth=1):

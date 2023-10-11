@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 import numpy as np
 
-from .. import constants as _mkconstants
+from .. import data as _mkdata
 from ..utils import general as _mkgeneral
 
 
@@ -61,7 +61,7 @@ def spectra_to_mgf(fp, spectra, charge_list=None):
     return
 
 
-def spectra_to_mzxml(fp, spectra, mzxml_attributes=None, min_intensity=_mkconstants.EPSILON, compress=True, use_id_as_scan=True):
+def spectra_to_mzxml(fp, spectra, mzxml_attributes=None, min_intensity=_mkdata.EPSILON, compress=True, use_id_as_scan=True):
     """
     write out an array-like of spectra in mzxml format
 

@@ -14,7 +14,7 @@ import scipy.stats as sts
 
 from .. import accumulator as _mkaccumulator
 from ..data_specs import schemas as _mkschemas
-from ..peptide import encoding as _mkencoding
+from .. import data as _mkdata
 from ..utils import fingerprints as _mkfingerprints
 from ..utils import textalloc as _mktextalloc
 from . import ipython as _mkipython
@@ -494,9 +494,9 @@ class Ions(ABC):
         tolerance = self.half_tolerance(precursor_mz)
         mask = (return_ions.mz < precursor_mz - tolerance) | (return_ions.mz > precursor_mz + tolerance)
         if h2o and charge is not None and charge != 0:
-            h2o_neutral_loss = (precursor_mz * charge - _mkencoding.h2o_mass)/charge
+            h2o_neutral_loss = (precursor_mz * charge - _mkdata.h2o_mass)/charge
             mask &= (return_ions.mz < h2o_neutral_loss - tolerance) | (return_ions.mz > h2o_neutral_loss + tolerance)
-            h2o_neutral_loss = (precursor_mz * charge - 2 * _mkencoding.h2o_mass)/charge
+            h2o_neutral_loss = (precursor_mz * charge - 2 * _mkdata.h2o_mass)/charge
             mask &= (return_ions.mz < h2o_neutral_loss - tolerance) | (return_ions.mz > h2o_neutral_loss + tolerance)
         return Ions.mask_ions(mask, return_ions)
 
