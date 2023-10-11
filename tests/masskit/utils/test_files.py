@@ -1,5 +1,7 @@
 import pytest
+
 from masskit.utils.files import load_mzTab
+
 
 @pytest.fixture
 def maxQuant_hitlist():

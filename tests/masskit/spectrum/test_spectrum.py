@@ -1,8 +1,9 @@
+import numpy as np
 import pytest
 from pytest import approx
-import numpy as np
-import masskit.spectrum.spectrum as mss
 from rdkit import Chem
+
+import masskit.spectrum.spectrum as mss
 
 
 def test_load_spectrum():
@@ -156,7 +157,7 @@ def hi_res3():
     )
     return hr
 
-def test_intersect_hires_spectrum(hi_res1, hi_res2):
+def test_intersect_hires_spectrum(hi_res1: mss.Spectrum, hi_res2: mss.Spectrum):
     index1, index2 = hi_res1.products.intersect(hi_res2.products)
     assert index1.tolist() == [0, 2]
     assert index2.tolist() == [0, 2]
@@ -179,14 +180,14 @@ def test_intersect_hires_spectrum_duplicates():
     assert index1.tolist() == [0, 0, 1, 2, 1, 2]
     assert index2.tolist() == [0, 1, 2, 2, 3, 3]
 
-def test_copy_ions(hi_res1):
+def test_copy_ions(hi_res1: mss.Spectrum):
     filtered = hi_res1.products.copy(min_mz=150, max_mz=250)
     assert filtered.mz.tolist() == [200.0002]
     filtered = hi_res1.products.copy(min_intensity=15, max_intensity=100)
     assert filtered.mz.tolist() == [300.0003]
     return
 
-def test_filter_ions(hi_res1):
+def test_filter_ions(hi_res1: mss.Spectrum):
     filtered = hi_res1.products.copy()
     filtered.filter(min_mz=150, max_mz=250, inplace=True)
     assert filtered.mz.tolist() == [200.0002]
@@ -195,33 +196,33 @@ def test_filter_ions(hi_res1):
     assert filtered.mz.tolist() == [300.0003]
     return
 
-def test_normalize(hi_res1):
+def test_normalize(hi_res1: mss.Spectrum):
     filtered = hi_res1.products.norm(10000)
     assert filtered.intensity.tolist() == [10000, 10, 500]
     filtered = hi_res1.products.norm(1.0, ord=2, keep_type=False)
     assert filtered.intensity.tolist() == approx([0.99874935, 0.00099975, 0.04998745])
     return
 
-def test_mask(hi_res1):
+def test_mask(hi_res1: mss.Spectrum):
     filtered = hi_res1.products.mask([1, 2])
     assert filtered.intensity.tolist() == [999]
     assert filtered.mz.tolist() == [100.0001]
     return
 
-def test_mask_bool(hi_res1):
+def test_mask_bool(hi_res1: mss.Spectrum):
     filtered = hi_res1.products.mask(hi_res1.products.mz < 200.0)
     assert filtered.intensity.tolist() == [1, 50]
     assert filtered.mz.tolist() == [200.0002, 300.0003]
     return
 
-def test_merge(hi_res1, hi_res2):
+def test_merge(hi_res1: mss.Spectrum, hi_res2: mss.Spectrum):
     merge1 = hi_res1.products.copy()  # make a copy
     merge2 = hi_res2.products.copy()  # make a copy
     merged = merge1.merge(merge2)
     assert merged.intensity.tolist() == [999, 999, 1, 1, 50, 120, 50]
     return
 
-def test_evenly_space(hi_res1):
+def test_evenly_space(hi_res1: mss.Spectrum):
     initial_spectrum = hi_res1.copy()  # make a copy
     initial_spectrum.evenly_space(
         tolerance=0.05,
@@ -230,7 +231,7 @@ def test_evenly_space(hi_res1):
     assert initial_spectrum.products.starts.tolist() == approx([99.95, 199.95, 299.95])
     assert initial_spectrum.products.stops.tolist() == approx([100.05, 200.05, 300.05])
 
-def test_evenly_space_stddev(hi_res3):
+def test_evenly_space_stddev(hi_res3: mss.Spectrum):
     initial_spectrum = hi_res3.copy()  # make a copy
     initial_spectrum.evenly_space(
         tolerance=0.05,
@@ -240,21 +241,21 @@ def test_evenly_space_stddev(hi_res3):
     assert initial_spectrum.products.stops.tolist() == approx([100.05, 200.05, 300.05])
     assert initial_spectrum.products.stddev.tolist() == approx([1, 2, 3])
 
-def test_cosine_score(spectrum1, predicted_spectrum1):
+def test_cosine_score(spectrum1: mss.Spectrum, predicted_spectrum1: mss.Spectrum):
     # according to mspepsearch should be 549.  spectra 484, first one in Qian's plot
     score = spectrum1.cosine_score(predicted_spectrum1)
     assert score == approx(992.2658666598618)
 
-def test_cosine_score_tiebreak(spectrum2, predicted_spectrum1):
+def test_cosine_score_tiebreak(spectrum2: mss.Spectrum, predicted_spectrum1: mss.Spectrum):
     # according to mspepsearch should be 549.  spectra 484, first one in Qian's plot
     score = predicted_spectrum1.cosine_score(spectrum2, tiebreaker='mz')
     assert score == approx(992.2658666598618)
 
-def test_to_msp(hi_res1):
+def test_to_msp(hi_res1: mss.Spectrum):
     ret_value = hi_res1.to_msp()
     len(ret_value) > 10
 
-def test_accumulator(hi_res1, hi_res2):
+def test_accumulator(hi_res1: mss.Spectrum, hi_res2: mss.Spectrum):
     acc = mss.AccumulatorSpectrum(mz=np.linspace(0.1, 2000, 20000), tolerance=0.05)
     acc1 = hi_res1.copy()  # make a copy
     acc2 = hi_res2.copy()  # make a copy
@@ -263,22 +264,22 @@ def test_accumulator(hi_res1, hi_res2):
     assert acc.products.intensity[999] == 999.0
     assert acc.products.intensity[4999] == 25.0
 
-def test_shift_mz(hi_res1):
+def test_shift_mz(hi_res1: mss.Spectrum):
     test_spectrum = hi_res1.copy()  # make a copy
     test_spectrum = test_spectrum.shift_mz(-200.0)
     assert test_spectrum.products.mz.tolist() == approx([0.0002, 100.0003])
 
-def test_windowed_filter(predicted_spectrum1):
+def test_windowed_filter(predicted_spectrum1: mss.Spectrum):
     test_spectrum = predicted_spectrum1.copy()
     test_spectrum = test_spectrum.windowed_filter(mz_window=100, num_ions=2)
     assert test_spectrum.products.mz.tolist() == approx([173.1, 201.1, 527.3, 640.4, 856.5, 955.6])
 
-def test_parent_filter(hi_res3):
+def test_parent_filter(hi_res3: mss.Spectrum):
     test_spectrum = hi_res3.copy()
     test_spectrum = test_spectrum.parent_filter(h2o=True, inplace=False)
     assert test_spectrum.products.mz.tolist() == approx([100.0001, 200.0002])
 
-def test_evenly_space_cosine_score(hi_res3):
+def test_evenly_space_cosine_score(hi_res3: mss.Spectrum):
     initial_spectrum = hi_res3.copy()  # make a copy
     even_nozero = initial_spectrum.evenly_space(
         tolerance=0.05,
@@ -290,5 +291,5 @@ def test_evenly_space_cosine_score(hi_res3):
         )
     assert(even_nozero.cosine_score(even_zero) == 999.0)
     
-def test_single_match(hi_res3):
+def test_single_match(hi_res3: mss.Spectrum):
     assert(hi_res3.single_match(hi_res3)[2] == 1.0)

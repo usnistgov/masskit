@@ -1,6 +1,7 @@
+from rdkit import Chem
+
 import masskit.small_molecule.react as react
 from masskit.small_molecule.utils import standardize_mol
-from rdkit import Chem
 
 
 def do_standardization(smiles):

@@ -1,8 +1,10 @@
+import numpy as np
 import pytest
 from pytest import approx
-from masskit.peptide.encoding import parse_modification_encoding
+
 import masskit.peptide.spectrum_generator as msps
-import numpy as np
+from masskit.peptide.encoding import parse_modification_encoding
+
 
 def test_generate_peptide_library():
     df = msps.generate_peptide_library(num=2, min_length=5, max_length=30, min_charge=1, max_charge=8, min_ev=10,

@@ -1,7 +1,8 @@
+import numpy as np
 import pytest
 from pytest import approx
+
 import masskit.peptide.encoding as mspe
-import numpy as np
 
 
 def test_encoding():

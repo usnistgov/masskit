@@ -1,4 +1,3 @@
-from pytest import approx
 
 def test_arrow_types(SRM1950_lumos_table):
     array = SRM1950_lumos_table['spectrum']

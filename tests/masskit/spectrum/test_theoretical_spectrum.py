@@ -1,9 +1,13 @@
-from masskit.utils.tablemap import ArrowLibraryMap
+from typing import Any
+
+import numpy as np
 import pytest
 from pytest import approx
+
 import masskit.spectrum.spectrum as mss
 import masskit.spectrum.theoretical_spectrum as msts
-import numpy as np
+from masskit.utils.tablemap import ArrowLibraryMap
+
 
 @pytest.fixture
 def peptide_spectrum():
@@ -187,12 +191,12 @@ def peptide_exp_spectrum(data_dir):
     return arrow_map[0]['spectrum']
 
 @pytest.fixture
-def peptide_pred_spectrum():
+def peptide_pred_spectrum(data_dir):
     arrow_map = ArrowLibraryMap.from_msp(data_dir / "Predicted_AENNCLYIEYGINEK_2_1(4,C,Carbamidomethyl)_msp.txt",
                                          spectrum_type='msp_peptide')
     return arrow_map[0]['spectrum']
 
-def test_annotate_peptide_exp_spectrum(peptide_exp_spectrum):
+def test_annotate_peptide_exp_spectrum(peptide_exp_spectrum: Any):
     msts.annotate_peptide_spectrum(peptide_exp_spectrum)
     output = peptide_exp_spectrum.to_msp()
     assert(output.find('IEA/1.0ppm') != -1)
@@ -202,13 +206,13 @@ def test_annotate_peptide_exp_spectrum(peptide_exp_spectrum):
     assert(output.find('Int/YIEYGIN+i/7.2ppm') != -1)
     assert(output.find('p-H2O/0.0ppm') != -1)
 
-def test_annotate_peptide_parent_spectrum(peptide_parent_spectrum):
+def test_annotate_peptide_parent_spectrum(peptide_parent_spectrum: mss.Spectrum):
     msts.annotate_peptide_spectrum(peptide_parent_spectrum)
     output = peptide_parent_spectrum.to_msp()
     # note that there is a collision here between p-H2O+i and p-NH3
     assert(output.find('p-H2O+i/0.4ppm') != -1)
 
-def test_annotate_peptide_spectrum(peptide_spectrum):
+def test_annotate_peptide_spectrum(peptide_spectrum: mss.Spectrum):
     msts.annotate_peptide_spectrum(peptide_spectrum)
     output = peptide_spectrum.to_msp()
     assert(output.find('294.1812\t1\t"y2/-0.1ppm"') != -1)

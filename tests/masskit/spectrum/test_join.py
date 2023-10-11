@@ -1,9 +1,11 @@
 import pytest
 from pytest import approx
+
 import masskit.spectrum.join as mssj
 import masskit.spectrum.spectrum as mss
 import masskit.spectrum.theoretical_spectrum as msts
 import masskit.utils.tablemap as msut
+
 
 @pytest.fixture
 def theo_spectrum():
@@ -53,28 +55,28 @@ def pred_spectrum_2():
     )
 
 
-def test_pairwise_join_none(exp_spectrum, pred_spectrum_2):
+def test_pairwise_join_none(exp_spectrum: mss.Spectrum, pred_spectrum_2: mss.Spectrum):
         result = mssj.Join.join_2_spectra(exp_spectrum, pred_spectrum_2, tiebreaker=None)
         assert result == ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                                             [0, 0, 1, None, 2, 3, None, 4, 5, 6, 7])
         j2 = mssj.PairwiseJoin(msut.ListLibraryMap([exp_spectrum, exp_spectrum]), msut.ListLibraryMap([pred_spectrum_2, pred_spectrum_2])).do_join(tiebreaker="intensity")
         pass
 
-def test_pairwise_join_delete(exp_spectrum, pred_spectrum_2):
+def test_pairwise_join_delete(exp_spectrum: mss.Spectrum, pred_spectrum_2: mss.Spectrum):
         result = mssj.Join.join_2_spectra(pred_spectrum_2, exp_spectrum, tiebreaker="delete")
         assert result == ([1, 2, 3, 4, 5, 6, 7, 8], [2, 4, 5, 7, 8, 9, 10, None])
                                             
         j2 = mssj.PairwiseJoin(msut.ListLibraryMap([exp_spectrum, exp_spectrum]), msut.ListLibraryMap([pred_spectrum_2, pred_spectrum_2])).do_join(tiebreaker="intensity")
         pass
 
-def test_pairwise_join(theo_spectrum, exp_spectrum, pred_spectrum):
+def test_pairwise_join(theo_spectrum: msts.TheoreticalPeptideSpectrum, exp_spectrum: mss.Spectrum, pred_spectrum: mss.Spectrum):
         result = mssj.Join.join_2_spectra(exp_spectrum, pred_spectrum, tiebreaker="intensity")
         assert result == ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
                                             [None, None, 0, None, 1, 2, None, 3, 4, 5, 6])
         j2 = mssj.PairwiseJoin(msut.ListLibraryMap([exp_spectrum, exp_spectrum]), msut.ListLibraryMap([pred_spectrum, pred_spectrum])).do_join(tiebreaker="intensity")
         pass
 
-def test_threeway_join(theo_spectrum, exp_spectrum, pred_spectrum):
+def test_threeway_join(theo_spectrum: msts.TheoreticalPeptideSpectrum, exp_spectrum: mss.Spectrum, pred_spectrum: mss.Spectrum):
         result = mssj.Join.join_3_spectra(exp_spectrum, pred_spectrum, theo_spectrum)
         assert result == ([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, None, None],
                                             [None, None, 0, None, 1, 2, None, 3, 4, 5, 6, 8, 7],

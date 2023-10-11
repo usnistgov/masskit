@@ -1,6 +1,8 @@
-from masskit.utils.hitlist import Hitlist, IdentityRecall
-import pytest
 import pandas as pd
+import pytest
+
+from masskit.utils.hitlist import Hitlist, IdentityRecall
+
 
 @pytest.fixture
 def maxQuant_hitlist():
