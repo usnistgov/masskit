@@ -9,7 +9,7 @@ import sys
 
 # import masskit
 from masskit.utils.tables import create_dataset
-import masskit.spectra.spectrum as spec
+import masskit.spectra.ions as mkions
 import masskit_ext
 
 FILENAME = 'test_data.parquet'

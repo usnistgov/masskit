@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 
 import numpy as np
 
+
 try:
     from rdkit import DataStructs
     from rdkit.Chem import rdFingerprintGenerator
@@ -546,8 +547,9 @@ class SpectrumTanimotoFingerPrint(SpectrumFingerprint):
 if __name__ == "__main__":
     import unittest
 
-    from ..spectra.spectrum import MassInfo, Spectrum
-
+    from ..spectra.ions import MassInfo
+    from ..spectra import Spectrum
+    
     class TestFingerprintMethods(unittest.TestCase):
         """
         unit tests for fingerprints

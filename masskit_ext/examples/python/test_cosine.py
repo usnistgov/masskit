@@ -1,11 +1,12 @@
 import pytest
 
-import masskit.spectra.spectrum as mss
+import masskit.spectra
+import masskit.spectra.ions as mkions
 
 
 @pytest.fixture
 def predicted_spectrum1():
-    ps = mss.Spectrum()
+    ps = masskit.spectra.Spectrum()
     ps.from_arrays(
         [173.1, 201.1, 527.3, 640.4, 769.5, 856.5, 955.6],
         [
@@ -17,7 +18,7 @@ def predicted_spectrum1():
             999.0,
             427.2822876,
         ],
-        product_mass_info=mss.MassInfo(
+        product_mass_info=mkions.MassInfo(
             tolerance=0.05,
             tolerance_type="daltons",
             mass_type="monoisotopic",
@@ -28,7 +29,7 @@ def predicted_spectrum1():
 
 @pytest.fixture
 def spectrum1():
-    s = mss.Spectrum()
+    s = masskit.spectra.Spectrum()
     s.from_arrays(
         [173.0928, 201.088, 527.3327, 640.4177, 769.4603, 856.4924, 955.5608],
         [
@@ -40,7 +41,7 @@ def spectrum1():
             33015900.0,
             14537000.0,
         ],
-        product_mass_info=mss.MassInfo(
+        product_mass_info=mkions.MassInfo(
             tolerance=10.0,
             tolerance_type="ppm",
             mass_type="monoisotopic",
@@ -49,7 +50,7 @@ def spectrum1():
     )
     return s
 
-def test_cosine_score(spectrum1, predicted_spectrum1):
+def test_cosine_score(spectrum1: masskit.spectra.Spectrum, predicted_spectrum1: masskit.spectra.Spectrum):
     # according to mspepsearch should be 549.  spectra 484, first one in Qian's plot
     score = spectrum1.cosine_score(predicted_spectrum1)
     return score

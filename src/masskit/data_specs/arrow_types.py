@@ -8,7 +8,7 @@ from pandas.core.arrays import ExtensionArray
 from pandas.core.dtypes.base import ExtensionDtype
 from rdkit import Chem
 
-from ..spectra import spectrum as _mkspectrum
+from .. import spectra as _mkspectra
 from ..utils import spectrum_writers as _mkspectrum_writers
 
 
@@ -178,7 +178,7 @@ class SpectrumArrowScalarType(pa.ExtensionScalar):
         if self.value is None:
             return None
         else:
-            return _mkspectrum.Spectrum(struct=self.value)
+            return _mkspectra.Spectrum(struct=self.value)
 
     
 class SpectrumArrowType(pa.PyExtensionType):
@@ -220,7 +220,7 @@ class SpectrumArrowArray(MasskitArrowArray):
 
 @register_extension_dtype
 class SpectrumPandasDtype(MasskitPandasDtype):
-    type = _mkspectrum.Spectrum
+    type = _mkspectra.Spectrum
     name = "Spectrum"
     na_value = np.nan
 

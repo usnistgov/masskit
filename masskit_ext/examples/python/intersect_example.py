@@ -1,7 +1,8 @@
 #!/bin/env python
 import numpy as np
 
-import masskit.spectra.spectrum as spec
+import masskit.spectra
+import masskit.spectra.ions as mkions
 import masskit_ext
 # import masskit
 from masskit.utils.files import spectra_to_array
@@ -16,7 +17,7 @@ from masskit.utils.files import spectra_to_array
 
 FILENAME = "test.msp"
 
-hi_res1 = spec.Spectrum()
+hi_res1 = masskit.spectra.Spectrum()
 hi_res1.from_arrays(
     [100.0001, 200.0002, 300.0003],
     [999, 1, 50],
@@ -27,10 +28,10 @@ hi_res1.from_arrays(
         "precursor_mz": 500.5,
     },
     precursor_mz=555.0,
-    product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
+    product_mass_info=mkions.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
 )
 
-hi_res2 = spec.Spectrum()
+hi_res2 = masskit.spectra.Spectrum()
 hi_res2.from_arrays(
     [100.0002, 200.0062, 500.0, 300.0009],
     [999, 1, 50, 120],
@@ -40,10 +41,10 @@ hi_res2.from_arrays(
         "name": "hi_res2",
         "precursor_mz": 500.5,
     },
-    product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
+    product_mass_info=mkions.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
 )
 
-dup1 = spec.Spectrum().from_arrays(
+dup1 = masskit.spectra.Spectrum().from_arrays(
     np.array([100.0001, 200.0002, 300.0003, 200.0000]),
     np.array([1, 3, 4, 2]),
     row={
@@ -52,10 +53,10 @@ dup1 = spec.Spectrum().from_arrays(
         "name": "dup1",
         "precursor_mz": 500.5,
     },
-    product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
+    product_mass_info=mkions.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
     copy_arrays=False)
 
-dup2 = spec.Spectrum().from_arrays(
+dup2 = masskit.spectra.Spectrum().from_arrays(
     np.array([100.0001, 100.0001, 200.0, 200.0002, 400.0003]),
     np.array([1, 1, 2, 3, 4]),
     row={
@@ -64,7 +65,7 @@ dup2 = spec.Spectrum().from_arrays(
         "name": "dup2",
         "precursor_mz": 500.5,
     },
-    product_mass_info=spec.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
+    product_mass_info=mkions.MassInfo(10.0, "ppm", "monoisotopic", "", 1),
     copy_arrays=False)
 
 spectra = [hi_res1, hi_res2, dup1, dup2]

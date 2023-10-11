@@ -19,12 +19,12 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 from pyarrow import csv as pacsv
 
 from .. import data as _mkdata
+from .. import spectra as _mkspectra
 from ..data_specs import arrow_types as _mkarrow_types
 from ..data_specs import file_schemas as _mkfile_schemas
 from ..data_specs import schemas as _mkschemas
 from ..small_molecule import threed as _mkthreed
 from ..small_molecule import utils as _mksmutils
-from ..spectra import spectrum as _mkspectrum
 from . import fingerprints as _mkfingerprints
 from . import general as _mkgeneral
 from . import hitlist as _mkhitlist
@@ -557,7 +557,7 @@ class MSPLoader(BatchLoader):
             if len(mz) != 0:
                 row['mz'] = mz
                 row['intensity'] = intensity
-                spectrum = _mkspectrum.Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
+                spectrum = _mkspectra.Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
                                         precursor_intensity=row.get('precursor_intensity', None))
                 spectrum.charge = row.get('charge', None)
                 spectrum.peptide = row.get('peptide', None)
@@ -654,7 +654,7 @@ class MGFLoader(BatchLoader):
             if len(mz) != 0:      
                 row['mz'] = mz
                 row['intensity'] = intensity
-                spectrum = _mkspectrum.Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
+                spectrum = _mkspectra.Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
                                         precursor_intensity=row.get('precursor_intensity', None))
                 spectrum.charge = row.get('charge', None)
                 spectrum.peptide = row.get('peptide', None)
@@ -738,7 +738,7 @@ class SDFLoader(BatchLoader):
             spectrum = None
             if self.format['source'] == "nist":
                 # create the mass spectrum
-                spectrum = _mkspectrum.Spectrum(product_mass_info=product_mass_info,
+                spectrum = _mkspectra.Spectrum(product_mass_info=product_mass_info,
                                         precursor_mass_info=precursor_mass_info)
                 spectrum.from_mol(mol, 
                                   self.format['skip_expensive'], 
