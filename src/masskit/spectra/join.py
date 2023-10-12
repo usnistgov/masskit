@@ -7,11 +7,10 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.compute as pc
 
-import masskit.spectra
-
 from ..data_specs import schemas as _mkschemas
-from . import ions as _mkions
 from ..utils import tablemap as _mktablemap
+from . import _spectrum as _mkspectrum
+from . import ions as _mkions
 
 
 class Join(ABC):
@@ -135,7 +134,7 @@ class PairwiseJoin(Join):
     """
     def __init__(self, exp_lib_map, theo_lib_map, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if issubclass(type(exp_lib_map), masskit.spectra.Spectrum) and issubclass(type(theo_lib_map), masskit.spectra.Spectrum):
+        if issubclass(type(exp_lib_map), _mkspectrum.Spectrum) and issubclass(type(theo_lib_map), _mkspectrum.Spectrum):
             # allow for joining just two spectra
             self.exp_lib_map = _mktablemap.ListLibraryMap([exp_lib_map])
             self.theo_lib_map = _mktablemap.ListLibraryMap([theo_lib_map])
@@ -179,8 +178,8 @@ class ThreewayJoin(Join):
     """
     def __init__(self, exp_lib_map, pred_lib_map, theo_lib_map, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if issubclass(type(exp_lib_map), masskit.spectra.Spectrum) and issubclass(type(theo_lib_map), masskit.spectra.Spectrum) and \
-                issubclass(pred_lib_map, masskit.spectra.Spectrum):
+        if issubclass(type(exp_lib_map), _mkspectrum.Spectrum) and issubclass(type(theo_lib_map), _mkspectrum.Spectrum) and \
+                issubclass(pred_lib_map, _mkspectrum.Spectrum):
             # allow for joining just two spectra
             self.exp_lib_map = _mktablemap.ListLibraryMap([exp_lib_map])
             self.pred_lib_map = _mktablemap.ListLibraryMap([pred_lib_map])

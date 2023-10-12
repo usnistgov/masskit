@@ -1,7 +1,7 @@
-import masskit.spectra
 from ..peptide import encoding as _mkencoding
-from . import join as _mkspecjoin
+from . import _spectrum as _mkspectrum
 from . import ions as _mkions
+from . import join as _mkspecjoin
 
 
 def annotate_peptide_spectrum(spectrum, peptide=None, precursor_charge=None, ion_types=None, mod_names=None,
@@ -25,7 +25,7 @@ def annotate_peptide_spectrum(spectrum, peptide=None, precursor_charge=None, ion
     spectrum.add_join(join.results, theo_spectrum)
 
 
-class TheoreticalSpectrum(masskit.spectra.Spectrum):
+class TheoreticalSpectrum(_mkspectrum.Spectrum):
     """
     base class to contain a theoretical spectrum
     """
