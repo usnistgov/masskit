@@ -5,7 +5,7 @@ from types import MethodType
 import numpy as np
 import pyarrow as pa
 
-from ..data_specs import arrow_types as _mkarrow_types
+from ..data_specs import arrow_types as mkarrow_types
 
 ALPHABET = np.array(list(string.ascii_letters))
 
@@ -84,7 +84,7 @@ def optimize_structarray(struct: pa.ChunkedArray) -> pa.ChunkedArray:
     # TODO: Need to find a better way to identify an extension array
     extension_type = None
     if "SpectrumArrowArray" in str(struct.chunk(0).__class__):
-        extension_type = _mkarrow_types.SpectrumArrowType
+        extension_type = mkarrow_types.SpectrumArrowType
     flat_struct = table_to_structarray(table, structarray_type=extension_type)
     return flat_struct
 

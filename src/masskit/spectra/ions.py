@@ -8,8 +8,8 @@ import pandas as pd
 import pyarrow as pa
 import scipy.stats as sts
 
-from .. import data as _mkdata
-from ..data_specs import schemas as _mkschemas
+from .. import data as mkdata
+from ..data_specs import schemas as mkschemas
 
 # try:
 #     from numba import jit
@@ -485,9 +485,9 @@ class Ions(ABC):
         tolerance = self.half_tolerance(precursor_mz)
         mask = (return_ions.mz < precursor_mz - tolerance) | (return_ions.mz > precursor_mz + tolerance)
         if h2o and charge is not None and charge != 0:
-            h2o_neutral_loss = (precursor_mz * charge - _mkdata.h2o_mass)/charge
+            h2o_neutral_loss = (precursor_mz * charge - mkdata.h2o_mass)/charge
             mask &= (return_ions.mz < h2o_neutral_loss - tolerance) | (return_ions.mz > h2o_neutral_loss + tolerance)
-            h2o_neutral_loss = (precursor_mz * charge - 2 * _mkdata.h2o_mass)/charge
+            h2o_neutral_loss = (precursor_mz * charge - 2 * mkdata.h2o_mass)/charge
             mask &= (return_ions.mz < h2o_neutral_loss - tolerance) | (return_ions.mz > h2o_neutral_loss + tolerance)
         return Ions.mask_ions(mask, return_ions)
 

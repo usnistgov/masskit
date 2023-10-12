@@ -7,7 +7,7 @@ import copy
 import unittest
 
 import numpy as np
-from .. import data as _mkdata
+from .. import data as mkdata
 
 def yang_polarizability(mol):
     """
@@ -18,19 +18,19 @@ def yang_polarizability(mol):
     """
     return_value = {}
     # go through the smarts patterns
-    for pattern in _mkdata.yang_model_2e:
+    for pattern in mkdata.yang_model_2e:
         hits = mol.GetSubstructMatches(Chem.MolFromSmarts(pattern))
         for i in range(len(hits)):
             # don't allow duplicates
             if hits[i][0] not in return_value:
-                return_value[hits[i][0]] = _mkdata.yang_model_2e[pattern]
+                return_value[hits[i][0]] = mkdata.yang_model_2e[pattern]
     # now fill in missing values using the measured atomic polarizability
-    for atomic_num in _mkdata.atom_num_dipole:
+    for atomic_num in mkdata.atom_num_dipole:
         hits = mol.GetSubstructMatches(Chem.MolFromSmarts(f"[#{atomic_num}]"))
         for i in range(len(hits)):
             # don't allow duplicates
             if hits[i][0] not in return_value:
-                return_value[hits[i][0]] = _mkdata.atom_num_dipole[atomic_num]
+                return_value[hits[i][0]] = mkdata.atom_num_dipole[atomic_num]
     polarizability = sum(return_value.values()) - 1.529
     return polarizability, return_value
 

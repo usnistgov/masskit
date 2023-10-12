@@ -4,8 +4,8 @@ from collections import OrderedDict
 import numpy as np
 import pyarrow as pa
 
-from .. import data as _mkdata
-from ..data_specs import schemas as _mkschemas
+from .. import data as mkdata
+from ..data_specs import schemas as mkschemas
 
 
 def parse_ion_type_tuple(tuple_in, precursor_charge):
@@ -33,19 +33,19 @@ def calc_ion_series(ion_type, num_isotopes, cumulative_masses, arrays, peptide, 
                     analysis, positions, start_offset=0, max_internal_size=7):
     
     # extract ion type info column by column to preserve type
-    ion_type_start = _mkdata.ion_types.df['start'].loc[ion_type]
-    ion_type_stop = _mkdata.ion_types.df['stop'].loc[ion_type]
-    ion_type_direction = _mkdata.ion_types.df['direction'].loc[ion_type]
-    ion_type_id = _mkdata.ion_types.df['id'].loc[ion_type]
-    ion_type_offset = _mkdata.ion_types.df['offset'].loc[ion_type]
+    ion_type_start = mkdata.ion_types.df['start'].loc[ion_type]
+    ion_type_stop = mkdata.ion_types.df['stop'].loc[ion_type]
+    ion_type_direction = mkdata.ion_types.df['direction'].loc[ion_type]
+    ion_type_id = mkdata.ion_types.df['id'].loc[ion_type]
+    ion_type_offset = mkdata.ion_types.df['offset'].loc[ion_type]
     
     # tack on neutral mass if specified
     if neutral_loss is None:
         neutral_loss_offset = 0.0
         neutral_loss_id = None
     else:
-        neutral_loss_offset = _mkdata.named_ions.df['offset'].loc[neutral_loss]
-        neutral_loss_id = _mkdata.named_ions.df['id'].loc[neutral_loss]
+        neutral_loss_offset = mkdata.named_ions.df['offset'].loc[neutral_loss]
+        neutral_loss_id = mkdata.named_ions.df['id'].loc[neutral_loss]
     
     # if there is a start offset (usually for internal ions) calculate the mass offset
     if start_offset != 0:
@@ -54,7 +54,7 @@ def calc_ion_series(ion_type, num_isotopes, cumulative_masses, arrays, peptide, 
         start_offset_mass = 0.0
         
     # if an internal ion, set the maximum size for an internal ion
-    if _mkdata.ion_types.df['is_internal'].loc[ion_type]:
+    if mkdata.ion_types.df['is_internal'].loc[ion_type]:
         end_offset = start_offset + max_internal_size
     else:
         end_offset = None
@@ -65,7 +65,7 @@ def calc_ion_series(ion_type, num_isotopes, cumulative_masses, arrays, peptide, 
         # also subtract off the offset for internal ions
         mz = ion_type_offset + cumulative_masses[ion_type_direction][ion_type_start:ion_type_stop:ion_type_direction][start_offset:end_offset] \
              - neutral_loss_offset - start_offset_mass
-        mz += num_carbon_13 * _mkdata.delta_c_13
+        mz += num_carbon_13 * mkdata.delta_c_13
 
         arrays['ion_mz'].append(protonate_mass(mz, charge_in))
         arrays['ion_intensity'].append(np.full_like(mz, 999.0))
@@ -78,7 +78,7 @@ def calc_ion_series(ion_type, num_isotopes, cumulative_masses, arrays, peptide, 
         else:
             arrays['ion_subtype_array'].append(pa.array(np.full_like(mz, neutral_loss_id), type=pa.int32()))
         # end position of ion (used for internal fragments)
-        if _mkdata.ion_types.df['is_internal'].loc[ion_type]:
+        if mkdata.ion_types.df['is_internal'].loc[ion_type]:
             arrays['position_array'].append(pa.array(np.full_like(mz, positions[ion_type_direction][ion_type_start:ion_type_stop:ion_type_direction][start_offset] - 1), type=pa.uint16()))
             arrays['end_position_array'].append(pa.array(positions[ion_type_direction][ion_type_start:ion_type_stop:ion_type_direction][start_offset:start_offset + len(mz)], type=pa.uint16()))
         else:
@@ -128,7 +128,7 @@ def calc_named_ions(arrays, analysis=None, named_ion=None, precursor_mass=None, 
                     charge_in=None, neutral_loss=None, num_isotopes=2):
     if named_ion is None:
         return
-    ion_df = _mkdata.named_ions.df[_mkdata.named_ions.df['ion_type'] == named_ion]
+    ion_df = mkdata.named_ions.df[mkdata.named_ions.df['ion_type'] == named_ion]
 
     if len(ion_df) != 0:
         ion_subtype = ion_df['id'].to_numpy(na_value=np.nan)
@@ -137,27 +137,27 @@ def calc_named_ions(arrays, analysis=None, named_ion=None, precursor_mass=None, 
     else:
         ion_subtype = np.zeros((1,))
         ion_subtype_mask = np.ones((1,), dtype=np.bool_)
-        offset = np.array([_mkdata.ion_types.df.loc[named_ion, 'offset']])
+        offset = np.array([mkdata.ion_types.df.loc[named_ion, 'offset']])
 
     if neutral_loss is not None:
-        neutral_loss_offset = np.array([_mkdata.named_ions.df.loc[neutral_loss, 'offset']])
-        ion_subtype = np.array([_mkdata.named_ions.df.loc[neutral_loss, 'id']])
+        neutral_loss_offset = np.array([mkdata.named_ions.df.loc[neutral_loss, 'offset']])
+        ion_subtype = np.array([mkdata.named_ions.df.loc[neutral_loss, 'id']])
         ion_subtype_mask = None
     else:
         neutral_loss_offset = np.zeros((1,))
       
     # don't bother doing C-13 isotopes for some ion types
-    if not _mkdata.ion_types.df.at[named_ion, 'calc_c_13']:
+    if not mkdata.ion_types.df.at[named_ion, 'calc_c_13']:
         num_isotopes = 1
 
     for num_carbon_13 in range(num_isotopes):
-        offsets = offset - neutral_loss_offset + num_carbon_13 * _mkdata.delta_c_13
+        offsets = offset - neutral_loss_offset + num_carbon_13 * mkdata.delta_c_13
         if named_ion == 'parent':
             offsets = protonate_mass(precursor_mass + offsets, precursor_charge)
 
         arrays['ion_mz'].append(offsets)
         arrays['ion_intensity'].append(np.full_like(offsets, 999.0))
-        arrays['ion_type_array'].append(np.full_like(offsets, _mkdata.ion_types.df.loc[named_ion]['id']))
+        arrays['ion_type_array'].append(np.full_like(offsets, mkdata.ion_types.df.loc[named_ion]['id']))
         arrays['charge_array'].append(np.full_like(offsets, charge_in))
         arrays['isotope_array'].append(np.full_like(offsets, num_carbon_13))
         arrays['ion_subtype_array'].append(pa.array(ion_subtype, type=pa.int32(), mask=ion_subtype_mask))
@@ -185,8 +185,8 @@ def mod_mass_pos(mod_positions, mod_names, i):
     mod_index = np.where(mod_positions == i)
     # add in the masses of any modifications that match the position
     for j in range(len(mod_index[0])):
-        row_index = _mkdata.mod_masses.id2row[mod_names[mod_index[0][j]]]
-        ret_value += _mkdata.mod_masses.df.at[row_index, 'mono_mass']
+        row_index = mkdata.mod_masses.id2row[mod_names[mod_index[0][j]]]
+        ret_value += mkdata.mod_masses.df.at[row_index, 'mono_mass']
     return ret_value
 
 
@@ -216,12 +216,12 @@ def calc_precursor_mass(peptide, mod_names=None, mod_positions=None):
     mod_positions = np.array(mod_positions)
     for i in range(len(peptide)):
         # the mass of any matching modification, for forward ion series and reverse ion series
-        ret_value += _mkdata.aa_masses[peptide[i]]['mono_mass']
+        ret_value += mkdata.aa_masses[peptide[i]]['mono_mass']
         if mod_names is not None:
             ret_value += mod_mass_pos(mod_positions, mod_names, i)
 
     # TODO: h2o_mass may not be correct if there are blocking PTMs at N or C terminus
-    ret_value += _mkdata.h2o_mass      
+    ret_value += mkdata.h2o_mass      
     return ret_value
 
 
@@ -271,9 +271,9 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     peptide_len = len(peptide)
     # dictionary that contains the forward (N to C) mass ladder (1) and the reverse (C to N) mass ladder (-1)
     cumulative_masses = {1: np.zeros(peptide_len), -1: np.zeros(peptide_len)}
-    cumulative_masses[1][0] = _mkdata.aa_masses[peptide[0]]['mono_mass'] + mod_mass_pos(mod_positions, mod_names, 0)
+    cumulative_masses[1][0] = mkdata.aa_masses[peptide[0]]['mono_mass'] + mod_mass_pos(mod_positions, mod_names, 0)
     # note that the reverse cumulative masses are still in N to C order
-    cumulative_masses[-1][-1] = _mkdata.aa_masses[peptide[-1]]['mono_mass']  + mod_mass_pos(mod_positions, mod_names, peptide_len - 1)
+    cumulative_masses[-1][-1] = mkdata.aa_masses[peptide[-1]]['mono_mass']  + mod_mass_pos(mod_positions, mod_names, peptide_len - 1)
     # ion position ordering for both forward and reverse.  starts with 1
     positions = {1: np.arange(1, peptide_len + 1), -1: np.arange(peptide_len, 0, -1)}
 
@@ -287,13 +287,13 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
             mod_mass_forward += mod_mass_pos(mod_positions, mod_names, i)
             mod_mass_reverse += mod_mass_pos(mod_positions, mod_names, peptide_len - i - 1)
 
-        cumulative_masses[1][i] = cumulative_masses[1][i-1] + _mkdata.aa_masses[peptide[i]]['mono_mass'] + mod_mass_forward
+        cumulative_masses[1][i] = cumulative_masses[1][i-1] + mkdata.aa_masses[peptide[i]]['mono_mass'] + mod_mass_forward
         cumulative_masses[-1][peptide_len - i - 1] = cumulative_masses[-1][peptide_len - i] \
-            + _mkdata.aa_masses[peptide[peptide_len - i - 1]]['mono_mass'] + mod_mass_reverse
+            + mkdata.aa_masses[peptide[peptide_len - i - 1]]['mono_mass'] + mod_mass_reverse
     
     # add on the last bit of the reverse cumulative mass array to get last AA plus modifications
     # todo: h2o_mass may not be correct if there are blocking PTMs at N or C terminus
-    precursor_mass = cumulative_masses[-1][0] + _mkdata.h2o_mass
+    precursor_mass = cumulative_masses[-1][0] + mkdata.h2o_mass
 
     for ion_type_in in ion_types_in:
         ion_type, neutral_loss, charge_in = parse_ion_type_tuple(ion_type_in, precursor_charge)
@@ -304,7 +304,7 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
             # skip product charges that exceed the precursor charge
             if charge_in > precursor_charge:
                 continue
-            if _mkdata.ion_types.df['is_internal'].loc[ion_type]:
+            if mkdata.ion_types.df['is_internal'].loc[ion_type]:
                 start = 1
                 stop = peptide_len - 1
             else:
@@ -326,13 +326,13 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
     # create the array
     arrays['ion_type_array'] = pa.DictionaryArray.from_arrays(
         indices=pa.array(arrays['ion_type_array'], type=pa.int32()),
-        dictionary=_mkdata.ion_types.dictionary)
+        dictionary=mkdata.ion_types.dictionary)
     arrays['charge_array'] = pa.array(arrays['charge_array'], type=pa.int16())
     arrays['isotope_array'] = pa.array(arrays['isotope_array'], type=pa.uint8())
     arrays['ion_subtype_array'] = pa.DictionaryArray.from_arrays(
         indices=arrays['ion_subtype_array'],
-        dictionary=_mkdata.named_ions.dictionary)
-    fields = _mkschemas.ion_annot_fields[0:6]
+        dictionary=mkdata.named_ions.dictionary)
+    fields = mkschemas.ion_annot_fields[0:6]
     arrays_out = list(arrays.values())[0:6] 
     if analysis is not None:
         analysis['aa_before_array'] = pa.DictionaryArray.from_arrays(
@@ -343,11 +343,11 @@ def calc_ions_mz(peptide, ion_types_in, mod_names=None, mod_positions=None,
             dictionary=pa.array(string.ascii_uppercase))
         analysis['ptm_before_array'] = pa.DictionaryArray.from_arrays(
             indices=pa.concat_arrays(analysis['ptm_before_array']),
-            dictionary=_mkdata.mod_masses.dictionary)
+            dictionary=mkdata.mod_masses.dictionary)
         analysis['ptm_after_array'] = pa.DictionaryArray.from_arrays(
             indices=pa.concat_arrays(analysis['ptm_after_array']),
-            dictionary=_mkdata.mod_masses.dictionary)
-        fields += _mkschemas.ion_annot_fields[6:]
+            dictionary=mkdata.mod_masses.dictionary)
+        fields += mkschemas.ion_annot_fields[6:]
         arrays_out += list(analysis.values())
 
     annotations = pa.StructArray.from_arrays(arrays=arrays_out, fields=fields)
@@ -362,7 +362,7 @@ def protonate_mass(mass, z):
     :param z: charge
     :return: m/z
     """
-    return (mass + z * _mkdata.atom_masses['p']) / z
+    return (mass + z * mkdata.atom_masses['p']) / z
 
 
 def expand_mod_string(mod_string):
@@ -433,7 +433,7 @@ def parse_modification_encoding(modification_encoding):
         mod_substrings = mod_string.split("{")
         # use default if nothing provided
         if len(mod_substrings) < 2:
-            values = _mkdata.mod_masses.df['default_sites'].loc[mod_substrings[0]]
+            values = mkdata.mod_masses.df['default_sites'].loc[mod_substrings[0]]
         else:
             # split by forward slash
             values = mod_substrings[1].split('/')

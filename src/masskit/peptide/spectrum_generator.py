@@ -3,9 +3,9 @@ import random
 
 import pandas as pd
 
-from .. import data as _mkdata
-from ..spectra import theoretical_spectrum as _mktheoretical_spectrum
-from . import encoding as _mkencoding
+from .. import data as mkdata
+from ..spectra import theoretical_spectrum as mktheoretical_spectrum
+from . import encoding as mkencoding
 
 """
 The amino acids used to generate the theoretical peptides
@@ -27,7 +27,7 @@ def create_peptide_name(peptide, precursor_charge, mod_names=None, mod_positions
         for mod in range(len(mod_names)):
             if mod == 0:
                 output += f'_{len(mod_names)}'
-            output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{_mkdata.mod_masses.id2row[mod_names[mod]]})'
+            output += f'({mod_positions[mod]+1},{peptide[mod_positions[mod]]},{mkdata.mod_masses.id2row[mod_names[mod]]})'
     if ev is not None:
         output += f'_{ev}'
     return output
@@ -48,7 +48,7 @@ def generate_mods(peptide, mod_list, n_peptide=False, c_peptide=False, mod_proba
         return [], []
 
     def add_mod(mod_name_in, mod_pos_in, mod_names_in, mod_positions_in):
-        mod_names_in.append(_mkdata.mod_masses.df.at[mod_name_in, 'id'])
+        mod_names_in.append(mkdata.mod_masses.df.at[mod_name_in, 'id'])
         mod_positions_in.append(mod_pos_in)
     
     mod_names = []
@@ -105,7 +105,7 @@ def generate_peptide_library(num=100, min_length=5, max_length=30, min_charge=1,
     :return: the dataframe
     """
 
-    mod_list = _mkencoding.parse_modification_encoding(mod_list)
+    mod_list = mkencoding.parse_modification_encoding(mod_list)
     data = {'peptide': [], 'peptide_len': [], 'charge': [], 'ev': [], 'nce': [], 'mod_names': [], 'mod_positions': [], 'spectrum': [], 'id': [], 'name':[]}
     for j in range(num):
         length = random.randint(min_length, max_length)
@@ -125,7 +125,7 @@ def generate_peptide_library(num=100, min_length=5, max_length=30, min_charge=1,
         data['mod_names'].append(mod_names)
         data['mod_positions'].append(mod_positions)
         name = create_peptide_name(peptide, charge, mod_names, mod_positions, ev)
-        data['spectrum'].append(_mktheoretical_spectrum.TheoreticalPeptideSpectrum(peptide, charge=charge,
+        data['spectrum'].append(mktheoretical_spectrum.TheoreticalPeptideSpectrum(peptide, charge=charge,
                                                            ion_types=[('b', 1), ('y',1)], mod_names=mod_names,
                                                            mod_positions=mod_positions, id=j, 
                                                            name=name, ev=ev, nce=ev))
@@ -157,7 +157,7 @@ def add_theoretical_spectra(df, theoretical_spectrum_column=None, ion_types=None
         peptide = df['peptide'].iat[j]
         mod_names = df['mod_names'].iat[j]
         mod_positions = df['mod_positions'].iat[j]
-        df[theoretical_spectrum_column].iat[j] = _mktheoretical_spectrum.TheoreticalPeptideSpectrum(peptide,
+        df[theoretical_spectrum_column].iat[j] = mktheoretical_spectrum.TheoreticalPeptideSpectrum(peptide,
                                                                             ion_types=ion_types,
                                                                             charge=charge,
                                                                             mod_names=mod_names,
