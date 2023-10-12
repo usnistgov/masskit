@@ -415,8 +415,7 @@ class Spectrum:
         """
         #todo: check to see if annotation should be turned on
         if annotate_peptide:
-            from masskit.spectra.theoretical_spectrum import \
-                annotate_peptide_spectrum
+            from .theoretical_spectrum import annotate_peptide_spectrum
             annotate_peptide_spectrum(self, ion_types=ion_types)
 
         ret_value = ""
