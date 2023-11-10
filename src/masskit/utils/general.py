@@ -17,6 +17,7 @@ except ImportError:
     boto3 = None
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
+from omegaconf import ListConfig
 
 
 def is_list_like(obj):
@@ -26,7 +27,7 @@ def is_list_like(obj):
     :param obj: the object to be tested
     :return: true if list like
     """
-    valid_types = (list, tuple, set, np.ndarray, pd.Series)
+    valid_types = (list, tuple, set, np.ndarray, pd.Series, ListConfig)
     return isinstance(obj, valid_types)
 
 class MassKitSearchPathPlugin(SearchPathPlugin):

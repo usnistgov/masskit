@@ -4,6 +4,8 @@ from rdkit.Chem import Descriptors
 from masskit.small_molecule.utils import standardize_mol
 from rdkit.Chem.MolStandardize import rdMolStandardize
 
+from masskit.utils.general import is_list_like
+
 
 class Reactor:
     """
@@ -125,7 +127,7 @@ class Reactor:
         for reaction in self.reactions:
             for molecule in molecules:
                 products = reaction.RunReactants(
-                    (molecule,), max_products=max_products)
+                    (molecule,), maxProducts=max_products)
                 all_products.extend([x[0] for x in products])
         # dedup molecules
         deduplicated_products = set()
@@ -151,8 +153,8 @@ class Reactor:
         Given a list of molecules, react them using the named reactions
 
         :param molecules: standardized molecule or list of molecules to be reacted
-        :param reactant_names: list of names of replacement groups added in the reaction.  [] means all
-        :param functional_group_names: list of names of the functional groups where reactions take place. [] means all
+        :param reactant_names: list of names of replacement groups added in the reaction.  None or [None] means all
+        :param functional_group_names: list of names of the functional groups where reactions take place. None or [None] means all
         :param max_products: maximum number of products per reaction and overall.  an approximate bound
         :param max_passes: iteratively apply the reactions to reaction products up to max_passes
         :param include_original_molecules: add the original molecules to the returned products
@@ -160,8 +162,17 @@ class Reactor:
         :param mass_range: tuple containing low and high value of allowed mass of product
         :return: list of reaction products as rdkit Mol
         """
-        if type(molecules) is not list:
+        if not is_list_like(molecules):
             molecules = [molecules]
+        if not is_list_like(reactant_names):
+            reactant_names = [reactant_names]
+        if not is_list_like(functional_group_names):
+            functional_group_names = [functional_group_names]
+
+        if reactant_names == [None]:
+            reactant_names = self.reactant_names
+        if functional_group_names  == [None]:
+            functional_group_names = self.functional_group_names
 
         # create tautomers if asked
         if num_tautomers > 0:

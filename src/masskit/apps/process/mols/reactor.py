@@ -8,8 +8,8 @@ from omegaconf import DictConfig
 import pyarrow as pa
 import pyarrow.parquet as pq
 import numpy as np
+from rdkit import Chem
 from masskit.data_specs.arrow_types import MolArrowType
-
 from masskit.small_molecule.react import Reactor
 
 """
@@ -31,7 +31,7 @@ def reactor_app(config: DictConfig) -> None:
     table = pq.read_table(input_file)
 
     # check that id field exists and is unique
-    assert pa.compute.count_distinct(table['id']) == len(table)
+    assert pa.compute.count_distinct(table['id']).as_py() == len(table)
 
     mols = table['mol'].combine_chunks().to_numpy()
     ids = table['id'].combine_chunks().to_numpy()
@@ -42,27 +42,19 @@ def reactor_app(config: DictConfig) -> None:
     orig_id = []
 
     reactor = Reactor()
-    if config.conversion.reactant_names is None:
-        reactant_names = reactor.reactant_names
-    else:
-        reactant_names = config.conversion.reactant_names
-    if config.conversion.functional_group_names is None:
-        functional_group_names = reactor.functional_group_names
-    else:
-        functional_group_names = config.conversion.functional_group_names
 
     # run reactor over entire set of mols, keeping a parallel list of orig_id
     for i, mol in enumerate(mols):
         new_products = reactor.react(mol, 
-                                    reactant_names=reactant_names,
-                                    functional_group_names=functional_group_names,
+                                    reactant_names=config.conversion.reactant_names,
+                                    functional_group_names=config.conversion.functional_group_names,
                                     num_tautomers=config.conversion.num_tautomers,
                                     max_products=config.conversion.max_products,
                                     mass_range=config.conversion.mass_range,
                                     max_passes=config.conversion.max_passes,
                                     include_original_molecules=config.conversion.include_original_molecules,
                                     )
-        products.extend(new_products)
+        products.extend([Chem.rdMolInterchange.MolToJSON(x) for x in new_products])
         orig_id.extend([ids[i]]*len(new_products))
     
     # create table using new mols and orig_id and new ids (which are just sequential)

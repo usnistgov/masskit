@@ -13,10 +13,10 @@ input:
 
 conversion:
   reactant_names:
-    - methylation
-    - acetylation
-    - trifluoroacetylation
-    - t-butyldimethylsilylation
+#    - methylation
+#    - acetylation
+#    - trifluoroacetylation
+#    - t-butyldimethylsilylation
     - trimethylsilylation
   functional_group_names:
     - alcohol
