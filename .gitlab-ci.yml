@@ -55,9 +55,6 @@ test masskit:
     paths:
       - masskit*.whl
 
-test masskit_ai:
-  needs:
-    - test masskit
-  trigger:
-    project: msdc/masskit_ai
-    strategy: depend
+deploy masskit_ai:
+  stage: deploy
+  trigger: msdc/masskit_ai
