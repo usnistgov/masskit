@@ -8,17 +8,23 @@ setup masskit_env:
   stage: setup
   rules:
     - changes:
-        - environments/init_masskit.sh
+        - environments/*
   script:
     - source environments/init_masskit.sh --force --suffix $CI_COMMIT_BRANCH
-    - echo "Dumping conda environment..."
+    - echo "Dumping masskit conda environment..."
     - conda env export --name masskit_${CI_COMMIT_BRANCH} > masskit_conda.yml
+    - conda deactivate
+    - conda deactivate
+    - source environments/init_masskit.sh --force --cpu --suffix $CI_COMMIT_BRANCH
+    - echo "Dumping masskit_ai_cpu conda environment..."
+    - conda env export --name masskit_ai_cpu_${CI_COMMIT_BRANCH} > masskit_ai_cpu_conda.yml
   tags:
     - linux
     - masskit
   artifacts:
     paths:
       - masskit_conda.yml
+      - masskit_ai_cpu_conda.yml
 
 build masskit:
   stage: build
