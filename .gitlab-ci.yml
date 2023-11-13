@@ -58,6 +58,6 @@ test masskit:
 test masskit_ai:
   needs:
     - test masskit
-    trigger:
-      project: masskit_ai
-      strategy: depend
+  trigger:
+    project: masskit_ai
+    strategy: depend
