@@ -5,11 +5,11 @@ import jsonpickle
 import numpy as np
 from rdkit import Chem
 
-from ..data_specs import schemas as _mkschemas
-from . import files as _mkfiles
-from . import general as _mkgeneral
-from . import spectrum_writers as _mkspectrum_writers
-from . import tables as _mktables
+from ..data_specs import schemas as mkschemas
+from . import files as mkfiles
+from . import general as mkgeneral
+from . import spectrum_writers as mkspectrum_writers
+from . import tables as mktables
 
 """
 TableMap classes
@@ -100,7 +100,7 @@ class TableMap(ABC):
         if spectrum_column is None:
             spectrum_column = 'spectrum'
         spectra = [self[i][spectrum_column] for i in range(len(self))]
-        _mkspectrum_writers.spectra_to_msp(file, spectra, annotate_peptide=annotate_peptide, ion_types=ion_types)
+        mkspectrum_writers.spectra_to_msp(file, spectra, annotate_peptide=annotate_peptide, ion_types=ion_types)
 
 
 class ArrowLibraryMap(TableMap):
@@ -118,7 +118,7 @@ class ArrowLibraryMap(TableMap):
         self.table = table_in
         if num:
             self.table = self.table.slice(0, num)
-        self.row = _mktables.row_view(self.table)
+        self.row = mktables.row_view(self.table)
         self.length = len(self.table['id'])
         self.ids = self.table['id'].combine_chunks().to_numpy()
         self.sort_indices = np.argsort(self.ids)
@@ -171,7 +171,7 @@ class ArrowLibraryMap(TableMap):
 
         :param file: filename or stream
         """
-        _mkfiles.write_parquet(file, self.table)
+        mkfiles.write_parquet(file, self.table)
         
     def to_mzxml(self, file, use_id_as_scan=True, spectrum_column=None):
         """
@@ -184,7 +184,7 @@ class ArrowLibraryMap(TableMap):
         if spectrum_column is None:
             spectrum_column = 'spectrum'
         spectra = [self[i][spectrum_column] for i in range(len(self))]
-        _mkspectrum_writers.spectra_to_mzxml(file, spectra, use_id_as_scan=use_id_as_scan)
+        mkspectrum_writers.spectra_to_mzxml(file, spectra, use_id_as_scan=use_id_as_scan)
             
     def to_mgf(self, file, spectrum_column=None):
         """
@@ -196,7 +196,7 @@ class ArrowLibraryMap(TableMap):
         if spectrum_column is None:
             spectrum_column = 'spectrum'
         spectra = [self[i][spectrum_column] for i in range(len(self))]
-        _mkspectrum_writers.spectra_to_mgf(file, spectra)
+        mkspectrum_writers.spectra_to_mgf(file, spectra)
 
     def to_csv(self, file, columns=None):
         """
@@ -207,9 +207,9 @@ class ArrowLibraryMap(TableMap):
         :param columns: list of columns to write out to csv file.  If none, all columns
         """
         if columns is None:
-            columns = _mkschemas.property_schema.names
+            columns = mkschemas.property_schema.names
 
-        fp = _mkgeneral.open_if_filename(file, 'w', newline='')
+        fp = mkgeneral.open_if_filename(file, 'w', newline='')
         csv_writer = csv.DictWriter(fp, fieldnames=columns, extrasaction='ignore')
         csv_writer.writeheader()
 
@@ -230,7 +230,7 @@ class ArrowLibraryMap(TableMap):
         :param combine_chunks: dechunkify the arrow table to allow zero copy
         :param filters: parquet predicate as a list of tuples
         """
-        input_table = _mkfiles.read_parquet(file, columns=columns, num=num, filters=filters)
+        input_table = mkfiles.read_parquet(file, columns=columns, num=num, filters=filters)
         if len(input_table) == 0:
             raise IOError(f'Parquet file {file} read in with zero rows when using filters {filters}')
         if combine_chunks:
@@ -250,11 +250,11 @@ class ArrowLibraryMap(TableMap):
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        fp = _mkgeneral.open_if_filename(file, 'r')
-        format = _mkfiles.load_default_config_schema('msp', spectrum_type)
+        fp = mkgeneral.open_if_filename(file, 'r')
+        format = mkfiles.load_default_config_schema('msp', spectrum_type)
         format['id']['field'] = id_field
         format['comment_fields'] = comment_fields
-        loader = _mkfiles.MSPLoader(num=num,
+        loader = mkfiles.MSPLoader(num=num,
                                 min_intensity=min_intensity, 
                                 format=format)
         return ArrowLibraryMap(loader.load(fp))
@@ -271,10 +271,10 @@ class ArrowLibraryMap(TableMap):
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        fp = _mkgeneral.open_if_filename(file, 'r')
-        format = _mkfiles.load_default_config_schema('msp', spectrum_type)
+        fp = mkgeneral.open_if_filename(file, 'r')
+        format = mkfiles.load_default_config_schema('msp', spectrum_type)
         format['title_fields'] = title_fields
-        loader = _mkfiles.MGFLoader(num=num,
+        loader = mkfiles.MGFLoader(num=num,
                                 min_intensity=min_intensity, 
                                 format=format)
         return ArrowLibraryMap(loader.load(fp))
@@ -304,11 +304,11 @@ class ArrowLibraryMap(TableMap):
         :param spectrum_type: the type of spectrum file
         :return: ArrowLibraryMap
         """
-        fp = _mkgeneral.open_if_filename(file, mode="rb")
+        fp = mkgeneral.open_if_filename(file, mode="rb")
         fp = Chem.ForwardSDMolSupplier(fp, sanitize=False)
-        format = _mkfiles.load_default_config_schema('msp', spectrum_type)
+        format = mkfiles.load_default_config_schema('msp', spectrum_type)
         format['id']['field'] = id_field
-        loader = _mkfiles.SDFLoader(num=num,
+        loader = mkfiles.SDFLoader(num=num,
                                 min_intensity=min_intensity, 
                                 format=format)
 
@@ -382,7 +382,7 @@ class ListLibraryMap(TableMap):
         spectrum = self.list_in[idx]
         return_val = {}
         # put interesting fields in the dictionary
-        for field in _mkschemas.property_schema.names:
+        for field in mkschemas.property_schema.names:
             try:
                 attribute = getattr(spectrum, field.name)
                 if attribute is not None:

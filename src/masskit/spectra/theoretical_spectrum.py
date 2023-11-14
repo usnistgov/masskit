@@ -1,7 +1,7 @@
-import masskit.spectra
-from ..peptide import encoding as _mkencoding
-from . import join as _mkspecjoin
-from . import ions as _mkions
+from ..peptide import encoding as mkencoding
+from . import _spectrum as mk_spectrum
+from . import ions as mkions
+from . import join as mkspecjoin
 
 
 def annotate_peptide_spectrum(spectrum, peptide=None, precursor_charge=None, ion_types=None, mod_names=None,
@@ -20,12 +20,12 @@ def annotate_peptide_spectrum(spectrum, peptide=None, precursor_charge=None, ion
         mod_positions = spectrum.mod_positions
     theo_spectrum = TheoreticalPeptideSpectrum(peptide, charge=precursor_charge, ion_types=ion_types,
                                                mod_names=mod_names, mod_positions=mod_positions)
-    join = _mkspecjoin.PairwiseJoin(spectrum, theo_spectrum).do_join()
+    join = mkspecjoin.PairwiseJoin(spectrum, theo_spectrum).do_join()
 
     spectrum.add_join(join.results, theo_spectrum)
 
 
-class TheoreticalSpectrum(masskit.spectra.Spectrum):
+class TheoreticalSpectrum(mk_spectrum.Spectrum):
     """
     base class to contain a theoretical spectrum
     """
@@ -85,9 +85,9 @@ class TheoreticalPeptideSpectrum(TheoreticalSpectrum):
                     ion_types.extend([("y-H3PO4", 3)])
         
         mz, intensity, annotations, precursor_mass = \
-            _mkencoding.calc_ions_mz(peptide, ion_types, mod_names=mod_names, mod_positions=mod_positions,
+            mkencoding.calc_ions_mz(peptide, ion_types, mod_names=mod_names, mod_positions=mod_positions,
                          analysis_annotations=analysis_annotations, num_isotopes=num_isotopes, precursor_charge=self.charge)
-        self.from_arrays(mz, intensity, product_mass_info=_mkions.MassInfo(0.0, "ppm", "monoisotopic"),
+        self.from_arrays(mz, intensity, product_mass_info=mkions.MassInfo(0.0, "ppm", "monoisotopic"),
                          copy_arrays=False, annotations=annotations,
-                         precursor_mz=_mkencoding.protonate_mass(precursor_mass, self.charge), precursor_intensity=999.0,
-                         precursor_mass_info=_mkions.MassInfo(0.0, "ppm", "monoisotopic"))
+                         precursor_mz=mkencoding.protonate_mass(precursor_mass, self.charge), precursor_intensity=999.0,
+                         precursor_mass_info=mkions.MassInfo(0.0, "ppm", "monoisotopic"))

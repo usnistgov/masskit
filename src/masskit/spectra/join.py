@@ -7,11 +7,10 @@ import pandas as pd
 import pyarrow as pa
 import pyarrow.compute as pc
 
-import masskit.spectra
-
-from ..data_specs import schemas as _mkschemas
-from . import ions as _mkions
-from ..utils import tablemap as _mktablemap
+from ..data_specs import schemas as mkschemas
+from ..utils import tablemap as mktablemap
+from . import _spectrum as mk_spectrum
+from . import ions as mkions
 
 
 class Join(ABC):
@@ -42,7 +41,7 @@ class Join(ABC):
         :return: list of peak ids from spectrum1, list of peak ids from spectrum2
         """
         index1, index2 = spectra1.intersect(spectra2)
-        return _mkions.dedup_matches(spectra1.products, spectra2.products, index1, index2, tiebreaker=tiebreaker, skip_nomatch=False)
+        return mkions.dedup_matches(spectra1.products, spectra2.products, index1, index2, tiebreaker=tiebreaker, skip_nomatch=False)
 
     @staticmethod
     def join_3_spectra(experimental_spectrum, predicted_spectrum, theoretical_spectrum, tiebreaker="mz"):
@@ -135,10 +134,10 @@ class PairwiseJoin(Join):
     """
     def __init__(self, exp_lib_map, theo_lib_map, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if issubclass(type(exp_lib_map), masskit.spectra.Spectrum) and issubclass(type(theo_lib_map), masskit.spectra.Spectrum):
+        if issubclass(type(exp_lib_map), mk_spectrum.Spectrum) and issubclass(type(theo_lib_map), mk_spectrum.Spectrum):
             # allow for joining just two spectra
-            self.exp_lib_map = _mktablemap.ListLibraryMap([exp_lib_map])
-            self.theo_lib_map = _mktablemap.ListLibraryMap([theo_lib_map])
+            self.exp_lib_map = mktablemap.ListLibraryMap([exp_lib_map])
+            self.theo_lib_map = mktablemap.ListLibraryMap([theo_lib_map])
         else:
             self.exp_lib_map = exp_lib_map
             self.theo_lib_map = theo_lib_map
@@ -179,12 +178,12 @@ class ThreewayJoin(Join):
     """
     def __init__(self, exp_lib_map, pred_lib_map, theo_lib_map, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        if issubclass(type(exp_lib_map), masskit.spectra.Spectrum) and issubclass(type(theo_lib_map), masskit.spectra.Spectrum) and \
-                issubclass(pred_lib_map, masskit.spectra.Spectrum):
+        if issubclass(type(exp_lib_map), mk_spectrum.Spectrum) and issubclass(type(theo_lib_map), mk_spectrum.Spectrum) and \
+                issubclass(pred_lib_map, mk_spectrum.Spectrum):
             # allow for joining just two spectra
-            self.exp_lib_map = _mktablemap.ListLibraryMap([exp_lib_map])
-            self.pred_lib_map = _mktablemap.ListLibraryMap([pred_lib_map])
-            self.theo_lib_map = _mktablemap.ListLibraryMap([theo_lib_map])
+            self.exp_lib_map = mktablemap.ListLibraryMap([exp_lib_map])
+            self.pred_lib_map = mktablemap.ListLibraryMap([pred_lib_map])
+            self.theo_lib_map = mktablemap.ListLibraryMap([theo_lib_map])
         else:
             self.exp_lib_map = exp_lib_map
             self.pred_lib_map = pred_lib_map
@@ -349,7 +348,7 @@ class ThreewayJoin(Join):
         if annotations:
             for i in range(len(annotations_structarray.type)):
                 arrays.append(annotations_structarray.field(i))
-                names.append(_mkschemas.ion_annot_fields[i][0])
+                names.append(mkschemas.ion_annot_fields[i][0])
 
         new_table = pa.Table.from_arrays(arrays, names=names)
         # hack to avoid issue with nulls in categorical pandas column

@@ -7,13 +7,13 @@ from io import BytesIO, StringIO
 import numpy as np
 import pyarrow as pa
 
-from .. import accumulator as _mkaccumulator
-from ..data_specs import schemas as _mkschemas
-from ..utils import fingerprints as _mkfingerprints
-from ..utils import textalloc as _mktextalloc
-from . import ipython as _mkipython
-from . import spectrum_plotting as _mkspectrum_plotting
-from . import ions as _mkions #import HiResIons, MassInfo, cosine_score_calc, nce2ev
+from ..data_specs import schemas as mkschemas
+from ..utils import accumulator as mkaccumulator
+from ..utils import fingerprints as mkfingerprints
+from ..utils import textalloc as mktextalloc
+from . import ions as mkions
+from . import ipython as mkipython
+from . import spectrum_plotting as mkspectrum_plotting
 
 
 class Spectrum:
@@ -23,7 +23,7 @@ class Spectrum:
     """
 
     def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None,
-                 ev=None, nce=None, charge=None, ion_class=_mkions.HiResIons, mz=None, intensity=None,
+                 ev=None, nce=None, charge=None, ion_class=mkions.HiResIons, mz=None, intensity=None,
                  row=None, struct=None, precursor_mz=None, precursor_intensity=None, stddev=None,
                  annotations=None, tolerance=None, copy_arrays=False):
         """
@@ -50,11 +50,11 @@ class Spectrum:
         self.precursor_class = ion_class
         self.product_class = ion_class
         if precursor_mass_info is None:
-            self.precursor_mass_info = _mkions.MassInfo(20.0, "ppm", "monoisotopic", "", 1)
+            self.precursor_mass_info = mkions.MassInfo(20.0, "ppm", "monoisotopic", "", 1)
         else:
             self.precursor_mass_info = precursor_mass_info
         if product_mass_info is None:
-            self.product_mass_info = _mkions.MassInfo(20.0, "ppm", "monoisotopic", "", 1)
+            self.product_mass_info = mkions.MassInfo(20.0, "ppm", "monoisotopic", "", 1)
         else:
             self.product_mass_info = product_mass_info
         self.name = name
@@ -175,7 +175,7 @@ class Spectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in _mkschemas.property_fields:
+        for field in mkschemas.property_fields:
             attribute = row.get(field.name)
             if attribute is not None:
                 setattr(self, field.name, attribute())
@@ -189,7 +189,7 @@ class Spectrum:
         self.precursor = self.precursor_class(
             mz=row.precursor_mz(),
             intensity=precursor_intensity,
-            mass_info=_mkions.MassInfo(arrow_struct_accessor=row.precursor_massinfo),
+            mass_info=mkions.MassInfo(arrow_struct_accessor=row.precursor_massinfo),
         )
 
         tolerance = row.tolerance() if row.get('tolerance') is not None else None
@@ -198,7 +198,7 @@ class Spectrum:
             row.mz(),
             row.intensity(),
             stddev=stddev,
-            mass_info=_mkions.MassInfo(arrow_struct_accessor=row.product_massinfo),
+            mass_info=mkions.MassInfo(arrow_struct_accessor=row.product_massinfo),
             annotations=annotations,
             copy_arrays=copy_arrays,
             tolerance=tolerance
@@ -216,7 +216,7 @@ class Spectrum:
         """
 
         # loop through the experimental fields and if there is data, save it to the spectrum
-        for field in _mkschemas.property_fields:
+        for field in mkschemas.property_fields:
             attribute = struct.get(field.name)
             if attribute is not None:
                 if pa.types.is_list(field.type) or pa.types.is_large_list(field.type):
@@ -243,7 +243,7 @@ class Spectrum:
         self.precursor = self.precursor_class(
             mz=struct.get('precursor_mz'),
             intensity=precursor_intensity,
-            mass_info=_mkions.MassInfo(arrow_struct_scalar=struct['precursor_massinfo']),
+            mass_info=mkions.MassInfo(arrow_struct_scalar=struct['precursor_massinfo']),
         )
 
         tolerance = struct2numpy(struct, 'tolerance')
@@ -257,7 +257,7 @@ class Spectrum:
             struct2numpy(struct, 'mz'),
             struct2numpy(struct, 'intensity'),
             stddev=stddev,
-            mass_info=_mkions.MassInfo(arrow_struct_scalar=struct['product_massinfo']),
+            mass_info=mkions.MassInfo(arrow_struct_scalar=struct['product_massinfo']),
             annotations=annotations,
             copy_arrays=copy_arrays,
             tolerance=tolerance
@@ -415,8 +415,7 @@ class Spectrum:
         """
         #todo: check to see if annotation should be turned on
         if annotate_peptide:
-            from masskit.spectra.theoretical_spectrum import \
-                annotate_peptide_spectrum
+            from .theoretical_spectrum import annotate_peptide_spectrum
             annotate_peptide_spectrum(self, ion_types=ion_types)
 
         ret_value = ""
@@ -614,7 +613,7 @@ class Spectrum:
                 elif match.group(3) is not None:
                     self.nce = float(match.group(3))
                     if precursor_mz is not None and self.charge is not None:
-                        self.collision_energy = _mkions.nce2ev(self.nce, precursor_mz, self.charge)
+                        self.collision_energy = mkions.nce2ev(self.nce, precursor_mz, self.charge)
                 elif match.group(1) is not None and match.group(2) is not None:
                     self.nce = float(match.group(1))
                     self.ev = float(match.group(2))
@@ -738,7 +737,7 @@ class Spectrum:
         # intersect the spectra
         matches = len(index1)
         if matches >= minimum_match:
-            cosine_score = _mkions.cosine_score_calc(
+            cosine_score = mkions.cosine_score_calc(
                 ion1.mz,
                 ion1.intensity,
                 ion2.mz,
@@ -1095,7 +1094,7 @@ class Spectrum:
         else:
             stddev = None
 
-        line_collections = _mkspectrum_plotting.spectrum_plot(
+        line_collections = mkspectrum_plotting.spectrum_plot(
             axes,
             self.products.mz,
             self.products.intensity,
@@ -1138,7 +1137,7 @@ class Spectrum:
                     xx.append(self.products.mz[j])
                     yy.append(self.products.intensity[j])
 
-            _mktextalloc.allocate_text(axes,xx,yy,
+            mktextalloc.allocate_text(axes,xx,yy,
                             annots,
                             x_lines=[np.array([self.products.mz[i],self.products.mz[i]]) for i in range(len(self.products))],
                             y_lines=[np.array([0,self.products.intensity[i]]) for i in range(len(self.products))],
@@ -1169,7 +1168,7 @@ class Spectrum:
             return f"<spectrum {self.id}>"
 
     def draw_spectrum(self, fig_format, output):
-        return _mkspectrum_plotting.draw_spectrum(self, fig_format, output)
+        return mkspectrum_plotting.draw_spectrum(self, fig_format, output)
 
     def _repr_png_(self):
         """
@@ -1188,7 +1187,7 @@ class Spectrum:
         return self.draw_spectrum("svg", StringIO())
 
     def __str__(self):
-        if _mkipython.is_notebook():
+        if mkipython.is_notebook():
             val = b64encode(self._repr_png_()).decode("ascii")
             return \
                 f'<img data-content="masskit/spectrum" src="data:image/png;base64,{val}" alt="spectrum {self.name}"/>'
@@ -1203,7 +1202,7 @@ class Spectrum:
         :param max_mz: the length of the fingerprint (also corresponds to maximum mz value)
         :return: SpectrumTanimotoFingerPrint
         """
-        fp = _mkfingerprints.SpectrumTanimotoFingerPrint(dimension=max_mz)
+        fp = mkfingerprints.SpectrumTanimotoFingerPrint(dimension=max_mz)
         fp.object2fingerprint(self)
         return fp
 
@@ -1238,10 +1237,10 @@ class Spectrum:
         return return_spectrum
     
     # Add properties from the schema to Spectrum
-_mkschemas.populate_properties(Spectrum)
+mkschemas.populate_properties(Spectrum)
 
 
-class AccumulatorSpectrum(Spectrum, _mkaccumulator.Accumulator):
+class AccumulatorSpectrum(Spectrum, mkaccumulator.Accumulator):
     """
     used to contain a spectrum that accumulates the sum of many spectra
     includes calculation of standard deviation
@@ -1264,9 +1263,9 @@ class AccumulatorSpectrum(Spectrum, _mkaccumulator.Accumulator):
         # keep count of the number of spectra being averaged into each bin
         self.count = np.zeros_like(mz)
         self.from_arrays(mz, np.zeros_like(mz), stddev=np.zeros_like(mz),
-                         product_mass_info=_mkions.MassInfo(tolerance, "daltons", "monoisotopic", evenly_spaced=True),
+                         product_mass_info=mkions.MassInfo(tolerance, "daltons", "monoisotopic", evenly_spaced=True),
                          precursor_mz=precursor_mz, precursor_intensity=999.0,
-                         precursor_mass_info=_mkions.MassInfo(0.0, "ppm", "monoisotopic"))
+                         precursor_mass_info=mkions.MassInfo(0.0, "ppm", "monoisotopic"))
         self.count_spectra = count_spectra
         self.take_max = take_max
 
@@ -1320,11 +1319,11 @@ class AccumulatorSpectrum(Spectrum, _mkaccumulator.Accumulator):
         del self.take_max
         self.__class__ = Spectrum
 
-_mkschemas.populate_properties(AccumulatorSpectrum, fields=_mkschemas.spectrum_accumulator_fields)
+mkschemas.populate_properties(AccumulatorSpectrum, fields=mkschemas.spectrum_accumulator_fields)
 
 
 class HiResSpectrum(Spectrum):
-    def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=_mkions.HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, tolerance=None, copy_arrays=False):
+    def __init__(self, precursor_mass_info=None, product_mass_info=None, name=None, id=None, ev=None, nce=None, charge=None, ion_class=mkions.HiResIons, mz=None, intensity=None, row=None, precursor_mz=None, precursor_intensity=None, stddev=None, annotations=None, tolerance=None, copy_arrays=False):
         super().__init__(precursor_mass_info=precursor_mass_info,
                          product_mass_info=product_mass_info,
                          name=name,

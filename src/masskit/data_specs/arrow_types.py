@@ -8,8 +8,8 @@ from pandas.core.arrays import ExtensionArray
 from pandas.core.dtypes.base import ExtensionDtype
 from rdkit import Chem
 
-from .. import spectra as _mkspectra
-from ..utils import spectrum_writers as _mkspectrum_writers
+from .. import spectra as mkspectra
+from ..utils import spectrum_writers as mkspectrum_writers
 
 
 class MasskitArrowArray(pa.ExtensionArray):
@@ -123,7 +123,7 @@ class MasskitPandasArray(ExtensionArray):
         :param annotate_peptide: annotate the spectrum as a peptide
         :param ion_types: ion types to annotate
         """
-        _mkspectrum_writers.spectra_to_msp(fp, self.data, annotate_peptide=annotate_peptide, ion_types=ion_types)
+        mkspectrum_writers.spectra_to_msp(fp, self.data, annotate_peptide=annotate_peptide, ion_types=ion_types)
         
     def to_mgf(self, fp):
         """
@@ -131,7 +131,7 @@ class MasskitPandasArray(ExtensionArray):
 
         :param fp: stream or filename
         """
-        _mkspectrum_writers.spectra_to_mgf(fp, self.data)
+        mkspectrum_writers.spectra_to_mgf(fp, self.data)
 
     def to_mzxml(self, fp):
         """
@@ -139,7 +139,7 @@ class MasskitPandasArray(ExtensionArray):
 
         :param fp: stream or filename
         """
-        _mkspectrum_writers.spectra_to_mzxml(fp, self.data)
+        mkspectrum_writers.spectra_to_mzxml(fp, self.data)
 
 
 
@@ -178,7 +178,7 @@ class SpectrumArrowScalarType(pa.ExtensionScalar):
         if self.value is None:
             return None
         else:
-            return _mkspectra.Spectrum(struct=self.value)
+            return mkspectra.Spectrum(struct=self.value)
 
     
 class SpectrumArrowType(pa.PyExtensionType):
@@ -220,7 +220,7 @@ class SpectrumArrowArray(MasskitArrowArray):
 
 @register_extension_dtype
 class SpectrumPandasDtype(MasskitPandasDtype):
-    type = _mkspectra.Spectrum
+    type = mkspectra.Spectrum
     name = "Spectrum"
     na_value = np.nan
 

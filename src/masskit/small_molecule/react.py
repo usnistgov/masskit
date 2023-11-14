@@ -2,7 +2,7 @@ from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem.MolStandardize import rdMolStandardize
 
-from . import utils as _mksmutils
+from . import utils as mksmutils
 
 
 class Reactor:
@@ -10,7 +10,7 @@ class Reactor:
     class for doing several reactions on molecules with multiple steps
     """
 
-    def __init__(self, standardization_function=_mksmutils.standardize_mol):
+    def __init__(self, standardization_function=mksmutils.standardize_mol):
         """
         initialize
 

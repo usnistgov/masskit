@@ -18,18 +18,18 @@ import pyarrow.parquet as pq
 from omegaconf import DictConfig, ListConfig, OmegaConf
 from pyarrow import csv as pacsv
 
-from .. import data as _mkdata
-from .. import spectra as _mkspectra
-from ..data_specs import arrow_types as _mkarrow_types
-from ..data_specs import file_schemas as _mkfile_schemas
-from ..data_specs import schemas as _mkschemas
-from ..small_molecule import threed as _mkthreed
-from ..small_molecule import utils as _mksmutils
-from . import fingerprints as _mkfingerprints
-from . import general as _mkgeneral
-from . import hitlist as _mkhitlist
-from . import spectrum_writers as _mkspectrum_writers
-from . import tables as _mktables
+from .. import data as mkdata
+from .. import spectra as mkspectra
+from ..data_specs import arrow_types as mkarrow_types
+from ..data_specs import file_schemas as mkfile_schemas
+from ..data_specs import schemas as mkschemas
+from ..small_molecule import threed as mkthreed
+from ..small_molecule import utils as mksmutils
+from . import fingerprints as mkfingerprints
+from . import general as mkgeneral
+from . import hitlist as mkhitlist
+from . import spectrum_writers as mkspectrum_writers
+from . import tables as mktables
 
 try:
     from rdkit import Chem, RDLogger
@@ -108,7 +108,7 @@ def write_parquet(fp, table):
     :param table: the dataframe
     :param fp: stream or filename
     """
-    fp = _mkgeneral.open_if_filename(fp, 'wb')
+    fp = mkgeneral.open_if_filename(fp, 'wb')
     pq.write_table(table, where=fp, row_group_size=5000)
 
 
@@ -121,7 +121,7 @@ def read_parquet(fp, columns=None, num=None, filters=None):
     :param filters: parquet predicate as a list of tuples
     :return: PyArrow table
     """
-    fp = _mkgeneral.open_if_filename(fp, 'rb')
+    fp = mkgeneral.open_if_filename(fp, 'rb')
     if type(columns) == ListConfig:
         columns = list(columns)
     metadata = pq.read_metadata(fp)
@@ -151,7 +151,7 @@ def spectra_to_array(spectra,
     if schema_group is None:
         schema_group = 'peptide'
     
-    records_schema = _mkfile_schemas.schema_groups[schema_group]['flat_schema']
+    records_schema = mkfile_schemas.schema_groups[schema_group]['flat_schema']
     records = empty_records(records_schema)
 
     for s in spectra:
@@ -235,7 +235,7 @@ class BatchLoader:
         else:
             self.format = format
 
-        self.schema_group = _mkfile_schemas.schema_groups[self.format['schema_group']]
+        self.schema_group = mkfile_schemas.schema_groups[self.format['schema_group']]
 
 
     def setup(self):
@@ -281,7 +281,7 @@ class BatchLoader:
         raise NotImplementedError
     
     # fingerprint generator
-    ecfp4 = _mkfingerprints.ECFPFingerprint()
+    ecfp4 = mkfingerprints.ECFPFingerprint()
     # smarts for tms for substructure matching
     tms = Chem.MolFromSmarts("[#14]([CH3])([CH3])[CH3]")
     # only enumerate unique stereoisomers
@@ -304,7 +304,7 @@ class BatchLoader:
             return {}, mol
 
         try:
-            mol = _mksmutils.standardize_mol(mol)
+            mol = mksmutils.standardize_mol(mol)
         except ValueError as e:
             logging.info(f"Unable to standardize")
             return {}, mol
@@ -327,7 +327,7 @@ class BatchLoader:
                 new_row["smiles"] = Chem.MolToSmiles(mol, isomericSmiles=False)
 
                 if not skip_expensive:
-                    mol, conformer_ids, return_value = _mkthreed.create_conformer(mol)
+                    mol, conformer_ids, return_value = mkthreed.create_conformer(mol)
                     if return_value == -1:
                         logging.info(f"Not able to create conformer")
                         return {}, mol
@@ -348,7 +348,7 @@ class BatchLoader:
                     new_row["num_conformers"] = len(conformer_ids)
                     new_row["partial_charges"] = partial_charges
                     new_row["logp"] = Chem.Descriptors.MolLogP(mol)
-                    bounding_box = _mkthreed.bounding_box(mol)
+                    bounding_box = mkthreed.bounding_box(mol)
                     new_row["min_x"] = bounding_box[0, 0]
                     new_row["max_x"] = bounding_box[0, 1]
                     new_row["min_y"] = bounding_box[1, 0]
@@ -406,7 +406,7 @@ class BatchLoader:
                     "num_undef_stereo"
                 ] = Chem.rdMolDescriptors.CalcNumUnspecifiedAtomStereoCenters(mol)
                 # get number of unspecified double bonds
-                new_row["num_undef_double"] = len(_mksmutils.get_unspec_double_bonds(mol))
+                new_row["num_undef_double"] = len(mksmutils.get_unspec_double_bonds(mol))
         except Exception as e:
             logging.info("Exception thrown when creating Mol properties: {str(e)}")
             return {}, mol
@@ -536,7 +536,7 @@ class MSPLoader(BatchLoader):
                                     if not submatch:
                                         # deal with older format of modifications
                                         submatch = re.findall(r'/(\d+),[A-Z]+,([^/]*)', match.group(2))
-                                    row["mod_names"] = [_mkdata.mod_masses.dictionary.index(nist_mod_2_unimod.get(x[1], x[1])) for x in submatch]
+                                    row["mod_names"] = [mkdata.mod_masses.dictionary.index(nist_mod_2_unimod.get(x[1], x[1])) for x in submatch]
                                     row["mod_positions"] = [int(x[0]) for x in submatch]
                                 elif match.group(1) == "Filter":
                                     submatch = re.search(r'@hcd(\d+\.*\d*) ', match.group(2))
@@ -557,7 +557,7 @@ class MSPLoader(BatchLoader):
             if len(mz) != 0:
                 row['mz'] = mz
                 row['intensity'] = intensity
-                spectrum = _mkspectra.Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
+                spectrum = mkspectra.Spectrum(mz=mz, intensity=intensity, row={}, precursor_mz=row['precursor_mz'],
                                         precursor_intensity=row.get('precursor_intensity', None))
                 spectrum.charge = row.get('charge', None)
                 spectrum.peptide = row.get('peptide', None)
@@ -595,7 +595,7 @@ class MGFLoader(BatchLoader):
             intensity = []
             row = {
                 "id": self.current_id,
-                "set": np.random.choice(_mkdata.SET_NAMES, p=self.set_probabilities),
+                "set": np.random.choice(mkdata.SET_NAMES, p=self.set_probabilities),
             }
             if self.format['row_entries']:
                 row = {**row, **self.format['row_entries']}  # merge in the passed in row entries
@@ -654,7 +654,7 @@ class MGFLoader(BatchLoader):
             if len(mz) != 0:      
                 row['mz'] = mz
                 row['intensity'] = intensity
-                spectrum = _mkspectra.Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
+                spectrum = mkspectra.Spectrum(mz=mz, intensity=intensity, row=row, precursor_mz=row['precursor_mz'],
                                         precursor_intensity=row.get('precursor_intensity', None))
                 spectrum.charge = row.get('charge', None)
                 spectrum.peptide = row.get('peptide', None)
@@ -738,7 +738,7 @@ class SDFLoader(BatchLoader):
             spectrum = None
             if self.format['source'] == "nist":
                 # create the mass spectrum
-                spectrum = _mkspectra.Spectrum(product_mass_info=product_mass_info,
+                spectrum = mkspectra.Spectrum(product_mass_info=product_mass_info,
                                         precursor_mass_info=precursor_mass_info)
                 spectrum.from_mol(mol, 
                                   self.format['skip_expensive'], 
@@ -859,7 +859,7 @@ class CSVLoader(BatchLoader):
             for i in range(len(table)):
                 try:
                     mol = Chem.MolFromSmiles(table[self.format['smiles_column_name']][i].as_py())
-                    mol = _mksmutils.standardize_mol(mol)
+                    mol = mksmutils.standardize_mol(mol)
                 except ValueError as e:
                     logging.info(f"Unable to standardize {table[self.format['smiles_column_name']][i].as_py()}")
                     continue
@@ -867,7 +867,7 @@ class CSVLoader(BatchLoader):
                 if self.current_id is not None:
                     ids.append(self.current_id)
                     self.current_id += 1
-            table = table.append_column('mol', pa.array(mols, type=_mkarrow_types.MolArrowType()))
+            table = table.append_column('mol', pa.array(mols, type=mkarrow_types.MolArrowType()))
             if self.current_id is not None:
                 table = table.append_column('id', pa.array(ids, type=pa.uint64()))
             self.tables.append(table)
@@ -889,10 +889,10 @@ def records2table(records, schema_group):
     table = pa.table(records, schema_group['flat_schema'])
     has_spectra = 'mz' in records and any(v is not None for v in records['mz'])
     if has_spectra:
-        structarray = _mktables.table_to_structarray(table, _mkarrow_types.SpectrumArrowType)
+        structarray = mktables.table_to_structarray(table, mkarrow_types.SpectrumArrowType)
     table = table.select([x for x in table.column_names if x in schema_group['nested_schema'].names])
     if has_spectra:
-        table = _mktables.table_add_structarray(table, structarray)
+        table = mktables.table_add_structarray(table, structarray)
     return table
 
 
@@ -925,10 +925,10 @@ def create_table_with_mod_dict(records, schema):
     # ptm_before_array = pa.DictionaryArray.from_arrays(
     #     indices=pa.array(ptm_before_array, type=pa.int16()),
     #     dictionary=mod_masses.dictionary)
-    mod_names = pa.DictionaryArray.from_arrays(indices=pa.array(records['mod_names'], type=pa.list_(pa.int16())), dictionary=_mkdata.mod_masses.dictionary)
+    mod_names = pa.DictionaryArray.from_arrays(indices=pa.array(records['mod_names'], type=pa.list_(pa.int16())), dictionary=mkdata.mod_masses.dictionary)
     del records['mod_names']
     table = pa.table(records, schema)
-    table.append_column(_mkschemas.mod_names_field, mod_names)
+    table.append_column(mkschemas.mod_names_field, mod_names)
     return table
 
 
@@ -1083,7 +1083,7 @@ class MzTab_Reader():
         # print(self.psm.to_pandas())
 
     def read_sections(self, fp):
-        fp = _mkgeneral.open_if_filename(fp, 'r')
+        fp = mkgeneral.open_if_filename(fp, 'r')
         for line in fp:
             if len(line) < 3 or line[0] == 'C':
                 # Empty lines and comments are ignored
@@ -1126,7 +1126,7 @@ class MzTab_Reader():
 
     def parse_psm(self):
         reader = csv.DictReader(self.psm_rows, dialect="excel-tab", )
-        records = empty_records(_mkschemas.hitlist_schema)
+        records = empty_records(mkschemas.hitlist_schema)
         prev_hit_id = None
         for row in reader:
             psm_row = self.parse_psm_row(row)
@@ -1136,7 +1136,7 @@ class MzTab_Reader():
             else:
                 add_row_to_records(records, psm_row)
             prev_hit_id = psm_row['hit_id']
-        table = pa.table(records, _mkschemas.hitlist_schema)
+        table = pa.table(records, mkschemas.hitlist_schema)
         self.psm = table
 
     def parse_psm_row(self, row):
@@ -1198,7 +1198,7 @@ class MzTab_Reader():
         df = self.psm.to_pandas()
         mIdx = pd.MultiIndex.from_arrays([df['query_id'], df['hit_id']])
 
-        return _mkhitlist.Hitlist(df.set_index(['query_id','hit_id']))
+        return mkhitlist.Hitlist(df.set_index(['query_id','hit_id']))
 
 
 def load_mzTab(fp, dedup=True, decoy_func=None):
@@ -1263,7 +1263,7 @@ class BatchFileReader:
             self.dataset = pa.ipc.RecordBatchFileReader(pa.memory_map(filename, 'r')).read_all()
         elif format['format'] in ['mgf', 'msp']:
             # supports gz and bz2 compression
-            self.dataset = _mkgeneral.open_if_filename(filename, mode="r")
+            self.dataset = mkgeneral.open_if_filename(filename, mode="r")
         elif format['format'] == 'csv':
             # supports gz and bz2 compression
             read_options = pacsv.ReadOptions(autogenerate_column_names=format['no_column_headers'],
@@ -1272,7 +1272,7 @@ class BatchFileReader:
             self.dataset =  pacsv.open_csv(filename, read_options=read_options, parse_options=parse_options)
         elif format['format'] == 'sdf':
              # supports gz and bz2 compression
-            self.dataset = _mkgeneral.open_if_filename(filename, mode="rb")
+            self.dataset = mkgeneral.open_if_filename(filename, mode="rb")
             self.dataset = Chem.ForwardSDMolSupplier(self.dataset, sanitize=False)
         else:
             raise ValueError(f'Unknown format {self.format["format"]}')
@@ -1328,12 +1328,12 @@ class BatchFileReader:
         
 def spectrum2msp(spectrum, annotate=False):
     output = StringIO()
-    _mkspectrum_writers.spectra_to_msp(output, [spectrum], annotate_peptide=annotate)
+    mkspectrum_writers.spectra_to_msp(output, [spectrum], annotate_peptide=annotate)
     return output.getvalue() 
 
 def spectrum2mgf(spectrum):
     output = StringIO()
-    _mkspectrum_writers.spectra_to_mgf(output, [spectrum])
+    mkspectrum_writers.spectra_to_mgf(output, [spectrum])
     return output.getvalue() 
         
 class BatchFileWriter:
