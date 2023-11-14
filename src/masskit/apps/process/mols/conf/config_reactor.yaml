@@ -1,0 +1,57 @@
+defaults:
+  - override hydra/hydra_logging: none
+   # should hydra configure python logging?
+  - override hydra/job_logging: none
+  - _self_
+
+input:
+  file:
+    # list of input file names
+    name:
+  # number of records to generate
+  num:
+
+conversion:
+  reactant_names:
+#    - methylation
+#    - acetylation
+#    - trifluoroacetylation
+#    - t-butyldimethylsilylation
+    - trimethylsilylation
+  functional_group_names:
+    - alcohol
+    - carboxyl
+    - amine
+    - pyrrole
+    - amide
+    - thiol
+  num_tautomers: 0
+  # mass range of products, expressed as a list with a low and high value
+  mass_range: 
+  max_products: 1000
+  max_passes: 100
+  include_original_molecules: True
+
+num_workers: 8 
+
+output:
+  file:
+    # output file or output file prefix
+    name:
+
+hydra:
+  run:
+    # directory to store log files and yaml config
+    # e.g. "." or hydra_output/${hydra.job.name}/${now:%Y-%m-%d_%H-%M-%S}
+    dir: .
+  # subdir of hydra.run.dir that contains hydra config yaml
+  # if set to null, will not create. Otherwise, set to "hydra"
+  output_subdir: null
+  sweep:
+    # directory to store log files and yaml config for multiruns
+    dir: hydra_sweep
+  searchpath:
+    - pkg://masskit.conf
+  job:
+    # change directory to output_subdir?
+    chdir: False

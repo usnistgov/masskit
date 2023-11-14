@@ -8,6 +8,7 @@ from hydra import compose, initialize
 
 from ..apps.process.libraries.batch_converter import batch_converter_app
 from ..apps.process.libraries.fasta2peptides import fasta2peptides_app
+import pandas as pd
 
 """
 pytest fixtures
@@ -18,6 +19,100 @@ pytest_plugins = ("masskit.test_fixtures",)
 in the conftest.py file at the root of the package unit tests
 
 """
+
+
+@pytest.fixture(scope="session")
+def test_molecules():
+    """
+    SMILES of molecules to be derivatized
+    """
+    return [
+            "O=C(C)Oc1ccccc1C(=O)O",
+            "CCCCCC1=CC2=C([C@@H]3C=C(CC[C@H]3C(O2)(C)C)C)C(=C1C(=O)O)O",
+            "c1ccc(cc1)O",  # phenol
+            "c1ccc(cc1)C(=O)N",  # benzamide
+            "OCC(N)(CO)CO",  # tris
+            "Cc1ccc(cc1)S(=O)(=O)NC(=O)NCCC",
+        ]
+
+@pytest.fixture(scope="session")
+def test_reactants():
+    """
+    derivatives for test_molecules
+    """
+    return [
+            [None],
+            ["trimethylsilylation"],
+            ["trimethylsilylation"],
+            ["trimethylsilylation"],
+            ["trimethylsilylation"],
+            ["trimethylsilylation"],
+        ]
+
+@pytest.fixture(scope="session")
+def test_num_tautomers():
+    """
+    num of tautomers to generate
+    """
+    return [
+            0,
+            0,
+            0,
+            0,
+            0,
+            5,
+        ]
+
+@pytest.fixture(scope="session")
+def test_products():
+    """
+    the products of test_molecules derivatized with test_reactants
+    """
+    return [
+            [
+                "CC(=O)Oc1ccccc1C(=O)OC(=O)C(F)(F)F",
+                "COC(=O)c1ccccc1OC(C)=O",
+                "CC(=O)Oc1ccccc1C(=O)O[Si](C)(C)C(C)(C)C",
+                "CC(=O)OC(=O)c1ccccc1OC(C)=O",
+                "CC(=O)Oc1ccccc1C(=O)O[Si](C)(C)C",
+            ],
+            [
+                "CCCCCc1cc2c(c(O[Si](C)(C)C)c1C(=O)O)[C@@H]1C=C(C)CC[C@H]1C(C)(C)O2",
+                "CCCCCc1cc2c(c(O)c1C(=O)O[Si](C)(C)C)[C@@H]1C=C(C)CC[C@H]1C(C)(C)O2",
+                "CCCCCc1cc2c(c(O[Si](C)(C)C)c1C(=O)O[Si](C)(C)C)[C@@H]1C=C(C)CC[C@H]1C(C)(C)O2",
+            ],
+            [
+                "C[Si](C)(C)Oc1ccccc1",
+            ],
+            [
+                "C[Si](C)(C)NC(=O)c1ccccc1", 
+                "C[Si](C)(C)N(C(=O)c1ccccc1)[Si](C)(C)C",
+            ],
+            [
+                "C[Si](C)(C)NC(CO)(CO)CO",
+                "C[Si](C)(C)OCC(N)(CO)CO",
+                "C[Si](C)(C)OCC(N)(CO)CO[Si](C)(C)C",
+                "C[Si](C)(C)N(C(CO)(CO)CO)[Si](C)(C)C",
+                "C[Si](C)(C)NC(CO)(CO)CO[Si](C)(C)C",
+                "C[Si](C)(C)OCC(N)(CO[Si](C)(C)C)CO[Si](C)(C)C",
+                "C[Si](C)(C)NC(CO)(CO[Si](C)(C)C)CO[Si](C)(C)C",
+                "C[Si](C)(C)OCC(CO)(CO)N([Si](C)(C)C)[Si](C)(C)C",
+                "C[Si](C)(C)NC(CO[Si](C)(C)C)(CO[Si](C)(C)C)CO[Si](C)(C)C",
+                "C[Si](C)(C)OCC(CO)(CO[Si](C)(C)C)N([Si](C)(C)C)[Si](C)(C)C",
+                "C[Si](C)(C)OCC(CO[Si](C)(C)C)(CO[Si](C)(C)C)N([Si](C)(C)C)[Si](C)(C)C",
+            ],
+            [
+                "CCCN(C(=O)NS(=O)(=O)c1ccc(C)cc1)[Si](C)(C)C",
+                "CCCN=C(O)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1",
+                "CCCN(C(O)=NS(=O)(=O)c1ccc(C)cc1)[Si](C)(C)C",
+                "CCCN=C(NS(=O)(=O)c1ccc(C)cc1)O[Si](C)(C)C",
+                "CCCNC(=O)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1",
+                "CCCNC(=NS(=O)(=O)c1ccc(C)cc1)O[Si](C)(C)C",
+                "CCCN(C(=O)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1)[Si](C)(C)C",
+                "CCCN=C(O[Si](C)(C)C)N([Si](C)(C)C)S(=O)(=O)c1ccc(C)cc1",
+                "CCCN(C(=NS(=O)(=O)c1ccc(C)cc1)O[Si](C)(C)C)[Si](C)(C)C",
+            ],
+        ]
 
 
 @pytest.fixture(scope="session")
@@ -32,6 +127,70 @@ def data_dir():
     else:
         raise FileNotFoundError(
             f'Unable to find test data directory, cwd={os.getcwd()}')
+
+@pytest.fixture(scope="session")
+def reactants(test_molecules, test_reactants, tmpdir_factory):
+    """
+    create a fixture factory. call the returned function with parameters for the fixture
+    """
+    def _reactants(slice_start=None, slice_end=None, file_prefix=None):
+        """
+        create a dataframe from the test_molecules
+        save to a csv file
+        convert it to parquet file and return the path to the parquet file
+
+        :param slice_start: the first molecule to use in test_molecules
+        :param slice_end: one after the last molecule to use in test_molecules
+        :param file_prefix: the last file
+        """
+        # df = pd.DataFrame(list(zip(test_molecules, [x[0] for x in test_reactants])),
+        #         columns =['SMILES', 'reactants'])
+        # don't add reactants until pyarrow supports columns with NULL in joins
+        df = pd.DataFrame(test_molecules,columns =['SMILES'])
+        df.index.name='id'
+        tmpdir = tmpdir_factory.mktemp(file_prefix) 
+        df = df[slice_start:slice_end] 
+        df.to_csv(tmpdir / f'{file_prefix}.csv')
+        with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+            cfg = compose(config_name="config_batch_converter",
+                        overrides=[f"input.file.names={tmpdir / file_prefix}.csv",
+                                    f"output.file.name={tmpdir / file_prefix}",
+                                    f"output.file.types=[parquet]",
+                                    f"conversion.row_batch_size=100",
+                                    ])
+
+            batch_converter_app(cfg)
+            return tmpdir / f'{file_prefix}.parquet'
+        assert False  
+    return _reactants
+
+
+@pytest.fixture(scope="session")
+def config_reactor(reactants, tmpdir_factory):
+    """
+    configuration for running reactor_app on test data
+    returns a factory
+    """
+    def _make_reactor_config(slice_start=None, slice_end=None, file_prefix=None):
+        """
+        create reactor config
+
+        :param slice_start: the first molecule to use in test_molecules
+        :param slice_end: one after the last molecule to use in test_molecules
+        :param file_prefix: the last file
+        """
+        tmpdir = tmpdir_factory.mktemp(file_prefix) 
+        out = tmpdir / f'{file_prefix}.parquet'
+        input = reactants(slice_start=slice_start, slice_end=slice_end, file_prefix=file_prefix)
+        with initialize(version_base=None, config_path="../apps/process/mols/conf"):
+            cfg = compose(config_name="config_reactor",
+                        overrides=[f"input.file.name={input}",
+                                    f"output.file.name={out}",
+                                    f"conversion.include_original_molecules=False",
+                                    ])
+            return cfg
+        assert False
+    return _make_reactor_config
 
 
 @pytest.fixture(scope="session")
@@ -126,6 +285,7 @@ def config_fasta2peptides(human_uniprot_trunc_parquet, human_uniprot_trunc_fasta
                       overrides=[f"input.file={human_uniprot_trunc_fasta}",
                                  f"output.file={human_uniprot_trunc_parquet}"])
         return cfg
+    assert False
 
 
 @pytest.fixture(scope="session")
@@ -155,6 +315,7 @@ def config_batch_converter_sdf(test_new_sdf, batch_converted_sdf_files):
                                  f"conversion/sdf=sdf_nist_mol"
                                  ])
         return cfg
+    assert False
 
 
 @pytest.fixture(scope="session")
@@ -177,6 +338,7 @@ def config_batch_converter_csv(test_csv, batch_converted_csv_files):
                                  f"conversion.row_batch_size=100",
                                  ])
         return cfg
+    assert False
 
 
 @pytest.fixture(scope="session")
@@ -199,6 +361,7 @@ def config_batch_converter_pubchem_sdf(pubchem_sdf, batch_converted_pubchem_sdf_
                                  f"conversion.row_batch_size=100",
                                  f"conversion/sdf=sdf_pubchem_mol"])
         return cfg
+    assert False
 
 
 @pytest.fixture(scope="session")
@@ -220,6 +383,7 @@ def config_batch_converter_plain_sdf(plain_sdf, batch_converted_plain_sdf_files)
                                  f"output.file.types=[parquet]",
                                  f"conversion.row_batch_size=100"])
         return cfg
+    assert False
 
 
 @pytest.fixture(scope="session")
@@ -237,3 +401,4 @@ def config_shortest_path_csv(batch_converted_csv_files, batch_converted_csv_path
                                  f"output.file.name={batch_converted_csv_path_file}.parquet",
                                  ])
         return cfg
+    assert False

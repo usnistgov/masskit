@@ -6,6 +6,10 @@ import os
 import tarfile
 from pathlib import Path, PurePosixPath
 from typing import Iterable
+import numpy as np
+import pandas as pd
+import gzip
+import bz2
 from urllib import request
 from urllib.parse import urlparse
 
@@ -19,7 +23,18 @@ except ImportError:
     logging.debug("Unable to import boto3")
     boto3 = None
 
+from omegaconf import ListConfig
 
+
+def is_list_like(obj):
+    """
+    is the object list-like?
+
+    :param obj: the object to be tested
+    :return: true if list like
+    """
+    valid_types = (list, tuple, set, np.ndarray, pd.Series, ListConfig)
+    return isinstance(obj, valid_types)
 
 class MassKitSearchPathPlugin(SearchPathPlugin):
     """

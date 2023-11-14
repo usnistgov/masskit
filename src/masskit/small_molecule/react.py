@@ -109,12 +109,12 @@ class Reactor:
                 self.reactions.append(AllChem.ReactionFromSmarts(self.functional_groups[functional_group].format(
                     replacement_group=self.reactants[replacement_group])))
 
-    def apply_reactions(self, molecules, maxProducts=1000, mass_range=None):
+    def apply_reactions(self, molecules, max_products=1000, mass_range=None):
         """
         apply a series of reactions to a list of molecules
 
         :param molecules: list of rdkit Mol
-        :param maxProducts: maximum number of products per reaction
+        :param max_products: maximum number of products per reaction
         :param mass_range: tuple containing low and high value of allowed mass of product
         :return: list of product molecules
         """
@@ -125,7 +125,7 @@ class Reactor:
         for reaction in self.reactions:
             for molecule in molecules:
                 products = reaction.RunReactants(
-                    (molecule,), maxProducts=maxProducts)
+                    (molecule,), maxProducts=max_products)
                 all_products.extend([x[0] for x in products])
         # dedup molecules
         deduplicated_products = set()
@@ -145,23 +145,32 @@ class Reactor:
                 continue
         return [Chem.MolFromSmiles(x) for x in deduplicated_products]
 
-    def react(self, molecules, reactant_names=None, functional_group_names=None, maxProducts=1000,
+    def react(self, molecules, reactant_names=None, functional_group_names=None, max_products=1000,
               max_passes=100, include_original_molecules=False, num_tautomers=0, mass_range=None):
         """
         Given a list of molecules, react them using the named reactions
 
         :param molecules: standardized molecule or list of molecules to be reacted
-        :param reactant_names: list of names of replacement groups added in the reaction.  [] means all
-        :param functional_group_names: list of names of the functional groups where reactions take place. [] means all
-        :param maxProducts: maximum number of products per reaction and overall.  an approximate bound
+        :param reactant_names: list of names of replacement groups added in the reaction.  None or [None] means all
+        :param functional_group_names: list of names of the functional groups where reactions take place. None or [None] means all
+        :param max_products: maximum number of products per reaction and overall.  an approximate bound
         :param max_passes: iteratively apply the reactions to reaction products up to max_passes
         :param include_original_molecules: add the original molecules to the returned products
         :param num_tautomers: create up to this this number of tautomers from the input structures
         :param mass_range: tuple containing low and high value of allowed mass of product
         :return: list of reaction products as rdkit Mol
         """
-        if type(molecules) is not list:
+        if not  _mksmutils.is_list_like(molecules):
             molecules = [molecules]
+        if not  _mksmutils.is_list_like(reactant_names):
+            reactant_names = [reactant_names]
+        if not  _mksmutils.is_list_like(functional_group_names):
+            functional_group_names = [functional_group_names]
+
+        if reactant_names == [None]:
+            reactant_names = self.reactant_names
+        if functional_group_names  == [None]:
+            functional_group_names = self.functional_group_names
 
         # create tautomers if asked
         if num_tautomers > 0:
@@ -178,15 +187,15 @@ class Reactor:
                               functional_group_names=functional_group_names)
 
         products = self.apply_reactions(
-            molecules, maxProducts=maxProducts, mass_range=mass_range)
+            molecules, max_products=max_products, mass_range=mass_range)
         new_products = products
         for i in range(max_passes):
             new_products = self.apply_reactions(
-                new_products, maxProducts=maxProducts, mass_range=mass_range)
+                new_products, max_products=max_products, mass_range=mass_range)
             if not new_products:
                 break
             products.extend(new_products)
-            if len(products) > maxProducts:
+            if len(products) > max_products:
                 break
         if include_original_molecules:
             # use molecules to keep the correct order
