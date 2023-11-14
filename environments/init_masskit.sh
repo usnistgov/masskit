@@ -123,17 +123,4 @@ if ! conda activate $ENVNAME; then
     mamba create -y -n $ENVNAME
     mamba install -y -n $ENVNAME -c nodefaults ${ML_CHANNELS} -c conda-forge ${BASE_PACKAGES} ${ML_PACKAGES}
     conda activate $ENVNAME
-
-    # # Check for bayesian_torch
-    # (python -c "import bayesian_torch" 2> /dev/null) && has_lib=1 || has_lib=0
-
-    # if [ $has_lib -ne 1 ]; then
-    #     pushd /tmp
-    #     git clone https://github.com/IntelLabs/bayesian-torch.git
-    #     cd bayesian-torch
-    #     pip install .
-    #     cd ..
-    #     rm -rf bayesian-torch
-    #     popd
-    # fi
 fi
