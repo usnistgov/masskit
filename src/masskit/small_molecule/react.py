@@ -1,8 +1,8 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem.MolStandardize import rdMolStandardize
-from masskit.utils.general import is_list_like
 
+from ..utils.general import is_list_like
 from . import utils as mksmutils
 
 
