@@ -1,4 +1,5 @@
-from masskit.utils.general import expand_path_list, parse_filename
+import os
+from masskit.utils.general import expand_path_list, get_file, parse_filename
 
 
 def test_expand_path_list():
@@ -15,3 +16,11 @@ def test_parse_filename():
     assert str(root) == 'file'
     assert suffix == 'sdf'
     assert compression == 'gz'
+
+def test_get_file(tmpdir_factory):
+    tmpdir = tmpdir_factory.mktemp('test_get_file')
+    get_file('https://github.com/usnistgov/masskit_ai/releases/download/v.1.2.0/airi_model_v3_1.tgz', 
+             cache_directory=tmpdir)
+    assert os.path.getsize(tmpdir / 'airi_model_v3_1.tgz') > 10000
+    
+

@@ -10,7 +10,7 @@ import numpy as np
 import pandas as pd
 import gzip
 import bz2
-from urllib import request
+import requests
 from urllib.parse import urlparse
 
 import numpy as np
@@ -256,7 +256,9 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
             with open(cache_directory / url_path.name, "wb") as f:
                 s3.download_fileobj(url.netloc, url.path, f)
         else:
-            request.urlretrieve(url.geturl(), cache_directory / url_path.name)
+            r = requests.get(url.geturl(), allow_redirects=True)  # to get content after redirection
+            with open(cache_directory / url_path.name, 'wb') as f:
+                f.write(r.content)
 
         if is_tgz:
             with tarfile.open(cache_directory / url_path.name, 'r:gz') as tgz_ref:
