@@ -216,10 +216,10 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
         cache_directory = Path(cache_directory).expanduser()
     if search_path is None:
         search_path = [Path.home() / Path('.masskit_cache')]
-    if cache_directory not in search_path:
-        search_path.append(cache_directory)
     search_path = [Path(x).expanduser()
                    for x in search_path]  # expand tilde notation
+    if cache_directory not in search_path:
+        search_path.append(cache_directory)
 
     # treat as an url
     url = urlparse(filename, allow_fragments=False)
@@ -262,7 +262,10 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
 
         if is_tgz:
             with tarfile.open(cache_directory / url_path.name, 'r:gz') as tgz_ref:
-                tgz_ref.extractall(cache_directory)
+                for member in tgz_ref.getmembers():
+                    tgz_ref.extract(member, path=cache_directory)
+                    untarred_file = cache_directory / Path(member.name)
+                    untarred_file.rename(cache_directory / final_filename)
             os.remove(cache_directory / url_path.name)
 
         if (cache_directory / final_filename).is_file():
