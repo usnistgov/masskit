@@ -1,6 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem, Descriptors
 from rdkit.Chem.MolStandardize import rdMolStandardize
+from masskit.utils.general import is_list_like
 
 from . import utils as mksmutils
 
@@ -160,11 +161,11 @@ class Reactor:
         :param mass_range: tuple containing low and high value of allowed mass of product
         :return: list of reaction products as rdkit Mol
         """
-        if not  _mksmutils.is_list_like(molecules):
+        if not is_list_like(molecules):
             molecules = [molecules]
-        if not  _mksmutils.is_list_like(reactant_names):
+        if not is_list_like(reactant_names):
             reactant_names = [reactant_names]
-        if not  _mksmutils.is_list_like(functional_group_names):
+        if not is_list_like(functional_group_names):
             functional_group_names = [functional_group_names]
 
         if reactant_names == [None]:
