@@ -126,72 +126,69 @@ def data_dir():
         raise FileNotFoundError(
             f'Unable to find test data directory, cwd={os.getcwd()}')
 
-def make_react_parquet(test_molecules, test_reactants, tmpdir_factory, slice_start=None, slice_end=None, file_prefix=None):
-    df = pd.DataFrame(list(zip(test_molecules, [x[0] for x in test_reactants])),
-               columns =['SMILES', 'reactants'])
-    df.index.name='id'
-    tmpdir = tmpdir_factory.mktemp('react') 
-    df = df[slice_start:slice_end] 
-    df.to_csv(tmpdir / f'{file_prefix}.csv')
-    with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
-        cfg = compose(config_name="config_batch_converter",
-                      overrides=[f"input.file.names={tmpdir / file_prefix}.csv",
-                                 f"output.file.name={tmpdir / file_prefix}",
-                                 f"output.file.types=[parquet]",
-                                 f"conversion.row_batch_size=100",
-                                 ])
-
-        batch_converter_app(cfg)
-        return tmpdir / f'{file_prefix}.parquet'
-    assert False  
-
 @pytest.fixture(scope="session")
 def reactants(test_molecules, test_reactants, tmpdir_factory):
     """
-    create a parquet file of molecules to be reacted
-    skips over the first example
+    create a fixture factory. call the returned function with parameters for the fixture
     """
-    return make_react_parquet(test_molecules, test_reactants, tmpdir_factory, slice_start=1, slice_end=-1, file_prefix='reactants')
+    def _reactants(slice_start=None, slice_end=None, file_prefix=None):
+        """
+        create a dataframe from the test_molecules
+        save to a csv file
+        convert it to parquet file and return the path to the parquet file
 
-@pytest.fixture(scope="session")
-def reactants_tautomers(test_molecules, test_reactants, tmpdir_factory):
-    """
-    create a parquet file of molecules to be reacted
-    skips over the first example
-    """
-    return make_react_parquet(test_molecules, test_reactants, tmpdir_factory, slice_start=-1, slice_end=None, file_prefix='reactants_tautomer')
+        :param slice_start: the first molecule to use in test_molecules
+        :param slice_end: one after the last molecule to use in test_molecules
+        :param file_prefix: the last file
+        """
+        # df = pd.DataFrame(list(zip(test_molecules, [x[0] for x in test_reactants])),
+        #         columns =['SMILES', 'reactants'])
+        # don't add reactants until pyarrow supports columns with NULL in joins
+        df = pd.DataFrame(test_molecules,columns =['SMILES'])
+        df.index.name='id'
+        tmpdir = tmpdir_factory.mktemp(file_prefix) 
+        df = df[slice_start:slice_end] 
+        df.to_csv(tmpdir / f'{file_prefix}.csv')
+        with initialize(version_base=None, config_path="../apps/process/libraries/conf"):
+            cfg = compose(config_name="config_batch_converter",
+                        overrides=[f"input.file.names={tmpdir / file_prefix}.csv",
+                                    f"output.file.name={tmpdir / file_prefix}",
+                                    f"output.file.types=[parquet]",
+                                    f"conversion.row_batch_size=100",
+                                    ])
 
-
-def make_reactor_config(reactants, tmpdir_factory):
-    tmpdir = tmpdir_factory.mktemp('reactor') 
-    out = tmpdir / 'reactor_reactants.parquet'
-    with initialize(version_base=None, config_path="../apps/process/mols/conf"):
-        cfg = compose(config_name="config_reactor",
-                      overrides=[f"input.file.name={reactants}",
-                                 f"output.file.name={out}",
-                                 f"conversion.include_original_molecules=False",
-                                 ])
-        return cfg
-    assert False
+            batch_converter_app(cfg)
+            return tmpdir / f'{file_prefix}.parquet'
+        assert False  
+    return _reactants
 
 
 @pytest.fixture(scope="session")
 def config_reactor(reactants, tmpdir_factory):
     """
     configuration for running reactor_app on test data
+    returns a factory
     """
-    cfg = make_reactor_config(reactants, tmpdir_factory)
-    return cfg
+    def _make_reactor_config(slice_start=None, slice_end=None, file_prefix=None):
+        """
+        create reactor config
 
-
-@pytest.fixture(scope="session")
-def config_reactor_tautomer(reactants_tautomers, tmpdir_factory):
-    """
-    configuration for running reactor_app on test data
-    """
-    cfg = make_reactor_config(reactants_tautomers, tmpdir_factory)
-    cfg.conversion.num_tautomers = 5
-    return cfg
+        :param slice_start: the first molecule to use in test_molecules
+        :param slice_end: one after the last molecule to use in test_molecules
+        :param file_prefix: the last file
+        """
+        tmpdir = tmpdir_factory.mktemp(file_prefix) 
+        out = tmpdir / f'{file_prefix}.parquet'
+        input = reactants(slice_start=slice_start, slice_end=slice_end, file_prefix=file_prefix)
+        with initialize(version_base=None, config_path="../apps/process/mols/conf"):
+            cfg = compose(config_name="config_reactor",
+                        overrides=[f"input.file.name={input}",
+                                    f"output.file.name={out}",
+                                    f"conversion.include_original_molecules=False",
+                                    ])
+            return cfg
+        assert False
+    return _make_reactor_config
 
 
 @pytest.fixture(scope="session")

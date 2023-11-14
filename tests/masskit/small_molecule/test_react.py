@@ -11,19 +11,39 @@ def do_standardization(smiles):
     return mol
 
 def test_reactants(config_reactor, test_products):
-    reactor_app(config_reactor)
-    t = pq.read_table(config_reactor.output.file.name)
+    """
+    test reactions with TMS and no tautomers
+    """
+    cfg = config_reactor(slice_start=1, slice_end=-1, file_prefix="react")
+    reactor_app(cfg)
+    t = pq.read_table(cfg.output.file.name)
     results = [Chem.MolToSmiles(x.as_py()) for x in t['mol']]
     flat_list = [item for sublist in test_products[1:-1] for item in sublist]
     assert set(results) == set(flat_list)
 
-def test_reactants_tautomer(config_reactor_tautomer, test_products):
-    reactor_app(config_reactor_tautomer)
-    t = pq.read_table(config_reactor_tautomer.output.file.name)
+def test_reactants_tautomers(config_reactor, test_products):
+    """
+    test reaction with TMS and tautomers
+    """
+    cfg = config_reactor(slice_start=-1, slice_end=None, file_prefix="react_tautomers")
+    cfg.conversion.num_tautomers = 5
+    reactor_app(cfg)
+    t = pq.read_table(cfg.output.file.name)
     results = [Chem.MolToSmiles(x.as_py()) for x in t['mol']]
-    flat_list = [item for sublist in test_products[-1:] for item in sublist]
+    flat_list = [item for sublist in test_products[-1:None] for item in sublist]
     assert set(results) == set(flat_list)
 
+def test_reactants_all(config_reactor, test_products):
+    """
+    test reaction with all possible derivatives and no tautomers
+    """
+    cfg = config_reactor(slice_start=0, slice_end=1, file_prefix="react_all")
+    cfg.conversion.reactant_names = [None]
+    reactor_app(cfg)
+    t = pq.read_table(cfg.output.file.name)
+    results = [Chem.MolToSmiles(x.as_py()) for x in t['mol']]
+    flat_list = [item for sublist in test_products[0:1] for item in sublist]
+    assert set(results) == set(flat_list)
 
 def do_reaction(
     molecule,
