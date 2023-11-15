@@ -1,4 +1,3 @@
-boto3
 imbalanced-learn
 levenshtein
 mlflow-skinny

@@ -17,7 +17,7 @@ if ! conda activate sphinx; then
     conda create -y -n sphinx
     conda activate sphinx
 fi
-conda install -y -c pytorch -c conda-forge --override-channels sphinx myst-parser nbsphinx awscli boto3 hydra-core rdkit scikit-learn mlflow numba pytorch-lightning torchvision imageio jsonpickle torchmetrics
+conda install -y -c pytorch -c conda-forge --override-channels sphinx myst-parser nbsphinx awscli hydra-core rdkit scikit-learn mlflow numba pytorch-lightning torchvision imageio jsonpickle torchmetrics
 
 # Check for bayesian_torch
 

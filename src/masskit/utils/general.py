@@ -17,11 +17,11 @@ import numpy as np
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
 
-try:
-    import boto3
-except ImportError:
-    logging.debug("Unable to import boto3")
-    boto3 = None
+# try:
+#     import boto3
+# except ImportError:
+#     logging.debug("Unable to import boto3")
+#     boto3 = None
 
 from omegaconf import ListConfig
 
@@ -252,9 +252,10 @@ def get_file(filename, cache_directory=None, search_path=None, tgz_extension=Non
         # make the cache directory if necessary
         cache_directory.mkdir(parents=True, exist_ok=True)
         if url.scheme == "s3":
-            s3 = boto3.client("s3")
-            with open(cache_directory / url_path.name, "wb") as f:
-                s3.download_fileobj(url.netloc, url.path, f)
+            raise NotImplementedError('s3 not currently supported')
+            # s3 = boto3.client("s3")
+            # with open(cache_directory / url_path.name, "wb") as f:
+            #     s3.download_fileobj(url.netloc, url.path, f)
         else:
             r = requests.get(url.geturl(), allow_redirects=True)  # to get content after redirection
             with open(cache_directory / url_path.name, 'wb') as f:
