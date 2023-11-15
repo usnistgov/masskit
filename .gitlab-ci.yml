@@ -4,7 +4,7 @@ stages:
   - test
   - deploy
 
-setup masskit_env:
+setup:masskit_env:
   stage: setup
   rules:
     - changes:
@@ -26,7 +26,7 @@ setup masskit_env:
       - masskit_conda.yml
       - masskit_ai_cpu_conda.yml
 
-build masskit:
+build:masskit:
   stage: build
   script:
     - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
@@ -38,10 +38,9 @@ build masskit:
     paths:
       - masskit*.whl
 
-test masskit:
+test:masskit:
   stage: test
-  dependencies:
-    - build masskit
+  needs: ["build:masskit"]
   script:
     - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
     - pip install --force-reinstall masskit*.whl
@@ -51,10 +50,7 @@ test masskit:
   tags:
     - linux
     - masskit
-  artifacts:
-    paths:
-      - masskit*.whl
 
-deploy masskit_ai:
+deploy:masskit_ai:
   stage: deploy
   trigger: msdc/masskit_ai
