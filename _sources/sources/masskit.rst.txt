@@ -8,28 +8,21 @@ Subpackages
    :maxdepth: 4
 
    masskit.apps
+   masskit.conf
    masskit.data_specs
    masskit.peptide
    masskit.small_molecule
-   masskit.spectrum
+   masskit.spectra
    masskit.test_fixtures
    masskit.utils
 
 Submodules
 ----------
 
-masskit.accumulator module
---------------------------
+masskit.data module
+-------------------
 
-.. automodule:: masskit.accumulator
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-masskit.constants module
-------------------------
-
-.. automodule:: masskit.constants
+.. automodule:: masskit.data
    :members:
    :undoc-members:
    :show-inheritance:

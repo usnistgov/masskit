@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+masskit.utils.accumulator module
+--------------------------------
+
+.. automodule:: masskit.utils.accumulator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 masskit.utils.arrow module
 --------------------------
 

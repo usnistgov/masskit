@@ -1,6 +1,14 @@
 masskit.apps.process.mols.conf package
 ======================================
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.apps.process.mols.conf.hydra
+
 Module contents
 ---------------
 

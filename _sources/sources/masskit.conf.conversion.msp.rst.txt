@@ -1,0 +1,10 @@
+masskit.conf.conversion.msp package
+===================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.conf.conversion.msp
+   :members:
+   :undoc-members:
+   :show-inheritance:

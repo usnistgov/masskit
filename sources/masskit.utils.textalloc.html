@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>masskit.utils.textalloc package &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>masskit.utils.textalloc package &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils.textalloc package</a></li> 
       </ul>
     </div>  
@@ -288,10 +289,29 @@ y_lines (List[np.ndarray]): y-coordinates of all lines in plot list of 1d arrays
     <ul>
 <li><a class="reference internal" href="#">masskit.utils.textalloc package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.textalloc.candidates">masskit.utils.textalloc.candidates module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.textalloc.non_overlapping_boxes">masskit.utils.textalloc.non_overlapping_boxes module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.textalloc.overlap_functions">masskit.utils.textalloc.overlap_functions module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.textalloc">Module contents</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc.candidates">masskit.utils.textalloc.candidates module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.textalloc.candidates.generate_candidates"><code class="docutils literal notranslate"><span class="pre">generate_candidates()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc.non_overlapping_boxes">masskit.utils.textalloc.non_overlapping_boxes module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.textalloc.non_overlapping_boxes.get_non_overlapping_boxes"><code class="docutils literal notranslate"><span class="pre">get_non_overlapping_boxes()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc.overlap_functions">masskit.utils.textalloc.overlap_functions module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.textalloc.overlap_functions.ccw"><code class="docutils literal notranslate"><span class="pre">ccw()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.overlap_functions.inside_plot"><code class="docutils literal notranslate"><span class="pre">inside_plot()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.overlap_functions.line_intersect"><code class="docutils literal notranslate"><span class="pre">line_intersect()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.overlap_functions.non_overlapping_with_boxes"><code class="docutils literal notranslate"><span class="pre">non_overlapping_with_boxes()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.overlap_functions.non_overlapping_with_lines"><code class="docutils literal notranslate"><span class="pre">non_overlapping_with_lines()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.overlap_functions.non_overlapping_with_points"><code class="docutils literal notranslate"><span class="pre">non_overlapping_with_points()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.textalloc">Module contents</a><ul>
+<li><a class="reference internal" href="#masskit.utils.textalloc.allocate_text"><code class="docutils literal notranslate"><span class="pre">allocate_text()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.find_nearest_point_on_box"><code class="docutils literal notranslate"><span class="pre">find_nearest_point_on_box()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.textalloc.lines_to_segments"><code class="docutils literal notranslate"><span class="pre">lines_to_segments()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -327,7 +347,7 @@ y_lines (List[np.ndarray]): y-coordinates of all lines in plot list of 1d arrays
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils.textalloc package</a></li> 
       </ul>
     </div>

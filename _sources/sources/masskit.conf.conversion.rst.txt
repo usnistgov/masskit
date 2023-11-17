@@ -1,0 +1,23 @@
+masskit.conf.conversion package
+===============================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   masskit.conf.conversion.arrow
+   masskit.conf.conversion.csv
+   masskit.conf.conversion.mgf
+   masskit.conf.conversion.msp
+   masskit.conf.conversion.parquet
+   masskit.conf.conversion.sdf
+
+Module contents
+---------------
+
+.. automodule:: masskit.conf.conversion
+   :members:
+   :undoc-members:
+   :show-inheritance:

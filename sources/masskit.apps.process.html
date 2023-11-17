@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>masskit.apps.process package &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>masskit.apps.process package &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.apps.process package</a></li> 
       </ul>
     </div>  
@@ -82,29 +83,139 @@ $(document).ready(function(){
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.batch_converter">masskit.apps.process.libraries.batch_converter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.converter">masskit.apps.process.libraries.converter module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.fasta2peptides">masskit.apps.process.libraries.fasta2peptides module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.batch_converter">masskit.apps.process.libraries.batch_converter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.batch_converter.batch_converter_app"><code class="docutils literal notranslate"><span class="pre">batch_converter_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.batch_converter.write_batch"><code class="docutils literal notranslate"><span class="pre">write_batch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.converter">masskit.apps.process.libraries.converter module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.converter.converter_app"><code class="docutils literal notranslate"><span class="pre">converter_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.converter.disable_console_logging"><code class="docutils literal notranslate"><span class="pre">disable_console_logging()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.fasta2peptides">masskit.apps.process.libraries.fasta2peptides module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.PepTuple"><code class="docutils literal notranslate"><span class="pre">PepTuple</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.PepTuple.cterm"><code class="docutils literal notranslate"><span class="pre">PepTuple.cterm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.PepTuple.nterm"><code class="docutils literal notranslate"><span class="pre">PepTuple.nterm</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.PepTuple.pep"><code class="docutils literal notranslate"><span class="pre">PepTuple.pep</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.count_rhk"><code class="docutils literal notranslate"><span class="pre">count_rhk()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.extract_peptides"><code class="docutils literal notranslate"><span class="pre">extract_peptides()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.fasta"><code class="docutils literal notranslate"><span class="pre">fasta()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.fasta2peptides_app"><code class="docutils literal notranslate"><span class="pre">fasta2peptides_app()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.fasta_parse_id"><code class="docutils literal notranslate"><span class="pre">fasta_parse_id()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.nonspecific"><code class="docutils literal notranslate"><span class="pre">nonspecific()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.pepgen"><code class="docutils literal notranslate"><span class="pre">pepgen</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.pepgen.add_row"><code class="docutils literal notranslate"><span class="pre">pepgen.add_row()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.pepgen.enumerate"><code class="docutils literal notranslate"><span class="pre">pepgen.enumerate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.pepgen.finalize_table"><code class="docutils literal notranslate"><span class="pre">pepgen.finalize_table()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.pepgen.permute_mods"><code class="docutils literal notranslate"><span class="pre">pepgen.permute_mods()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.semitryptic"><code class="docutils literal notranslate"><span class="pre">semitryptic()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.trypsin"><code class="docutils literal notranslate"><span class="pre">trypsin()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.fasta2peptides.tryptic"><code class="docutils literal notranslate"><span class="pre">tryptic()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.optimize_parquet">masskit.apps.process.libraries.optimize_parquet module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.parquet_info">masskit.apps.process.libraries.parquet_info module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.pepsearch2parquet">masskit.apps.process.libraries.pepsearch2parquet module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.pubchem_links">masskit.apps.process.libraries.pubchem_links module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.rewrite_sdf">masskit.apps.process.libraries.rewrite_sdf module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.transform_table">masskit.apps.process.libraries.transform_table module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.update_sets">masskit.apps.process.libraries.update_sets module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.pepsearch2parquet">masskit.apps.process.libraries.pepsearch2parquet module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pepsearch2parquet.read_pepsearch"><code class="docutils literal notranslate"><span class="pre">read_pepsearch()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.pubchem_links">masskit.apps.process.libraries.pubchem_links module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze"><code class="docutils literal notranslate"><span class="pre">Analyze</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.do_joins"><code class="docutils literal notranslate"><span class="pre">Analyze.do_joins()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.load_cas"><code class="docutils literal notranslate"><span class="pre">Analyze.load_cas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.load_nist_data"><code class="docutils literal notranslate"><span class="pre">Analyze.load_nist_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.patent_counts"><code class="docutils literal notranslate"><span class="pre">Analyze.patent_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.pmid_counts"><code class="docutils literal notranslate"><span class="pre">Analyze.pmid_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.save_data"><code class="docutils literal notranslate"><span class="pre">Analyze.save_data()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Analyze.wikipedia_counts"><code class="docutils literal notranslate"><span class="pre">Analyze.wikipedia_counts()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Download"><code class="docutils literal notranslate"><span class="pre">Download</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.Download.download_url"><code class="docutils literal notranslate"><span class="pre">Download.download_url()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemCAS"><code class="docutils literal notranslate"><span class="pre">PubChemCAS</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemCAS.get_pubchem_cas"><code class="docutils literal notranslate"><span class="pre">PubChemCAS.get_pubchem_cas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemCAS.parse_pubchem_json"><code class="docutils literal notranslate"><span class="pre">PubChemCAS.parse_pubchem_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemCAS.pubchem_cas"><code class="docutils literal notranslate"><span class="pre">PubChemCAS.pubchem_cas()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemCAS.use_pubchem_cache"><code class="docutils literal notranslate"><span class="pre">PubChemCAS.use_pubchem_cache()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemFTP"><code class="docutils literal notranslate"><span class="pre">PubChemFTP</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemFTP.cache_pubchem_files"><code class="docutils literal notranslate"><span class="pre">PubChemFTP.cache_pubchem_files()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemFTP.get_convert_options"><code class="docutils literal notranslate"><span class="pre">PubChemFTP.get_convert_options()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemFTP.get_csv_type"><code class="docutils literal notranslate"><span class="pre">PubChemFTP.get_csv_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemFTP.get_new_columns"><code class="docutils literal notranslate"><span class="pre">PubChemFTP.get_new_columns()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemFTP.process"><code class="docutils literal notranslate"><span class="pre">PubChemFTP.process()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki"><code class="docutils literal notranslate"><span class="pre">PubChemWiki</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki.fetch_counts"><code class="docutils literal notranslate"><span class="pre">PubChemWiki.fetch_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki.get_pubchem_wiki"><code class="docutils literal notranslate"><span class="pre">PubChemWiki.get_pubchem_wiki()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki.parse_counts"><code class="docutils literal notranslate"><span class="pre">PubChemWiki.parse_counts()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki.parse_pubchem_json"><code class="docutils literal notranslate"><span class="pre">PubChemWiki.parse_pubchem_json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki.pubchem_wiki"><code class="docutils literal notranslate"><span class="pre">PubChemWiki.pubchem_wiki()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.PubChemWiki.use_pubchem_cache"><code class="docutils literal notranslate"><span class="pre">PubChemWiki.use_pubchem_cache()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.pubchem_links.main"><code class="docutils literal notranslate"><span class="pre">main()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.rewrite_sdf">masskit.apps.process.libraries.rewrite_sdf module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.rewrite_sdf.rewrite_sdf_app"><code class="docutils literal notranslate"><span class="pre">rewrite_sdf_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.transform_table">masskit.apps.process.libraries.transform_table module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.cast_columns"><code class="docutils literal notranslate"><span class="pre">cast_columns()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.compress_start_stop"><code class="docutils literal notranslate"><span class="pre">compress_start_stop()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.concat_to_output"><code class="docutils literal notranslate"><span class="pre">concat_to_output()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.get_sort_index"><code class="docutils literal notranslate"><span class="pre">get_sort_index()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.misc_operations"><code class="docutils literal notranslate"><span class="pre">misc_operations()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.process_and_cache"><code class="docutils literal notranslate"><span class="pre">process_and_cache()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.str2pyarrow_type"><code class="docutils literal notranslate"><span class="pre">str2pyarrow_type()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.transform_table.transform_table_app"><code class="docutils literal notranslate"><span class="pre">transform_table_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries.update_sets">masskit.apps.process.libraries.update_sets module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.libraries.html#masskit.apps.process.libraries.update_sets.update_sets_app"><code class="docutils literal notranslate"><span class="pre">update_sets_app()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.libraries.html#module-masskit.apps.process.libraries">Module contents</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="masskit.apps.process.mols.html">masskit.apps.process.mols package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.html#subpackages">Subpackages</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.conf.html">masskit.apps.process.mols.conf package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.mols.conf.html#subpackages">Subpackages</a></li>
 <li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.mols.conf.html#module-masskit.apps.process.mols.conf">Module contents</a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.html#module-masskit.apps.process.mols.shortest_path">masskit.apps.process.mols.shortest_path module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.html#module-masskit.apps.process.mols.reactor">masskit.apps.process.mols.reactor module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.reactor.reactor_app"><code class="docutils literal notranslate"><span class="pre">reactor_app()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.html#module-masskit.apps.process.mols.shortest_path">masskit.apps.process.mols.shortest_path module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.BatchWriter"><code class="docutils literal notranslate"><span class="pre">BatchWriter</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.BatchWriter.close"><code class="docutils literal notranslate"><span class="pre">BatchWriter.close()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.BatchWriter.write_table"><code class="docutils literal notranslate"><span class="pre">BatchWriter.write_table()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.batch_reader"><code class="docutils literal notranslate"><span class="pre">batch_reader()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.get_ring_paths"><code class="docutils literal notranslate"><span class="pre">get_ring_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.get_shortest_paths"><code class="docutils literal notranslate"><span class="pre">get_shortest_paths()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.mol2path"><code class="docutils literal notranslate"><span class="pre">mol2path()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.ordered_pair"><code class="docutils literal notranslate"><span class="pre">ordered_pair()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.html#masskit.apps.process.mols.shortest_path.path_generator_app"><code class="docutils literal notranslate"><span class="pre">path_generator_app()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.html#module-masskit.apps.process.mols">Module contents</a></li>
 </ul>
 </li>
@@ -164,7 +275,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.apps.process package</a></li> 
       </ul>
     </div>

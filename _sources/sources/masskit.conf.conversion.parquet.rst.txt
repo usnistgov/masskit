@@ -1,0 +1,10 @@
+masskit.conf.conversion.parquet package
+=======================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.conf.conversion.parquet
+   :members:
+   :undoc-members:
+   :show-inheritance:

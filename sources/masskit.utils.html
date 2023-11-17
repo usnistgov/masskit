@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>masskit.utils package &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>masskit.utils package &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils package</a></li> 
       </ul>
     </div>  
@@ -74,10 +75,29 @@ $(document).ready(function(){
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="masskit.utils.textalloc.html">masskit.utils.textalloc package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc.candidates">masskit.utils.textalloc.candidates module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc.non_overlapping_boxes">masskit.utils.textalloc.non_overlapping_boxes module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc.overlap_functions">masskit.utils.textalloc.overlap_functions module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc">Module contents</a></li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc.candidates">masskit.utils.textalloc.candidates module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.candidates.generate_candidates"><code class="docutils literal notranslate"><span class="pre">generate_candidates()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc.non_overlapping_boxes">masskit.utils.textalloc.non_overlapping_boxes module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.non_overlapping_boxes.get_non_overlapping_boxes"><code class="docutils literal notranslate"><span class="pre">get_non_overlapping_boxes()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc.overlap_functions">masskit.utils.textalloc.overlap_functions module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.overlap_functions.ccw"><code class="docutils literal notranslate"><span class="pre">ccw()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.overlap_functions.inside_plot"><code class="docutils literal notranslate"><span class="pre">inside_plot()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.overlap_functions.line_intersect"><code class="docutils literal notranslate"><span class="pre">line_intersect()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.overlap_functions.non_overlapping_with_boxes"><code class="docutils literal notranslate"><span class="pre">non_overlapping_with_boxes()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.overlap_functions.non_overlapping_with_lines"><code class="docutils literal notranslate"><span class="pre">non_overlapping_with_lines()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.overlap_functions.non_overlapping_with_points"><code class="docutils literal notranslate"><span class="pre">non_overlapping_with_points()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="masskit.utils.textalloc.html#module-masskit.utils.textalloc">Module contents</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.allocate_text"><code class="docutils literal notranslate"><span class="pre">allocate_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.find_nearest_point_on_box"><code class="docutils literal notranslate"><span class="pre">find_nearest_point_on_box()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="masskit.utils.textalloc.html#masskit.utils.textalloc.lines_to_segments"><code class="docutils literal notranslate"><span class="pre">lines_to_segments()</span></code></a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -85,6 +105,58 @@ $(document).ready(function(){
 </section>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
+</section>
+<section id="module-masskit.utils.accumulator">
+<span id="masskit-utils-accumulator-module"></span><h2>masskit.utils.accumulator module<a class="headerlink" href="#module-masskit.utils.accumulator" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.accumulator.Accumulator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.accumulator.</span></span><span class="sig-name descname"><span class="pre">Accumulator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.accumulator.Accumulator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></p>
+<p>accumulator class used to take the mean and standard deviation of a set of data</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.accumulator.Accumulator.add">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.accumulator.Accumulator.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>accumulated a new item</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_item</strong> – new item to be accumulated</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.accumulator.Accumulator.finalize">
+<em class="property"><span class="pre">abstract</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.accumulator.Accumulator.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>finalize the accumulation</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.accumulator.AccumulatorProperty">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.accumulator.</span></span><span class="sig-name descname"><span class="pre">AccumulatorProperty</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.accumulator.AccumulatorProperty" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.utils.accumulator.Accumulator" title="masskit.utils.accumulator.Accumulator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Accumulator</span></code></a></p>
+<p>used to calculate the mean and standard deviation of a property</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.accumulator.AccumulatorProperty.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new_item</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.accumulator.AccumulatorProperty.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>add an item to the average.  Keeps running total of average and std deviation using
+Welford’s algorithm.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>new_spectrum</strong> – new item to be added</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.accumulator.AccumulatorProperty.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.accumulator.AccumulatorProperty.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>finalize the std deviation after all the the spectra have been added</p>
+</dd></dl>
+
+</dd></dl>
+
 </section>
 <section id="module-masskit.utils.arrow">
 <span id="masskit-utils-arrow-module"></span><h2>masskit.utils.arrow module<a class="headerlink" href="#module-masskit.utils.arrow" title="Permalink to this heading">¶</a></h2>
@@ -131,13 +203,18 @@ already exists</p>
 <span id="masskit-utils-files-module"></span><h2>masskit.utils.files module<a class="headerlink" href="#module-masskit.utils.files" title="Permalink to this heading">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="masskit.utils.files.BatchFileReader">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">BatchFileReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment_fields</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_column_headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mol_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimiter</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchFileReader" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">BatchFileReader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">PathLike</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">omegaconf.DictConfig</span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchFileReader" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <dl class="py method">
 <dt class="sig sig-object py" id="masskit.utils.files.BatchFileReader.iter_tables">
 <span class="sig-name descname"><span class="pre">iter_tables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Table</span></span></span><a class="headerlink" href="#masskit.utils.files.BatchFileReader.iter_tables" title="Permalink to this definition">¶</a></dt>
 <dd><p>read batch generator, returns a Table</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchFileReader.loaders">
+<span class="sig-name descname"><span class="pre">loaders</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'csv':</span> <span class="pre">&lt;class</span> <span class="pre">'masskit.utils.files.CSVLoader'&gt;,</span> <span class="pre">'mgf':</span> <span class="pre">&lt;class</span> <span class="pre">'masskit.utils.files.MGFLoader'&gt;,</span> <span class="pre">'msp':</span> <span class="pre">&lt;class</span> <span class="pre">'masskit.utils.files.MSPLoader'&gt;,</span> <span class="pre">'sdf':</span> <span class="pre">&lt;class</span> <span class="pre">'masskit.utils.files.SDFLoader'&gt;}</span></em><a class="headerlink" href="#masskit.utils.files.BatchFileReader.loaders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
@@ -158,6 +235,121 @@ already exists</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>table</strong> – table to write</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">BatchLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.ecfp4">
+<span class="sig-name descname"><span class="pre">ecfp4</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">&lt;masskit.utils.fingerprints.ECFPFingerprint</span> <span class="pre">object&gt;</span></em><a class="headerlink" href="#masskit.utils.files.BatchLoader.ecfp4" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.finalize">
+<span class="sig-name descname"><span class="pre">finalize</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchLoader.finalize" title="Permalink to this definition">¶</a></dt>
+<dd><p>finalized the chunk</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchLoader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in a chunk from a stream</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – the stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.loop_end">
+<span class="sig-name descname"><span class="pre">loop_end</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchLoader.loop_end" title="Permalink to this definition">¶</a></dt>
+<dd><p>end of loop to read in one record</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.mol2row">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">mol2row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_computed_props</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#masskit.utils.files.BatchLoader.mol2row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert an rdkit Mol into a row</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mol</strong> – the molecule</p></li>
+<li><p><strong>max_size</strong> – the maximum bounding box size (used to filter out large molecules. 0=no bound)</p></li>
+<li><p><strong>skip_computed_props</strong> – skip computing properties</p></li>
+<li><p><strong>skip_expensive</strong> – skip computing computationally expensive properties</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>row as dict, mol</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.setup">
+<span class="sig-name descname"><span class="pre">setup</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.BatchLoader.setup" title="Permalink to this definition">¶</a></dt>
+<dd><p>set up loading</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="masskit.utils.files.BatchLoader.tms">
+<span class="sig-name descname"><span class="pre">tms</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'[#14]([CH3])([CH3])[CH3]'</span></em><a class="headerlink" href="#masskit.utils.files.BatchLoader.tms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.files.CSVLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">CSVLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.CSVLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.utils.files.BatchLoader" title="masskit.utils.files.BatchLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchLoader</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.CSVLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.CSVLoader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in a chunk from a stream</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – the stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.files.MGFLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">MGFLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_probabilities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.93,</span> <span class="pre">0.02,</span> <span class="pre">0.05)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.MGFLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.utils.files.BatchLoader" title="masskit.utils.files.BatchLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchLoader</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.MGFLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.MGFLoader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in a chunk from a stream</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – the stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.files.MSPLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">MSPLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.MSPLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.utils.files.BatchLoader" title="masskit.utils.files.BatchLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchLoader</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.MSPLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.MSPLoader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in a chunk from a stream</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – the stream</p>
 </dd>
 </dl>
 </dd></dl>
@@ -204,6 +396,23 @@ already exists</p>
 
 </dd></dl>
 
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.files.SDFLoader">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">SDFLoader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_probabilities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.0,</span> <span class="pre">0.93,</span> <span class="pre">0.02,</span> <span class="pre">0.05)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.SDFLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#masskit.utils.files.BatchLoader" title="masskit.utils.files.BatchLoader"><code class="xref py py-class docutils literal notranslate"><span class="pre">BatchLoader</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.files.SDFLoader.load">
+<span class="sig-name descname"><span class="pre">load</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.SDFLoader.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>read in a chunk from a stream</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>fp</strong> – the stream</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.files.add_row_to_records">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">add_row_to_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.add_row_to_records" title="Permalink to this definition">¶</a></dt>
@@ -231,68 +440,18 @@ already exists</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.files.load_csv2array">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">load_csv2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_rdkit_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">no_column_headers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mol_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">smiles_column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.load_csv2array" title="Permalink to this definition">¶</a></dt>
-<dd><p>read in csv file with SMILES in one column and convert to an arrow table
-SMILES are standardized and converted into an rdkit Mol object</p>
+<dt class="sig sig-object py" id="masskit.utils.files.load_default_config_schema">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">load_default_config_schema</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">format</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.load_default_config_schema" title="Permalink to this definition">¶</a></dt>
+<dd><p>for a given file type and format, return configuration</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fp</strong> – name of the file to read or a file object</p></li>
-<li><p><strong>id_field</strong> – integer value that is the start of the id values. If none, no id field is created</p></li>
-<li><p><strong>suppress_rdkit_warnings</strong> – don’t print out spurious rdkit warnings</p></li>
-<li><p><strong>no_column_headers</strong> – the csv has no headers.  In that case, the columns are labeled f0, f1, …</p></li>
-<li><p><strong>mol_column_name</strong> – name of the rdkit Mol column in the output table</p></li>
-<li><p><strong>smiles_column_name</strong> – the name of the SMILES column. default is “SMILES” or “f0” if no headers</p></li>
+<li><p><strong>file_type</strong> – the type of file, e.g. mgf, msp, arrow, parquet, sdf</p></li>
+<li><p><strong>format</strong> – the specific format of the file_type, e.g. msp_mol, msp_peptide, sdf_mol, sdf_nist_mol, sdf_pubchem_mol. If none, use default</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>arrow table</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.files.load_mgf2array">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">load_mgf2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_probabilities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.01,</span> <span class="pre">0.97,</span> <span class="pre">0.01,</span> <span class="pre">0.01)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_entries</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.load_mgf2array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read stream in MGF format and return as Pandas data frame.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fp</strong> – stream or filename</p></li>
-<li><p><strong>num</strong> – the maximum number of records to generate (0=all)</p></li>
-<li><p><strong>id_field</strong> – the spectrum id to begin with</p></li>
-<li><p><strong>set_probabilities</strong> – how to divide into dev, train, valid, test</p></li>
-<li><p><strong>row_entries</strong> – dict containing additional row columns</p></li>
-<li><p><strong>title_fields</strong> – dict containing column names with corresponding regex to extract field values from the TITLE regex match group 1 is the value</p></li>
-<li><p><strong>min_intensity</strong> – the minimum intensity to set the fingerprint bit</p></li>
-<li><p><strong>spectrum_type</strong> – the type of spectrum file</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>one dataframe</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.files.load_msp2array">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">load_msp2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">title_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">comment_fields</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.load_msp2array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read stream or filename in MSP format and return as pyarrow Table.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fp</strong> – stream or filename</p></li>
-<li><p><strong>num</strong> – the maximum number of records to generate (None=all)</p></li>
-<li><p><strong>id_field</strong> – the spectrum id to begin with</p></li>
-<li><p><strong>title_fields</strong> – dict containing column names with corresponding regex to extract field values from the TITLE. regex match group 1 is the value</p></li>
-<li><p><strong>comment_fields</strong> – a Dict of regexes used to extract fields from the Comment field.  Form of the Dict is { comment_field_name: (regex, type, field_name)}.  For example {‘Filter’:(r’&#64;hcd(d+.?d* )’, float, ‘nce’)}</p></li>
-<li><p><strong>min_intensity</strong> – the minimum intensity to set the fingerprint bit</p></li>
-<li><p><strong>spectrum_type</strong> – type of spectrum file</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>arrow table</p>
+<dd class="field-even"><p>config</p>
 </dd>
 </dl>
 </dd></dl>
@@ -307,73 +466,6 @@ SMILES are standardized and converted into an rdkit Mol object</p>
 <li><p><strong>fp</strong> – stream or filename</p></li>
 <li><p><strong>dedup</strong> – Only take the first row with a given hit_id</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.files.load_sdf2array">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">load_sdf2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precursor_mass_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">product_mass_info</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_probabilities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.01,</span> <span class="pre">0.97,</span> <span class="pre">0.01,</span> <span class="pre">0.01)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_rdkit_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.load_sdf2array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read file in SDF format and return as Lists of Dicts.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fp</strong> – ForwardSDMolSupplier iterator</p></li>
-<li><p><strong>max_size</strong> – the maximum bounding box size (used to filter out large molecules. 0=no bound)</p></li>
-<li><p><strong>num</strong> – the maximum number of records to generate (None=all)</p></li>
-<li><p><strong>source</strong> – where did the sdf come from?  pubchem, nist, ?</p></li>
-<li><p><strong>precursor_mass_info</strong> – mass information for precursor. if None, will use default.</p></li>
-<li><p><strong>product_mass_info</strong> – mass information for product. if None, will use default.</p></li>
-<li><p><strong>skip_expensive</strong> – skip expensive calculations for better perf</p></li>
-<li><p><strong>id_field</strong> – field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum</p></li>
-<li><p><strong>id_field_type</strong> – the id field type, such as int or str</p></li>
-<li><p><strong>min_intensity</strong> – the minimum intensity to set the fingerprint bit</p></li>
-<li><p><strong>set_probabilities</strong> – how to divide into dev, train, valid, test</p></li>
-<li><p><strong>suppress_rdkit_warnings</strong> – don’t print out spurious rdkit warnings</p></li>
-<li><p><strong>spectrum_type</strong> – the type of spectrum file</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>arrow table with records</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.files.load_smiles2array">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">load_smiles2array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fp</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">suppress_rdkit_warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.load_smiles2array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Read file of SMILES and return pyarrow table.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>fp</strong> – name of the file to read or a file object</p></li>
-<li><p><strong>num</strong> – the maximum number of records to generate (None=all)</p></li>
-<li><p><strong>skip_expensive</strong> – skip expensive calculations for better perf</p></li>
-<li><p><strong>id_field</strong> – field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if integer, use the value as the starting value for the id and increment for each spectrum</p></li>
-<li><p><strong>suppress_rdkit_warnings</strong> – don’t print out spurious rdkit warnings</p></li>
-<li><p><strong>spectrum_type</strong> – the type of spectrum file</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>arrow table with records</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.files.mol2row">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">mol2row</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Dict</span></span></span><a class="headerlink" href="#masskit.utils.files.mol2row" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert an rdkit Mol into a row</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mol</strong> – the molecule</p></li>
-<li><p><strong>max_size</strong> – the maximum bounding box size (used to filter out large molecules. 0=no bound)</p></li>
-<li><p><strong>skip_expensive</strong> – skip expensive calculations for better perf</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>row as dict, mol</p>
 </dd>
 </dl>
 </dd></dl>
@@ -422,13 +514,13 @@ this function is not complete.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.files.records2table">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">records2table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.records2table" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">records2table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">records</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_group</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.records2table" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert a flat table with spectral records into a table with a nested spectrum</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>records</strong> – records to be added to a table</p></li>
-<li><p><strong>spectrum_type</strong> – which type of spectrum</p></li>
+<li><p><strong>schema_group</strong> – the schema group</p></li>
 </ul>
 </dd>
 </dl>
@@ -441,15 +533,15 @@ this function is not complete.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.files.spectra_to_array">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">spectra_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_starts_stops</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.spectra_to_array" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">spectra_to_array</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectra</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_tolerance</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">schema_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.spectra_to_array" title="Permalink to this definition">¶</a></dt>
 <dd><p>convert an array-like of spectra to an arrow_table</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>spectra</strong> – iteratable containing the spectrums</p></li>
 <li><p><strong>min_intensity</strong> – the minimum intensity to set the fingerprint bit</p></li>
-<li><p><strong>write_starts_stops</strong> – put the starts and stops arrays into the arrow Table</p></li>
-<li><p><strong>spectrum_type</strong> – the type of spectrum file</p></li>
+<li><p><strong>write_tolerance</strong> – put the tolerance into the arrow Table</p></li>
+<li><p><strong>schema_group</strong> – the schema group of spectrum file</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -457,6 +549,16 @@ this function is not complete.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.files.spectrum2mgf">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">spectrum2mgf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.spectrum2mgf" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.files.spectrum2msp">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.files.</span></span><span class="sig-name descname"><span class="pre">spectrum2msp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">spectrum</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">annotate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.files.spectrum2msp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.files.write_parquet">
@@ -1022,6 +1124,18 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 </section>
 <section id="module-masskit.utils.general">
 <span id="masskit-utils-general-module"></span><h2>masskit.utils.general module<a class="headerlink" href="#module-masskit.utils.general" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.utils.general.MassKitSearchPathPlugin">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">MassKitSearchPathPlugin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Any</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.MassKitSearchPathPlugin" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">SearchPathPlugin</span></code></p>
+<p>add the cwd to the search path for configuration yaml files</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.utils.general.MassKitSearchPathPlugin.manipulate_search_path">
+<span class="sig-name descname"><span class="pre">manipulate_search_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">search_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">hydra.core.config_search_path.ConfigSearchPath</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#masskit.utils.general.MassKitSearchPathPlugin.manipulate_search_path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.general.class_for_name">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">class_for_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name_list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_name</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.class_for_name" title="Permalink to this definition">¶</a></dt>
@@ -1035,6 +1149,35 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 <dt class="sig sig-object py" id="masskit.utils.general.discounted_cumulative_gain">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">discounted_cumulative_gain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">relevance_array</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.discounted_cumulative_gain" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.general.expand_path">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">expand_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_pattern</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Path</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#masskit.utils.general.expand_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>expand a path with globs (wildcards) into a generator of Paths</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_pattern</strong> – the path to be globbed</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>iterable of Path</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.general.expand_path_list">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">expand_path_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path_list</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.expand_path_list" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a file path or list of file paths that may contain wildcards,
+expand ~ to the user directory and glob the wildcards</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path_list</strong> – list or str of paths, may include ~ and *</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of expanded paths</p>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.general.get_file">
@@ -1054,6 +1197,20 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 </dd>
 </dl>
 <p>Notes: we don’t support zip files as the python api for zip files doesn’t support symlinks</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.general.is_list_like">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">is_list_like</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">obj</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.is_list_like" title="Permalink to this definition">¶</a></dt>
+<dd><p>is the object list-like?</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>obj</strong> – the object to be tested</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if list like</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -1095,13 +1252,28 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.general.parse_filename">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">parse_filename</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.parse_filename" title="Permalink to this definition">¶</a></dt>
-<dd><p>parse filename into root and extension</p>
+<dd><p>parse filename into root, extension, and compression extension</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>filename</strong> – filename</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>root, extension</p>
+<dd class="field-even"><p>root, extension, compression</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.general.read_arrow">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">read_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.read_arrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>read a pyarrow Table from an arrow or parquet file.
+arrow file is memory mapped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – file to input. use the suffix “arrow” if an arrow file, “parquet” if a parquet file</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>pyarrow Table</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1119,6 +1291,21 @@ is a numpy array.  even arrow fixed size lists do this.  fixedbinary uses byte o
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>the Path to the file, otherwise None if not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.general.write_arrow">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.general.</span></span><span class="sig-name descname"><span class="pre">write_arrow</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_group_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.general.write_arrow" title="Permalink to this definition">¶</a></dt>
+<dd><p>write a pyarrow Table to an arrow or parquet file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – file to output. use the suffix “arrow” if an arrow file, “parquet” if a parquet file</p></li>
+<li><p><strong>table</strong> – pyarrow Table</p></li>
+<li><p><strong>row_group_size</strong> – if a parquet file, use this row group size</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -1908,7 +2095,7 @@ truth_score</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="masskit.utils.tablemap.ArrowLibraryMap.from_sdf">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_sdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_probabilities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.01,</span> <span class="pre">0.97,</span> <span class="pre">0.01,</span> <span class="pre">0.01)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tablemap.ArrowLibraryMap.from_sdf" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_sdf</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skip_expensive</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">id_field</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_intensity</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">set_probabilities</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0.01,</span> <span class="pre">0.97,</span> <span class="pre">0.01,</span> <span class="pre">0.01)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spectrum_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tablemap.ArrowLibraryMap.from_sdf" title="Permalink to this definition">¶</a></dt>
 <dd><p>read in an sdf file and create an ArrowLibraryMap</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1917,7 +2104,6 @@ truth_score</p></li>
 <li><p><strong>num</strong> – number of rows.  None means all</p></li>
 <li><p><strong>skip_expensive</strong> – don’t compute fields that are computationally expensive</p></li>
 <li><p><strong>max_size</strong> – the maximum bounding box size (used to filter out large molecules. 0=no bound)</p></li>
-<li><p><strong>source</strong> – where did the sdf come from?  pubchem, nist, ?</p></li>
 <li><p><strong>id_field</strong> – field to use for the mol id, such as NISTNO, ID or _NAME (the sdf title field). if an integer,
 use the integer as the starting value for an assigned id</p></li>
 <li><p><strong>min_intensity</strong> – the minimum intensity to set the fingerprint bit</p></li>
@@ -2265,6 +2451,21 @@ canonical SMILES</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.is_struct_or_extstruct">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">is_struct_or_extstruct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chunked_array</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ChunkedArray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="headerlink" href="#masskit.utils.tables.is_struct_or_extstruct" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.optimize_structarray">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">optimize_structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ChunkedArray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ChunkedArray</span></span></span><a class="headerlink" href="#masskit.utils.tables.optimize_structarray" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.optimize_table">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">optimize_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Table</span></span></span><a class="headerlink" href="#masskit.utils.tables.optimize_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.tables.random_string">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">random_string</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.random_string" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -2280,19 +2481,50 @@ canonical SMILES</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.tables.struct_to_table">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">struct_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.struct_to_table" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
 <dt class="sig sig-object py" id="masskit.utils.tables.struct_view">
 <span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">struct_view</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">parent</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.struct_view" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="masskit.utils.tables.table_to_struct">
-<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">table_to_struct</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.utils.tables.table_to_struct" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="masskit.utils.tables.structarray_to_table">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">structarray_to_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">struct</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StructArray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Table</span></span></span><a class="headerlink" href="#masskit.utils.tables.structarray_to_table" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.table_add_structarray">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">table_add_structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structarray</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">StructArray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Table</span></span></span><a class="headerlink" href="#masskit.utils.tables.table_add_structarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>add a struct array to a table</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table</strong> – table to be added to</p></li>
+<li><p><strong>structarray</strong> – structarray to add to table</p></li>
+<li><p><strong>column_name</strong> – name of column to add</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>new table with appended column</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.utils.tables.table_to_structarray">
+<span class="sig-prename descclassname"><span class="pre">masskit.utils.tables.</span></span><span class="sig-name descname"><span class="pre">table_to_structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structarray_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExtensionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">StructArray</span></span></span><a class="headerlink" href="#masskit.utils.tables.table_to_structarray" title="Permalink to this definition">¶</a></dt>
+<dd><p>convert a spectrum table into a struct array.
+if an ExtensionType is passed in, will create a struct array of that type</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>table</strong> – spectrum table</p></li>
+<li><p><strong>structarray_type</strong> – the type of the array returned, e.g. SpectrumArrowType()</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>StructArray</p>
+</dd>
+</dl>
+</dd></dl>
 
 </section>
 <section id="module-masskit.utils">
@@ -2313,15 +2545,317 @@ canonical SMILES</p>
 <li><a class="reference internal" href="#">masskit.utils package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.arrow">masskit.utils.arrow module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.files">masskit.utils.files module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.fingerprints">masskit.utils.fingerprints module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.general">masskit.utils.general module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.hitlist">masskit.utils.hitlist module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.index">masskit.utils.index module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.spectrum_writers">masskit.utils.spectrum_writers module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.tablemap">masskit.utils.tablemap module</a></li>
-<li><a class="reference internal" href="#module-masskit.utils.tables">masskit.utils.tables module</a></li>
+<li><a class="reference internal" href="#module-masskit.utils.accumulator">masskit.utils.accumulator module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.accumulator.Accumulator"><code class="docutils literal notranslate"><span class="pre">Accumulator</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.accumulator.Accumulator.add"><code class="docutils literal notranslate"><span class="pre">Accumulator.add()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.accumulator.Accumulator.finalize"><code class="docutils literal notranslate"><span class="pre">Accumulator.finalize()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.accumulator.AccumulatorProperty"><code class="docutils literal notranslate"><span class="pre">AccumulatorProperty</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.accumulator.AccumulatorProperty.add"><code class="docutils literal notranslate"><span class="pre">AccumulatorProperty.add()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.accumulator.AccumulatorProperty.finalize"><code class="docutils literal notranslate"><span class="pre">AccumulatorProperty.finalize()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.arrow">masskit.utils.arrow module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.arrow.create_object_id"><code class="docutils literal notranslate"><span class="pre">create_object_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.arrow.save_to_arrow"><code class="docutils literal notranslate"><span class="pre">save_to_arrow()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.files">masskit.utils.files module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.BatchFileReader"><code class="docutils literal notranslate"><span class="pre">BatchFileReader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.BatchFileReader.iter_tables"><code class="docutils literal notranslate"><span class="pre">BatchFileReader.iter_tables()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchFileReader.loaders"><code class="docutils literal notranslate"><span class="pre">BatchFileReader.loaders</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchFileWriter"><code class="docutils literal notranslate"><span class="pre">BatchFileWriter</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.BatchFileWriter.close"><code class="docutils literal notranslate"><span class="pre">BatchFileWriter.close()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchFileWriter.write_table"><code class="docutils literal notranslate"><span class="pre">BatchFileWriter.write_table()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader"><code class="docutils literal notranslate"><span class="pre">BatchLoader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.ecfp4"><code class="docutils literal notranslate"><span class="pre">BatchLoader.ecfp4</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.finalize"><code class="docutils literal notranslate"><span class="pre">BatchLoader.finalize()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.load"><code class="docutils literal notranslate"><span class="pre">BatchLoader.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.loop_end"><code class="docutils literal notranslate"><span class="pre">BatchLoader.loop_end()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.mol2row"><code class="docutils literal notranslate"><span class="pre">BatchLoader.mol2row()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.setup"><code class="docutils literal notranslate"><span class="pre">BatchLoader.setup()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.BatchLoader.tms"><code class="docutils literal notranslate"><span class="pre">BatchLoader.tms</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.CSVLoader"><code class="docutils literal notranslate"><span class="pre">CSVLoader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.CSVLoader.load"><code class="docutils literal notranslate"><span class="pre">CSVLoader.load()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.MGFLoader"><code class="docutils literal notranslate"><span class="pre">MGFLoader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.MGFLoader.load"><code class="docutils literal notranslate"><span class="pre">MGFLoader.load()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.MSPLoader"><code class="docutils literal notranslate"><span class="pre">MSPLoader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.MSPLoader.load"><code class="docutils literal notranslate"><span class="pre">MSPLoader.load()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.MzTab_Reader"><code class="docutils literal notranslate"><span class="pre">MzTab_Reader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.MzTab_Reader.get_hitlist"><code class="docutils literal notranslate"><span class="pre">MzTab_Reader.get_hitlist()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.MzTab_Reader.parse_metadata"><code class="docutils literal notranslate"><span class="pre">MzTab_Reader.parse_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.MzTab_Reader.parse_psm"><code class="docutils literal notranslate"><span class="pre">MzTab_Reader.parse_psm()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.MzTab_Reader.parse_psm_row"><code class="docutils literal notranslate"><span class="pre">MzTab_Reader.parse_psm_row()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.MzTab_Reader.read_sections"><code class="docutils literal notranslate"><span class="pre">MzTab_Reader.read_sections()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.SDFLoader"><code class="docutils literal notranslate"><span class="pre">SDFLoader</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.files.SDFLoader.load"><code class="docutils literal notranslate"><span class="pre">SDFLoader.load()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.files.add_row_to_records"><code class="docutils literal notranslate"><span class="pre">add_row_to_records()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.create_table_with_mod_dict"><code class="docutils literal notranslate"><span class="pre">create_table_with_mod_dict()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.empty_records"><code class="docutils literal notranslate"><span class="pre">empty_records()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.get_progress"><code class="docutils literal notranslate"><span class="pre">get_progress()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.load_default_config_schema"><code class="docutils literal notranslate"><span class="pre">load_default_config_schema()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.load_mzTab"><code class="docutils literal notranslate"><span class="pre">load_mzTab()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.parse_energy"><code class="docutils literal notranslate"><span class="pre">parse_energy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.parse_glycopeptide_annot"><code class="docutils literal notranslate"><span class="pre">parse_glycopeptide_annot()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.read_parquet"><code class="docutils literal notranslate"><span class="pre">read_parquet()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.records2table"><code class="docutils literal notranslate"><span class="pre">records2table()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.seek_size"><code class="docutils literal notranslate"><span class="pre">seek_size()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.spectra_to_array"><code class="docutils literal notranslate"><span class="pre">spectra_to_array()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.spectrum2mgf"><code class="docutils literal notranslate"><span class="pre">spectrum2mgf()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.spectrum2msp"><code class="docutils literal notranslate"><span class="pre">spectrum2msp()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.files.write_parquet"><code class="docutils literal notranslate"><span class="pre">write_parquet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.fingerprints">masskit.utils.fingerprints module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.ECFPFingerprint"><code class="docutils literal notranslate"><span class="pre">ECFPFingerprint</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.ECFPFingerprint.from_bitvec"><code class="docutils literal notranslate"><span class="pre">ECFPFingerprint.from_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.ECFPFingerprint.from_numpy"><code class="docutils literal notranslate"><span class="pre">ECFPFingerprint.from_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.ECFPFingerprint.object2fingerprint"><code class="docutils literal notranslate"><span class="pre">ECFPFingerprint.object2fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.ECFPFingerprint.to_bitvec"><code class="docutils literal notranslate"><span class="pre">ECFPFingerprint.to_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.ECFPFingerprint.to_numpy"><code class="docutils literal notranslate"><span class="pre">ECFPFingerprint.to_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint"><code class="docutils literal notranslate"><span class="pre">Fingerprint</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.bitvec2numpy"><code class="docutils literal notranslate"><span class="pre">Fingerprint.bitvec2numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.from_bitvec"><code class="docutils literal notranslate"><span class="pre">Fingerprint.from_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.from_numpy"><code class="docutils literal notranslate"><span class="pre">Fingerprint.from_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.get_num_on_bits"><code class="docutils literal notranslate"><span class="pre">Fingerprint.get_num_on_bits()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.numpy2bitvec"><code class="docutils literal notranslate"><span class="pre">Fingerprint.numpy2bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.object2fingerprint"><code class="docutils literal notranslate"><span class="pre">Fingerprint.object2fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.size"><code class="docutils literal notranslate"><span class="pre">Fingerprint.size()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.to_bitvec"><code class="docutils literal notranslate"><span class="pre">Fingerprint.to_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.Fingerprint.to_numpy"><code class="docutils literal notranslate"><span class="pre">Fingerprint.to_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.MolFingerprint"><code class="docutils literal notranslate"><span class="pre">MolFingerprint</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.MolFingerprint.from_bitvec"><code class="docutils literal notranslate"><span class="pre">MolFingerprint.from_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.MolFingerprint.from_numpy"><code class="docutils literal notranslate"><span class="pre">MolFingerprint.from_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.MolFingerprint.object2fingerprint"><code class="docutils literal notranslate"><span class="pre">MolFingerprint.object2fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.MolFingerprint.to_bitvec"><code class="docutils literal notranslate"><span class="pre">MolFingerprint.to_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.MolFingerprint.to_numpy"><code class="docutils literal notranslate"><span class="pre">MolFingerprint.to_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFingerprint"><code class="docutils literal notranslate"><span class="pre">SpectrumFingerprint</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFingerprint.from_bitvec"><code class="docutils literal notranslate"><span class="pre">SpectrumFingerprint.from_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFingerprint.from_numpy"><code class="docutils literal notranslate"><span class="pre">SpectrumFingerprint.from_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFingerprint.object2fingerprint"><code class="docutils literal notranslate"><span class="pre">SpectrumFingerprint.object2fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFingerprint.to_bitvec"><code class="docutils literal notranslate"><span class="pre">SpectrumFingerprint.to_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFingerprint.to_numpy"><code class="docutils literal notranslate"><span class="pre">SpectrumFingerprint.to_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFloatFingerprint"><code class="docutils literal notranslate"><span class="pre">SpectrumFloatFingerprint</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFloatFingerprint.from_bitvec"><code class="docutils literal notranslate"><span class="pre">SpectrumFloatFingerprint.from_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFloatFingerprint.from_numpy"><code class="docutils literal notranslate"><span class="pre">SpectrumFloatFingerprint.from_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFloatFingerprint.object2fingerprint"><code class="docutils literal notranslate"><span class="pre">SpectrumFloatFingerprint.object2fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFloatFingerprint.to_bitvec"><code class="docutils literal notranslate"><span class="pre">SpectrumFloatFingerprint.to_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumFloatFingerprint.to_numpy"><code class="docutils literal notranslate"><span class="pre">SpectrumFloatFingerprint.to_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumTanimotoFingerPrint"><code class="docutils literal notranslate"><span class="pre">SpectrumTanimotoFingerPrint</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumTanimotoFingerPrint.from_bitvec"><code class="docutils literal notranslate"><span class="pre">SpectrumTanimotoFingerPrint.from_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumTanimotoFingerPrint.from_numpy"><code class="docutils literal notranslate"><span class="pre">SpectrumTanimotoFingerPrint.from_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumTanimotoFingerPrint.object2fingerprint"><code class="docutils literal notranslate"><span class="pre">SpectrumTanimotoFingerPrint.object2fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumTanimotoFingerPrint.to_bitvec"><code class="docutils literal notranslate"><span class="pre">SpectrumTanimotoFingerPrint.to_bitvec()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.SpectrumTanimotoFingerPrint.to_numpy"><code class="docutils literal notranslate"><span class="pre">SpectrumTanimotoFingerPrint.to_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.calc_bit"><code class="docutils literal notranslate"><span class="pre">calc_bit()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.calc_dynamic_fingerprint"><code class="docutils literal notranslate"><span class="pre">calc_dynamic_fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.calc_interval_fingerprint"><code class="docutils literal notranslate"><span class="pre">calc_interval_fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.fingerprints.fingerprint_search_numpy"><code class="docutils literal notranslate"><span class="pre">fingerprint_search_numpy()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.general">masskit.utils.general module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.general.MassKitSearchPathPlugin"><code class="docutils literal notranslate"><span class="pre">MassKitSearchPathPlugin</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.general.MassKitSearchPathPlugin.manipulate_search_path"><code class="docutils literal notranslate"><span class="pre">MassKitSearchPathPlugin.manipulate_search_path()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.general.class_for_name"><code class="docutils literal notranslate"><span class="pre">class_for_name()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.discounted_cumulative_gain"><code class="docutils literal notranslate"><span class="pre">discounted_cumulative_gain()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.expand_path"><code class="docutils literal notranslate"><span class="pre">expand_path()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.expand_path_list"><code class="docutils literal notranslate"><span class="pre">expand_path_list()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.get_file"><code class="docutils literal notranslate"><span class="pre">get_file()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.is_list_like"><code class="docutils literal notranslate"><span class="pre">is_list_like()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.open_if_compressed"><code class="docutils literal notranslate"><span class="pre">open_if_compressed()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.open_if_filename"><code class="docutils literal notranslate"><span class="pre">open_if_filename()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.parse_filename"><code class="docutils literal notranslate"><span class="pre">parse_filename()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.read_arrow"><code class="docutils literal notranslate"><span class="pre">read_arrow()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.search_for_file"><code class="docutils literal notranslate"><span class="pre">search_for_file()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.general.write_arrow"><code class="docutils literal notranslate"><span class="pre">write_arrow()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.hitlist">masskit.utils.hitlist module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.CompareRecallDCG"><code class="docutils literal notranslate"><span class="pre">CompareRecallDCG</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.CompareRecallDCG.compare"><code class="docutils literal notranslate"><span class="pre">CompareRecallDCG.compare()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.CosineScore"><code class="docutils literal notranslate"><span class="pre">CosineScore</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.CosineScore.score"><code class="docutils literal notranslate"><span class="pre">CosineScore.score()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist"><code class="docutils literal notranslate"><span class="pre">Hitlist</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist.get_query_ids"><code class="docutils literal notranslate"><span class="pre">Hitlist.get_query_ids()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist.hitlist"><code class="docutils literal notranslate"><span class="pre">Hitlist.hitlist</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist.load"><code class="docutils literal notranslate"><span class="pre">Hitlist.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist.save"><code class="docutils literal notranslate"><span class="pre">Hitlist.save()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist.sort"><code class="docutils literal notranslate"><span class="pre">Hitlist.sort()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Hitlist.to_pandas"><code class="docutils literal notranslate"><span class="pre">Hitlist.to_pandas()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.HitlistCompare"><code class="docutils literal notranslate"><span class="pre">HitlistCompare</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.HitlistCompare.compare"><code class="docutils literal notranslate"><span class="pre">HitlistCompare.compare()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.IdentityRecall"><code class="docutils literal notranslate"><span class="pre">IdentityRecall</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.IdentityRecall.compare"><code class="docutils literal notranslate"><span class="pre">IdentityRecall.compare()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.PeptideIdentityScore"><code class="docutils literal notranslate"><span class="pre">PeptideIdentityScore</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.PeptideIdentityScore.score"><code class="docutils literal notranslate"><span class="pre">PeptideIdentityScore.score()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Score"><code class="docutils literal notranslate"><span class="pre">Score</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.Score.score"><code class="docutils literal notranslate"><span class="pre">Score.score()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.hitlist.TanimotoScore"><code class="docutils literal notranslate"><span class="pre">TanimotoScore</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.hitlist.TanimotoScore.score"><code class="docutils literal notranslate"><span class="pre">TanimotoScore.score()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.index">masskit.utils.index module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.index.BruteForceIndex"><code class="docutils literal notranslate"><span class="pre">BruteForceIndex</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.index.BruteForceIndex.create"><code class="docutils literal notranslate"><span class="pre">BruteForceIndex.create()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.BruteForceIndex.load"><code class="docutils literal notranslate"><span class="pre">BruteForceIndex.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.BruteForceIndex.optimize"><code class="docutils literal notranslate"><span class="pre">BruteForceIndex.optimize()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.BruteForceIndex.save"><code class="docutils literal notranslate"><span class="pre">BruteForceIndex.save()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.BruteForceIndex.search"><code class="docutils literal notranslate"><span class="pre">BruteForceIndex.search()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex"><code class="docutils literal notranslate"><span class="pre">DescentIndex</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex.create"><code class="docutils literal notranslate"><span class="pre">DescentIndex.create()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex.create_from_fingerprint"><code class="docutils literal notranslate"><span class="pre">DescentIndex.create_from_fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex.load"><code class="docutils literal notranslate"><span class="pre">DescentIndex.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex.optimize"><code class="docutils literal notranslate"><span class="pre">DescentIndex.optimize()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex.save"><code class="docutils literal notranslate"><span class="pre">DescentIndex.save()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DescentIndex.search"><code class="docutils literal notranslate"><span class="pre">DescentIndex.search()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.index.DotProductIndex"><code class="docutils literal notranslate"><span class="pre">DotProductIndex</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.index.DotProductIndex.create"><code class="docutils literal notranslate"><span class="pre">DotProductIndex.create()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DotProductIndex.load"><code class="docutils literal notranslate"><span class="pre">DotProductIndex.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DotProductIndex.optimize"><code class="docutils literal notranslate"><span class="pre">DotProductIndex.optimize()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DotProductIndex.save"><code class="docutils literal notranslate"><span class="pre">DotProductIndex.save()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.DotProductIndex.search"><code class="docutils literal notranslate"><span class="pre">DotProductIndex.search()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.index.Index"><code class="docutils literal notranslate"><span class="pre">Index</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.index.Index.create"><code class="docutils literal notranslate"><span class="pre">Index.create()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.Index.load"><code class="docutils literal notranslate"><span class="pre">Index.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.Index.optimize"><code class="docutils literal notranslate"><span class="pre">Index.optimize()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.Index.save"><code class="docutils literal notranslate"><span class="pre">Index.save()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.Index.search"><code class="docutils literal notranslate"><span class="pre">Index.search()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.Index.spectrum2array"><code class="docutils literal notranslate"><span class="pre">Index.spectrum2array()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex.create"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex.create()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex.create_from_fingerprint"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex.create_from_fingerprint()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex.load"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex.load()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex.optimize"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex.optimize()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex.save"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex.save()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.index.TanimotoIndex.search"><code class="docutils literal notranslate"><span class="pre">TanimotoIndex.search()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.index.dot_product"><code class="docutils literal notranslate"><span class="pre">dot_product()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.spectrum_writers">masskit.utils.spectrum_writers module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.spectrum_writers.spectra_to_mgf"><code class="docutils literal notranslate"><span class="pre">spectra_to_mgf()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.spectrum_writers.spectra_to_msp"><code class="docutils literal notranslate"><span class="pre">spectra_to_msp()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.spectrum_writers.spectra_to_mzxml"><code class="docutils literal notranslate"><span class="pre">spectra_to_mzxml()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.tablemap">masskit.utils.tablemap module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.create_dict"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.create_dict()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.from_mgf"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.from_mgf()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.from_msp"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.from_msp()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.from_parquet"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.from_parquet()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.from_sdf"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.from_sdf()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.get_ids"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.get_ids()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.getitem_by_id"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.getitem_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.getitem_by_row"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.getitem_by_row()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.getrow_by_id"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.getrow_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.to_arrow"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.to_arrow()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.to_csv"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.to_csv()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.to_mgf"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.to_mgf()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.to_mzxml"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.to_mzxml()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.to_pandas"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.to_pandas()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ArrowLibraryMap.to_parquet"><code class="docutils literal notranslate"><span class="pre">ArrowLibraryMap.to_parquet()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ListLibraryMap"><code class="docutils literal notranslate"><span class="pre">ListLibraryMap</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ListLibraryMap.create_dict"><code class="docutils literal notranslate"><span class="pre">ListLibraryMap.create_dict()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ListLibraryMap.get_ids"><code class="docutils literal notranslate"><span class="pre">ListLibraryMap.get_ids()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ListLibraryMap.getitem_by_id"><code class="docutils literal notranslate"><span class="pre">ListLibraryMap.getitem_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ListLibraryMap.getitem_by_row"><code class="docutils literal notranslate"><span class="pre">ListLibraryMap.getitem_by_row()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.ListLibraryMap.getrow_by_id"><code class="docutils literal notranslate"><span class="pre">ListLibraryMap.getrow_by_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.PandasLibraryMap"><code class="docutils literal notranslate"><span class="pre">PandasLibraryMap</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.tablemap.PandasLibraryMap.create_dict"><code class="docutils literal notranslate"><span class="pre">PandasLibraryMap.create_dict()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.PandasLibraryMap.get_ids"><code class="docutils literal notranslate"><span class="pre">PandasLibraryMap.get_ids()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.PandasLibraryMap.getitem_by_id"><code class="docutils literal notranslate"><span class="pre">PandasLibraryMap.getitem_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.PandasLibraryMap.getitem_by_row"><code class="docutils literal notranslate"><span class="pre">PandasLibraryMap.getitem_by_row()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.PandasLibraryMap.getrow_by_id"><code class="docutils literal notranslate"><span class="pre">PandasLibraryMap.getrow_by_id()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap"><code class="docutils literal notranslate"><span class="pre">TableMap</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap.create_dict"><code class="docutils literal notranslate"><span class="pre">TableMap.create_dict()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap.get_ids"><code class="docutils literal notranslate"><span class="pre">TableMap.get_ids()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap.getitem_by_id"><code class="docutils literal notranslate"><span class="pre">TableMap.getitem_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap.getitem_by_row"><code class="docutils literal notranslate"><span class="pre">TableMap.getitem_by_row()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap.getrow_by_id"><code class="docutils literal notranslate"><span class="pre">TableMap.getrow_by_id()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tablemap.TableMap.to_msp"><code class="docutils literal notranslate"><span class="pre">TableMap.to_msp()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.utils.tables">masskit.utils.tables module</a><ul>
+<li><a class="reference internal" href="#masskit.utils.tables.create_dataset"><code class="docutils literal notranslate"><span class="pre">create_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.is_struct_or_extstruct"><code class="docutils literal notranslate"><span class="pre">is_struct_or_extstruct()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.optimize_structarray"><code class="docutils literal notranslate"><span class="pre">optimize_structarray()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.optimize_table"><code class="docutils literal notranslate"><span class="pre">optimize_table()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.random_string"><code class="docutils literal notranslate"><span class="pre">random_string()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.row_view"><code class="docutils literal notranslate"><span class="pre">row_view()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.row_view_raw"><code class="docutils literal notranslate"><span class="pre">row_view_raw()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.struct_view"><code class="docutils literal notranslate"><span class="pre">struct_view()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.structarray_to_table"><code class="docutils literal notranslate"><span class="pre">structarray_to_table()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.table_add_structarray"><code class="docutils literal notranslate"><span class="pre">table_add_structarray()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.utils.tables.table_to_structarray"><code class="docutils literal notranslate"><span class="pre">table_to_structarray()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-masskit.utils">Module contents</a></li>
 </ul>
 </li>
@@ -2358,7 +2892,7 @@ canonical SMILES</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.utils package</a></li> 
       </ul>
     </div>

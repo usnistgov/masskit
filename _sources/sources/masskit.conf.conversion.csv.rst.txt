@@ -1,0 +1,10 @@
+masskit.conf.conversion.csv package
+===================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.conf.conversion.csv
+   :members:
+   :undoc-members:
+   :show-inheritance:

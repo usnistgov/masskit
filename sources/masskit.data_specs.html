@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>masskit.data_specs package &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>masskit.data_specs package &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.data_specs package</a></li> 
       </ul>
     </div>  
@@ -439,7 +440,7 @@ type</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="masskit.data_specs.arrow_types.SpectrumPandasDtype.type">
 <span class="sig-name descname"><span class="pre">type</span></span><a class="headerlink" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.type" title="Permalink to this definition">¶</a></dt>
-<dd><p>alias of <a class="reference internal" href="masskit.spectrum.html#masskit.spectrum.spectrum.Spectrum" title="masskit.spectrum.spectrum.Spectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></a></p>
+<dd><p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Spectrum</span></code></p>
 </dd></dl>
 
 </dd></dl>
@@ -578,7 +579,7 @@ type</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.data_specs.schemas.populate_properties">
-<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">populate_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">class_in,</span> <span class="pre">fields=[pyarrow.Field&lt;id:</span> <span class="pre">uint64&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument_type:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument_model:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ion_mode:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ionization:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;name:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;casno:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;synonyms:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;scan:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;collision_energy:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;retention_time:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;collision_gas:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;insource_voltage:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;sample_inlet:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ev:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;nce:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;charge:</span> <span class="pre">int8&gt;,</span> <span class="pre">pyarrow.Field&lt;precursor_mz:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;exact_mass:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;exact_mw:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;set:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;composition:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;spectrum_fp:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">uint8&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;spectrum_fp_count:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide_len:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide_type:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;mod_names:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">int16&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;mod_positions:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">int32&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;protein_id:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">string&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;column:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;vial_id:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;aromatic_rings:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;ecfp4:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">uint8&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;ecfp4_count:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_error:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;formula:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;has_2d:</span> <span class="pre">bool&gt;,</span> <span class="pre">pyarrow.Field&lt;has_conformer:</span> <span class="pre">bool&gt;,</span> <span class="pre">pyarrow.Field&lt;has_tms:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;hba:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;hbd:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;inchi_key:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;inchi_key_orig:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;isomeric_smiles:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;num_atoms:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;num_undef_double:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;num_undef_stereo:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;rotatable_bonds:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;smiles:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;tpsa:</span> <span class="pre">double&gt;]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.populate_properties" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">populate_properties</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">class_in,</span> <span class="pre">fields=[pyarrow.Field&lt;id:</span> <span class="pre">uint64&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument_type:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;instrument_model:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ion_mode:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ionization:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;name:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;casno:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;synonyms:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;scan:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;collision_energy:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;retention_time:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;collision_gas:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;insource_voltage:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;sample_inlet:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;ev:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;nce:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;charge:</span> <span class="pre">int16&gt;,</span> <span class="pre">pyarrow.Field&lt;precursor_mz:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;exact_mass:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;exact_mw:</span> <span class="pre">double&gt;,</span> <span class="pre">pyarrow.Field&lt;set:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;composition:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;spectrum_fp:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">uint8&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;spectrum_fp_count:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide_len:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;peptide_type:</span> <span class="pre">dictionary&lt;values=string,</span> <span class="pre">indices=int32,</span> <span class="pre">ordered=0&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;mod_names:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">int16&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;mod_positions:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">int32&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;protein_id:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">string&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;column:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;experimental_ri_error:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;stdnp_error:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar_data:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;stdpolar_error:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;vial_id:</span> <span class="pre">int64&gt;,</span> <span class="pre">pyarrow.Field&lt;aromatic_rings:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;ecfp4:</span> <span class="pre">large_list&lt;item:</span> <span class="pre">uint8&gt;&gt;,</span> <span class="pre">pyarrow.Field&lt;ecfp4_count:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_error:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_stdnp:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_stdnp_error:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_stdpolar:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;estimated_ri_stdpolar_error:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;formula:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;has_2d:</span> <span class="pre">bool&gt;,</span> <span class="pre">pyarrow.Field&lt;has_conformer:</span> <span class="pre">bool&gt;,</span> <span class="pre">pyarrow.Field&lt;has_tms:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;hba:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;hbd:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;inchi_key:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;inchi_key_orig:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;isomeric_smiles:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;num_atoms:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;num_undef_double:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;num_undef_stereo:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;rotatable_bonds:</span> <span class="pre">int32&gt;,</span> <span class="pre">pyarrow.Field&lt;smiles:</span> <span class="pre">string&gt;,</span> <span class="pre">pyarrow.Field&lt;tpsa:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;logp:</span> <span class="pre">float&gt;,</span> <span class="pre">pyarrow.Field&lt;fragments:</span> <span class="pre">int32&gt;]</span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.populate_properties" title="Permalink to this definition">¶</a></dt>
 <dd><p>given a class (or any object), create a set of properties from a list of fields</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -623,42 +624,6 @@ in the metadata of field</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>edited field list</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.data_specs.schemas.table2structarray">
-<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">table2structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structarray_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ExtensionType</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">StructArray</span></span></span><a class="headerlink" href="#masskit.data_specs.schemas.table2structarray" title="Permalink to this definition">¶</a></dt>
-<dd><p>convert a spectrum table into a struct array.
-if an ExtensionType is passed in, will create a struct array of that type</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>table</strong> – spectrum table</p></li>
-<li><p><strong>structarray_type</strong> – the type of the array returned, e.g. SpectrumArrowType()</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>StructArray</p>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="masskit.data_specs.schemas.table_add_structarray">
-<span class="sig-prename descclassname"><span class="pre">masskit.data_specs.schemas.</span></span><span class="sig-name descname"><span class="pre">table_add_structarray</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">structarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">column_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.data_specs.schemas.table_add_structarray" title="Permalink to this definition">¶</a></dt>
-<dd><p>add a struct array to a table</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>table</strong> – table to be added to</p></li>
-<li><p><strong>structarray</strong> – structarray to add to table</p></li>
-<li><p><strong>column_name</strong> – name of column to add</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>new table with appended column</p>
 </dd>
 </dl>
 </dd></dl>
@@ -709,10 +674,119 @@ if an ExtensionType is passed in, will create a struct array of that type</p>
     <ul>
 <li><a class="reference internal" href="#">masskit.data_specs package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-masskit.data_specs.arrow_types">masskit.data_specs.arrow_types module</a></li>
+<li><a class="reference internal" href="#module-masskit.data_specs.arrow_types">masskit.data_specs.arrow_types module</a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.JSONArrowArray"><code class="docutils literal notranslate"><span class="pre">JSONArrowArray</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.JSONArrowScalarType"><code class="docutils literal notranslate"><span class="pre">JSONArrowScalarType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.JSONArrowScalarType.as_py"><code class="docutils literal notranslate"><span class="pre">JSONArrowScalarType.as_py()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.JSONArrowType"><code class="docutils literal notranslate"><span class="pre">JSONArrowType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.JSONArrowType.to_pandas_dtype"><code class="docutils literal notranslate"><span class="pre">JSONArrowType.to_pandas_dtype()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitArrowArray"><code class="docutils literal notranslate"><span class="pre">MasskitArrowArray</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitArrowArray.to_numpy"><code class="docutils literal notranslate"><span class="pre">MasskitArrowArray.to_numpy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitArrowArray.to_pylist"><code class="docutils literal notranslate"><span class="pre">MasskitArrowArray.to_pylist()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.copy"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.copy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.dtype"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.dtype</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.isna"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.isna()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.nbytes"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.nbytes()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.take"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.take()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.to_mgf"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.to_mgf()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.to_msp"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.to_msp()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasArray.to_mzxml"><code class="docutils literal notranslate"><span class="pre">MasskitPandasArray.to_mzxml()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype"><code class="docutils literal notranslate"><span class="pre">MasskitPandasDtype</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.construct_array_type"><code class="docutils literal notranslate"><span class="pre">MasskitPandasDtype.construct_array_type()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.na_value"><code class="docutils literal notranslate"><span class="pre">MasskitPandasDtype.na_value</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.name"><code class="docutils literal notranslate"><span class="pre">MasskitPandasDtype.name</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MasskitPandasDtype.type"><code class="docutils literal notranslate"><span class="pre">MasskitPandasDtype.type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolArrowArray"><code class="docutils literal notranslate"><span class="pre">MolArrowArray</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolArrowScalarType"><code class="docutils literal notranslate"><span class="pre">MolArrowScalarType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolArrowScalarType.as_py"><code class="docutils literal notranslate"><span class="pre">MolArrowScalarType.as_py()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolArrowType"><code class="docutils literal notranslate"><span class="pre">MolArrowType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolArrowType.to_pandas_dtype"><code class="docutils literal notranslate"><span class="pre">MolArrowType.to_pandas_dtype()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolPandasArray"><code class="docutils literal notranslate"><span class="pre">MolPandasArray</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolPandasArray.dtype"><code class="docutils literal notranslate"><span class="pre">MolPandasArray.dtype</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolPandasDtype"><code class="docutils literal notranslate"><span class="pre">MolPandasDtype</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolPandasDtype.construct_array_type"><code class="docutils literal notranslate"><span class="pre">MolPandasDtype.construct_array_type()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolPandasDtype.na_value"><code class="docutils literal notranslate"><span class="pre">MolPandasDtype.na_value</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.MolPandasDtype.name"><code class="docutils literal notranslate"><span class="pre">MolPandasDtype.name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathArrowType"><code class="docutils literal notranslate"><span class="pre">PathArrowType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathArrowType.to_pandas_dtype"><code class="docutils literal notranslate"><span class="pre">PathArrowType.to_pandas_dtype()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasArray"><code class="docutils literal notranslate"><span class="pre">PathPandasArray</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasArray.dtype"><code class="docutils literal notranslate"><span class="pre">PathPandasArray.dtype</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasDtype"><code class="docutils literal notranslate"><span class="pre">PathPandasDtype</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasDtype.construct_array_type"><code class="docutils literal notranslate"><span class="pre">PathPandasDtype.construct_array_type()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasDtype.na_value"><code class="docutils literal notranslate"><span class="pre">PathPandasDtype.na_value</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasDtype.name"><code class="docutils literal notranslate"><span class="pre">PathPandasDtype.name</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.PathPandasDtype.type"><code class="docutils literal notranslate"><span class="pre">PathPandasDtype.type</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumArrowArray"><code class="docutils literal notranslate"><span class="pre">SpectrumArrowArray</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumArrowScalarType"><code class="docutils literal notranslate"><span class="pre">SpectrumArrowScalarType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumArrowScalarType.as_py"><code class="docutils literal notranslate"><span class="pre">SpectrumArrowScalarType.as_py()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumArrowType"><code class="docutils literal notranslate"><span class="pre">SpectrumArrowType</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumArrowType.to_pandas_dtype"><code class="docutils literal notranslate"><span class="pre">SpectrumArrowType.to_pandas_dtype()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasArray"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasArray</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasArray.dtype"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasArray.dtype</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasDtype</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.construct_array_type"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasDtype.construct_array_type()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.na_value"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasDtype.na_value</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.name"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasDtype.name</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.arrow_types.SpectrumPandasDtype.type"><code class="docutils literal notranslate"><span class="pre">SpectrumPandasDtype.type</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-masskit.data_specs.file_schemas">masskit.data_specs.file_schemas module</a></li>
-<li><a class="reference internal" href="#module-masskit.data_specs.schemas">masskit.data_specs.schemas module</a></li>
-<li><a class="reference internal" href="#module-masskit.data_specs.spectral_library">masskit.data_specs.spectral_library module</a></li>
+<li><a class="reference internal" href="#module-masskit.data_specs.schemas">masskit.data_specs.schemas module</a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.compose_fields"><code class="docutils literal notranslate"><span class="pre">compose_fields()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.create_array"><code class="docutils literal notranslate"><span class="pre">create_array()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.create_getter"><code class="docutils literal notranslate"><span class="pre">create_getter()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.create_scalar"><code class="docutils literal notranslate"><span class="pre">create_scalar()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.create_setter"><code class="docutils literal notranslate"><span class="pre">create_setter()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.get_field_int_metadata"><code class="docutils literal notranslate"><span class="pre">get_field_int_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.massinfo2struct"><code class="docutils literal notranslate"><span class="pre">massinfo2struct()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.name_to_type"><code class="docutils literal notranslate"><span class="pre">name_to_type()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.populate_properties"><code class="docutils literal notranslate"><span class="pre">populate_properties()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.set_field_int_metadata"><code class="docutils literal notranslate"><span class="pre">set_field_int_metadata()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.schemas.subtract_fields"><code class="docutils literal notranslate"><span class="pre">subtract_fields()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.data_specs.spectral_library">masskit.data_specs.spectral_library module</a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.spectral_library.LibraryAccessor"><code class="docutils literal notranslate"><span class="pre">LibraryAccessor</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.data_specs.spectral_library.LibraryAccessor.copy"><code class="docutils literal notranslate"><span class="pre">LibraryAccessor.copy()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.data_specs.spectral_library.LibraryAccessor.display"><code class="docutils literal notranslate"><span class="pre">LibraryAccessor.display()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.data_specs.spectral_library.display_masskit_df"><code class="docutils literal notranslate"><span class="pre">display_masskit_df()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-masskit.data_specs">Module contents</a></li>
 </ul>
 </li>
@@ -749,7 +823,7 @@ if an ExtensionType is passed in, will create a struct array of that type</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.data_specs package</a></li> 
       </ul>
     </div>

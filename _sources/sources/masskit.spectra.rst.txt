@@ -1,0 +1,53 @@
+masskit.spectra package
+=======================
+
+Submodules
+----------
+
+masskit.spectra.ions module
+---------------------------
+
+.. automodule:: masskit.spectra.ions
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.spectra.ipython module
+------------------------------
+
+.. automodule:: masskit.spectra.ipython
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.spectra.join module
+---------------------------
+
+.. automodule:: masskit.spectra.join
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.spectra.spectrum\_plotting module
+-----------------------------------------
+
+.. automodule:: masskit.spectra.spectrum_plotting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+masskit.spectra.theoretical\_spectrum module
+--------------------------------------------
+
+.. automodule:: masskit.spectra.theoretical_spectrum
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+Module contents
+---------------
+
+.. automodule:: masskit.spectra
+   :members:
+   :undoc-members:
+   :show-inheritance:

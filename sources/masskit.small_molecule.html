@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>masskit.small_molecule package &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>masskit.small_molecule package &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.small_molecule package</a></li> 
       </ul>
     </div>  
@@ -80,13 +81,13 @@ $(document).ready(function(){
 <p>class for doing several reactions on molecules with multiple steps</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.apply_reactions">
-<span class="sig-name descname"><span class="pre">apply_reactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxProducts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.apply_reactions" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">apply_reactions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_products</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.apply_reactions" title="Permalink to this definition">¶</a></dt>
 <dd><p>apply a series of reactions to a list of molecules</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>molecules</strong> – list of rdkit Mol</p></li>
-<li><p><strong>maxProducts</strong> – maximum number of products per reaction</p></li>
+<li><p><strong>max_products</strong> – maximum number of products per reaction</p></li>
 <li><p><strong>mass_range</strong> – tuple containing low and high value of allowed mass of product</p></li>
 </ul>
 </dd>
@@ -123,15 +124,15 @@ $(document).ready(function(){
 
 <dl class="py method">
 <dt class="sig sig-object py" id="masskit.small_molecule.react.Reactor.react">
-<span class="sig-name descname"><span class="pre">react</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reactant_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_group_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">maxProducts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_original_molecules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tautomers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.react" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">react</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">molecules</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reactant_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">functional_group_names</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_products</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_passes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_original_molecules</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_tautomers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mass_range</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.react.Reactor.react" title="Permalink to this definition">¶</a></dt>
 <dd><p>Given a list of molecules, react them using the named reactions</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>molecules</strong> – standardized molecule or list of molecules to be reacted</p></li>
-<li><p><strong>reactant_names</strong> – list of names of replacement groups added in the reaction.  [] means all</p></li>
-<li><p><strong>functional_group_names</strong> – list of names of the functional groups where reactions take place. [] means all</p></li>
-<li><p><strong>maxProducts</strong> – maximum number of products per reaction and overall.  an approximate bound</p></li>
+<li><p><strong>reactant_names</strong> – list of names of replacement groups added in the reaction.  None or [None] means all</p></li>
+<li><p><strong>functional_group_names</strong> – list of names of the functional groups where reactions take place. None or [None] means all</p></li>
+<li><p><strong>max_products</strong> – maximum number of products per reaction and overall.  an approximate bound</p></li>
 <li><p><strong>max_passes</strong> – iteratively apply the reactions to reaction products up to max_passes</p></li>
 <li><p><strong>include_original_molecules</strong> – add the original molecules to the returned products</p></li>
 <li><p><strong>num_tautomers</strong> – create up to this this number of tautomers from the input structures</p></li>
@@ -162,7 +163,7 @@ $(document).ready(function(){
 <span id="masskit-small-molecule-threed-module"></span><h2>masskit.small_molecule.threed module<a class="headerlink" href="#module-masskit.small_molecule.threed" title="Permalink to this heading">¶</a></h2>
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.small_molecule.threed.bounding_box">
-<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.threed.</span></span><span class="sig-name descname"><span class="pre">bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conformer_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-</span> <span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.threed.bounding_box" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">masskit.small_molecule.threed.</span></span><span class="sig-name descname"><span class="pre">bounding_box</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">conformer_id</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">-1</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.small_molecule.threed.bounding_box" title="Permalink to this definition">¶</a></dt>
 <dd><p>given a mol with a conformer, return the bounding box of the conformer</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -280,9 +281,31 @@ with dative bonds. The replacement is only done if the atom has “too many” b
     <ul>
 <li><a class="reference internal" href="#">masskit.small_molecule package</a><ul>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-masskit.small_molecule.react">masskit.small_molecule.react module</a></li>
-<li><a class="reference internal" href="#module-masskit.small_molecule.threed">masskit.small_molecule.threed module</a></li>
-<li><a class="reference internal" href="#module-masskit.small_molecule.utils">masskit.small_molecule.utils module</a></li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.react">masskit.small_molecule.react module</a><ul>
+<li><a class="reference internal" href="#masskit.small_molecule.react.Reactor"><code class="docutils literal notranslate"><span class="pre">Reactor</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.small_molecule.react.Reactor.apply_reactions"><code class="docutils literal notranslate"><span class="pre">Reactor.apply_reactions()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.react.Reactor.create_reactions"><code class="docutils literal notranslate"><span class="pre">Reactor.create_reactions()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.react.Reactor.functional_group_names"><code class="docutils literal notranslate"><span class="pre">Reactor.functional_group_names</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.react.Reactor.react"><code class="docutils literal notranslate"><span class="pre">Reactor.react()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.react.Reactor.reactant_names"><code class="docutils literal notranslate"><span class="pre">Reactor.reactant_names</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.threed">masskit.small_molecule.threed module</a><ul>
+<li><a class="reference internal" href="#masskit.small_molecule.threed.bounding_box"><code class="docutils literal notranslate"><span class="pre">bounding_box()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.threed.create_conformer"><code class="docutils literal notranslate"><span class="pre">create_conformer()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.small_molecule.utils">masskit.small_molecule.utils module</a><ul>
+<li><a class="reference internal" href="#masskit.small_molecule.utils.AdjustAromaticNs"><code class="docutils literal notranslate"><span class="pre">AdjustAromaticNs()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.utils.get_unspec_double_bonds"><code class="docutils literal notranslate"><span class="pre">get_unspec_double_bonds()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.utils.is_transition_metal"><code class="docutils literal notranslate"><span class="pre">is_transition_metal()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.utils.set_dative_bonds"><code class="docutils literal notranslate"><span class="pre">set_dative_bonds()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.utils.standardize_mol"><code class="docutils literal notranslate"><span class="pre">standardize_mol()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.small_molecule.utils.yang_polarizability"><code class="docutils literal notranslate"><span class="pre">yang_polarizability()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-masskit.small_molecule">Module contents</a></li>
 </ul>
 </li>
@@ -319,7 +342,7 @@ with dative bonds. The replacement is only done if the atom has “too many” b
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.small_molecule package</a></li> 
       </ul>
     </div>

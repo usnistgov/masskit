@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>Use of the spectrum object &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>Use of the spectrum object &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/nature.css" />
     <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="_static/underscore.js"></script>
     <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
@@ -66,7 +67,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="index.html" title="Welcome to masskit’s documentation!"
              accesskey="P">previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Use of the spectrum object</a></li> 
       </ul>
     </div>  
@@ -286,11 +287,12 @@ div.nboutput.container div.output_area > div[class^='highlight']{
 }
 
 /* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
-.prompt a.copybtn {
+.prompt .copybtn {
     display: none;
 }
 
 /* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
 div.rendered_html table {
   border: none;
   border-collapse: collapse;
@@ -299,10 +301,14 @@ div.rendered_html table {
   font-size: 12px;
   table-layout: fixed;
 }
+.jp-RenderedHTMLCommon thead,
 div.rendered_html thead {
   border-bottom: 1px solid black;
   vertical-align: bottom;
 }
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
 div.rendered_html tr,
 div.rendered_html th,
 div.rendered_html td {
@@ -314,12 +320,15 @@ div.rendered_html td {
   max-width: none;
   border: none;
 }
+.jp-RenderedHTMLCommon th,
 div.rendered_html th {
   font-weight: bold;
 }
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
 div.rendered_html tbody tr:nth-child(odd) {
   background: #f5f5f5;
 }
+.jp-RenderedHTMLCommon tbody tr:hover,
 div.rendered_html tbody tr:hover {
   background: rgba(66, 165, 245, 0.2);
 }
@@ -328,8 +337,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="o">%</span><span class="k">matplotlib</span> inline
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">matplotlib</span> inline
 <span class="kn">import</span> <span class="nn">matplotlib</span>
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">from</span> <span class="nn">masskit.utils.tablemap</span> <span class="kn">import</span> <span class="n">ArrowLibraryMap</span>
@@ -344,8 +352,7 @@ div.rendered_html tbody tr:hover {
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">table</span> <span class="o">=</span> <span class="n">ArrowLibraryMap</span><span class="o">.</span><span class="n">from_parquet</span><span class="p">(</span><span class="n">cho_uniq_short_parquet</span><span class="p">())</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">table</span> <span class="o">=</span> <span class="n">ArrowLibraryMap</span><span class="o">.</span><span class="n">from_parquet</span><span class="p">(</span><span class="n">cho_uniq_short_parquet</span><span class="p">())</span>
 <span class="n">spectrum1</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span>
 <span class="n">spectrum2</span> <span class="o">=</span> <span class="n">table</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;spectrum&#39;</span><span class="p">]</span>
 <span class="n">spectrum1</span>
@@ -374,8 +381,7 @@ INFO:root:created chunk 1 with 0 records
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The precursor m/z of spectrum 1 is&#39;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">precursor</span><span class="o">.</span><span class="n">mz</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;The precursor m/z of spectrum 1 is&#39;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">precursor</span><span class="o">.</span><span class="n">mz</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The first five product ion m/z&#39;s of spectrum 1 are&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mz</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The first five product ion intensities&#39;s of spectrum 1 are&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mz</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 </pre></div>
@@ -399,8 +405,7 @@ The first five product ion intensities&#39;s of spectrum 1 are [143.0823 153.257
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The name of the spectrum is&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;and the collision energy is&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">ev</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The name of the spectrum is&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;and the collision energy is&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">ev</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -415,16 +420,14 @@ The name of the spectrum is AAAACALTPGPLADLAAR/2_1(4,C,CAM) and the collision en
 </section>
 <section id="Spectrum-mass-tolerance-information">
 <h2>Spectrum mass tolerance information<a class="headerlink" href="#Spectrum-mass-tolerance-information" title="Permalink to this heading">¶</a></h2>
-<p>The spectrum object supports mass tolerances measured in both ppm’s and Daltons. Mass tolerance information is kept in objects of class <code class="docutils literal notranslate"><span class="pre">`MassInfo</span></code> &lt;../masskit.spectrum.html#masskit.spectrum.spectrum.MassInfo&gt;`__, and is applied to ions by using the <code class="docutils literal notranslate"><span class="pre">starts</span></code> and <code class="docutils literal notranslate"><span class="pre">stops</span></code> arrays of <code class="docutils literal notranslate"><span class="pre">Spectrum</span></code> that show the minimum and maximum mz values for each ion. Optinally, these <code class="docutils literal notranslate"><span class="pre">starts</span></code> and <code class="docutils literal notranslate"><span class="pre">stops</span></code> array values can be set individually for each ion to allow for nonstandard mass tolerances. The are
-also used to perform quick interval arithmetic when matching spectra.</p>
+<p>The spectrum object supports mass tolerances measured in both ppm’s and Daltons. Mass tolerance information is kept in objects of class <code class="docutils literal notranslate"><span class="pre">`MassInfo</span></code> &lt;../masskit.spectrum.html#masskit.spectrum.spectrum.MassInfo&gt;`__, and is applied to ions by using the <code class="docutils literal notranslate"><span class="pre">tolerance</span></code> array of <code class="docutils literal notranslate"><span class="pre">Spectrum</span></code> that show the mz tolerance for each ion. Optionally, the <code class="docutils literal notranslate"><span class="pre">tolerance</span></code> array values can be set individually for each ion to allow for nonstandard mass tolerances. The arrya is also used to perform quick interval
+arithmetic when matching spectra.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="nb">print</span><span class="p">(</span><span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mass_info</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mass_info</span><span class="o">.</span><span class="n">tolerance_type</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;minimum mz values&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">starts</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;maximum mz values&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">stops</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mass_info</span><span class="o">.</span><span class="n">tolerance</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">mass_info</span><span class="o">.</span><span class="n">tolerance_type</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;minimum mz values&quot;</span><span class="p">,</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">tolerance</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">5</span><span class="p">])</span>
 </pre></div>
 </div>
 </div>
@@ -446,8 +449,7 @@ maximum mz values [143.08516165 153.26056515 159.09488183 162.60095195 169.10058
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">spectrum1b</span> <span class="o">=</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_intensity</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum1b</span> <span class="o">=</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_intensity</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
 <span class="n">spectrum1</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">axes</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">gca</span><span class="p">(),</span> <span class="n">mirror_spectrum</span><span class="o">=</span><span class="n">spectrum1b</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -478,8 +480,7 @@ maximum mz values [143.08516165 153.26056515 159.09488183 162.60095195 169.10058
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">spectrum1</span><span class="o">.</span><span class="n">cosine_score</span><span class="p">(</span><span class="n">spectrum2</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum1</span><span class="o">.</span><span class="n">cosine_score</span><span class="p">(</span><span class="n">spectrum2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -499,8 +500,7 @@ maximum mz values [143.08516165 153.26056515 159.09488183 162.60095195 169.10058
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">spectrum1</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_mz</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_mz</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">cosine_score</span><span class="p">(</span><span class="n">spectrum2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_mz</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_mz</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum1</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_mz</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_mz</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span><span class="o">.</span><span class="n">cosine_score</span><span class="p">(</span><span class="n">spectrum2</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">min_mz</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span> <span class="n">max_mz</span><span class="o">=</span><span class="mi">1000</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -520,8 +520,7 @@ maximum mz values [143.08516165 153.26056515 159.09488183 162.60095195 169.10058
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">spectrum3</span> <span class="o">=</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">max_mz</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum3</span> <span class="o">=</span> <span class="n">spectrum1</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">max_mz</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
 <span class="n">spectrum3</span>
 </pre></div>
 </div>
@@ -539,8 +538,7 @@ maximum mz values [143.08516165 153.26056515 159.09488183 162.60095195 169.10058
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
-<span></span><span class="n">spectrum3</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">spectrum2</span><span class="p">)</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">spectrum3</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">spectrum2</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -630,7 +628,7 @@ maximum mz values [143.08516165 153.26056515 159.09488183 162.60095195 169.10058
         <li class="right" >
           <a href="index.html" title="Welcome to masskit’s documentation!"
              >previous</a> |</li>
-        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">Use of the spectrum object</a></li> 
       </ul>
     </div>

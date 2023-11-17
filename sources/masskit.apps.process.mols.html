@@ -4,9 +4,9 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
-    <title>masskit.apps.process.mols package &#8212; masskit 1.1.0-8-g811254f documentation</title>
+    <title>masskit.apps.process.mols package &#8212; masskit 1.2.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/nature.css" />
     <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
@@ -14,6 +14,7 @@
     <script src="../_static/underscore.js"></script>
     <script src="../_static/_sphinx_javascript_frameworks_compat.js"></script>
     <script src="../_static/doctools.js"></script>
+    <script src="../_static/sphinx_highlight.js"></script>
     <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -56,7 +57,7 @@ $(document).ready(function(){
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.apps.process.mols package</a></li> 
       </ul>
     </div>  
@@ -73,6 +74,14 @@ $(document).ready(function(){
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="masskit.apps.process.mols.conf.html">masskit.apps.process.mols.conf package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.conf.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="masskit.apps.process.mols.conf.hydra.html">masskit.apps.process.mols.conf.hydra package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.mols.conf.hydra.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="masskit.apps.process.mols.conf.hydra.html#module-masskit.apps.process.mols.conf.hydra">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="masskit.apps.process.mols.conf.html#module-masskit.apps.process.mols.conf">Module contents</a></li>
 </ul>
 </li>
@@ -82,8 +91,40 @@ $(document).ready(function(){
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this heading">¶</a></h2>
 </section>
+<section id="module-masskit.apps.process.mols.reactor">
+<span id="masskit-apps-process-mols-reactor-module"></span><h2>masskit.apps.process.mols.reactor module<a class="headerlink" href="#module-masskit.apps.process.mols.reactor" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.reactor.reactor_app">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.reactor.</span></span><span class="sig-name descname"><span class="pre">reactor_app</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">omegaconf.DictConfig</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#masskit.apps.process.mols.reactor.reactor_app" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</section>
 <section id="module-masskit.apps.process.mols.shortest_path">
 <span id="masskit-apps-process-mols-shortest-path-module"></span><h2>masskit.apps.process.mols.shortest_path module<a class="headerlink" href="#module-masskit.apps.process.mols.shortest_path" title="Permalink to this heading">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.BatchWriter">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">BatchWriter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output_file</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.BatchWriter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Doesn’t admit well to being a context manager as the file can’t be
+opened until write_table() is called as the file open functions
+require a table schema</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.BatchWriter.close">
+<span class="sig-name descname"><span class="pre">close</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.BatchWriter.close" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.BatchWriter.write_table">
+<span class="sig-name descname"><span class="pre">write_table</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">table</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.BatchWriter.write_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.batch_reader">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">batch_reader</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">row_batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5000</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.batch_reader" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.get_ring_paths">
 <span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">get_ring_paths</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">rd_mol</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.get_ring_paths" title="Permalink to this definition">¶</a></dt>
@@ -103,6 +144,11 @@ the ring information for atoms inside rings.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.mol2path">
+<span class="sig-prename descclassname"><span class="pre">masskit.apps.process.mols.shortest_path.</span></span><span class="sig-name descname"><span class="pre">mol2path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mol</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_path_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#masskit.apps.process.mols.shortest_path.mol2path" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="masskit.apps.process.mols.shortest_path.ordered_pair">
@@ -133,7 +179,24 @@ the ring information for atoms inside rings.</p>
 <li><a class="reference internal" href="#">masskit.apps.process.mols package</a><ul>
 <li><a class="reference internal" href="#subpackages">Subpackages</a></li>
 <li><a class="reference internal" href="#submodules">Submodules</a></li>
-<li><a class="reference internal" href="#module-masskit.apps.process.mols.shortest_path">masskit.apps.process.mols.shortest_path module</a></li>
+<li><a class="reference internal" href="#module-masskit.apps.process.mols.reactor">masskit.apps.process.mols.reactor module</a><ul>
+<li><a class="reference internal" href="#masskit.apps.process.mols.reactor.reactor_app"><code class="docutils literal notranslate"><span class="pre">reactor_app()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#module-masskit.apps.process.mols.shortest_path">masskit.apps.process.mols.shortest_path module</a><ul>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.BatchWriter"><code class="docutils literal notranslate"><span class="pre">BatchWriter</span></code></a><ul>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.BatchWriter.close"><code class="docutils literal notranslate"><span class="pre">BatchWriter.close()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.BatchWriter.write_table"><code class="docutils literal notranslate"><span class="pre">BatchWriter.write_table()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.batch_reader"><code class="docutils literal notranslate"><span class="pre">batch_reader()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.get_ring_paths"><code class="docutils literal notranslate"><span class="pre">get_ring_paths()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.get_shortest_paths"><code class="docutils literal notranslate"><span class="pre">get_shortest_paths()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.mol2path"><code class="docutils literal notranslate"><span class="pre">mol2path()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.ordered_pair"><code class="docutils literal notranslate"><span class="pre">ordered_pair()</span></code></a></li>
+<li><a class="reference internal" href="#masskit.apps.process.mols.shortest_path.path_generator_app"><code class="docutils literal notranslate"><span class="pre">path_generator_app()</span></code></a></li>
+</ul>
+</li>
 <li><a class="reference internal" href="#module-masskit.apps.process.mols">Module contents</a></li>
 </ul>
 </li>
@@ -170,7 +233,7 @@ the ring information for atoms inside rings.</p>
         <li class="right" >
           <a href="../py-modindex.html" title="Python Module Index"
              >modules</a> |</li>
-        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.1.0-8-g811254f documentation</a> &#187;</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">masskit 1.2.0 documentation</a> &#187;</li>
         <li class="nav-item nav-item-this"><a href="">masskit.apps.process.mols package</a></li> 
       </ul>
     </div>

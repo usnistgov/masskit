@@ -1,0 +1,10 @@
+masskit.conf.conversion.mgf package
+===================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.conf.conversion.mgf
+   :members:
+   :undoc-members:
+   :show-inheritance:

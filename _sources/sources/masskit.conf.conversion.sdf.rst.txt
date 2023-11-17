@@ -1,0 +1,10 @@
+masskit.conf.conversion.sdf package
+===================================
+
+Module contents
+---------------
+
+.. automodule:: masskit.conf.conversion.sdf
+   :members:
+   :undoc-members:
+   :show-inheritance:

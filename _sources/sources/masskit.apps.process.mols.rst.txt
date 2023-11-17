@@ -12,6 +12,14 @@ Subpackages
 Submodules
 ----------
 
+masskit.apps.process.mols.reactor module
+----------------------------------------
+
+.. automodule:: masskit.apps.process.mols.reactor
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 masskit.apps.process.mols.shortest\_path module
 -----------------------------------------------
 
