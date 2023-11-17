@@ -1,31 +1,46 @@
-app_name: batch_converter
+app_name: reactor
 
 template: |-
-  ${hydra.help.app_name}: Streaming file converter with multiprocessing.
-  Takes a variety of inputs, including msp, sdf, mgf, csv, parquet and arrow 
-  formatted files and converts them in batches to msp, mgf, arrow, and parquet 
-  formatted files.
+  ${hydra.help.app_name}: Takes as input a parquet file containing molecules
+  and generates derivatives of the molecules and their tautomers.
 
   Examples:
-  
+
   `${hydra.help.app_name} input.file.names=mysdf.sdf output.file.name=output.msp`
 
   `${hydra.help.app_name} input.file.names=mysdf.msp output.file.name=output
     output.file.types=[parquet,msp] conversion/msp=msp_peptide`
 
-  Various settings for file formats:
-  conversion/arrow=arrow_mol
-  conversion/arrow=arrow_peptide
-  conversion/csv=csv_mol
-  conversion/mgf=mgf_peptide
-  conversion/msp=msp_mol
-  conversion/msp=msp_peptide
-  conversion/parquet=parquet_mol
-  conversion/parquet=parquet_peptide
-  conversion/sdf=sdf_mol
-  conversion/sdf=sdf_nist_mol
-  conversion/sdf=sdf_pubchem_mol
+  Common command line options:
 
+  input.file.name
+  name of the parquet file to input
+
+  output.file.name
+  name of the parquet file to output
+
+  
+
+  conversion.reactant_names=[methylation,acetylation,trifluoroacetylation,t-butyldimethylsilylation,trimethylsilylation]
+  the name of the derivativation reaction to use.  defaults to trimethylsilylation.
+
+  conversion.functional_group_names=[alcohol,carboxyl,amine,pyrrole,amide,thiol]
+  the functional groups that are derivatized. By default all are used
+
+  conversion.num_tautomers=0
+  the number of tautomers to generate per derivatized structure. 0 is the default
+
+  conversion.mass_range=[0,5000]
+  a mass range in Daltons the products of the derivativation are limited to. Unlimited by default
+
+  conversion.max_products=1000
+  the maximum number of derivatives generated per input molecule. 1000 by default
+
+  conversion.max_passes=100
+  the number of times the derivativation reaction is applied to a given product. 100 by default
+
+  conversion.include_original_molecules=True
+  should the original underivatized molecule be inclcuded in the output? True by default
 
   Different ways to configure ${hydra.help.app_name}:
 

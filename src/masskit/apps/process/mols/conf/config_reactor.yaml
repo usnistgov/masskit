@@ -2,6 +2,7 @@ defaults:
   - override hydra/hydra_logging: none
    # should hydra configure python logging?
   - override hydra/job_logging: none
+  - override hydra/help: reactor_help
   - _self_
 
 input:

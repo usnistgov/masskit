@@ -6,7 +6,7 @@
 
 To generate a library of peptides, which is typically the first step in generating a peptide
 spectral library, use the program `fasta2peptides`. This program takes protein sequences
-in fasta format and generates a peptide library in parquet format. The default configuration for this program can be see by running `fasta2peptides -h`.
+in fasta format and generates a peptide library in parquet format.
 
 * to change the name of the input file, specify `input.file=myfilename.fasta` on the
 command line.
@@ -23,6 +23,8 @@ the command line.
   the peptide generated.
   * `peptide.nce=[30]` is a list of NCE values to generate per peptide
   * `peptide.use_basic_limit=True` limits the max charge of a peptide to the number of basic residues
+
+To get additional help on options for this program, run the program using the `-h` option.
 
 #### An example command line to convert `uniprot.fasta` to `uniprot_peptides.parquet`
 
@@ -52,6 +54,8 @@ command line of the format:
 ```bash
 batch_converter input.file.names=my_sdf.sdf output.file.name=my_sdf output.file.types=[parquet]
 ```
+
+To get additional help on options for this program, run the program using the `-h` option.
 
 #### SDF files with incorrect encoding or pre-v2000 format
 
@@ -83,6 +87,8 @@ Options for csv parsing:
 * the default SMILES column name is `SMILES` if there is a header and `f0` if not. To change the column name, set `conversion.csv.smiles_column_name`
 * use `conversion.csv.delimiter`, set to the column delimiter.  Tab delimited is `conversion.csv.delimiter="\t"`
 * the default rdkit Mol column name is "mol". To change this, use `conversion.csv.mol_column_name`
+
+To get additional help on options for this program, run the program using the `-h` option.
 
 #### Example of reading in a headerless tab delimited file with the SMILES in the second column
 

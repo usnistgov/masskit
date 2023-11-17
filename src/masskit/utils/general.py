@@ -14,6 +14,8 @@ import requests
 from urllib.parse import urlparse
 
 import numpy as np
+import pyarrow as pa
+import pyarrow.parquet as pq
 from hydra.core.config_search_path import ConfigSearchPath
 from hydra.plugins.search_path_plugin import SearchPathPlugin
 
@@ -130,6 +132,44 @@ def open_if_filename(fp, mode, newline=None):
         if not fp:
             raise ValueError(f"not able to open file")
     return fp
+
+
+def read_arrow(filename):
+    """
+    read a pyarrow Table from an arrow or parquet file.
+    arrow file is memory mapped.
+    
+    :param filename: file to input. use the suffix "arrow" if an arrow file, "parquet" if a parquet file
+    :return: pyarrow Table
+    """
+    input_file = Path(filename)
+    if input_file.suffix == '.parquet':
+        table = pq.read_table(input_file)
+    elif input_file.suffix == '.arrow':
+        with pa.memory_map(str(input_file), 'rb') as source:
+            table =  pa.ipc.open_file(source).read_all()
+    else:
+        raise ValueError(f"{filename} is an unsupported file format")
+    return table
+
+
+def write_arrow(table, filename, row_group_size=5000):
+    """
+    write a pyarrow Table to an arrow or parquet file.
+    
+    :param filename: file to output. use the suffix "arrow" if an arrow file, "parquet" if a parquet file
+    :param table: pyarrow Table
+    :param row_group_size: if a parquet file, use this row group size
+    """
+    output_file = Path(filename)
+    if output_file.suffix == '.parquet':
+        pq.write_table(table, str(output_file), row_group_size=row_group_size)
+    elif output_file.suffix == '.arrow':
+        with pa.OSFile(str(output_file), 'wb') as sink:
+            with pa.RecordBatchFileWriter(sink, table.schema) as writer:
+                writer.write_table(table)
+    else:
+        raise ValueError(f"{filename} is an unsupported file format")
 
 
 def discounted_cumulative_gain(relevance_array):

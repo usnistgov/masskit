@@ -11,6 +11,7 @@ import numpy as np
 from rdkit import Chem
 from masskit.data_specs.arrow_types import MolArrowType
 from masskit.small_molecule.react import Reactor
+from masskit.utils.general import read_arrow, write_arrow
 
 """
 takes a parquet file with rdkit mols in it and expands the file by doing reactions and tautomerization
@@ -28,7 +29,7 @@ def reactor_app(config: DictConfig) -> None:
     logging.getLogger().setLevel(logging.INFO)
 
     input_file = Path(config.input.file.name).expanduser()
-    table = pq.read_table(input_file)
+    table = read_arrow(input_file)
 
     # check that id field exists and is unique
     assert pa.compute.count_distinct(table['id']).as_py() == len(table)
@@ -74,7 +75,7 @@ def reactor_app(config: DictConfig) -> None:
 
     # output the files
     output_file = Path(config.output.file.name).expanduser()
-    pq.write_table(new_table, output_file)
+    write_arrow(new_table, output_file)
 
 if __name__ == "__main__":
     reactor_app()

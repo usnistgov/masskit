@@ -12,6 +12,7 @@ from omegaconf import DictConfig
 from rdkit import Chem
 
 from masskit.data_specs.arrow_types import PathArrowType
+from masskit.utils.general import read_arrow, write_arrow
 
 """
 takes a parquet file with rdkit mols in it and adds shortest path information
@@ -159,7 +160,7 @@ def path_generator_app(config: DictConfig) -> None:
 
     input_file = Path(config.input.file.name).expanduser()
 
-    table = pq.read_table(input_file)
+    table = read_arrow(input_file)
 
     shortest_paths = []
     mols = table['mol'].combine_chunks().to_numpy()
@@ -184,7 +185,8 @@ def path_generator_app(config: DictConfig) -> None:
     table = table.add_column(table.num_columns,"shortest_paths", new_arrays)
     # output the files
     output_file = Path(config.output.file.name).expanduser()
-    pq.write_table(table, output_file)
+    write_arrow(table, output_file)
+    
 """
 # batched addition of shortest_path.  Currently not implemented as ParquetFile.iter_batches()
 # cannot handle nested data conversions for chunked array outputs.  Will be fixed in a future

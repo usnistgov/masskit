@@ -5,11 +5,16 @@ template: |-
   files containing digested peptides decorated with modifications.
 
   Examples:
+
   `${hydra.help.app_name} input.file=uniprot.fasta 
     output.file=uniprot_peptides.parquet`
 
-  Applications can be configured two ways: by groups of configurations and
-  overriding individual configuration values. 
+  Different ways to configure ${hydra.help.app_name}:
+
+  Applications can be configured two ways: by using hierarchically
+  organized configuration files written in the YAML format and
+  overriding individual configuration values found in the YAML
+  formatted files on the command line. 
   
   To override individual configuration values, use 
   the name=value syntax on the command line, where name is the dot notation 
