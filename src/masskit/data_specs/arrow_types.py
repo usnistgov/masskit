@@ -1,4 +1,5 @@
 import numbers
+import pickle
 
 import jsonpickle
 import numpy as np
@@ -181,14 +182,14 @@ class SpectrumArrowScalarType(pa.ExtensionScalar):
             return mkspectra.Spectrum(struct=self.value)
 
     
-class SpectrumArrowType(pa.PyExtensionType):
+class SpectrumArrowType(pa.ExtensionType):
     """
     arrow type extension class for spectra
     parameterized by storage_type, which can be molecules_struct or peptide_struct
     """
 
     def __init__(self, storage_type=None):
-        pa.PyExtensionType.__init__(self, storage_type)
+        super().__init__(storage_type, "masskit.spectrum")
 
     def __reduce__(self):
         """
@@ -210,7 +211,18 @@ class SpectrumArrowType(pa.PyExtensionType):
         returns pandas extension dtype
         """
         return SpectrumPandasDtype()
+    
+    def __arrow_ext_serialize__(self):
+        return pickle.dumps(self)
 
+    @classmethod
+    def __arrow_ext_deserialize__(cls, storage_type, serialized):
+        ty = pickle.loads(serialized)
+
+        if ty.storage_type != storage_type:
+            raise TypeError("Expected storage type {0} but got {1}"
+                            .format(ty.storage_type, storage_type))
+        return ty
 
 class SpectrumArrowArray(MasskitArrowArray):
     """
@@ -255,13 +267,13 @@ class MolArrowScalarType(pa.ExtensionScalar):
             return mol
 
     
-class MolArrowType(pa.PyExtensionType):
+class MolArrowType(pa.ExtensionType):
     """
     arrow type extension class for Mols
     """
 
     def __init__(self):
-        pa.PyExtensionType.__init__(self, pa.string())
+        super().__init__(pa.string(), 'masskit.mol')
 
     def __reduce__(self):
         """
@@ -282,6 +294,18 @@ class MolArrowType(pa.PyExtensionType):
         returns pandas extension dtype
         """
         return MolPandasDtype()
+    
+    def __arrow_ext_serialize__(self):
+        return pickle.dumps(self)
+
+    @classmethod
+    def __arrow_ext_deserialize__(cls, storage_type, serialized):
+        ty = pickle.loads(serialized)
+
+        if ty.storage_type != storage_type:
+            raise TypeError("Expected storage type {0} but got {1}"
+                            .format(ty.storage_type, storage_type))
+        return ty
 
 
 class MolArrowArray(MasskitArrowArray):
@@ -327,13 +351,13 @@ class JSONArrowScalarType(pa.ExtensionScalar):
             return obj
 
     
-class JSONArrowType(pa.PyExtensionType):
+class JSONArrowType(pa.ExtensionType):
     """
     arrow type extension class for jsonpickled objects
     """
 
     def __init__(self):
-        pa.PyExtensionType.__init__(self, pa.string())
+        super().__init__(pa.string(), "masskit.json")
 
     def __reduce__(self):
         """
@@ -355,6 +379,17 @@ class JSONArrowType(pa.PyExtensionType):
         """
         raise NotImplementedError
 
+    def __arrow_ext_serialize__(self):
+        return pickle.dumps(self)
+
+    @classmethod
+    def __arrow_ext_deserialize__(cls, storage_type, serialized):
+        ty = pickle.loads(serialized)
+
+        if ty.storage_type != storage_type:
+            raise TypeError("Expected storage type {0} but got {1}"
+                            .format(ty.storage_type, storage_type))
+        return ty
 
 
 class JSONArrowArray(MasskitArrowArray):

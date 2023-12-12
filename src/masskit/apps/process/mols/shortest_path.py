@@ -158,15 +158,6 @@ def path_generator_app(config: DictConfig) -> None:
 
     logging.getLogger().setLevel(logging.INFO)
 
-    # Quick fix for the following error message:
-    #
-    #   RuntimeWarning: pickle-based deserialization of pyarrow.PyExtensionType subclasses is disabled by default; 
-    #   if you only ingest trusted data files, you may re-enable this using `pyarrow.PyExtensionType.set_auto_load(True)`.
-    #   In the future, Python-defined extension subclasses should derive from pyarrow.ExtensionType 
-    #   (not pyarrow.PyExtensionType) and implement their own serialization mechanism.
-    # TODO: needs to be fixed right
-    pa.PyExtensionType.set_auto_load(True)
-
     input_file = Path(config.input.file.name).expanduser()
 
     table = read_arrow(input_file)

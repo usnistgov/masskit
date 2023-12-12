@@ -65,7 +65,14 @@ def reactor_app(config: DictConfig) -> None:
 
     table = table.rename_columns([x if x != 'id' else 'orig_id' for x in table.column_names])
     # do a join with original table (delete mol before)
-    table = table.drop_columns('mol')
+    try:
+        table = table.drop_columns('mol')
+        # drop columns of type large list of uint8 until these are supported by Table.join()
+        table = table.drop_columns('spectrum_fp')
+        table = table.drop_columns('ecfp4')
+    except KeyError:
+        pass
+
     new_table = new_table.join(table, 'orig_id')
 
     # with Pool(config.get('num_workers', 8)) as p:

@@ -1,5 +1,4 @@
 import pyarrow as pa
-# from masskit.data_specs.arrow_types import MolArrowType, PathArrowType, SpectrumArrowType
 # from masskit.data_specs.schemas import *
 
 from ..data_specs import arrow_types as mkarrow_types

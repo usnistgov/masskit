@@ -5,10 +5,12 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 from hydra import compose, initialize
+import pandas as pd
 
+import masskit
 from ..apps.process.libraries.batch_converter import batch_converter_app
 from ..apps.process.libraries.fasta2peptides import fasta2peptides_app
-import pandas as pd
+
 
 """
 pytest fixtures
