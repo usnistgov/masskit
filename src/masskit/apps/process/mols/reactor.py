@@ -39,6 +39,7 @@ def reactor_app(config: DictConfig) -> None:
 
     # new products
     products = []
+    isomeric_smiles = []
     # original ids
     orig_id = []
 
@@ -56,22 +57,29 @@ def reactor_app(config: DictConfig) -> None:
                                     include_original_molecules=config.conversion.include_original_molecules,
                                     )
         products.extend([Chem.rdMolInterchange.MolToJSON(x) for x in new_products])
+        isomeric_smiles.extend([Chem.MolToSmiles(x) for x in new_products])
         orig_id.extend([ids[i]]*len(new_products))
     
     # create table using new mols and orig_id and new ids (which are just sequential)
     new_table = pa.Table.from_arrays([pa.array(np.arange(len(products)), type=pa.uint64()), 
                                       pa.array(orig_id, type=pa.uint64())], names=['id', 'orig_id'])
+    if 'mol' in new_table.column_names:
+        new_table = new_table.drop_columns('mol')
     new_table = new_table.append_column('mol', pa.array(products, type=MolArrowType()))
+    if 'isomeric_smiles' in new_table.column_names:
+        new_table = new_table.drop_columns('isomeric_smiles')
+    new_table = new_table.append_column('isomeric_smiles', pa.array(isomeric_smiles, type=pa.string()))
 
     table = table.rename_columns([x if x != 'id' else 'orig_id' for x in table.column_names])
     # do a join with original table (delete mol before)
-    try:
+    if 'mol' in table.column_names:
         table = table.drop_columns('mol')
         # drop columns of type large list of uint8 until these are supported by Table.join()
+    if 'spectrum_fp' in table.column_names:
         table = table.drop_columns('spectrum_fp')
+    if 'ecfp4' in table.column_names:
         table = table.drop_columns('ecfp4')
-    except KeyError:
-        pass
+
 
     new_table = new_table.join(table, 'orig_id')
 
