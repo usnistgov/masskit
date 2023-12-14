@@ -10,14 +10,15 @@ setup:masskit_env:
     - changes:
         - environments/*
   script:
-    - source environments/init_masskit.sh --force --suffix $CI_COMMIT_BRANCH
+    - '[ -z "$CI_COMMIT_BRANCH" ] && CONDA_SUFFIX=main || CONDA_SUFFIX=$CI_COMMIT_BRANCH'
+    - source environments/init_masskit.sh --force --suffix $CONDA_SUFFIX
     - echo "Dumping masskit conda environment..."
-    - conda env export --name masskit_${CI_COMMIT_BRANCH} > masskit_conda.yml
+    - conda env export --name masskit_${CONDA_SUFFIX} > masskit_conda.yml
     - conda deactivate
     - conda deactivate
-    - source environments/init_masskit.sh --force --cpu --suffix $CI_COMMIT_BRANCH
+    - source environments/init_masskit.sh --force --cpu --suffix $CONDA_SUFFIX
     - echo "Dumping masskit_ai_cpu conda environment..."
-    - conda env export --name masskit_ai_cpu_${CI_COMMIT_BRANCH} > masskit_ai_cpu_conda.yml
+    - conda env export --name masskit_ai_cpu_${CONDA_SUFFIX} > masskit_ai_cpu_conda.yml
   tags:
     - linux
     - masskit
@@ -29,7 +30,8 @@ setup:masskit_env:
 build:masskit:
   stage: build
   script:
-    - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
+    - '[ -z "$CI_COMMIT_BRANCH" ] && CONDA_SUFFIX=main || CONDA_SUFFIX=$CI_COMMIT_BRANCH'
+    - source environments/init_masskit.sh --suffix $CONDA_SUFFIX
     - VERBOSE=1 pip wheel --no-build-isolation .
   tags:
     - linux
@@ -42,7 +44,8 @@ test:masskit:
   stage: test
   needs: ["build:masskit"]
   script:
-    - source environments/init_masskit.sh --suffix $CI_COMMIT_BRANCH
+    - '[ -z "$CI_COMMIT_BRANCH" ] && CONDA_SUFFIX=main || CONDA_SUFFIX=$CI_COMMIT_BRANCH'
+    - source environments/init_masskit.sh --suffix $CONDA_SUFFIX
     - pip install --force-reinstall masskit*.whl
     - cd tests
     - pytest
